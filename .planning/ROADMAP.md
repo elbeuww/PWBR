@@ -31,7 +31,11 @@ Périmètre : MVP day/swing perso/démo. Les exigences v2 (scalping/temps réel,
   2. Toutes les tables ont une RLS active (vérifiable via `get_advisors`) ; les données de marché sont en lecture pour les authentifiés et la clé service_role n'apparaît jamais dans le bundle frontend (lint anti-import).
   3. La convention de bougie clôturée (exclut la bougie en cours), l'UTC et la convention daily cross-asset (OANDA 17:00 NY vs Binance 00:00 UTC) sont documentées et codées comme constantes partagées dans `core`.
   4. Le modèle d'exécution réel des Routines Claude est vérifié et documenté (cloud, quota ~15 runs/j Max, secrets via env de routine, MCP cloud-hosted) ; le fallback Windows Task Scheduler pour les étapes non-IA est posé et chaque exécution écrit une entrée `job_runs`.
-**Plans**: TBD
+**Plans**: 3 plans
+Plans:
+- [ ] 01-01-PLAN.md — Scaffold monorepo pnpm + infra de test + constantes temps `packages/core` (DATA-05)
+- [ ] 01-02-PLAN.md — Slice auth + RLS : signup→login→session→lecture instruments, isolation service_role (AUTH-01/02/03)
+- [ ] 01-03-PLAN.md — Runner de jobs agnostique écrivant `job_runs` + doc Routines Claude (JOB-03/04)
 **Research flag**: yes — vérifier la doc officielle des Routines Claude Code (dépendance externe la plus incertaine, confidence MEDIUM)
 
 ### Phase 2: Ingestion fiable des données
@@ -139,7 +143,7 @@ Périmètre : MVP day/swing perso/démo. Les exigences v2 (scalping/temps réel,
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Fondations & Sécurité | 0/0 | Not started | - |
+| 1. Fondations & Sécurité | 0/3 | Planned | - |
 | 2. Ingestion fiable des données | 0/0 | Not started | - |
 | 3. Moteur d'analyse déterministe | 0/0 | Not started | - |
 | 4. Moteur IA "vétéran" & scoring | 0/0 | Not started | - |
