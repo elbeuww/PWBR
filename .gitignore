@@ -1,0 +1,34 @@
+# Dépendances
+node_modules/
+
+# Next.js
+.next/
+out/
+
+# Build artifacts
+dist/
+
+# Secrets — NE JAMAIS commiter (voir .env.example pour le contrat)
+.env
+.env.local
+.env.*.local
+.env.production
+
+# Tests
+test-results/
+playwright-report/
+coverage/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# pnpm
+.pnpm-store/
+
+# TypeScript
+*.tsbuildinfo
