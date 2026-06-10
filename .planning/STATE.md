@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-last_updated: "2026-06-10T02:10:00.000Z"
+last_updated: "2026-06-10T14:59:37.165Z"
 progress:
   total_phases: 9
   completed_phases: 0
   total_plans: 3
   completed_plans: 1
-  percent: 3
+  percent: 33
 ---
 
 # Project State
@@ -27,9 +27,9 @@ progress:
 ## Current Position
 
 Phase: 01 (fondations-s-curit) — EXECUTING
-Plan: 2 of 3 (01-01 COMPLETE)
+Plan: 1 of 3
 **Phase:** 1 — Fondations & Sécurité
-**Plan:** 01-01 COMPLETE — proceeding to 01-02 (Auth + RLS)
+**Plan:** 01-02 IN PROGRESS — paused at checkpoint:human-action (credentials Supabase requis)
 **Status:** Executing Phase 01
 
 **Progress:** [          ] 0/9 phases complete (1/3 plans phase 01)
@@ -81,13 +81,13 @@ Phase 9  [ ] Backtest & calibration
 
 ### Blockers
 
-- None.
+- **01-02 checkpoint:human-action** : credentials Supabase requis pour push migration + GREEN tests. Action : remplir apps/web/.env.local + apps/jobs/.env + désactiver Confirm email Dashboard → taper "approved".
 
 ## Session Continuity
 
-**Next action:** Exécuter le plan `01-02` (Auth + RLS Supabase) — le workspace est prêt, l'infra de test est posée.
+**Next action:** Reprendre le plan `01-02` après remplissage des credentials Supabase (checkpoint:human-action). Signal : "approved". Puis pousser la migration et faire passer les tests RLS/E2E en GREEN (Task 4/5).
 
-**Notes pour la session suivante:** Plan 01-01 COMPLET. Les 3 verrous temporels (D-09/D-10/D-11) sont résolus. Prochain verrou critique = sécurité RLS/service_role (plan 01-02). La règle ESLint anti-service_role est déjà posée dans eslint.config.mjs — le plan 02 crée le module interdit et doit faire passer les tests RLS.
+**Notes pour la session suivante:** Plan 01-02 paused à checkpoint:human-action (Task 4). Tasks 1-3 commitées (a5841ee, e034d2e, 13106f9). Migration SQL prête mais non poussée. Tests RED (rls.test.ts + auth.spec.ts) en attente des credentials. Après "approved" de l'utilisateur : push migration, remplir .env.local + apps/jobs/.env, exécuter les tests, créer le fixture lint AUTH-03, marquer GREEN.
 
 ---
 *State initialized: 2026-06-09*
