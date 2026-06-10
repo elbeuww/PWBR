@@ -89,7 +89,7 @@ describe('RLS isolation cross-user (AUTH-02)', () => {
     if (userIdB) await deleteUser(userIdB)
   })
 
-  it('échoue si les variables d'environnement Supabase ne sont pas configurées', () => {
+  it("echoue si les variables d'environnement Supabase ne sont pas configurees", () => {
     // Cette assertion est volontairement RED tant que .env n'est pas rempli.
     // Elle documente explicitement l'état attendu : ces tests ne peuvent pas
     // passer sans les credentials Supabase (checkpoint human-action requis).
