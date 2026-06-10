@@ -8,5 +8,17 @@
     "build": "next build",
     "start": "next start"
   },
-  "dependencies": {}
+  "dependencies": {
+    "@app/supabase": "workspace:*",
+    "@supabase/ssr": "0.12.0",
+    "@supabase/supabase-js": "2.108.0",
+    "next": "15",
+    "react": "^19.2.7",
+    "react-dom": "^19.2.7",
+    "zod": "4.4.3"
+  },
+  "devDependencies": {
+    "@types/react": "^19.2.17",
+    "@types/react-dom": "^19.2.3"
+  }
 }
