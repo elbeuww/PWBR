@@ -12,7 +12,14 @@
  * Cleanup : supprime les lignes test via service_role après chaque cas.
  */
 
-import 'dotenv/config'
+import { config as dotenvConfig } from 'dotenv'
+import path from 'path'
+import { fileURLToPath } from 'url'
+
+// Charger apps/jobs/.env explicitement (CWD = racine monorepo lors de vitest run)
+const __dirname = path.dirname(fileURLToPath(import.meta.url))
+dotenvConfig({ path: path.resolve(__dirname, '../.env') })
+
 import { createClient } from '@supabase/supabase-js'
 import { afterEach, beforeAll, describe, expect, it } from 'vitest'
 import type { Database } from '@app/supabase'

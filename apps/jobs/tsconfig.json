@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "module": "Preserve",
+    "moduleResolution": "Bundler",
+    "baseUrl": ".",
+    "paths": {
+      "@app/supabase": ["../../packages/supabase/src/index.ts"],
+      "@app/supabase/*": ["../../packages/supabase/src/*"]
+    },
+    "noEmit": true
+  },
+  "include": ["src/**/*.ts", "__tests__/**/*.ts"],
+  "exclude": ["node_modules"]
+}
