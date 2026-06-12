@@ -2,14 +2,14 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: executing
+status: ready_to_plan
 last_updated: "2026-06-12T16:00:00.000Z"
 progress:
   total_phases: 9
-  completed_phases: 1
+  completed_phases: 2
   total_plans: 3
   completed_plans: 3
-  percent: 100
+  percent: 22
 ---
 
 # Project State
@@ -28,9 +28,9 @@ progress:
 
 Phase: 01 (fondations-s-curit) — COMPLETE
 Plan: 3 of 3
-**Phase:** 1 — Fondations & Sécurité
-**Plan:** 01-03 COMPLETE (2026-06-12) — JOB-03/JOB-04 GREEN. Phase 01 terminée.
-**Status:** Phase 01 complete — prêt pour Phase 02 (Ingestion fiable des données)
+**Phase:** 2
+**Plan:** Not started
+**Status:** Ready to plan
 
 **Progress:** [+         ] 1/9 phases complete (3/3 plans phase 01)
 
