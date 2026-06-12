@@ -9,7 +9,7 @@
  */
 
 import { createBrowserClient, createServerClient } from '@supabase/ssr'
-import type { Database } from './database.types.js'
+import type { Database } from './database.types'
 
 // ─── Browser client (Client Components) ─────────────────────────────────────
 

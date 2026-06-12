@@ -4,7 +4,7 @@
 import 'server-only'
 
 import { createClient } from '@supabase/supabase-js'
-import type { Database } from './database.types.js'
+import type { Database } from './database.types'
 
 /**
  * Client Supabase avec la clé service_role.

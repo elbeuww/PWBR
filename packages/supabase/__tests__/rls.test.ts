@@ -21,7 +21,7 @@
 
 import { createClient } from '@supabase/supabase-js'
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
-import type { Database } from '../src/database.types.js'
+import type { Database } from '../src/database.types'
 
 // ─── helpers ────────────────────────────────────────────────────────────────
 
@@ -55,13 +55,15 @@ async function deleteUser(userId: string) {
 // ─── tests ──────────────────────────────────────────────────────────────────
 
 describe('RLS isolation cross-user (AUTH-02)', () => {
+  // Supabase Auth rejette les domaines réservés (example.com) — utiliser un
+  // domaine réel ; aucun email n'est envoyé (Confirm email OFF, D-02) et les
+  // comptes sont supprimés en afterAll via service_role.
   const tsMillis = Date.now()
-  const emailA = `rls-test-a-${tsMillis}@example.com`
-  const emailB = `rls-test-b-${tsMillis}@example.com`
+  const emailA = `rls-test-a-${tsMillis}@gmail.com`
+  const emailB = `rls-test-b-${tsMillis}@gmail.com`
   const password = 'TestPassword123!'
 
   let clientA: ReturnType<typeof createClient<Database>>
-  let clientB: ReturnType<typeof createClient<Database>>
   let userIdA: string
   let userIdB: string
 
@@ -79,8 +81,8 @@ describe('RLS isolation cross-user (AUTH-02)', () => {
     clientA = resultA.client
     userIdA = resultA.userId
 
+    // user B : seul son userId est nécessaire (l'isolation se teste depuis clientA)
     const resultB = await signUpAndGetClient(emailB, password)
-    clientB = resultB.client
     userIdB = resultB.userId
   })
 

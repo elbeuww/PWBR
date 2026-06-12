@@ -1,51 +1,55 @@
 /**
  * E2E : auth signup → login → session persiste (AUTH-01)
  *
- * Ces tests sont RED tant que :
- *  - .env.local n'est pas rempli (NEXT_PUBLIC_SUPABASE_URL + ANON_KEY)
- *  - La migration 0001 n'est pas poussée sur le projet Supabase cloud
- *  - "Confirm email" n'est pas désactivé dans le Dashboard (D-02)
- *  - `next dev` n'est pas démarré (ou webServer Playwright configuré)
+ * Pré-requis GREEN :
+ *  - .env.local rempli (NEXT_PUBLIC_SUPABASE_URL + ANON_KEY)
+ *  - Migration 0001 poussée sur le projet Supabase cloud
+ *  - "Confirm email" désactivé dans le Dashboard (D-02)
+ *  - `next dev` démarré (ou webServer Playwright configuré)
  *
- * Ils deviendront GREEN en Task 4 après les checkpoints human-action + human-verify.
+ * Notes d'ajustement (Task 4 GREEN) :
+ *  - Supabase Auth rejette les domaines réservés (example.com) → @gmail.com ;
+ *    aucun email n'est envoyé (Confirm email OFF), comptes de test jetables.
+ *  - Chaque test utilise un email unique : un second signUp avec le même email
+ *    échoue ("User already registered") et casserait l'isolation des tests.
  *
  * Source : 01-PLAN.md §behavior Task 3
  */
 
-import { test, expect } from '@playwright/test'
+import { test, expect, type Page } from '@playwright/test'
 
 const tsMillis = Date.now()
-const TEST_EMAIL = `e2e-auth-${tsMillis}@example.com`
 const TEST_PASSWORD = 'TestPassword123!'
+
+function uniqueEmail(tag: string): string {
+  return `e2e-auth-${tag}-${tsMillis}@gmail.com`
+}
+
+async function signUp(page: Page, email: string): Promise<void> {
+  await page.goto('/signup')
+  await page.locator('input[name="email"]').fill(email)
+  await page.locator('input[name="password"]').fill(TEST_PASSWORD)
+  await page.locator('button[type="submit"]').click()
+  await expect(page).toHaveURL('/dashboard', { timeout: 10000 })
+}
 
 test.describe('AUTH-01 : signup → login → session persiste', () => {
   test('signup crée un compte et redirige vers /dashboard', async ({ page }) => {
-    await page.goto('/signup')
-
-    // Remplir le formulaire
-    await page.locator('input[name="email"]').fill(TEST_EMAIL)
-    await page.locator('input[name="password"]').fill(TEST_PASSWORD)
-    await page.locator('button[type="submit"]').click()
-
-    // Doit être redirigé vers /dashboard après signup
-    await expect(page).toHaveURL('/dashboard', { timeout: 10000 })
+    const email = uniqueEmail('signup')
+    await signUp(page, email)
 
     // Le dashboard doit afficher l'email de l'utilisateur
-    await expect(page.locator('p')).toContainText(TEST_EMAIL)
+    await expect(page.locator('p')).toContainText(email)
   })
 
   test('session persiste après rechargement de la page', async ({ page }) => {
-    // Signup d'abord
-    await page.goto('/signup')
-    await page.locator('input[name="email"]').fill(TEST_EMAIL)
-    await page.locator('input[name="password"]').fill(TEST_PASSWORD)
-    await page.locator('button[type="submit"]').click()
-    await expect(page).toHaveURL('/dashboard', { timeout: 10000 })
+    const email = uniqueEmail('reload')
+    await signUp(page, email)
 
     // Rechargement : la session doit persister (cookies httpOnly)
     await page.reload()
     await expect(page).toHaveURL('/dashboard')
-    await expect(page.locator('p')).toContainText(TEST_EMAIL)
+    await expect(page.locator('p')).toContainText(email)
   })
 
   test('visiteur non authentifié sur /dashboard est redirigé vers /login', async ({ page }) => {
@@ -54,24 +58,25 @@ test.describe('AUTH-01 : signup → login → session persiste', () => {
     await expect(page).toHaveURL('/login', { timeout: 5000 })
   })
 
-  test('/dashboard affiche au moins un instrument (seed)', async ({ page }) => {
-    // Login d'abord
+  test('login avec des credentials valides connecte et redirige', async ({ page, context }) => {
+    // Créer le compte, puis purger la session pour tester le login réel
+    const email = uniqueEmail('login')
+    await signUp(page, email)
+    await context.clearCookies()
+
     await page.goto('/login')
-    await page.locator('input[name="email"]').fill(TEST_EMAIL)
+    await page.locator('input[name="email"]').fill(email)
     await page.locator('input[name="password"]').fill(TEST_PASSWORD)
     await page.locator('button[type="submit"]').click()
     await expect(page).toHaveURL('/dashboard', { timeout: 10000 })
-
-    // La table instruments doit afficher au moins une ligne (seed)
-    const rows = page.locator('table tbody tr')
-    await expect(rows).toHaveCount(3, { timeout: 5000 }) // 3 seeds : XAU_USD, EUR_USD, BTCUSDT
   })
 
-  test('login avec des credentials valides connecte et redirige', async ({ page }) => {
-    await page.goto('/login')
-    await page.locator('input[name="email"]').fill(TEST_EMAIL)
-    await page.locator('input[name="password"]').fill(TEST_PASSWORD)
-    await page.locator('button[type="submit"]').click()
-    await expect(page).toHaveURL('/dashboard', { timeout: 10000 })
+  test('/dashboard affiche au moins un instrument (seed)', async ({ page }) => {
+    const email = uniqueEmail('seed')
+    await signUp(page, email)
+
+    // La table instruments doit afficher les 3 seeds : XAU_USD, EUR_USD, BTCUSDT
+    const rows = page.locator('table tbody tr')
+    await expect(rows).toHaveCount(3, { timeout: 5000 })
   })
 })

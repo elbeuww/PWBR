@@ -8,7 +8,7 @@
  */
 
 import type { SupabaseClient } from '@supabase/supabase-js'
-import type { Database, JobRunRow, JobRunStatus, Json } from '../database.types.js'
+import type { Database, JobRunRow, JobRunStatus, Json } from '../database.types'
 
 type ServiceClient = SupabaseClient<Database>
 

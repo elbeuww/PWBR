@@ -3,7 +3,12 @@
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
     "outDir": "./dist",
-    "rootDir": "."
+    "rootDir": ".",
+    // Package consommé en source (transpilePackages Next / tsx jobs / Vitest) :
+    // résolution bundler + imports relatifs SANS extension .js — Turbopack ne
+    // résout pas l'aliasing NodeNext .js→.ts dans les packages workspace.
+    "module": "Preserve",
+    "moduleResolution": "Bundler"
   },
   "include": ["src/**/*.ts", "__tests__/**/*.ts"],
   "exclude": ["node_modules", "dist"]

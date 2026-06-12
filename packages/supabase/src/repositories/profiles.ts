@@ -5,7 +5,7 @@
  */
 
 import type { SupabaseClient } from '@supabase/supabase-js'
-import type { Database, ProfileRow } from '../database.types.js'
+import type { Database, ProfileRow } from '../database.types'
 
 type Client = SupabaseClient<Database>
 
