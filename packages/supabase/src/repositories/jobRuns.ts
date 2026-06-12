@@ -17,9 +17,16 @@ type ServiceClient = SupabaseClient<Database>
  * Retourne l'ID de la ligne créée.
  */
 export async function startRun(client: ServiceClient, jobName: string): Promise<string> {
+  // started_at explicite (horloge locale) : finishRun écrit finished_at depuis
+  // la même horloge — le default now() Postgres peut dériver de plusieurs
+  // secondes vs le PC et produire finished_at < started_at (durées négatives)
   const { data, error } = await client
     .from('job_runs')
-    .insert({ job_name: jobName, status: 'running' as JobRunStatus })
+    .insert({
+      job_name: jobName,
+      status: 'running' as JobRunStatus,
+      started_at: new Date().toISOString(),
+    })
     .select('id')
     .single()
 

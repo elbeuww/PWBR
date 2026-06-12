@@ -87,6 +87,11 @@ describe('runJob — intégration job_runs (JOB-04)', () => {
     expect(row.error).toBeNull()
     expect(row.stats).toEqual(expectedStats)
     expect(row.job_name).toBe(testJobName)
+    // Invariant monitoring : les deux timestamps viennent de la même horloge
+    // (l'horloge locale du PC peut dériver vs now() Postgres → durées négatives)
+    expect(new Date(row.finished_at!).getTime()).toBeGreaterThanOrEqual(
+      new Date(row.started_at).getTime(),
+    )
   })
 
   it('écrit job_runs status=error avec message quand fn lève, et re-throw', async () => {
