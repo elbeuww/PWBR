@@ -3,19 +3,19 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-last_updated: "2026-06-12T15:30:00.000Z"
+last_updated: "2026-06-12T16:00:00.000Z"
 progress:
   total_phases: 9
-  completed_phases: 0
+  completed_phases: 1
   total_plans: 3
-  completed_plans: 2
-  percent: 67
+  completed_plans: 3
+  percent: 100
 ---
 
 # Project State
 
 **Project:** Plateforme d'Analyse de Trading "Vétéran"
-**Last updated:** 2026-06-09
+**Last updated:** 2026-06-12
 
 ## Project Reference
 
@@ -26,13 +26,13 @@ progress:
 
 ## Current Position
 
-Phase: 01 (fondations-s-curit) — EXECUTING
-Plan: 2 of 3
+Phase: 01 (fondations-s-curit) — COMPLETE
+Plan: 3 of 3
 **Phase:** 1 — Fondations & Sécurité
-**Plan:** 01-02 COMPLETE (2026-06-12) — AUTH-01/02/03 GREEN. Next : plan 01-03 (jobs)
-**Status:** Executing Phase 01
+**Plan:** 01-03 COMPLETE (2026-06-12) — JOB-03/JOB-04 GREEN. Phase 01 terminée.
+**Status:** Phase 01 complete — prêt pour Phase 02 (Ingestion fiable des données)
 
-**Progress:** [          ] 0/9 phases complete (2/3 plans phase 01)
+**Progress:** [+         ] 1/9 phases complete (3/3 plans phase 01)
 
 ```
 Phase 1  [ ] Fondations & Sécurité          ← next
@@ -73,10 +73,12 @@ Phase 9  [ ] Backtest & calibration
 - D-15 : % de réussite des patterns chartiques = mesuré par notre backtest (PATT-02), jamais affirmé sans données. Revue légale AMF/MiFID II obligatoire avant d'encaisser le premier abonnement.
 - D-16 (2026-06-12) : Turbopack obligatoire pour apps/web (`next dev/build --turbopack`) — webpack interdit le `!` du chemin projet. `turbopack.root` + `outputFileTracingRoot` fixés (package-lock.json parasite dans le HOME). `packages/supabase` en moduleResolution Bundler (imports relatifs sans `.js` — Turbopack ne résout pas l'aliasing NodeNext dans les packages workspace).
 - D-17 (2026-06-12) : MCP Supabase projet (`.mcp.json`, OAuth) opérationnel — migrations via `apply_migration`, types via `generate_typescript_types`, gate sécurité via `get_advisors` (0 alerte après migration 0002 revoke execute). Emails de test = `@gmail.com` uniques (Supabase Auth rejette example.com), cleanup via SQL service.
+- D-18 (2026-06-12) : Client service_role lazy dans runJob.ts (instancié à l'exécution, pas à l'import) — permet la compatibilité Vitest/dotenv sans modifier packages/supabase/service-client.ts. Mock server-only via __mocks__/ + alias vitest.config.ts.
+- D-19 (2026-06-12) : Aucune Routine Claude planifiée en Phase 1 — ingestion déterministe via Windows Task Scheduler (run-job.cmd). Routines Remote (cloud Anthropic, ~15 runs/j quota partagé Max) = Phase 4 uniquement (analyse IA).
 
 ### Open todos / risques à lever
 
-- **Phase 1 (research flag):** vérifier le modèle d'exécution réel des Routines Claude Code (cloud, quota ~15 runs/j Max, secrets, MCP cloud-hosted). Prévoir fallback Windows Task Scheduler pour INGEST+SNAPSHOT. Dépendance externe la plus incertaine.
+- ~~**Phase 1 (research flag):** vérifier le modèle d'exécution réel des Routines Claude Code~~ — RÉSOLU : documenté dans `docs/routines-claude.md` (D-19). Fallback .cmd implémenté.
 - **Phase 1:** verrouiller la convention daily cross-asset (OANDA 17:00 NY vs Binance 00:00 UTC) + convention de bougie clôturée (anti look-ahead).
 - **Phase 3 (research flag):** concevoir et tester la détection de structure de marché maison (HH/HL, BOS/CHoCH, swings, POC) — absente des libs.
 - **Phase 4 (research flag):** point à plus haut risque — robustesse prompt vétéran, taux de rejet Zod, méthode de scoring. À itérer.
@@ -91,11 +93,11 @@ Aucun.
 
 ## Session Continuity
 
-**Last session:** 2026-06-12 — plan 01-02 terminé (checkpoints levés via MCP Supabase, RLS 6/6, E2E 5/5, lint AUTH-03 OK, advisors 0 alerte).
+**Last session:** 2026-06-12 — plan 01-03 terminé (JOB-03/JOB-04 GREEN, 2 tests intégration job_runs, dispatcher tsx + wrapper .cmd, doc routines-claude.md). Phase 01 complète.
 
-**Next action:** Exécuter le plan `01-03` (jobs : runJob/job_runs via service_role + dispatcher Windows Task Scheduler) — `/gsd-execute-phase 1`.
+**Next action:** Démarrer la Phase 02 — Ingestion fiable des données (`/gsd-execute-phase 2`).
 
-**Notes pour la session suivante:** `apps/jobs/.env` est rempli (URL + service_role). Le MCP Supabase projet est connecté (ré-authentifier via /mcp si le token expire). Lancer le dev web avec `pnpm dev` (Turbopack, D-16).
+**Notes pour la session suivante:** Phase 01 complète (3/3 plans). Prêt pour Phase 02 (data-sources : OANDA/Binance/Finnhub/FRED, candles, packages/data-sources). `apps/jobs/.env` rempli. MCP Supabase opérationnel. Dispatcher jobs fonctionnel via `pnpm --filter jobs exec tsx src/dispatch.ts <job>`.
 
 ---
 *State initialized: 2026-06-09*

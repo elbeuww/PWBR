@@ -19,7 +19,7 @@ Décision fondateur : produit par abonnement **9 $/mois**, distribution **Telegr
 
 ## Phases
 
-- [ ] **Phase 1: Fondations & Sécurité** - Monorepo, Supabase + RLS + auth, conventions temporelles verrouillées, modèle d'exécution des Routines Claude vérifié
+- [x] **Phase 1: Fondations & Sécurité** - Monorepo, Supabase + RLS + auth, conventions temporelles verrouillées, modèle d'exécution des Routines Claude vérifié — COMPLETE 2026-06-12
 - [ ] **Phase 2: Ingestion fiable des données** - Clients data-sources et jobs d'ingestion idempotents (OHLCV, news, macro) tolérants aux pannes
 - [ ] **Phase 3: Moteur d'analyse déterministe** - Indicateurs, détection de structure de marché maison et snapshots technique/fondamental/news
 - [ ] **Phase 4: Moteur IA "vétéran" & scoring** - Routines Claude planifiées produisant des setups JSON validés par Zod et garde-fous déterministes
@@ -44,8 +44,8 @@ Décision fondateur : produit par abonnement **9 $/mois**, distribution **Telegr
 **Plans**: 3 plans
 Plans:
 - [x] 01-01-PLAN.md — Scaffold monorepo pnpm + infra de test + constantes temps `packages/core` (DATA-05) — COMPLETE 2026-06-10
-- [ ] 01-02-PLAN.md — Slice auth + RLS : signup→login→session→lecture instruments, isolation service_role (AUTH-01/02/03)
-- [ ] 01-03-PLAN.md — Runner de jobs agnostique écrivant `job_runs` + doc Routines Claude (JOB-03/04)
+- [x] 01-02-PLAN.md — Slice auth + RLS : signup→login→session→lecture instruments, isolation service_role (AUTH-01/02/03) — COMPLETE 2026-06-12
+- [x] 01-03-PLAN.md — Runner de jobs agnostique écrivant `job_runs` + doc Routines Claude (JOB-03/04) — COMPLETE 2026-06-12
 **Research flag**: yes — vérifier la doc officielle des Routines Claude Code (dépendance externe la plus incertaine, confidence MEDIUM)
 
 ### Phase 2: Ingestion fiable des données

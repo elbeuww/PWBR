@@ -42,8 +42,8 @@ Périmètre MVP (Phase 0 fondations + Phase 1 day/swing, usage perso/démo). Cha
 
 - [ ] **JOB-01**: Des routines planifiées s'exécutent aux ouvertures de sessions (Asie, Londres, New York) et en clôture daily (EOD swing), en UTC
 - [ ] **JOB-02**: Un run traite une session entière en batch (tous instruments/styles), dans le budget de runs du forfait Max
-- [ ] **JOB-03**: Les étapes déterministes (ingestion, snapshot) peuvent s'exécuter hors agent Claude (Windows Task Scheduler) en filet de sécurité
-- [ ] **JOB-04**: Chaque exécution écrit une entrée `job_runs` (statut, timing, erreur) pour le monitoring
+- [x] **JOB-03**: Les étapes déterministes (ingestion, snapshot) peuvent s'exécuter hors agent Claude (Windows Task Scheduler) en filet de sécurité
+- [x] **JOB-04**: Chaque exécution écrit une entrée `job_runs` (statut, timing, erreur) pour le monitoring
 
 ### Dashboard & Opportunities (DASH)
 
@@ -80,7 +80,7 @@ Périmètre MVP (Phase 0 fondations + Phase 1 day/swing, usage perso/démo). Cha
 
 ### Auth & Security (AUTH)
 
-- [ ] **AUTH-01**: L'utilisateur peut créer un compte et se connecter (Supabase Auth) ; la session persiste
+- [x] **AUTH-01**: L'utilisateur peut créer un compte et se connecter (Supabase Auth) ; la session persiste
 - [ ] **AUTH-02**: Toutes les tables ont une RLS active ; les données de marché/analyses sont en lecture pour les utilisateurs authentifiés
 - [ ] **AUTH-03**: La clé service_role est isolée aux jobs et jamais exposée au frontend (lint anti-import)
 
@@ -156,12 +156,12 @@ Reporté (après lancement abonnement + bloquants levés). Suivi mais hors roadm
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| AUTH-01 | Phase 1 | Pending |
-| AUTH-02 | Phase 1 | Pending |
-| AUTH-03 | Phase 1 | Pending |
-| DATA-05 | Phase 1 | Pending |
-| JOB-03 | Phase 1 | Pending |
-| JOB-04 | Phase 1 | Pending |
+| AUTH-01 | Phase 1 | Complete |
+| AUTH-02 | Phase 1 | Complete |
+| AUTH-03 | Phase 1 | Complete |
+| DATA-05 | Phase 1 | Complete |
+| JOB-03 | Phase 1 | Complete |
+| JOB-04 | Phase 1 | Complete |
 | DATA-01 | Phase 2 | Pending |
 | DATA-02 | Phase 2 | Pending |
 | DATA-03 | Phase 2 | Pending |
