@@ -41,9 +41,9 @@ created: 2026-06-09
 | Task ID | Plan | Wave | Requirement | Threat Ref | Secure Behavior | Test Type | Automated Command | File Exists | Status |
 |---------|------|------|-------------|------------|-----------------|-----------|-------------------|-------------|--------|
 | 01-01-T2 | 01-01 | 1 | DATA-05 | — | constantes temps (bougie clôturée/UTC/daily par source) déterministes | unit | `pnpm vitest run packages/core` | ❌ W0 | ⬜ pending |
-| 01-02-T1 | 01-02 | 2 | AUTH-02 | T-02 | un user ne lit pas le profiles/job_runs d'un autre + RLS active 3 tables | integration | `pnpm vitest run packages/supabase` | ❌ W0 | ⬜ pending |
-| 01-02-T3 | 01-02 | 2 | AUTH-01 | T-03 | signup → login → session persiste entre rechargements | e2e | `pnpm exec playwright test auth.spec.ts` | ❌ W0 | ⬜ pending |
-| 01-02-T4 | 01-02 | 2 | AUTH-03 | T-01 | import service_role depuis apps/web échoue au lint | lint (statique) | `pnpm lint apps/web` (fixture import interdit) | ❌ W0 | ⬜ pending |
+| 01-02-T1 | 01-02 | 2 | AUTH-02 | T-02 | un user ne lit pas le profiles/job_runs d'un autre + RLS active 3 tables | integration | `pnpm vitest run packages/supabase` | ✅ | ✅ green (6/6, 2026-06-12) |
+| 01-02-T3 | 01-02 | 2 | AUTH-01 | T-03 | signup → login → session persiste entre rechargements | e2e | `pnpm exec playwright test auth.spec.ts` | ✅ | ✅ green (5/5, 2026-06-12) |
+| 01-02-T4 | 01-02 | 2 | AUTH-03 | T-01 | import service_role depuis apps/web échoue au lint | lint (statique) | `pnpm lint` (fixture import interdit) | ✅ | ✅ green (exit ≠ 0 sur fixture seule, 2026-06-12) |
 | 01-03-T1 | 01-03 | 3 | JOB-04 | T-10 | runJob écrit job_runs (success + error) via service_role | integration | `pnpm vitest run apps/jobs` | ❌ W0 | ⬜ pending |
 | 01-03-T2 | 01-03 | 3 | JOB-03 | T-08 | dispatcher exécutable hors agent Claude (.cmd Task Scheduler) | manuel/doc | `apps/jobs/windows/run-job.cmd heartbeat` | ❌ W0 | ⬜ pending |
 
@@ -55,9 +55,9 @@ created: 2026-06-09
 
 - [ ] `vitest.config.ts` + `playwright.config.ts` — infra de test (plan 01-01, projet greenfield)
 - [ ] golden-values pour les constantes temps de `packages/core` (DATA-05, plan 01-01)
-- [ ] test d'intégration RLS (deux users, isolation `profiles`/`job_runs`) (plan 01-02)
-- [ ] 1 E2E Playwright auth (signup → login → session persiste) (plan 01-02)
-- [ ] fixture lint AUTH-03 (import service_role interdit depuis apps/web) (plan 01-02)
+- [x] test d'intégration RLS (deux users, isolation `profiles`/`job_runs`) (plan 01-02)
+- [x] 1 E2E Playwright auth (signup → login → session persiste) (plan 01-02)
+- [x] fixture lint AUTH-03 (import service_role interdit depuis apps/web) (plan 01-02)
 - [ ] test intégration `runJob` écrit job_runs (plan 01-03)
 
 ---

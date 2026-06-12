@@ -66,10 +66,10 @@ key-decisions:
   - "Server Actions void (pas de retour d'erreur UI en Phase 1 — Phase 5 = design)"
 
 # Metrics
-duration: ~120min
-completed: "2026-06-10"
-status: "IN_PROGRESS — paused at checkpoint:human-action"
-tasks_completed: 3
+duration: ~165min
+completed: "2026-06-12"
+status: "COMPLETE"
+tasks_completed: 5
 tasks_total: 5
 ---
 
@@ -79,9 +79,9 @@ tasks_total: 5
 
 ## Status
 
-**PLAN EN COURS — paused au checkpoint:human-action (Task 4)**
+**PLAN COMPLET — GREEN le 2026-06-12**
 
-Tasks 1-3 exécutées et commitées. Tasks 4-5 nécessitent les credentials Supabase (NEXT_PUBLIC_SUPABASE_URL + ANON_KEY + SERVICE_ROLE_KEY) et la désactivation de "Confirm email" dans le Dashboard.
+Tasks 1-3 commitées le 2026-06-10. Checkpoints human-action + human-verify levés le 2026-06-12 (MCP Supabase connecté en session : URL/anon key récupérées automatiquement, migration poussée via `apply_migration`, `get_advisors` security = 0 alerte). Task 4 GREEN : RLS 6/6, E2E auth 5/5, fixture lint AUTH-03 bloque l'import service_role.
 
 ## Performance
 
@@ -138,28 +138,23 @@ Tasks 1-3 exécutées et commitées. Tasks 4-5 nécessitent les credentials Supa
 - **Fix:** `rootDir: '.'` couvre `src/` et `__tests__/`.
 - **Files modified:** `packages/supabase/tsconfig.json`
 
-## Known Stubs
+## Résolution des checkpoints (2026-06-12)
 
-**database.types.ts (manuel)** — À regénérer après push schéma :
-- `packages/supabase/src/database.types.ts` : types écrits manuellement, valides mais non officiels. Regénérer via `supabase gen types typescript --linked`.
+- **human-action** : MCP Supabase connecté en session (OAuth, `.mcp.json` projet). URL + anon key remplies automatiquement dans `apps/web/.env.local` ; `apps/jobs/.env` créé (service_role collée par l'utilisateur) ; "Confirm email" désactivé dans le Dashboard.
+- **human-verify** : migration 0001 appliquée via MCP `apply_migration`. `list_tables` → 3 tables RLS enabled + 3 seeds instruments. `get_advisors` (security) → 4 WARN sur EXECUTE des fonctions SECURITY DEFINER → **migration 0002** (`revoke execute` sur `handle_new_user` + `rls_auto_enable`) → **0 alerte**.
+- **database.types.ts regénéré** via MCP `generate_typescript_types` (types officiels, stub manuel remplacé ; unions littérales broker/asset_class/status conservées en raccourcis).
 
-## Tasks restantes (après checkpoint)
+## Déviations Task 4 GREEN (Rule 1 — auto-fixed)
 
-- **Task 4 (checkpoint:human-action)** : Fournir credentials Supabase + remplir `.env.local` + désactiver "Confirm email"
-- **Task 5 (checkpoint:human-verify)** : Pousser la migration 0001 sur le projet cloud + vérifier `get_advisors`
-- **Task 6 (auto tdd=true GREEN)** : Exécuter rls.test.ts (vert) + auth.spec.ts (vert) + fixture lint AUTH-03
+**6. Emails de test `@example.com` → `@gmail.com`** — Supabase Auth rejette les domaines réservés (`example.com` = "invalid email"). Aucun email envoyé (Confirm email OFF), comptes supprimés après les runs. Fichiers : `rls.test.ts`, `auth.spec.ts`.
 
-## Checkpoint Atteint
+**7. `auth.spec.ts` : email unique par test** — un 2ᵉ signUp avec le même email échoue ("User already registered") et cassait l'isolation des tests. Helper `signUp()` + `uniqueEmail(tag)` ; le test login purge les cookies avant de tester le login réel.
 
-**Type:** human-action (gate: blocking-human)
-**Bloquant:** credentials Supabase + configuration Dashboard
+**8. webpack → Turbopack (`!` dans le chemin du projet)** — webpack interdit `!` dans les chemins (syntaxe loaders) → `next dev` crashait. `dev`/`build` passés en `--turbopack` (apps/web/package.json).
 
-**Actions requises par l'utilisateur :**
-1. Supabase Dashboard → Project Settings → API → copier Project URL et anon key
-2. Remplir `apps/web/.env.local` : `NEXT_PUBLIC_SUPABASE_URL` + `NEXT_PUBLIC_SUPABASE_ANON_KEY` (jamais SERVICE_ROLE ici)
-3. Créer `apps/jobs/.env` (sera utilisé au plan 03) : `SUPABASE_URL` + `SUPABASE_SERVICE_ROLE_KEY`
-4. Dashboard → Authentication → Providers → Email → mettre "Confirm email" sur OFF (D-02)
-5. Signal de reprise : taper "approved"
+**9. Workspace root + résolution imports `.js`** — un `package-lock.json` parasite dans `C:\Users\KOTEK Informatique` faisait inférer un mauvais root à Next (`turbopack.root` + `outputFileTracingRoot` fixés dans next.config.ts). Turbopack ne résout pas l'aliasing NodeNext `.js`→`.ts` dans les packages workspace → `packages/supabase` passé en `moduleResolution: Bundler` + imports relatifs sans extension. Typecheck racine OK.
+
+**10. `clientB` inutilisé supprimé de rls.test.ts** — le lint devait échouer UNIQUEMENT sur la fixture AUTH-03.
 
 ## Threat Surface Scan
 

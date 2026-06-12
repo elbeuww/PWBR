@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-last_updated: "2026-06-10T14:59:37.165Z"
+last_updated: "2026-06-12T15:30:00.000Z"
 progress:
   total_phases: 9
   completed_phases: 0
   total_plans: 3
-  completed_plans: 1
-  percent: 33
+  completed_plans: 2
+  percent: 67
 ---
 
 # Project State
@@ -27,12 +27,12 @@ progress:
 ## Current Position
 
 Phase: 01 (fondations-s-curit) — EXECUTING
-Plan: 1 of 3
+Plan: 2 of 3
 **Phase:** 1 — Fondations & Sécurité
-**Plan:** 01-02 IN PROGRESS — paused at checkpoint:human-action (credentials Supabase requis)
+**Plan:** 01-02 COMPLETE (2026-06-12) — AUTH-01/02/03 GREEN. Next : plan 01-03 (jobs)
 **Status:** Executing Phase 01
 
-**Progress:** [          ] 0/9 phases complete (1/3 plans phase 01)
+**Progress:** [          ] 0/9 phases complete (2/3 plans phase 01)
 
 ```
 Phase 1  [ ] Fondations & Sécurité          ← next
@@ -71,6 +71,8 @@ Phase 9  [ ] Backtest & calibration
 - D-13 : Vitest + Playwright configurés racine ; golden values DATA-05 vertes (16/16).
 - D-14 (2026-06-12) : **Vision élargie v1.1** — abonnement 9 $/mois, Telegram public (1 signal/j) + privé (résumé abonnés), actions ajoutées, scalping confirmé (en dernier). Phases 1-9 inchangées ; extension en phases 10-13 (voir ROADMAP « Scope Update » + REQUIREMENTS v1.1 : DIST/MON/STOCK/PATT/RT).
 - D-15 : % de réussite des patterns chartiques = mesuré par notre backtest (PATT-02), jamais affirmé sans données. Revue légale AMF/MiFID II obligatoire avant d'encaisser le premier abonnement.
+- D-16 (2026-06-12) : Turbopack obligatoire pour apps/web (`next dev/build --turbopack`) — webpack interdit le `!` du chemin projet. `turbopack.root` + `outputFileTracingRoot` fixés (package-lock.json parasite dans le HOME). `packages/supabase` en moduleResolution Bundler (imports relatifs sans `.js` — Turbopack ne résout pas l'aliasing NodeNext dans les packages workspace).
+- D-17 (2026-06-12) : MCP Supabase projet (`.mcp.json`, OAuth) opérationnel — migrations via `apply_migration`, types via `generate_typescript_types`, gate sécurité via `get_advisors` (0 alerte après migration 0002 revoke execute). Emails de test = `@gmail.com` uniques (Supabase Auth rejette example.com), cleanup via SQL service.
 
 ### Open todos / risques à lever
 
@@ -85,13 +87,15 @@ Phase 9  [ ] Backtest & calibration
 
 ### Blockers
 
-- **01-02 checkpoint:human-action** : credentials Supabase requis pour push migration + GREEN tests. Action : remplir apps/web/.env.local + apps/jobs/.env + désactiver Confirm email Dashboard → taper "approved".
+Aucun.
 
 ## Session Continuity
 
-**Next action:** Reprendre le plan `01-02` après remplissage des credentials Supabase (checkpoint:human-action). Signal : "approved". Puis pousser la migration et faire passer les tests RLS/E2E en GREEN (Task 4/5).
+**Last session:** 2026-06-12 — plan 01-02 terminé (checkpoints levés via MCP Supabase, RLS 6/6, E2E 5/5, lint AUTH-03 OK, advisors 0 alerte).
 
-**Notes pour la session suivante:** Plan 01-02 paused à checkpoint:human-action (Task 4). Tasks 1-3 commitées (a5841ee, e034d2e, 13106f9). Migration SQL prête mais non poussée. Tests RED (rls.test.ts + auth.spec.ts) en attente des credentials. Après "approved" de l'utilisateur : push migration, remplir .env.local + apps/jobs/.env, exécuter les tests, créer le fixture lint AUTH-03, marquer GREEN.
+**Next action:** Exécuter le plan `01-03` (jobs : runJob/job_runs via service_role + dispatcher Windows Task Scheduler) — `/gsd-execute-phase 1`.
+
+**Notes pour la session suivante:** `apps/jobs/.env` est rempli (URL + service_role). Le MCP Supabase projet est connecté (ré-authentifier via /mcp si le token expire). Lancer le dev web avec `pnpm dev` (Turbopack, D-16).
 
 ---
 *State initialized: 2026-06-09*
