@@ -59,14 +59,14 @@ Les 6 research flags de CONTEXT.md sont résolus. Le point dur : **le testnet sp
 
 **Installation:**
 ```bash
-# Jobs / data-sources (ESM)
-pnpm --filter jobs add binance finnhub p-retry p-limit
-# (zod, luxon, pino, @supabase/supabase-js, tsx déjà présents depuis P1)
+# Jobs / data-sources (ESM) — versions épinglées CLAUDE.md
+pnpm --filter @app/data-sources add binance@3.5.9 finnhub@2.0.14 p-retry@8.0.0 p-limit@7.3.0 luxon@3.7.2
+# (zod, pino, @supabase/supabase-js, tsx déjà présents depuis P1)
 # OANDA / Marketaux / FRED = clients fetch maison (aucun paquet npm) dans packages/data-sources
 ```
 > Note ESM : `p-retry 8` / `p-limit 7` sont ESM-only — OK, les jobs tournent en ESM (`"type":"module"` + tsx). Ne jamais `require()`.
 
-**Version verification (2026-06-12, npm registry):** binance `3.5.10`, finnhub `2.0.14`, p-retry `8.0.0`, p-limit `7.3.0`, luxon `3.7.2`, zod `4.4.3`, pino `10.3.1`, tsx `4.22.4`. `[VERIFIED: npm registry]`
+**Version verification (2026-06-12, npm registry):** binance `3.5.10` (verrouiller `3.5.9` CLAUDE.md), finnhub `2.0.14`, p-retry `8.0.0`, p-limit `7.3.0`, luxon `3.7.2`, zod `4.4.3`, pino `10.3.1`, tsx `4.22.4`. `[VERIFIED: npm registry]`
 
 ## Package Legitimacy Audit
 
@@ -74,7 +74,7 @@ pnpm --filter jobs add binance finnhub p-retry p-limit
 
 | Package | Registry | Source Repo | slopcheck | Disposition |
 |---------|----------|-------------|-----------|-------------|
-| `binance` | npm 3.5.10 | github.com/tiagosiebler/binance (actif) | non exécuté | Approuvé (CLAUDE.md locked) |
+| `binance` | npm 3.5.10 | github.com/tiagosiebler/binance (actif) | non exécuté | Approuvé (CLAUDE.md locked 3.5.9) |
 | `finnhub` | npm 2.0.14 | github.com/Finnhub-Stock-API/finnhub-js | non exécuté | Approuvé (officiel + locked) |
 | `p-retry` | npm 8.0.0 | github.com/sindresorhus/p-retry | non exécuté | Approuvé (sindresorhus) |
 | `p-limit` | npm 7.3.0 | github.com/sindresorhus/p-limit | non exécuté | Approuvé (sindresorhus) |
@@ -137,10 +137,10 @@ packages/data-sources/
 │   ├── faireconomy/client.ts# fetch JSON calendrier, cache hebdo
 │   └── index.ts
 apps/jobs/src/jobs/
-│   ├── market-ingest.ts     # gap fill OHLCV multi-instrument/TF
-│   ├── news-ingest.ts
-│   ├── macro-ingest.ts
-│   └── calendar-ingest.ts
+│   ├── market-ingest.ts     # gap fill OHLCV multi-instrument/TF (plan 02)
+│   ├── news-ingest.ts       # plan 04
+│   ├── macro-ingest.ts      # plan 04
+│   └── calendar-ingest.ts   # plan 04
 packages/supabase/src/repositories/
 │   ├── candles.ts           # upsertCandles(onConflict)
 │   ├── news.ts              # upsertNews(onConflict url_hash)
@@ -323,7 +323,7 @@ const events = FairEconomyCalendarSchema.parse(await res.json())
 | `@supabase/auth-helpers` | `@supabase/ssr` | — (déjà P1) | sans objet en P2 |
 | Finnhub free `company-news` pour tout | `marketNews(category)` pour forex/crypto | Finnhub a restreint company-news aux actions NA | P2 utilise marketNews |
 | Finnhub `economicCalendar` free | premium-locked | restriction tier free | P2 utilise FairEconomy |
-| binance 3.5.9 (CLAUDE.md) | 3.5.10 (npm latest) | patch | non-bloquant, garder ^3.5.9 |
+| binance 3.5.9 (CLAUDE.md) | 3.5.10 (npm latest) | patch | non-bloquant, garder `3.5.9` épinglé |
 
 **Deprecated/outdated:**
 - `@oanda/v20`, `ccxt` (P1), ORM : interdits par CLAUDE.md.
@@ -338,17 +338,17 @@ const events = FairEconomyCalendarSchema.parse(await res.json())
 | A4 | `marketNews` free renvoie crypto/forex utilisables | News | MEDIUM — endpoint confirmé free ; volume/qualité par catégorie non mesurés. Marketaux en fallback (D-29). |
 | A5 | DTWEXBGS = bon proxy DXY sur FRED | Macro | LOW — DTWEXBGS = Trade Weighted USD Broad Goods&Services (≠ ICE DXY exact mais proxy macro valable). Alternative : pas de DXY pur gratuit sur FRED. Documenter la sémantique. |
 
-## Open Questions
+## Open Questions (RESOLVED)
 
-1. **Disponibilité exacte WTICO_USD sur le compte démo OANDA précis**
+1. **Disponibilité exacte WTICO_USD sur le compte démo OANDA précis** — **RESOLVED:** mitigation D-20 retenue (skip + log + continuer, jamais bloquant) ; vérification déléguée au 1er run réel via `GET /v3/accounts/{accountId}/instruments` (logguer les symboles absents dans `job_runs.stats`). Pas de blocage planning.
    - Ce qu'on sait : WTICO_USD est le symbole OANDA correct pour le WTI ; XAU_USD/XAG_USD/EUR_USD/GBP_USD/USD_JPY/AUD_USD sont standards.
-   - Inconnu : la liste exacte servie par CE compte démo.
-   - Recommandation : au démarrage de market-ingest, appeler `GET /v3/accounts/{accountId}/instruments` une fois, logguer les symboles absents dans `job_runs.stats` (D-20). Pas de blocage.
+   - Inconnu (levé à l'exécution) : la liste exacte servie par CE compte démo.
+   - Décision : au démarrage de market-ingest, appeler `GET /v3/accounts/{accountId}/instruments` une fois, logguer les symboles absents (D-20). L'absence d'un instrument n'interrompt pas l'ingestion des autres (DATA-07).
 
-2. **Granularité H4 native OANDA vs agrégation**
+2. **Granularité H4 native OANDA vs agrégation** — **RESOLVED:** tirer la granularité **H4 native** d'OANDA (`granularity=H4`), PAS d'agrégation maison depuis H1. Alignement vérifié contre `packages/core` au 1er run.
    - Ce qu'on sait : OANDA expose H4 nativement (liste des granularités inclut H4).
-   - Inconnu : l'alignement H4 OANDA (ancrage) vs la convention interne.
-   - Recommandation : tirer H4 natif (pas d'agrégation maison) ; vérifier l'alignement contre `packages/core` au 1er run.
+   - Inconnu (levé à l'exécution) : l'alignement H4 OANDA (ancrage) vs la convention interne.
+   - Décision : `granularity=H4` natif (zéro agrégation côté job) ; au 1er run, comparer l'ancrage des bornes OANDA aux constantes `packages/core` et tracer tout écart dans `job_runs.stats`.
 
 ## Environment Availability
 
@@ -365,101 +365,4 @@ const events = FairEconomyCalendarSchema.parse(await res.json())
 
 **Missing dependencies sans fallback (bloquantes) :**
 - Token OANDA démo (FX/métaux/énergie) ; clé FRED (macro). À placer dans `apps/jobs/.env` avant exécution. La staleness/D-20 rend leur absence visible, pas crashante.
-
-**Missing dependencies avec fallback :**
-- Clé Binance (klines = mainnet public) ; clés news (Finnhub↔Marketaux).
-
-## Validation Architecture
-
-### Test Framework
-| Property | Value |
-|----------|-------|
-| Framework | Vitest 4.1.8 |
-| Config file | `vitest.config.ts` (racine, `.env.test` via `process.loadEnvFile`) |
-| Quick run command | `pnpm test` (= `vitest run`) |
-| Full suite command | `pnpm test && pnpm test:e2e` |
-
-### Phase Requirements → Test Map
-| Req ID | Behavior | Test Type | Automated Command | File Exists? |
-|--------|----------|-----------|-------------------|-------------|
-| DATA-01 | klines crypto H1/H4/D normalisées UTC | unit (parse Zod + normalisation, fixture klines) | `vitest run packages/data-sources` | ❌ Wave 0 |
-| DATA-02 | OANDA OHLCV FX/métaux/énergie UTC | unit (parse + pagination count XOR from/to) | `vitest run packages/data-sources` | ❌ Wave 0 |
-| DATA-03 | news mappées par catégorie + sentiment provider | unit (mapping catégorie, dédup url_hash) | `vitest run packages/data-sources` | ❌ Wave 0 |
-| DATA-04 | séries FRED mappées | unit (parse observations, upsert) | `vitest run packages/data-sources` | ❌ Wave 0 |
-| DATA-06 | re-run = 0 doublon | **integration** (upsert ×2, count stable) contre Supabase cloud | `vitest run packages/supabase` | ❌ Wave 0 |
-| DATA-07 | source coupée ⇒ autres ingèrent + stale exposé | **integration** (clé invalide simulée, stats.errors peuplé, vue freshness) | `vitest run apps/jobs` | ❌ Wave 0 |
-
-### Sampling Rate
-- **Per task commit:** `pnpm test` (cible le package/job touché)
-- **Per wave merge:** `pnpm test` complet
-- **Phase gate:** suite verte avant `/gsd:verify-work` ; idempotence (DATA-06) et tolérance (DATA-07) sont les deux tests qui *définissent* la fiabilité de la phase (cf. CONTEXT §specifics).
-
-### Wave 0 Gaps
-- [ ] `packages/data-sources/src/**/schema.test.ts` — parse Zod + normalisation UTC par source (golden fixtures OANDA/Binance/FRED/FairEconomy/Finnhub)
-- [ ] `packages/supabase/__tests__/idempotency.test.ts` — DATA-06 : upsert ×2 ⇒ count identique (contre cloud, cleanup SQL service comme rls.test.ts)
-- [ ] `apps/jobs/__tests__/fault-isolation.test.ts` — DATA-07 : une source en erreur ne bloque pas les autres ; `stats.errors` peuplé
-- [ ] `apps/jobs/__tests__/gap-fill.test.ts` — D-22 : dernier ts en base → fenêtre correcte (mock repository)
-- [ ] Fixtures JSON réelles (échantillons réponses API) dans `__fixtures__/` pour des tests déterministes hors-ligne
-- [ ] Framework déjà installé (Vitest P1) — aucune install requise
-
-## Security Domain
-
-### Applicable ASVS Categories
-| ASVS Category | Applies | Standard Control |
-|---------------|---------|-----------------|
-| V2 Authentication | non | pas d'auth nouvelle en P2 (jobs = service_role) |
-| V3 Session Management | non | — |
-| V4 Access Control | oui | RLS sur toutes nouvelles tables (lecture authenticated, écriture service_role) — pattern P1 |
-| V5 Input Validation | **oui (central)** | Zod à chaque frontière d'ingestion (réponses API = données externes non fiables) |
-| V6 Cryptography | non | pas de crypto maison ; clés API en `.env` |
-| V7 Secrets / Config | **oui** | clés API broker/news/FRED en `.env` jobs uniquement, jamais préfixées `NEXT_PUBLIC_`, jamais commitées (D-12) |
-
-### Known Threat Patterns
-| Pattern | STRIDE | Standard Mitigation |
-|---------|--------|---------------------|
-| Données API malformées/injectées en base | Tampering | parse Zod strict avant upsert ; types numériques validés |
-| Fuite de clé service_role/broker vers le front | Information Disclosure | service_role isolé `apps/jobs` (lint no-restricted-imports P1) ; `.env` gitignoré |
-| Empoisonnement par source compromise (FairEconomy) | Tampering | schéma Zod tolérant + champ `source` ; impact borné (calendrier informatif) |
-| RLS oubliée sur nouvelle table | Elevation of Privilege | `enable row level security` + policy explicite dans CHAQUE migration ; vérifier via MCP `get_advisors` (0 alerte, comme P1) |
-| DoS involontaire sur tier gratuit (rate limit) | Denial of Service | `p-limit` + `p-retry` + cache (FairEconomy) ; upsert idempotent borne les re-runs |
-
-## Project Constraints (from CLAUDE.md)
-
-- Stack data-sources **verrouillée** : SDK `binance` (tiagosiebler, klines), SDK `finnhub`, clients fetch+Zod maison pour OANDA/Marketaux/FRED. **Interdits** : `ccxt`, `@oanda/v20`, ORM (Drizzle/Prisma), `node-cron`, clé API Anthropic.
-- `p-retry`/`p-limit` **ESM only** — jobs en ESM.
-- Zod **v4**. luxon (pas date-fns) pour la logique TZ/sessions des jobs.
-- Rate limits de départ (CLAUDE.md §) : Finnhub `pLimit(1)` + Retry-After, OANDA `pLimit(2)`, Binance `pLimit(3)`, FRED `pLimit(2)`. Cache : ne pas re-puller des candles déjà en base.
-- Migrations SQL versionnées (Supabase CLI/MCP), RLS sur toute table, types régénérés après migration.
-- Sécurité : démo/testnet d'abord, clés en `.env` non commitées, service_role réservé aux jobs.
-- Tests : Vitest, cible 80% sur le code métier ; intégration contre Supabase cloud (pattern rls.test.ts).
-- Tout chiffre déterministe calculé en code (P2 = ingestion brute, pas d'indicateurs).
-
-## Sources
-
-### Primary (HIGH confidence)
-- `github.com/tiagosiebler/binance/blob/master/src/main-client.ts` — `getKlines(params: KlinesParams): Promise<Kline[]>` L823 ; `KlinesParams { symbol, interval: KlineInterval, startTime?, endTime?, timeZone?, limit? }` ; `RestClientOptions.testnet?: boolean`, `baseUrlKey` (`spottest`).
-- `github.com/Finnhub-Stock-API/finnhub-js` README — `marketNews('general'|'crypto'|'forex', {})` ; `companyNews` = actions NA.
-- developer.oanda.com/rest-live-v20/instrument-ep — candles : `count` défaut 500 / **max 5000**, count XOR (from&to), `includeFirst`, granularités incluent H1/H4/D.
-- developers.binance.com/docs/binance-spot-api-docs/testnet — testnet réinitialisé périodiquement (pas d'historique) ; klines limit 1000, poids 2.
-- fred.stlouisfed.org — DFF (Fed funds, daily), CPIAUCSL (CPI, monthly), DTWEXBGS (USD broad, daily), DFII10 (real yield 10Y, daily).
-- npm registry (2026-06-12) — versions vérifiées de tous les paquets.
-- CLAUDE.md, ARCHITECTURE.md §4, 01-CONTEXT.md, 02-CONTEXT.md — schéma, stack verrouillée, décisions.
-
-### Secondary (MEDIUM confidence)
-- finnhub.io/docs/api — economic-calendar & news-sentiment premium-locked, news-sentiment = US equities (recoupé multi-sources WebSearch).
-- nfs.faireconomy.media/ff_calendar_thisweek.json — flux calendrier hebdo gratuit, rate limit 2/5min, formats xml/json/ics/csv (sources tierces ForexFactory/MQL).
-- marketaux.com/documentation — free 100 req/jour, 3 articles/req, param `symbols`/`entities`.
-
-### Tertiary (LOW confidence)
-- Disponibilité instrument-par-instrument sur le compte démo OANDA précis (non testée sans clé) — à valider au 1er run via `/v3/accounts/{id}/instruments`.
-
-## Metadata
-
-**Confidence breakdown:**
-- Standard stack : HIGH — versions npm vérifiées, signatures SDK lues dans le source.
-- Architecture/patterns : HIGH — réutilise l'infra P1 (lue dans le code) ; idempotence/isolation directes.
-- Endpoints externes : HIGH (OANDA count/granularité, Binance klines, FRED series) / MEDIUM (FairEconomy format, Finnhub catégories news).
-- Disponibilité instruments démo : LOW — à confirmer au runtime (mitigé par D-20).
-
-**Research date:** 2026-06-12
-**Valid until:** 2026-07-12 (stack stable ; revérifier les tiers gratuits Finnhub/Marketaux/FairEconomy avant exécution — politique sujette à changement).
+</content>

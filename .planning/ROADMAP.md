@@ -60,8 +60,13 @@ Plans:
   4. Une source en échec n'interrompt pas les autres et la donnée périmée est marquée `stale` (rate limits gérés par backoff/p-limit).
 **Plans**: 3 plans
 Plans:
+**Wave 1**
 - [ ] 02-01-PLAN.md — Schéma d'ingestion (candles/news/macro/calendrier) + RLS + seed 12 instruments + vue freshness + repositories d'upsert idempotent (DATA-06)
+
+**Wave 2** *(blocked on Wave 1 completion)*
 - [ ] 02-02-PLAN.md — Slice OHLCV : clients Binance/OANDA + parsers UTC + job market-ingest gap-fill (DATA-01/02/05)
+
+**Wave 3** *(blocked on Wave 2 completion)*
 - [ ] 02-03-PLAN.md — Slices news/macro/calendrier + jobs + isolation des pannes prouvée (DATA-03/04/07)
 
 ### Phase 3: Moteur d'analyse déterministe
