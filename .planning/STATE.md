@@ -69,6 +69,8 @@ Phase 9  [ ] Backtest & calibration
 - D-11 : Strict skeleton 4 packages — apps/web, apps/jobs, packages/core, packages/supabase déclarés ; data-sources/indicators en phases ultérieures.
 - D-12 : .env.example commité sans secret (4 clés vides), .gitignore exclut .env/.env.local.
 - D-13 : Vitest + Playwright configurés racine ; golden values DATA-05 vertes (16/16).
+- D-14 (2026-06-12) : **Vision élargie v1.1** — abonnement 9 $/mois, Telegram public (1 signal/j) + privé (résumé abonnés), actions ajoutées, scalping confirmé (en dernier). Phases 1-9 inchangées ; extension en phases 10-13 (voir ROADMAP « Scope Update » + REQUIREMENTS v1.1 : DIST/MON/STOCK/PATT/RT).
+- D-15 : % de réussite des patterns chartiques = mesuré par notre backtest (PATT-02), jamais affirmé sans données. Revue légale AMF/MiFID II obligatoire avant d'encaisser le premier abonnement.
 
 ### Open todos / risques à lever
 
@@ -77,6 +79,8 @@ Phase 9  [ ] Backtest & calibration
 - **Phase 3 (research flag):** concevoir et tester la détection de structure de marché maison (HH/HL, BOS/CHoCH, swings, POC) — absente des libs.
 - **Phase 4 (research flag):** point à plus haut risque — robustesse prompt vétéran, taux de rejet Zod, méthode de scoring. À itérer.
 - **Phase 9 (research flag):** méthode de calibration (isotonic/Platt) et seuil d'échantillon minimal.
+- **Phase 12 (research flag, v1.1):** source de données actions — Finnhub free n'offre plus les candles actions ; évaluer Alpha Vantage / Twelve Data / Polygon (tiers gratuits + rate limits).
+- **Phase 11 (porte légale, v1.1):** revue « conseil en investissement » AMF/MiFID II avant d'encaisser le premier abonnement (vendre des signaux à des tiers ≠ outil perso).
 - **Bloquants v2 (hors roadmap actuelle):** calibration prouvée + revue juridique MiFID II/AMF + licences de redistribution des données.
 
 ### Blockers

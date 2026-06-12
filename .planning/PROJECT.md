@@ -2,7 +2,9 @@
 
 ## What This Is
 
-Plateforme d'analyse de trading qui combine analyse chartique (technique) et analyse fondamentale + news pour identifier des opportunités, noter chaque trade sur 100, évaluer son risque, et proposer entrée / stop-loss / take-profits / ratio R:R avec un raisonnement explicite. L'IA se comporte comme un trader vétéran (50 ans d'expérience). D'abord outil personnel (capital réel 500 $, démarrage sur compte démo), puis partagé avec une communauté. Utilisateur de niveau intermédiaire.
+Plateforme d'analyse de trading qui combine analyse chartique (technique) et analyse fondamentale + news pour identifier des opportunités, noter chaque trade sur 100, évaluer son risque, et proposer entrée / stop-loss / take-profits / ratio R:R avec un raisonnement explicite. L'IA se comporte comme un trader vétéran (50 ans d'expérience). L'analyse chartique s'appuie sur un catalogue de patterns solides dont le taux de réussite est mesuré par backtest maison.
+
+**Trajectoire produit (vision élargie 2026-06-12)** : d'abord outil personnel validé sur compte démo, puis produit par **abonnement 9 $/mois**. Distribution : **1 signal/jour sur un canal Telegram public** (acquisition) + **résumé quotidien des trades sur un canal Telegram privé** réservé aux abonnés. Marchés : crypto (sélection des plus pertinents) + forex + actions. Styles : scalping + day trading + long terme (le scalping arrive en dernier, infra temps réel).
 
 ## Core Value
 
@@ -28,13 +30,20 @@ Produire, pour chaque opportunité, une analyse fiable et explicable — score /
 - [ ] Boucle d'apprentissage : évaluation prédiction vs résultat (prediction_outcomes) + backtest hebdo + métriques (win rate, calibration du score, expectancy)
 - [ ] Disclaimers conseil financier (éducatif, pas un conseil)
 
+### Active — v1.1 (vision élargie 2026-06-12, après le cœur analytique)
+
+- [ ] Bot Telegram : 1 signal/jour (mieux scoré) sur canal public + résumé quotidien des trades sur canal privé abonnés (DIST-01..04)
+- [ ] Abonnement Stripe 9 $/mois + gating plateforme et canal Telegram privé (MON-01..03)
+- [ ] Actions/equities : ingestion + traitement comme classe d'actif supplémentaire (STOCK-01..02 — source de données à valider)
+- [ ] Catalogue de patterns chartiques déterministes + taux de réussite mesuré par backtest, alimentant le score (PATT-01..02)
+- [ ] Scalping temps réel M1/M5 (websockets) — en dernier, après moteur prouvé (RT-01..02)
+
 ### Out of Scope
 
-- Actions / equities — non couvertes en MVP (focus crypto + forex + commodités)
-- Scalping / temps réel (M1, websockets) — reporté en Phase 2 (infra temps réel plus lourde)
-- Clé API Anthropic / analyses live à la demande — reporté en Phase 2 (Phase 1 = forfait Max + routines planifiées, coût zéro)
-- Communauté (profils, follows, commentaires, leaderboard) + monétisation Stripe — reporté en Phase 2
+- Clé API Anthropic / analyses live à la demande — reporté en v2 (Phase 1 = forfait Max + routines planifiées, coût zéro)
+- Communauté (profils, follows, commentaires, leaderboard) — reporté en v2
 - Exécution automatique des trades (passage d'ordres) — hors scope (outil d'aide à la décision, pas de bot d'exécution)
+- ~~Actions / equities~~ et ~~scalping~~ et ~~monétisation~~ — **sortis du out-of-scope le 2026-06-12** (voir Active v1.1)
 
 ## Context
 
@@ -64,6 +73,10 @@ Produire, pour chaque opportunité, une analyse fiable et explicable — score /
 | Indicateurs calculés en code (déterministe), Claude raisonne seulement | Évite l'hallucination de chiffres, économise les tokens | — Pending |
 | Stack Next.js + Supabase | Réutilise les compétences du fondateur, MCP déjà connecté | — Pending |
 | Démarrage compte démo obligatoire avant capital réel | Apprentissage sans risque, boucle de feedback | — Pending |
+| **2026-06-12 — Vision élargie** : abonnement 9 $/mois, Telegram public (1 signal/j) + privé (résumé abonnés), actions ajoutées, scalping confirmé | Passage d'outil perso à produit ; le canal public construit l'audience avant le lancement payant | — Pending |
+| Phases 1-9 inchangées, nouveau scope en phases 10-13 (extension) | Tout le nouveau scope dépend du cœur analytique ; ne pas déstabiliser l'exécution en cours | — Pending |
+| % de réussite des patterns = mesuré par notre backtest, jamais affirmé | Honnêteté produit + risque légal (aucune promesse non mesurée) | — Pending |
+| Revue légale AMF/MiFID II obligatoire AVANT d'encaisser le premier abonnement | Vendre des signaux à des tiers ≠ outil perso — exposition réglementaire réelle | — Pending |
 
 ## Evolution
 
@@ -83,4 +96,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-06-09 after initialization*
+*Last updated: 2026-06-12 — vision élargie v1.1 (abonnement, Telegram, actions, scalping, patterns mesurés)*

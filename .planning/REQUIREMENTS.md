@@ -89,14 +89,41 @@ Périmètre MVP (Phase 0 fondations + Phase 1 day/swing, usage perso/démo). Cha
 - [ ] **LEGAL-01**: Un disclaimer "contenu éducatif, pas un conseil en investissement" est affiché sur le dashboard et le détail trade
 - [ ] **LEGAL-02**: Aucune promesse de gain n'est affichée ; les scores non calibrés ne sont pas présentés comme des probabilités
 
+## v1.1 Requirements — Vision élargie (2026-06-12)
+
+Décision fondateur : la plateforme devient un produit par abonnement (9 $/mois) avec distribution Telegram (1 signal/jour public + résumé quotidien des trades sur canal privé abonnés), ajout des actions, scalping confirmé. Ces exigences étendent la roadmap APRÈS le cœur analytique (Phases 1-4) — voir « Scope Update » dans ROADMAP.md. Non encore mappées à des phases.
+
+### Distribution Telegram (DIST)
+
+- [ ] **DIST-01**: Un bot Telegram publie 1 signal par jour (le mieux scoré du jour) sur le canal public, formaté (actif, direction, entrée, SL, TP, score, disclaimer)
+- [ ] **DIST-02**: Le bot publie le résumé quotidien des trades du jour sur le canal privé réservé aux abonnés
+- [ ] **DIST-03**: L'accès au canal privé est contrôlé par le statut d'abonnement (liens d'invitation / retraits automatisés via l'API Telegram)
+- [ ] **DIST-04**: Chaque publication est tracée en base (setup, canal, timestamp) — idempotente, jamais de double post
+
+### Monétisation (MON) — promu de v2
+
+- [ ] **MON-01**: Abonnement Stripe 9 $/mois (checkout, portail client, webhooks de statut)
+- [ ] **MON-02**: Le statut d'abonnement gate l'accès au contenu premium de la plateforme et au canal Telegram privé
+- [ ] **MON-03**: Page pricing publique + flux d'inscription
+
+### Actions / Equities (STOCK) — sorti du out-of-scope
+
+- [ ] **STOCK-01**: Ingestion OHLCV pour une liste curatée d'actions (source à valider — research : les candles actions ne sont plus dans le tier gratuit Finnhub ; candidats Alpha Vantage / Twelve Data / Polygon)
+- [ ] **STOCK-02**: Les moteurs technique/fondamental/vétéran traitent les actions comme classe d'actif supplémentaire (heures de marché, gaps, earnings)
+
+### Patterns chartiques à taux de réussite mesuré (PATT)
+
+- [ ] **PATT-01**: Le moteur détecte un catalogue de patterns chartiques classiques en code déterministe (engulfing, pin bar, double top/bottom, breakout de range, continuation, etc.)
+- [ ] **PATT-02**: Le taux de réussite de chaque pattern est MESURÉ par le backtest maison (par actif/timeframe) et alimente la pondération du score — jamais affirmé sans données
+
+### Scalping temps réel (RT) — promu de v2, en dernier
+
+- [ ] **RT-01**: Streaming temps réel (websockets Binance/OANDA) et timeframes M1/M5 pour le scalping
+- [ ] **RT-02**: Moteur d'analyse temps réel (2e writer additif, sans réécrire le batch)
+
 ## v2 Requirements
 
-Reporté en Phase 2 (après product-market fit perso + bloquants levés). Suivi mais hors roadmap actuelle.
-
-### Real-time / Scalping (RT)
-
-- **RT-01**: Streaming temps réel (websockets OANDA/Binance) et timeframes M1/M5 pour le scalping
-- **RT-02**: Moteur d'analyse temps réel (2e writer additif, sans réécrire le batch)
+Reporté (après lancement abonnement + bloquants levés). Suivi mais hors roadmap actuelle.
 
 ### Live AI (LIVE)
 
@@ -107,19 +134,18 @@ Reporté en Phase 2 (après product-market fit perso + bloquants levés). Suivi 
 - **COMM-01**: Profils, follows, commentaires, watchlists partagées
 - **COMM-02**: Leaderboard basé sur la calibration/discipline (jamais sur le P&L brut)
 
-### Monetization & Scale (MON)
+### Scale (SCALE)
 
-- **MON-01**: Abonnements Stripe (tiers free/pro, quotas d'analyses live)
-- **MON-02**: Alertes (email/push/Telegram) sur setups à score élevé
-- **MON-03**: Mise à l'échelle multi-utilisateur (cache Upstash Redis, CDN)
+- **SCALE-01**: Mise à l'échelle multi-utilisateur (cache Upstash Redis, CDN)
+- **SCALE-02**: Alertes additionnelles (email/push) sur setups à score élevé
 
-**Portes bloquantes avant toute ouverture v2 :** (1) calibration du score prouvée (reliability diagram monotone, Brier mesuré) ; (2) revue juridique MiFID II/AMF + vérification des licences de redistribution des données.
+**Portes bloquantes avant d'encaisser le moindre abonnement :** (1) calibration du score prouvée (reliability diagram monotone, Brier mesuré) sur compte démo ; (2) revue juridique conseil en investissement (MiFID II/AMF — vendre des signaux à des tiers est une exposition réglementaire bien plus forte qu'un outil perso) + licences de redistribution des données.
 
 ## Out of Scope
 
 | Feature | Reason |
 |---------|--------|
-| Actions / equities | Hors focus MVP — concentration crypto + forex + métaux + énergie |
+| ~~Actions / equities~~ | **Sorti du out-of-scope le 2026-06-12** → STOCK-01/02 (v1.1) |
 | Exécution automatique des ordres / copy trading | Outil d'aide à la décision, pas un bot d'exécution — risque financier et légal |
 | Promesses de gain / garanties de performance | Risque légal et réputationnel ; contraire à l'honnêteté du produit |
 | Leaderboard de P&L brut | Encourage la prise de risque malsaine ; on classe sur calibration/discipline |
@@ -181,7 +207,8 @@ Reporté en Phase 2 (après product-market fit perso + bloquants levés). Suivi 
 - v1 requirements: 44 total
 - Mapped to phases: 44 ✓
 - Unmapped: 0
+- v1.1 requirements (vision élargie): 13 total (DIST×4, MON×3, STOCK×2, PATT×2, RT×2) — à mapper lors de l'extension de roadmap (voir ROADMAP.md « Scope Update »)
 
 ---
 *Requirements defined: 2026-06-09*
-*Last updated: 2026-06-09 after roadmap creation*
+*Last updated: 2026-06-12 — vision élargie v1.1 (abonnement 9 $/mois, Telegram, actions, scalping, patterns mesurés)*

@@ -7,6 +7,16 @@
 
 Périmètre : MVP day/swing perso/démo. Les exigences v2 (scalping/temps réel, clé API live, communauté, monétisation) sont reportées en Phase 2 produit et ne figurent PAS dans cette roadmap.
 
+## Scope Update — 2026-06-12 (vision élargie v1.1)
+
+Décision fondateur : produit par abonnement **9 $/mois**, distribution **Telegram** (1 signal/jour sur canal public + résumé quotidien des trades sur canal privé abonnés), ajout des **actions**, **scalping** confirmé (day + scalping + long terme). Les Phases 1-9 restent inchangées — le cœur analytique est le prérequis de tout le nouveau scope. Extension proposée (à détailler via `/gsd-new-milestone` ou re-roadmap après la Phase 4) :
+
+- **Phase 10 : Distribution Telegram** — bot, 1 signal/jour public, résumé quotidien privé, traçabilité/idempotence des posts (DIST-01..04). Depends on: Phase 4 (seul besoin : setups scorés en base — peut tourner en parallèle des Phases 5-9 pour construire l'audience tôt).
+- **Phase 11 : Monétisation** — Stripe 9 $/mois, gating plateforme + canal privé, page pricing (MON-01..03). Depends on: Phases 5 + 10. **Porte légale : revue « conseil en investissement » (AMF/MiFID II) AVANT d'encaisser.**
+- **Phase 12 : Actions / equities** — source de données actions (research : Finnhub free n'a plus les candles actions), heures de marché/gaps/earnings (STOCK-01..02). Depends on: Phases 2-4.
+- **Phase 13 : Scalping temps réel** — websockets M1/M5, second writer additif (RT-01..02). Depends on: moteur prouvé (idéalement après Phase 9) — infra la plus lourde, exigence de latence maximale, en dernier.
+- **Transverse (Phases 3 + 9)** : catalogue de patterns chartiques déterministes (PATT-01) et mesure de leur taux de réussite réel par le backtest (PATT-02) — le « % de réussite » des patterns est mesuré sur nos données, jamais repris d'affirmations externes.
+
 ## Phases
 
 - [ ] **Phase 1: Fondations & Sécurité** - Monorepo, Supabase + RLS + auth, conventions temporelles verrouillées, modèle d'exécution des Routines Claude vérifié
