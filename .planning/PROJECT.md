@@ -14,7 +14,7 @@ Produire, pour chaque opportunité, une analyse fiable et explicable — score /
 
 ### Validated
 
-(None yet — ship to validate)
+- [x] **Fondations & sécurité (Phase 1, 2026-06-12)** : monorepo pnpm + auth Supabase SSR (signup→login→session, E2E 5/5), RLS active 3 tables avec isolation cross-user prouvée (6/6), double barrière service_role (lint + server-only), constantes temps anti look-ahead (16/16 golden values), runner de jobs `job_runs` + dispatcher Windows Task Scheduler exécuté hors agent (exit 0, ligne cloud vérifiée). Requirements AUTH-01/02/03, DATA-05, JOB-03/04.
 
 ### Active
 
@@ -96,4 +96,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-06-12 — vision élargie v1.1 (abonnement, Telegram, actions, scalping, patterns mesurés)*
+*Last updated: 2026-06-12 — Phase 1 (Fondations & Sécurité) complète et vérifiée (4/4) ; vision élargie v1.1 (abonnement, Telegram, actions, scalping, patterns mesurés)*
