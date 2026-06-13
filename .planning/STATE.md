@@ -3,13 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-last_updated: "2026-06-13T14:27:52.629Z"
+last_updated: "2026-06-13T14:35:26.465Z"
 progress:
   total_phases: 9
   completed_phases: 2
   total_plans: 11
-  completed_plans: 9
-  percent: 82
+  completed_plans: 10
+  percent: 91
+  note: "Phase 03 : 3/4 plans (03-01, 03-02, 03-03 complete ; 03-04 next)"
 ---
 
 # Project State
@@ -27,12 +28,12 @@ progress:
 ## Current Position
 
 Phase: 03 (moteur-d-analyse-d-terministe) — EXECUTING
-Plan: 3 of 4 (03-01 + 03-02 COMPLETE, next 03-03)
+Plan: 4 of 4 (03-01 + 03-02 + 03-03 COMPLETE, next 03-04)
 **Phase:** 3
-**Plan:** 03-02 complete
+**Plan:** 03-03 complete
 **Status:** Executing Phase 03
 
-**Progress:** [████████░░] 82%
+**Progress:** [█████████░] 91%
 
 ```
 Phase 1  [ ] Fondations & Sécurité          ← next
@@ -51,8 +52,8 @@ Phase 9  [ ] Backtest & calibration
 | Metric | Value |
 |--------|-------|
 | Phases complete | 2/9 |
-| Plans complete | 9 (Phase 01 + 02-01..02-04 + 03-01 + 03-02) |
-| Requirements covered | DATA-06 + Phase 01 + DATA-01/02/05 + DATA-03 + DATA-04 + DATA-07 + TECH-04 + FUND-01/02/03 + TECH-01/02/03 |
+| Plans complete | 10 (Phase 01 + 02-01..02-04 + 03-01 + 03-02 + 03-03) |
+| Requirements covered | DATA-06 + Phase 01 + DATA-01/02/05 + DATA-03 + DATA-04 + DATA-07 + TECH-04 + FUND-01/02/03 + TECH-01/02/03 (03-03 : slice vertical TECH-01..04 assemblé) |
 
 ## Accumulated Context
 
@@ -89,6 +90,7 @@ Phase 9  [ ] Backtest & calibration
 - D-43 (2026-06-13, plan 03-02) : `trendDirection` (HH/LL) déduit le sens AVANT cassure ; tendance flat ⇒ la cassure définit BOS par défaut, CHoCH seulement si tendance opposée établie (raffine D-33, confirmation toujours sur clôture du corps, jamais mèche).
 - D-44 (2026-06-13, plan 03-02) : hash de contenu = sha256 sur JSON canonique (clés triées récursivement + précision fixe 6 décimales via toFixed). Gèle le bruit flottant cross-plateforme (D-41/Pitfall 3). node:crypto builtin, jamais de hash maison.
 - D-45 (2026-06-13, plan 03-02) : wrappers exposent valeur at(-1) (null si historique insuffisant) ET série complète. La série permet le pin de longueur anti-warmup dans les golden tests et le calcul percentile/slope en aval. Type lib jamais exposé (MacdValue/BollingerValue propres). @app/indicators câblé dans tsconfig.base paths + vitest alias.
+- D-46 (2026-06-13, plan 03-03) : technical-engine = premier slice vertical complet. buildTechnicalSnapshot (pure, D-23) séparée du harness IO pour testabilité offline. trend = close vs EMA200 (repli EMA50) + bande neutre 0.1% ; slope = MACD−signal ; volume_state = volume récent (1/4 final) vs antérieur ; POC ajouté comme key_level dédié portant volume_source (D-35). Gap EMA200 → partial:true + missing['ema200'] (Pitfall 2, jamais zéro silencieux). Zod §3 validé AVANT upsert (T-03-10). @app/indicators ajouté en dep workspace + path mapping apps/jobs.
 
 ### Open todos / risques à lever
 
@@ -107,11 +109,11 @@ Aucun.
 
 ## Session Continuity
 
-**Last session:** 2026-06-13T14:27:52.621Z
+**Last session:** 2026-06-13T14:34:35Z
 
-**Next action:** Plan 03-03 — engines (technical/fundamental/news) consommant @app/indicators.
+**Next action:** Plan 03-04 — fundamental-engine + news-engine (dupliquer le pattern engine de 03-03).
 
-**Notes pour la session suivante:** Plan 03-02 COMPLETE. `packages/indicators` livré from scratch en TDD : wrappers thin RSI/MACD/EMA/ATR/Bollinger (valeur at(-1) alignée bougie clôturée + série), structure MAISON (swings/BOS-CHoCH/S-R/POC, flag volume_source real|proxy), schéma Zod §3 LOCKED + snapshotContentHash sha256 canonique (raw_indicators_ref D-41). 37/37 golden tests verts offline. Suite complète 128/128. tsc racine clean. Barrel @app/indicators prêt. Les engines 03-03/03-04 assembleront les snapshots (read candles → wrappers+structure → §3 Zod → hash → upsertSnapshot) ; schémas fundamental/news définis mais producteurs à câbler.
+**Notes pour la session suivante:** Plan 03-03 COMPLETE. `technical-engine` livré en TDD : fonction pure buildTechnicalSnapshot (read candles clôturées D-10 → @app/indicators wrappers+structure → §3 → Zod → hash D-41 → upsertSnapshot), harness isolé per-instrument×style (D-36 day=H4/H1, swing=D/H4), partial:true sur gap EMA200, volume_source real/proxy par broker (D-35). Enregistré dans dispatch JOB_REGISTRY ('technical-engine') → runJob écrit job_runs. 7/7 golden tests verts ; suite complète 135/135 ; tsc apps/jobs clean. Déviation Rule 3 : @app/indicators ajouté en dep workspace + path mapping apps/jobs. Pour 03-04 : dupliquer le harness, lire macro_series/getAssetDrivers (FUND) et news/economic_calendar (NEWS), produire fundamental_context/news_context via les schémas Zod déjà définis dans @app/indicators.
 
 ---
 *State initialized: 2026-06-09*

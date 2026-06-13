@@ -91,7 +91,7 @@ Plans:
 - [x] 03-02-PLAN.md — `packages/indicators` : wrappers golden + structure maison (swings/BOS-CHoCH/S-R/POC) + schéma Zod §3 + hash déterministe (TECH-01/02/03)
 
 **Wave 3** *(blocked on Wave 1+2)*
-- [ ] 03-03-PLAN.md — Slice technical-engine end-to-end : candles réelles → §3 snapshot → hash → upsert + dispatcher (TECH-01..04)
+- [x] 03-03-PLAN.md — Slice technical-engine end-to-end : candles réelles → §3 snapshot → hash → upsert + dispatcher (TECH-01..04) — COMPLETE 2026-06-13
 
 **Wave 4** *(blocked on Wave 3 — partage dispatch.ts)*
 - [ ] 03-04-PLAN.md — Slices fundamental-engine + news-engine : règles FRED + drivers table, sentiment décroissant + news_risk + dispatcher (FUND-01/02/03)
@@ -179,7 +179,7 @@ Plans:
 |-------|----------------|--------|-----------|
 | 1. Fondations & Sécurité | 3/3 | Complete | 2026-06-12 |
 | 2. Ingestion fiable des données | 4/4 | Complete | 2026-06-13 |
-| 3. Moteur d'analyse déterministe | 0/4 | Planned | - |
+| 3. Moteur d'analyse déterministe | 3/4 | In progress | - |
 | 4. Moteur IA "vétéran" & scoring | 0/0 | Not started | - |
 | 5. Dashboard des opportunités | 0/0 | Not started | - |
 | 6. Détail trade & charting | 0/0 | Not started | - |
