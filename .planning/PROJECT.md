@@ -2,13 +2,25 @@
 
 ## What This Is
 
-Plateforme d'analyse de trading qui combine analyse chartique (technique) et analyse fondamentale + news pour identifier des opportunités, noter chaque trade sur 100, évaluer son risque, et proposer entrée / stop-loss / take-profits / ratio R:R avec un raisonnement explicite. L'IA se comporte comme un trader vétéran (50 ans d'expérience). L'analyse chartique s'appuie sur un catalogue de patterns solides dont le taux de réussite est mesuré par backtest maison.
+**Plateforme publique par abonnement (9 $/mois, payé en USDT)** donnant accès à un outil d'analyse des marchés et à des **signaux de trade complets** : point d'entrée, take-profits, stop-loss, marge/levier suggéré si souhaité, score /100, niveau de risque — avec, pour chaque trade, **toute l'analyse (chartique + fondamentale + news) qui justifie le signal**, expliquée d'abord simplement, puis en profondeur pour qui veut comprendre le pourquoi.
 
-**Trajectoire produit (vision élargie 2026-06-12)** : d'abord outil personnel validé sur compte démo, puis produit par **abonnement 9 $/mois**. Distribution : **1 signal/jour sur un canal Telegram public** (acquisition) + **résumé quotidien des trades sur un canal Telegram privé** réservé aux abonnés. Marchés : crypto (sélection des plus pertinents) + forex + actions. Styles : scalping + day trading + long terme (le scalping arrive en dernier, infra temps réel).
+Chaque signal affiche un **pourcentage de réussite visible** : au lancement, le taux mesuré par backtest maison du pattern détecté ; avec le temps, le track record réel de la plateforme.
+
+**Audience cible** : Algérie d'abord, Afrique du Nord et Moyen-Orient ensuite — un public **non technique**. Tout est vulgarisé, rien n'est jargonneux. **Trilingue : arabe (RTL), anglais, français.**
+
+**Le produit (penser comme une société d'une cinquantaine de personnes — construire tous les outils dont elle aurait besoin)** :
+- **Vitrine publique** : présentation, % de réussite affiché, cours/articles gratuits qui partent de zéro (« c'est quoi un portefeuille ? »…), funnel d'abonnement.
+- **Espace membre (payant)** : signaux + analyses détaillées + outil d'analyse du marché.
+- **Paiement crypto** : abonnement réglé en USDT vers un portefeuille de la plateforme ; détection automatique des paiements on-chain et association paiement → compte (activation/expiration d'abonnement sans intervention manuelle).
+- **Affiliation à paliers** (stratégie influenceurs) : codes promo pour tracer les abonnés ramenés, dashboard affilié (abonnés, revenus, paiements), commissions payées en crypto. Palier maximum : **20 % récurrent des abonnements ramenés** (ex. 1 000 abonnés × 9 $ → 1 800 $/mois).
+- **Dashboard superadmin** : vue claire des membres (actifs/inactifs, état de paiement), des affiliés et de leurs performances, des signaux publiés, de la santé des jobs/données.
+- **Canal Telegram public** : résultats journaliers des trades partagés + **% de trades gagnants visible en permanence** (canal d'acquisition).
+
+L'IA se comporte comme un trader vétéran (50 ans d'expérience). L'analyse chartique s'appuie sur un catalogue de patterns dont le taux de réussite est **mesuré par backtest maison — jamais affirmé sans mesure**.
 
 ## Core Value
 
-Produire, pour chaque opportunité, une analyse fiable et explicable — score /100 + niveau de risque + plan de trade (entrée/SL/TP/R:R) — qui aide à décider avec discipline. Si tout le reste échoue, **la qualité et la traçabilité de l'analyse d'un trade** doit fonctionner.
+Produire, pour chaque opportunité, une analyse fiable et explicable — score /100 + niveau de risque + plan de trade (entrée/SL/TP/R:R/levier) — vulgarisée pour un public non technique. Si tout le reste échoue, **la qualité et la traçabilité de l'analyse d'un trade** doit fonctionner : le % de réussite affiché est toujours mesuré, jamais inventé — c'est le socle de confiance qui fait payer l'abonnement.
 
 ## Requirements
 
@@ -16,67 +28,69 @@ Produire, pour chaque opportunité, une analyse fiable et explicable — score /
 
 - [x] **Fondations & sécurité (Phase 1, 2026-06-12)** : monorepo pnpm + auth Supabase SSR (signup→login→session, E2E 5/5), RLS active 3 tables avec isolation cross-user prouvée (6/6), double barrière service_role (lint + server-only), constantes temps anti look-ahead (16/16 golden values), runner de jobs `job_runs` + dispatcher Windows Task Scheduler exécuté hors agent (exit 0, ligne cloud vérifiée). Requirements AUTH-01/02/03, DATA-05, JOB-03/04.
 
-### Active
+### Active — Cœur analytique (inchangé par le pivot 2026-06-13)
 
-- [ ] Ingestion des données marché OHLCV multi-timeframes (H1/H4/Daily) pour crypto (Binance) + forex/or/argent/pétrole (OANDA)
-- [ ] Ingestion des news + sentiment (Finnhub/Marketaux) et macro (FRED)
+- [ ] Ingestion des données marché OHLCV multi-timeframes (H1/H4/Daily) pour crypto (Binance) + forex/or/argent/pétrole (OANDA) — **Phase 2 planifiée, prête à exécuter**
+- [ ] Ingestion des news + sentiment (Finnhub/Marketaux), macro (FRED) et calendrier économique
 - [ ] Moteur d'indicateurs techniques déterministe (RSI, MACD, EMA, ATR, Bollinger, structure de marché, S/R)
-- [ ] Moteur d'analyse "vétéran" (routine planifiée Claude Max) produisant un JSON structuré par trade (score/100, risque, entrée, SL, TP, R:R, raisons techniques/fondamentales/news, invalidation)
+- [ ] Moteur d'analyse "vétéran" produisant un JSON structuré par trade (score/100, risque, entrée, SL, TP, marge/levier, R:R, raisons techniques/fondamentales/news, invalidation)
 - [ ] Persistance des analyses + setups dans Supabase avec validation Zod et garde-fous déterministes
-- [ ] Dashboard Next.js : liste des opportunités triées par score, filtres (actif, style, risque)
-- [ ] Vue détail d'un trade : chart (lightweight-charts) + niveaux SL/TP + raisonnement + note du vétéran
-- [ ] Routines planifiées aux ouvertures de marché (Asie/Londres/New York) + EOD swing
-- [ ] Journal de trading (trades réels de l'utilisateur, demo/live) + calculateur de sizing (risque fixe 1-2 %)
-- [ ] Boucle d'apprentissage : évaluation prédiction vs résultat (prediction_outcomes) + backtest hebdo + métriques (win rate, calibration du score, expectancy)
-- [ ] Disclaimers conseil financier (éducatif, pas un conseil)
+- [ ] Catalogue de patterns chartiques déterministes + **taux de réussite mesuré par backtest** alimentant le % affiché (PATT-01..02 — remonté du v1.1 au cœur)
+- [ ] Boucle d'apprentissage : prédiction vs résultat (prediction_outcomes) + backtest + métriques (win rate, calibration, expectancy) → track record réel de la plateforme
 
-### Active — v1.1 (vision élargie 2026-06-12, après le cœur analytique)
+### Active — Plateforme produit (pivot 2026-06-13)
 
-- [ ] Bot Telegram : 1 signal/jour (mieux scoré) sur canal public + résumé quotidien des trades sur canal privé abonnés (DIST-01..04)
-- [ ] Abonnement Stripe 9 $/mois + gating plateforme et canal Telegram privé (MON-01..03)
-- [ ] Actions/equities : ingestion + traitement comme classe d'actif supplémentaire (STOCK-01..02 — source de données à valider)
-- [ ] Catalogue de patterns chartiques déterministes + taux de réussite mesuré par backtest, alimentant le score (PATT-01..02)
-- [ ] Scalping temps réel M1/M5 (websockets) — en dernier, après moteur prouvé (RT-01..02)
+- [ ] Vitrine publique trilingue (arabe RTL / anglais / français) : présentation, % de réussite, funnel d'abonnement
+- [ ] Espace membre gated par abonnement : liste des signaux triés par score, filtres, vue détail trade (chart lightweight-charts + niveaux + explication simple + analyse approfondie dépliable)
+- [ ] Paiement abonnement en USDT : détection des paiements on-chain, association paiement → compte, activation/renouvellement/expiration automatiques (méthode de détection à trancher : processeur crypto vs watcher maison)
+- [ ] Système d'affiliation à paliers : codes promo, tracking des abonnés ramenés, dashboard affilié, calcul et suivi des commissions (palier max 20 % récurrent), paiement des commissions en crypto
+- [ ] Dashboard superadmin : membres (actifs/inactifs/paiements), affiliés et leurs stats, signaux, santé jobs/données
+- [ ] CMS articles/cours gratuits vulgarisés (de la base : outils, portefeuille, …) sur la vitrine
+- [ ] Bot/canal Telegram public : publication des résultats journaliers des trades + win rate permanent
+- [ ] Disclaimers (contenu éducatif, pas de conseil personnalisé, aucune promesse de gain) sur vitrine, espace membre et Telegram
 
 ### Out of Scope
 
-- Clé API Anthropic / analyses live à la demande — reporté en v2 (Phase 1 = forfait Max + routines planifiées, coût zéro)
-- Communauté (profils, follows, commentaires, leaderboard) — reporté en v2
-- Exécution automatique des trades (passage d'ordres) — hors scope (outil d'aide à la décision, pas de bot d'exécution)
-- ~~Actions / equities~~ et ~~scalping~~ et ~~monétisation~~ — **sortis du out-of-scope le 2026-06-12** (voir Active v1.1)
+- Stripe / paiement par carte — remplacé par paiement crypto USDT (décision 2026-06-13)
+- Trajectoire « outil perso + capital 500 $ » — **abandonnée le 2026-06-13** (la plateforme reste utilisable par le fondateur pour ses trades perso, mais ce n'est plus l'objectif produit)
+- Communauté sociale (profils, follows, commentaires, leaderboard) — v2
+- Exécution automatique des trades (passage d'ordres) — hors scope (aide à la décision, pas de bot d'exécution)
+- Scalping temps réel M1/M5 (websockets) — après moteur prouvé
+- Actions/equities — à revalider après le lancement du cœur (source de données à trancher)
 
 ## Context
 
-- **Fondateur** : Borhane, développeur (maîtrise Next.js + Supabase, plusieurs projets e-commerce existants). Niveau trading intermédiaire (connaît chandeliers, S/R, gestion du risque).
-- **Capital** : 500 $. Démarrage obligatoire sur compte démo/testnet avant tout capital réel. Apprentissage durant la phase démo via la boucle de feedback.
-- **Forfait Claude Max** disponible → permet de faire tourner des routines/agents planifiés sans coût par token. L'app Claude Code tourne sur Windows.
-- **MCP Supabase déjà connecté.**
-- **Architecture détaillée** : voir `ARCHITECTURE.md` à la racine du projet (flux de données, schéma Supabase, moteur de scoring, JSON de sortie, cron des routines, boucle d'apprentissage, stack).
-- **Principe clé** : le backend Next.js ne fait que lire Supabase en Phase 1 ; c'est la routine planifiée (agent Claude Code sous Max) qui produit l'intelligence et persiste. Les indicateurs sont calculés en code (déterministe) — Claude raisonne, n'invente pas les chiffres.
+- **Fondateur** : Borhane, développeur (Next.js + Supabase). Niveau trading intermédiaire.
+- **Audience** : MENA (Algérie → Moyen-Orient), non technique, acquise via influenceurs + Telegram. L'USDT y est le moyen de paiement crypto dominant (généralement via P2P).
+- **Forfait Claude Max** disponible → routines/agents planifiés sans coût par token (à réévaluer pour une plateforme publique : fiabilité 24/7).
+- **MCP Supabase connecté.** Architecture détaillée : `ARCHITECTURE.md` (à réviser post-pivot pour les briques plateforme).
+- **Principe clé inchangé** : les indicateurs sont calculés en code (déterministe) — Claude raisonne, n'invente pas les chiffres. Le % de réussite vient du backtest, jamais d'une affirmation.
 
 ## Constraints
 
-- **Tech stack**: Next.js 15 + Supabase (Postgres/Auth/Realtime/RLS) — réutilise les compétences existantes du fondateur.
-- **Budget**: Phase 1 à coût quasi nul — sources de données gratuites (testnet/démo), pas de clé API Anthropic (forfait Max + routines).
-- **Données**: OANDA (forex/métaux/énergie), Binance (crypto), Finnhub/Marketaux (news), FRED (macro). Tiers gratuits → gérer les rate limits.
-- **Sécurité**: démo/testnet d'abord (pas de fonds réels), clés en `.env` non commitées, service_role réservé aux jobs, RLS stricte (journal privé).
-- **Légal**: contenu éducatif, disclaimers explicites, aucune promesse de gain (responsabilité communauté).
-- **Robustesse routines**: PC potentiellement éteint → jobs idempotents + monitoring `job_runs` + Windows Task Scheduler en backup.
+- **Tech stack** : Next.js 15 + Supabase (Postgres/Auth/Realtime/RLS).
+- **Budget** : coût quasi nul jusqu'au lancement — sources de données gratuites, pas de clé API Anthropic tant que les routines Max suffisent.
+- **Données** : OANDA (forex/métaux/énergie), Binance (crypto), Finnhub/Marketaux (news), FRED (macro), FairEconomy (calendrier éco). Tiers gratuits → rate limits gérés.
+- **Sécurité** : clés en `.env` non commitées, service_role réservé aux jobs, RLS stricte ; portefeuille crypto de la plateforme = clés jamais dans le code ni la DB (cold wallet pour les fonds, watcher en lecture seule).
+- **Légal — ATTENTION RENFORCÉE POST-PIVOT** : vendre des signaux à un public non averti = exposition réglementaire réelle (conseil en investissement non agréé). Positionnement strictement éducatif + disclaimers systématiques. ⚠️ La réglementation crypto en Algérie (interdiction légale des crypto-monnaies) et dans certains pays ciblés est un risque structurel à traiter (structure juridique, juridiction d'exploitation) **avant d'encaisser le premier abonnement**.
+- **Robustesse routines** : PC potentiellement éteint → jobs idempotents + monitoring `job_runs` + Windows Task Scheduler en backup. Pour une plateforme publique payante, la fiabilité des publications devra être garantie (à trancher : migration vers clé API/infra cloud au lancement).
 
 ## Key Decisions
 
 | Decision | Rationale | Outcome |
 |----------|-----------|---------|
-| Forfait Max + routines planifiées (pas de clé API) en Phase 1 | Coût zéro, backend ne fait que lire Supabase | — Pending |
-| Marchés : crypto + forex + or/argent/pétrole (pas d'actions) | Adapté à 500 $, sources gratuites, 24/7 crypto | — Pending |
-| Styles Day + Swing en MVP, scalping en Phase 2 | Swing/Day partagent le même moteur ; scalping = temps réel coûteux | — Pending |
-| Indicateurs calculés en code (déterministe), Claude raisonne seulement | Évite l'hallucination de chiffres, économise les tokens | — Pending |
-| Stack Next.js + Supabase | Réutilise les compétences du fondateur, MCP déjà connecté | — Pending |
-| Démarrage compte démo obligatoire avant capital réel | Apprentissage sans risque, boucle de feedback | — Pending |
-| **2026-06-12 — Vision élargie** : abonnement 9 $/mois, Telegram public (1 signal/j) + privé (résumé abonnés), actions ajoutées, scalping confirmé | Passage d'outil perso à produit ; le canal public construit l'audience avant le lancement payant | — Pending |
-| Phases 1-9 inchangées, nouveau scope en phases 10-13 (extension) | Tout le nouveau scope dépend du cœur analytique ; ne pas déstabiliser l'exécution en cours | — Pending |
-| % de réussite des patterns = mesuré par notre backtest, jamais affirmé | Honnêteté produit + risque légal (aucune promesse non mesurée) | — Pending |
-| Revue légale AMF/MiFID II obligatoire AVANT d'encaisser le premier abonnement | Vendre des signaux à des tiers ≠ outil perso — exposition réglementaire réelle | — Pending |
+| Forfait Max + routines planifiées (pas de clé API) tant que viable | Coût zéro, backend ne fait que lire Supabase | — Pending |
+| Marchés : crypto + forex + or/argent/pétrole | Sources gratuites, 24/7 crypto, audience crypto-friendly | — Pending |
+| Styles Day + Swing d'abord, scalping plus tard | Même moteur ; scalping = temps réel coûteux | — Pending |
+| Indicateurs calculés en code, Claude raisonne seulement | Évite l'hallucination de chiffres | — Pending |
+| Stack Next.js + Supabase | Compétences fondateur, MCP connecté | — Pending |
+| **2026-06-13 — PIVOT PRODUIT** : plateforme publique payante (9 $/mois) d'analyses + signaux, vitrine + espace membre, audience MENA non technique, trilingue AR/EN/FR | Passage direct au produit ; l'outil perso n'est plus l'objectif | — Pending |
+| **2026-06-13** — Paiement exclusivement en USDT vers portefeuille crypto, détection on-chain des paiements, commissions affiliés en crypto | Audience MENA : carte bancaire inadaptée, USDT dominant ; pas de Stripe | — Pending |
+| **2026-06-13** — Affiliation à paliers basée sur les abonnés actifs ramenés (code promo), palier max 20 % récurrent | Acquisition par influenceurs, alignement long terme | — Pending |
+| **2026-06-13** — % de réussite affiché = taux des patterns backtestés d'abord, track record réel ensuite | Honnêteté produit : jamais un chiffre non mesuré | — Pending |
+| % de réussite des patterns = mesuré par notre backtest, jamais affirmé | Honnêteté produit + risque légal | — Pending |
+| Revue légale obligatoire AVANT d'encaisser le premier abonnement (conseil non agréé + statut crypto dans les pays cibles, dont l'Algérie) | Exposition réglementaire réelle | — Pending |
+| Phases 1-2 (fondations, ingestion) inchangées par le pivot ; roadmap aval (phases 3+) à réviser | Le cœur analytique sert les deux visions ; ne pas geler l'exécution | — Pending |
 
 ## Evolution
 
@@ -96,4 +110,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-06-12 — Phase 1 (Fondations & Sécurité) complète et vérifiée (4/4) ; vision élargie v1.1 (abonnement, Telegram, actions, scalping, patterns mesurés)*
+*Last updated: 2026-06-13 — PIVOT : plateforme publique payante (9 $/mois en USDT), affiliation à paliers, audience MENA trilingue AR/EN/FR, Telegram résultats journaliers ; trajectoire outil perso 500 $ abandonnée. Phases 1-2 inchangées, roadmap aval à réviser.*
