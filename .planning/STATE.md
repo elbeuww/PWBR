@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-last_updated: "2026-06-13T14:14:25.771Z"
+last_updated: "2026-06-13T14:27:52.629Z"
 progress:
   total_phases: 9
   completed_phases: 2
   total_plans: 11
-  completed_plans: 8
-  percent: 73
+  completed_plans: 9
+  percent: 82
 ---
 
 # Project State
@@ -27,12 +27,12 @@ progress:
 ## Current Position
 
 Phase: 03 (moteur-d-analyse-d-terministe) — EXECUTING
-Plan: 2 of 4 (03-01 COMPLETE, next 03-02)
+Plan: 3 of 4 (03-01 + 03-02 COMPLETE, next 03-03)
 **Phase:** 3
-**Plan:** 03-01 complete
+**Plan:** 03-02 complete
 **Status:** Executing Phase 03
 
-**Progress:** [███████░░░] 73%
+**Progress:** [████████░░] 82%
 
 ```
 Phase 1  [ ] Fondations & Sécurité          ← next
@@ -51,8 +51,8 @@ Phase 9  [ ] Backtest & calibration
 | Metric | Value |
 |--------|-------|
 | Phases complete | 2/9 |
-| Plans complete | 8 (Phase 01 + 02-01..02-04 + 03-01) |
-| Requirements covered | DATA-06 + Phase 01 + DATA-01/02/05 + DATA-03 + DATA-04 + DATA-07 + TECH-04 + FUND-01/02/03 |
+| Plans complete | 9 (Phase 01 + 02-01..02-04 + 03-01 + 03-02) |
+| Requirements covered | DATA-06 + Phase 01 + DATA-01/02/05 + DATA-03 + DATA-04 + DATA-07 + TECH-04 + FUND-01/02/03 + TECH-01/02/03 |
 
 ## Accumulated Context
 
@@ -85,12 +85,16 @@ Phase 9  [ ] Backtest & calibration
 - D-27 (2026-06-13, plan 02-04) : vi.mock top-level (hoisted) obligatoire pour mocker les imports ESM statiques des jobs — vi.mock dynamique dans les fonctions de test n'affecte pas les modules déjà résolus.
 - D-28 (2026-06-13, plan 02-04) : fallback Marketaux dans newsIngest déclenché sur erreur Finnhub (catch), pas sur 0 résultats — garantit que Finnhub est toujours tenté en premier.
 - D-30 (2026-06-13, plan 03-01) : Frontière `snapshots` = table horizontale écrite par 3 moteurs verticaux (technical/fundamental/news), référencée par `content_hash` (= raw_indicators_ref, D-41) en aval ; `getSnapshotByHash` exposé pour la Phase 4. `asset_drivers` = data-not-code (D-38), 13 lignes seedées (or↔DXY/REAL_YIELDS, JPY↔RATE_DIFF, crypto↔RISK_SENTIMENT/DXY). RLS select-only dès 0005, AUCUNE write policy (service_role bypass, D-05). idempotence snapshots_uniq prouvée par test golden DB.
+- D-42 (2026-06-13, plan 03-02) : swings pinés N=2 (fenêtre 2N+1=5), k=1.0×ATR — candidats RESEARCH validés par golden tests sur cas vérifiés à la main (D-32). Constantes nommées SWING_N/SWING_K dans swings.ts.
+- D-43 (2026-06-13, plan 03-02) : `trendDirection` (HH/LL) déduit le sens AVANT cassure ; tendance flat ⇒ la cassure définit BOS par défaut, CHoCH seulement si tendance opposée établie (raffine D-33, confirmation toujours sur clôture du corps, jamais mèche).
+- D-44 (2026-06-13, plan 03-02) : hash de contenu = sha256 sur JSON canonique (clés triées récursivement + précision fixe 6 décimales via toFixed). Gèle le bruit flottant cross-plateforme (D-41/Pitfall 3). node:crypto builtin, jamais de hash maison.
+- D-45 (2026-06-13, plan 03-02) : wrappers exposent valeur at(-1) (null si historique insuffisant) ET série complète. La série permet le pin de longueur anti-warmup dans les golden tests et le calcul percentile/slope en aval. Type lib jamais exposé (MacdValue/BollingerValue propres). @app/indicators câblé dans tsconfig.base paths + vitest alias.
 
 ### Open todos / risques à lever
 
 - ~~**Phase 1 (research flag):** vérifier le modèle d'exécution réel des Routines Claude Code~~ — RÉSOLU : documenté dans `docs/routines-claude.md` (D-19). Fallback .cmd implémenté.
 - **Phase 1:** verrouiller la convention daily cross-asset (OANDA 17:00 NY vs Binance 00:00 UTC) + convention de bougie clôturée (anti look-ahead).
-- **Phase 3 (research flag):** concevoir et tester la détection de structure de marché maison (HH/HL, BOS/CHoCH, swings, POC) — absente des libs.
+- ~~**Phase 3 (research flag):** concevoir et tester la détection de structure de marché maison (HH/HL, BOS/CHoCH, swings, POC) — absente des libs.~~ — RÉSOLU plan 03-02 : structure maison golden-testée (swings D-32, BOS/CHoCH corps D-33, S/R D-34, POC+flag D-35), 37/37 verts.
 - **Phase 4 (research flag):** point à plus haut risque — robustesse prompt vétéran, taux de rejet Zod, méthode de scoring. À itérer.
 - **Phase 9 (research flag):** méthode de calibration (isotonic/Platt) et seuil d'échantillon minimal.
 - **Phase 12 (research flag, v1.1):** source de données actions — Finnhub free n'offre plus les candles actions ; évaluer Alpha Vantage / Twelve Data / Polygon (tiers gratuits + rate limits).
@@ -103,11 +107,11 @@ Aucun.
 
 ## Session Continuity
 
-**Last session:** 2026-06-13T14:14:25.764Z
+**Last session:** 2026-06-13T14:27:52.621Z
 
-**Next action:** Commencer Phase 03 — Moteur d'analyse déterministe.
+**Next action:** Plan 03-03 — engines (technical/fundamental/news) consommant @app/indicators.
 
-**Notes pour la session suivante:** Phase 02 COMPLETE (4/4 plans). 3 jobs d'ingestion livrés (news/macro/calendar), enregistrés dans dispatch.ts (5 jobs au total). fault-isolation.test.ts vert (DATA-07). Suite 86/86. tsc clean. vendor.d.ts pour finnhub sans types. D-29 fallback Marketaux = catch Finnhub. Phase 3 consommera economic_calendar + macro_series + news déjà prêts en base.
+**Notes pour la session suivante:** Plan 03-02 COMPLETE. `packages/indicators` livré from scratch en TDD : wrappers thin RSI/MACD/EMA/ATR/Bollinger (valeur at(-1) alignée bougie clôturée + série), structure MAISON (swings/BOS-CHoCH/S-R/POC, flag volume_source real|proxy), schéma Zod §3 LOCKED + snapshotContentHash sha256 canonique (raw_indicators_ref D-41). 37/37 golden tests verts offline. Suite complète 128/128. tsc racine clean. Barrel @app/indicators prêt. Les engines 03-03/03-04 assembleront les snapshots (read candles → wrappers+structure → §3 Zod → hash → upsertSnapshot) ; schémas fundamental/news définis mais producteurs à câbler.
 
 ---
 *State initialized: 2026-06-09*

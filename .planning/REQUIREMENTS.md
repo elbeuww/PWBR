@@ -19,9 +19,9 @@ Périmètre MVP (Phase 0 fondations + Phase 1 day/swing, usage perso/démo). Cha
 
 ### Technical Analysis Engine (TECH)
 
-- [ ] **TECH-01**: Le système calcule en code déterministe les indicateurs (RSI, MACD, EMA, ATR, Bollinger) à partir des bougies
-- [ ] **TECH-02**: Le système détecte la structure de marché (HH/HL, swings, BOS/CHoCH) de façon déterministe
-- [ ] **TECH-03**: Le système identifie les niveaux clés (support/résistance, POC volume) avec une mesure de force
+- [x] **TECH-01**: Le système calcule en code déterministe les indicateurs (RSI, MACD, EMA, ATR, Bollinger) à partir des bougies
+- [x] **TECH-02**: Le système détecte la structure de marché (HH/HL, swings, BOS/CHoCH) de façon déterministe
+- [x] **TECH-03**: Le système identifie les niveaux clés (support/résistance, POC volume) avec une mesure de force
 - [x] **TECH-04**: Le système produit un `technical_snapshot` structuré (tendance HTF/LTF, momentum, volatilité, niveaux, structure) par instrument/style
 
 ### Fundamental & News Engine (FUND)
@@ -168,9 +168,9 @@ Reporté (après lancement abonnement + bloquants levés). Suivi mais hors roadm
 | DATA-04 | Phase 2 | Pending |
 | DATA-06 | Phase 2 | Complete |
 | DATA-07 | Phase 2 | Pending |
-| TECH-01 | Phase 3 | Pending |
-| TECH-02 | Phase 3 | Pending |
-| TECH-03 | Phase 3 | Pending |
+| TECH-01 | Phase 3 | Complete |
+| TECH-02 | Phase 3 | Complete |
+| TECH-03 | Phase 3 | Complete |
 | TECH-04 | Phase 3 | Complete |
 | FUND-01 | Phase 3 | Complete |
 | FUND-02 | Phase 3 | Complete |
