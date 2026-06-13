@@ -39,6 +39,11 @@ export type {
   Timeframe,
   QuoteHours,
   CalendarImpact,
+  // Phase 3 — moteur déterministe
+  SnapshotRow,
+  SnapshotInsert,
+  AssetDriverRow,
+  AssetDriverInsert,
 } from './database.types'
 
 // Repositories
@@ -50,3 +55,6 @@ export { upsertCandles, getLastCandleTs } from './repositories/candles'
 export { upsertNews } from './repositories/news'
 export { upsertMacroSeries } from './repositories/macroSeries'
 export { upsertEconomicCalendar } from './repositories/economicCalendar'
+// Phase 3 — moteur déterministe repositories
+export { upsertSnapshot, getSnapshotByHash } from './repositories/snapshots'
+export { getAssetDrivers } from './repositories/assetDrivers'
