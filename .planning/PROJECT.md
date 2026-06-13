@@ -27,11 +27,10 @@ Produire, pour chaque opportunité, une analyse fiable et explicable — score /
 ### Validated
 
 - [x] **Fondations & sécurité (Phase 1, 2026-06-12)** : monorepo pnpm + auth Supabase SSR (signup→login→session, E2E 5/5), RLS active 3 tables avec isolation cross-user prouvée (6/6), double barrière service_role (lint + server-only), constantes temps anti look-ahead (16/16 golden values), runner de jobs `job_runs` + dispatcher Windows Task Scheduler exécuté hors agent (exit 0, ligne cloud vérifiée). Requirements AUTH-01/02/03, DATA-05, JOB-03/04.
+- [x] **Ingestion fiable des données (Phase 2, 2026-06-13)** : 4 tables RLS (candles/news/macro_series/economic_calendar) + 12 instruments seedés + vue `v_data_freshness` (horaires de cotation NY-DST), 5 clients data-sources (Binance mainnet public, OANDA démo, Finnhub, Marketaux, FRED, FairEconomy) avec parsers Zod golden-testés, 4 jobs idempotents gap-fill avec isolation des pannes. 88/88 tests, idempotence prouvée contre le cloud. Requirements DATA-01/02/03/04/06/07. Reste UAT humain : clés API + premier run live (02-HUMAN-UAT.md).
 
 ### Active — Cœur analytique (inchangé par le pivot 2026-06-13)
 
-- [ ] Ingestion des données marché OHLCV multi-timeframes (H1/H4/Daily) pour crypto (Binance) + forex/or/argent/pétrole (OANDA) — **Phase 2 planifiée, prête à exécuter**
-- [ ] Ingestion des news + sentiment (Finnhub/Marketaux), macro (FRED) et calendrier économique
 - [ ] Moteur d'indicateurs techniques déterministe (RSI, MACD, EMA, ATR, Bollinger, structure de marché, S/R)
 - [ ] Moteur d'analyse "vétéran" produisant un JSON structuré par trade (score/100, risque, entrée, SL, TP, marge/levier, R:R, raisons techniques/fondamentales/news, invalidation)
 - [ ] Persistance des analyses + setups dans Supabase avec validation Zod et garde-fous déterministes
@@ -114,4 +113,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-06-13 — PIVOT : plateforme publique payante (9 $/mois en USDT), affiliation à paliers, audience MENA trilingue AR/EN/FR, Telegram résultats journaliers ; trajectoire outil perso 500 $ abandonnée. Phases 1-2 inchangées, roadmap aval à réviser.*
+*Last updated: 2026-06-13 — Phase 2 (ingestion) COMPLÈTE : pipeline data OHLCV/news/macro/calendrier idempotent et tolérant aux pannes, 88/88 tests. PIVOT actif : plateforme publique payante (9 $/mois en USDT), affiliation à paliers, audience MENA trilingue AR/EN/FR, Telegram résultats journaliers ; trajectoire outil perso 500 $ abandonnée. Roadmap aval (3+) à réviser.*
