@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "binance": "3.5.9",
+    "finnhub": "2.0.14",
     "luxon": "3.7.2",
     "p-limit": "7.3.0",
     "p-retry": "8.0.0",

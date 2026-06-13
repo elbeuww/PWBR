@@ -1,0 +1,35 @@
+[
+  {
+    "category": "crypto",
+    "datetime": 1749463200,
+    "headline": "Bitcoin surges past 70,000 as ETF inflows accelerate",
+    "id": 11223344,
+    "image": "https://example.com/btc-surge.jpg",
+    "related": "BTCUSDT",
+    "source": "Reuters",
+    "summary": "Bitcoin reached a new monthly high of $70,500 driven by continued inflows into spot ETFs. Analysts remain bullish for Q3 2026.",
+    "url": "https://www.reuters.com/crypto/bitcoin-surges-70000-etf-inflows-2026-06-09/"
+  },
+  {
+    "category": "crypto",
+    "datetime": 1749452400,
+    "headline": "Ethereum upgrade reduces gas fees by 30%",
+    "id": 55667788,
+    "image": "",
+    "related": "ETHUSDT",
+    "source": "CoinDesk",
+    "summary": "The latest Ethereum network upgrade slashed average gas fees significantly, boosting DeFi activity.",
+    "url": "https://www.coindesk.com/tech/2026/06/09/ethereum-upgrade-gas-fees/"
+  },
+  {
+    "category": "crypto",
+    "datetime": 1749441600,
+    "headline": "Crypto market cap hits $3T milestone",
+    "id": 99001122,
+    "image": null,
+    "related": "",
+    "source": "Bloomberg",
+    "summary": null,
+    "url": "https://www.bloomberg.com/news/articles/2026-06-09/crypto-market-cap-3-trillion"
+  }
+]

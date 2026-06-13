@@ -1,0 +1,43 @@
+[
+  {
+    "title": "Non-Farm Employment Change",
+    "country": "USD",
+    "date": "2026-06-06T12:30:00+00:00",
+    "impact": "High",
+    "forecast": "185K",
+    "previous": "177K"
+  },
+  {
+    "title": "CPI m/m",
+    "country": "USD",
+    "date": "2026-06-11T12:30:00+00:00",
+    "impact": "High",
+    "forecast": "0.3%",
+    "previous": "0.2%"
+  },
+  {
+    "title": "Fed Chair Powell Speaks",
+    "country": "USD",
+    "date": "2026-06-12T14:00:00+00:00",
+    "impact": "Medium",
+    "forecast": null,
+    "previous": null
+  },
+  {
+    "title": "GDP Growth Rate QoQ",
+    "country": "EUR",
+    "date": "2026-06-13T09:00:00+00:00",
+    "impact": "Medium",
+    "forecast": "0.4%",
+    "previous": "0.3%",
+    "extra_field": "ignored_by_tolerant_schema"
+  },
+  {
+    "title": "BOJ Rate Decision",
+    "country": "JPY",
+    "date": "2026-06-14T03:00:00+00:00",
+    "impact": "Low",
+    "forecast": "-0.1%",
+    "previous": "-0.1%"
+  }
+]
