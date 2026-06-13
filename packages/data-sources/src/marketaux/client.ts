@@ -25,12 +25,15 @@ const MarketauxArticleSchema = z
     description: z.string().nullable().optional(),
     url: z.string(),
     published_at: z.string(), // ISO datetime
-    sentiment_score: z.number().nullable().optional(), // D-30 : sentiment provider
+    // D-30 : sentiment borné [-1, 1] pour correspondre au check constraint DB.
+    // .catch(null) : si la valeur est hors plage ou invalide, elle est ramenée à null
+    // plutôt que de faire échouer tout le lot (l'article reste ingéré sans sentiment).
+    sentiment_score: z.number().min(-1).max(1).nullable().optional().catch(null),
     entities: z
       .array(
         z.object({
           symbol: z.string().optional(),
-          sentiment_score: z.number().nullable().optional(),
+          sentiment_score: z.number().min(-1).max(1).nullable().optional().catch(null),
         }),
       )
       .optional(),
