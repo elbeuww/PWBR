@@ -82,7 +82,19 @@ Plans:
   2. La structure de marché (HH/HL, swings, BOS/CHoCH) et les niveaux clés (S/R, POC volume avec mesure de force) sont détectés de façon déterministe par un module maison.
   3. Un `technical_snapshot` structuré (tendance HTF/LTF, momentum, volatilité, niveaux, structure) est produit par instrument/style.
   4. Un `fundamental_context` (biais macro, environnement de taux, drivers par actif) et un `news_context` (sentiment net, catalyseurs, events à venir avec flag `news_risk`) sont produits par instrument.
-**Plans**: TBD
+**Plans**: 4 plans
+Plans:
+**Wave 1**
+- [ ] 03-01-PLAN.md — Persistance partagée : migration 0005 snapshots + asset_drivers + RLS + [BLOCKING] apply MCP + repos idempotents (TECH-04, FUND-01..03)
+
+**Wave 2** *(blocked on Wave 1 — types régénérés)*
+- [ ] 03-02-PLAN.md — `packages/indicators` : wrappers golden + structure maison (swings/BOS-CHoCH/S-R/POC) + schéma Zod §3 + hash déterministe (TECH-01/02/03)
+
+**Wave 3** *(blocked on Wave 1+2)*
+- [ ] 03-03-PLAN.md — Slice technical-engine end-to-end : candles réelles → §3 snapshot → hash → upsert + dispatcher (TECH-01..04)
+
+**Wave 4** *(blocked on Wave 3 — partage dispatch.ts)*
+- [ ] 03-04-PLAN.md — Slices fundamental-engine + news-engine : règles FRED + drivers table, sentiment décroissant + news_risk + dispatcher (FUND-01/02/03)
 **Research flag**: yes — détection de structure de marché maison absente des libs (effort sous-estimé) : algos déterministes HH/HL, BOS/CHoCH, swing detection, POC volume
 
 ### Phase 4: Moteur IA "vétéran" & scoring
@@ -165,9 +177,9 @@ Plans:
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Fondations & Sécurité | 1/3 | Executing | - |
-| 2. Ingestion fiable des données | 1/4 | In Progress|  |
-| 3. Moteur d'analyse déterministe | 0/0 | Not started | - |
+| 1. Fondations & Sécurité | 3/3 | Complete | 2026-06-12 |
+| 2. Ingestion fiable des données | 4/4 | Complete | 2026-06-13 |
+| 3. Moteur d'analyse déterministe | 0/4 | Planned | - |
 | 4. Moteur IA "vétéran" & scoring | 0/0 | Not started | - |
 | 5. Dashboard des opportunités | 0/0 | Not started | - |
 | 6. Détail trade & charting | 0/0 | Not started | - |
