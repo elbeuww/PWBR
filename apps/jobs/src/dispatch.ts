@@ -21,6 +21,7 @@ import { marketIngest } from './jobs/market-ingest'
 import { newsIngest } from './jobs/news-ingest'
 import { macroIngest } from './jobs/macro-ingest'
 import { calendarIngest } from './jobs/calendar-ingest'
+import { technicalEngine } from './jobs/technical-engine'
 import type { Json } from '@app/supabase'
 
 const logger = pino({ level: 'info' })
@@ -33,6 +34,7 @@ const JOB_REGISTRY: Record<string, () => Promise<Json | undefined>> = {
   'news-ingest': newsIngest,
   'macro-ingest': macroIngest,
   'calendar-ingest': calendarIngest,
+  'technical-engine': technicalEngine,
 }
 
 // ─── Dispatch ────────────────────────────────────────────────────────────────
