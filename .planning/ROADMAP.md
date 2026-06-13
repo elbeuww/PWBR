@@ -107,7 +107,19 @@ Plans:
   2. Chaque setup retenu est produit en JSON structuré (direction, entrée, SL, TP multiples, R:R, raisons technique/fondamentale/news, invalidation, note du vétéran) avec une note d'opportunité /100 décomposable et un niveau de risque séparé (low/medium/high/extreme).
   3. Le `scoring-aggregator` valide chaque sortie IA via Zod et applique les garde-fous déterministes (recalcul R:R, cohérence SL/TP, seuil de rejet) ; les sorties non conformes sont rejetées et loggées.
   4. Chaque analyse stocke le `snapshot` exact utilisé et n'est jamais mutée — une nouvelle version remplace, l'ancienne est marquée expired/invalidated.
-**Plans**: TBD
+**Plans**: 4 plans
+Plans:
+**Wave 1**
+- [ ] 04-01-PLAN.md — Fondation : migration 0006 analyses+trade_setups + RLS + [BLOCKING] apply MCP + OutputSchema §3 + repos insert/expiry (SCORE-01/05)
+
+**Wave 2** *(blocked on Wave 1 — types + OutputSchema)*
+- [ ] 04-02-PLAN.md — Scoring core pur golden : weights §3 + rr bord conservateur + risk_level + confidence + score /100 décomposable + cap 45 (SCORE-02/03)
+
+**Wave 3** *(blocked on Wave 1+2)*
+- [ ] 04-03-PLAN.md — Frontière de confiance `persist.ts` : Zod + garde-fous + scoring + immuabilité/expiry + upsert service_role (SCORE-04/05)
+
+**Wave 4** *(blocked on Wave 3 — partage persist.ts/dispatch.ts)*
+- [ ] 04-04-PLAN.md — Scheduling : config sessions + univers + prompt veteran.md versionné + prompt_version sha256 + dispatch + [BLOCKING] routines + run réel (JOB-01/02, SCORE-01)
 **Research flag**: yes — point à plus haut risque : robustesse du prompt vétéran, taux de rejet Zod acceptable, méthode de scoring. À itérer.
 
 ### Phase 5: Dashboard des opportunités
@@ -180,7 +192,7 @@ Plans:
 | 1. Fondations & Sécurité | 3/3 | Complete | 2026-06-12 |
 | 2. Ingestion fiable des données | 4/4 | Complete | 2026-06-13 |
 | 3. Moteur d'analyse déterministe | 3/4 | In progress | - |
-| 4. Moteur IA "vétéran" & scoring | 0/0 | Not started | - |
+| 4. Moteur IA "vétéran" & scoring | 0/4 | Planned | - |
 | 5. Dashboard des opportunités | 0/0 | Not started | - |
 | 6. Détail trade & charting | 0/0 | Not started | - |
 | 7. Risque & dimensionnement | 0/0 | Not started | - |
