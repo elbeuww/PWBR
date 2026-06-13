@@ -57,11 +57,17 @@ export function computeGapFillWindow(
       ? now.toUTC().minus({ years: 2 })
       : now.toUTC().minus({ months: 6 })
 
-  // Borne haute exclusive (anti look-ahead DATA-05 D-10)
-  const until =
+  // Borne haute exclusive (anti look-ahead DATA-05 D-10) :
+  // until = début de la bougie EN COURS (la première non-clôturée).
+  // Toute bougie avec openTime < until est clôturée → safe à ingérer.
+  // lastClosedCandleStart / dailyAnchorStart retournent l'ouverture de la
+  // DERNIÈRE bougie clôturée ; on y ajoute la durée du timeframe pour obtenir
+  // l'ouverture de la bougie en cours (borne exclusive correcte).
+  const lastClosed =
     tf === 'D'
       ? dailyAnchorStart(broker, now)
       : lastClosedCandleStart(now, TIMEFRAMES[tf])
+  const until = lastClosed.plus({ minutes: TIMEFRAMES[tf] })
 
   return { since, until }
 }
