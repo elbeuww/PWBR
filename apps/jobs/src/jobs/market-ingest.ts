@@ -282,5 +282,12 @@ export async function marketIngest(): Promise<Json> {
     }
   }
 
+  // WR-04 : si 0 instrument ingéré et des erreurs → job en échec total, pas succès silencieux
+  if (stats.inserted === 0 && stats.skipped === 0 && stats.errors.length > 0) {
+    throw new Error(
+      `market-ingest: 0 cible ingérée sur ${stats.errors.length} erreur(s) — ${stats.errors[0]?.msg ?? 'voir stats.errors'}`,
+    )
+  }
+
   return stats as Json
 }

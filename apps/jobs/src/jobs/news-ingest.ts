@@ -106,5 +106,12 @@ export async function newsIngest(): Promise<Json> {
     }
   }
 
+  // WR-04 : si 0 article ingéré et des erreurs → job en échec total, pas succès silencieux
+  if (stats.inserted === 0 && stats.skipped === 0 && stats.errors.length > 0) {
+    throw new Error(
+      `news-ingest: 0 article ingéré sur ${stats.errors.length} erreur(s) — ${stats.errors[0]?.msg ?? 'voir stats.errors'}`,
+    )
+  }
+
   return stats as Json
 }
