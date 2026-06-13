@@ -1,14 +1,3 @@
-/**
- * Types Supabase générés depuis le schéma live (MCP `generate_typescript_types`, 2026-06-13).
- *
- * Regénération : `supabase gen types typescript --linked > packages/supabase/src/database.types.ts`
- * (ou MCP Supabase generate_typescript_types), puis ré-appliquer la section
- * « Raccourcis pratiques » en bas de fichier.
- *
- * NB : broker/asset_class/status/timeframe sont des CHECK constraints SQL — le générateur les
- * rend en `string`. Les unions littérales correspondantes vivent dans les raccourcis.
- */
-
 export type Json =
   | string
   | number
@@ -25,6 +14,38 @@ export type Database = {
   }
   public: {
     Tables: {
+      asset_drivers: {
+        Row: {
+          direction: number
+          driver_code: string
+          id: string
+          instrument_id: string
+          weight: number
+        }
+        Insert: {
+          direction: number
+          driver_code: string
+          id?: string
+          instrument_id: string
+          weight?: number
+        }
+        Update: {
+          direction?: number
+          driver_code?: string
+          id?: string
+          instrument_id?: string
+          weight?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "asset_drivers_instrument_id_fkey"
+            columns: ["instrument_id"]
+            isOneToOne: false
+            referencedRelation: "instruments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       candles: {
         Row: {
           close: number
@@ -258,6 +279,53 @@ export type Database = {
         }
         Relationships: []
       }
+      snapshots: {
+        Row: {
+          computed_for_ts: string
+          content_hash: string
+          created_at: string
+          id: string
+          instrument_id: string
+          kind: string
+          partial: boolean
+          payload: Json
+          style: string
+          timeframe_set: string
+        }
+        Insert: {
+          computed_for_ts: string
+          content_hash: string
+          created_at?: string
+          id?: string
+          instrument_id: string
+          kind: string
+          partial?: boolean
+          payload: Json
+          style: string
+          timeframe_set: string
+        }
+        Update: {
+          computed_for_ts?: string
+          content_hash?: string
+          created_at?: string
+          id?: string
+          instrument_id?: string
+          kind?: string
+          partial?: boolean
+          payload?: Json
+          style?: string
+          timeframe_set?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "snapshots_instrument_id_fkey"
+            columns: ["instrument_id"]
+            isOneToOne: false
+            referencedRelation: "instruments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       v_data_freshness: {
@@ -417,7 +485,7 @@ export const Constants = {
 
 // ─────────────────────────────────────────────
 // Raccourcis pratiques (maintenus à la main — à ré-appliquer après regénération)
-// Les unions littérales reflètent les CHECK constraints des migrations 0001 et 0003.
+// Les unions littérales reflètent les CHECK constraints des migrations 0001, 0003 et 0005.
 // ─────────────────────────────────────────────
 export type Broker = 'oanda' | 'binance'
 export type AssetClass = 'crypto' | 'forex' | 'metal' | 'energy'
@@ -425,6 +493,8 @@ export type JobRunStatus = 'running' | 'success' | 'error'
 export type Timeframe = 'H1' | 'H4' | 'D'
 export type QuoteHours = '24/7' | 'fx'
 export type CalendarImpact = 'High' | 'Medium' | 'Low'
+export type SnapshotStyle = 'day' | 'swing'
+export type SnapshotKind = 'technical' | 'fundamental' | 'news'
 
 export type ProfileRow = Database['public']['Tables']['profiles']['Row']
 export type ProfileInsert = Database['public']['Tables']['profiles']['Insert']
@@ -442,3 +512,7 @@ export type MacroSeriesInsert = Database['public']['Tables']['macro_series']['In
 export type EconomicCalendarRow = Database['public']['Tables']['economic_calendar']['Row']
 export type EconomicCalendarInsert = Database['public']['Tables']['economic_calendar']['Insert']
 export type DataFreshnessRow = Database['public']['Views']['v_data_freshness']['Row']
+export type SnapshotRow = Database['public']['Tables']['snapshots']['Row']
+export type SnapshotInsert = Database['public']['Tables']['snapshots']['Insert']
+export type AssetDriverRow = Database['public']['Tables']['asset_drivers']['Row']
+export type AssetDriverInsert = Database['public']['Tables']['asset_drivers']['Insert']
