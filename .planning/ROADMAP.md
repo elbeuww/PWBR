@@ -21,7 +21,7 @@ Décision fondateur : produit par abonnement **9 $/mois**, distribution **Telegr
 
 - [x] **Phase 1: Fondations & Sécurité** - Monorepo, Supabase + RLS + auth, conventions temporelles verrouillées, modèle d'exécution des Routines Claude vérifié — COMPLETE 2026-06-12
 - [x] **Phase 2: Ingestion fiable des données** - Clients data-sources et jobs d'ingestion idempotents (OHLCV, news, macro) tolérants aux pannes — COMPLETE 2026-06-13
-- [ ] **Phase 3: Moteur d'analyse déterministe** - Indicateurs, détection de structure de marché maison et snapshots technique/fondamental/news
+- [x] **Phase 3: Moteur d'analyse déterministe** - Indicateurs, détection de structure de marché maison et snapshots technique/fondamental/news — COMPLETE 2026-06-13
 - [ ] **Phase 4: Moteur IA "vétéran" & scoring** - Routines Claude planifiées produisant des setups JSON validés par Zod et garde-fous déterministes
 - [ ] **Phase 5: Dashboard des opportunités** - Liste triée par score, filtres, temps réel et disclaimers légaux
 - [ ] **Phase 6: Détail trade & charting** - Graphique chandeliers avec niveaux SL/TP, décomposition du score et raisonnement
@@ -94,7 +94,7 @@ Plans:
 - [x] 03-03-PLAN.md — Slice technical-engine end-to-end : candles réelles → §3 snapshot → hash → upsert + dispatcher (TECH-01..04) — COMPLETE 2026-06-13
 
 **Wave 4** *(blocked on Wave 3 — partage dispatch.ts)*
-- [ ] 03-04-PLAN.md — Slices fundamental-engine + news-engine : règles FRED + drivers table, sentiment décroissant + news_risk + dispatcher (FUND-01/02/03)
+- [x] 03-04-PLAN.md — Slices fundamental-engine + news-engine : règles FRED + drivers table, sentiment décroissant + news_risk + dispatcher (FUND-01/02/03) — COMPLETE 2026-06-13
 **Research flag**: yes — détection de structure de marché maison absente des libs (effort sous-estimé) : algos déterministes HH/HL, BOS/CHoCH, swing detection, POC volume
 
 ### Phase 4: Moteur IA "vétéran" & scoring

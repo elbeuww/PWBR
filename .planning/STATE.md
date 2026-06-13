@@ -3,14 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-last_updated: "2026-06-13T14:35:26.465Z"
+last_updated: "2026-06-13T14:43:59.004Z"
 progress:
   total_phases: 9
-  completed_phases: 2
+  completed_phases: 3
   total_plans: 11
-  completed_plans: 10
-  percent: 91
-  note: "Phase 03 : 3/4 plans (03-01, 03-02, 03-03 complete ; 03-04 next)"
+  completed_plans: 11
+  percent: 100
 ---
 
 # Project State
@@ -27,19 +26,19 @@ progress:
 
 ## Current Position
 
-Phase: 03 (moteur-d-analyse-d-terministe) — EXECUTING
-Plan: 4 of 4 (03-01 + 03-02 + 03-03 COMPLETE, next 03-04)
+Phase: 03 (moteur-d-analyse-d-terministe) — COMPLETE
+Plan: 4 of 4 (03-01 + 03-02 + 03-03 + 03-04 COMPLETE)
 **Phase:** 3
-**Plan:** 03-03 complete
-**Status:** Executing Phase 03
+**Plan:** 03-04 complete
+**Status:** Phase 03 complete
 
-**Progress:** [█████████░] 91%
+**Progress:** [██████████] 100%
 
 ```
-Phase 1  [ ] Fondations & Sécurité          ← next
-Phase 2  [ ] Ingestion fiable des données
-Phase 3  [ ] Moteur d'analyse déterministe
-Phase 4  [ ] Moteur IA "vétéran" & scoring
+Phase 1  [x] Fondations & Sécurité
+Phase 2  [x] Ingestion fiable des données
+Phase 3  [x] Moteur d'analyse déterministe
+Phase 4  [ ] Moteur IA "vétéran" & scoring   ← next
 Phase 5  [ ] Dashboard des opportunités
 Phase 6  [ ] Détail trade & charting
 Phase 7  [ ] Risque & dimensionnement
@@ -51,9 +50,9 @@ Phase 9  [ ] Backtest & calibration
 
 | Metric | Value |
 |--------|-------|
-| Phases complete | 2/9 |
-| Plans complete | 10 (Phase 01 + 02-01..02-04 + 03-01 + 03-02 + 03-03) |
-| Requirements covered | DATA-06 + Phase 01 + DATA-01/02/05 + DATA-03 + DATA-04 + DATA-07 + TECH-04 + FUND-01/02/03 + TECH-01/02/03 (03-03 : slice vertical TECH-01..04 assemblé) |
+| Phases complete | 3/9 |
+| Plans complete | 11 (Phase 01 + 02-01..02-04 + 03-01..03-04) |
+| Requirements covered | DATA-06 + Phase 01 + DATA-01/02/05 + DATA-03 + DATA-04 + DATA-07 + TECH-01/02/03/04 + FUND-01/02/03 (03-04 : moteurs fondamental + news déterministes) |
 
 ## Accumulated Context
 
@@ -91,6 +90,8 @@ Phase 9  [ ] Backtest & calibration
 - D-44 (2026-06-13, plan 03-02) : hash de contenu = sha256 sur JSON canonique (clés triées récursivement + précision fixe 6 décimales via toFixed). Gèle le bruit flottant cross-plateforme (D-41/Pitfall 3). node:crypto builtin, jamais de hash maison.
 - D-45 (2026-06-13, plan 03-02) : wrappers exposent valeur at(-1) (null si historique insuffisant) ET série complète. La série permet le pin de longueur anti-warmup dans les golden tests et le calcul percentile/slope en aval. Type lib jamais exposé (MacdValue/BollingerValue propres). @app/indicators câblé dans tsconfig.base paths + vitest alias.
 - D-46 (2026-06-13, plan 03-03) : technical-engine = premier slice vertical complet. buildTechnicalSnapshot (pure, D-23) séparée du harness IO pour testabilité offline. trend = close vs EMA200 (repli EMA50) + bande neutre 0.1% ; slope = MACD−signal ; volume_state = volume récent (1/4 final) vs antérieur ; POC ajouté comme key_level dédié portant volume_source (D-35). Gap EMA200 → partial:true + missing['ema200'] (Pitfall 2, jamais zéro silencieux). Zod §3 validé AVANT upsert (T-03-10). @app/indicators ajouté en dep workspace + path mapping apps/jobs.
+- D-47 (2026-06-13, plan 03-04) : fundamental-engine déterministe (zéro IA). deriveFundamentalContext (pure, D-23) : règles nommées macro_bias (DXY+real_yields ↗↗→risk_off, ↘↘→risk_on, mixte→neutral, TREND_EPSILON 0.1%) + rate_environment (DFF ↗→hawkish, ↘→dovish). Drivers par actif lus depuis asset_drivers (data-not-code, D-38), jamais codés — libellé `CODE(±dir)`. Contexte macro partagé par instrument, seuls asset_specific_drivers varient (1 derive, 2 upserts day/swing). Codes FRED : DTWEXBGS=DXY, DFII10=real_yields, DFF=fed funds.
+- D-48 (2026-06-13, plan 03-04) : news-engine déterministe. deriveNewsContext (pure, now injectable) : net_sentiment = moyenne pondérée décroissance EWMA-like (HALF_LIFE_HOURS=12), fenêtre day≈24h / swing≈7j (STYLE_PARAMS). Sentiment null (free tier, D-24) exclu de la moyenne (absence, pas 0 faux). net_sentiment borné [-1,1]. news_risk (D-40) = event High-impact (insensible casse) dans <2h (day) / <24h (swing), calculé via luxon (jamais Date maison, T-03-17). Les trois moteurs (technical/fundamental/news) dans JOB_REGISTRY. Suite 159/159 verte.
 
 ### Open todos / risques à lever
 
@@ -109,11 +110,11 @@ Aucun.
 
 ## Session Continuity
 
-**Last session:** 2026-06-13T14:34:35Z
+**Last session:** 2026-06-13T15:42:00Z
 
-**Next action:** Plan 03-04 — fundamental-engine + news-engine (dupliquer le pattern engine de 03-03).
+**Next action:** Phase 04 — moteur IA "vétéran" & scoring. Les 3 snapshots §3 (technical/fundamental/news) par instrument×style sont prêts en base ; Phase 4 les consomme via getSnapshotByHash.
 
-**Notes pour la session suivante:** Plan 03-03 COMPLETE. `technical-engine` livré en TDD : fonction pure buildTechnicalSnapshot (read candles clôturées D-10 → @app/indicators wrappers+structure → §3 → Zod → hash D-41 → upsertSnapshot), harness isolé per-instrument×style (D-36 day=H4/H1, swing=D/H4), partial:true sur gap EMA200, volume_source real/proxy par broker (D-35). Enregistré dans dispatch JOB_REGISTRY ('technical-engine') → runJob écrit job_runs. 7/7 golden tests verts ; suite complète 135/135 ; tsc apps/jobs clean. Déviation Rule 3 : @app/indicators ajouté en dep workspace + path mapping apps/jobs. Pour 03-04 : dupliquer le harness, lire macro_series/getAssetDrivers (FUND) et news/economic_calendar (NEWS), produire fundamental_context/news_context via les schémas Zod déjà définis dans @app/indicators.
+**Notes pour la session suivante:** Phase 03 COMPLETE (plan 03-04 livré). `fundamental-engine` + `news-engine` en TDD, déterministes (zéro IA). deriveFundamentalContext : règles FRED nommées (D-47, DXY/real_yields→macro_bias, DFF→rate_environment) + drivers asset_drivers (D-38, data-not-code). deriveNewsContext : sentiment pondéré-décroissant (D-48, half-life 12h, fenêtre day/swing), news_risk High-impact <2h/<24h via luxon (D-40). Les deux assemblent §3 → Zod (T-03-14) → hash (D-41) → upsertSnapshot (kind fundamental/news). Les trois moteurs enregistrés dans JOB_REGISTRY → runJob écrit job_runs. 10+14 golden tests verts ; suite complète 159/159 ; tsc apps/jobs clean. Aucune déviation. Entrée complète Phase 4 prête.
 
 ---
 *State initialized: 2026-06-09*

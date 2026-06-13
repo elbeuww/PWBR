@@ -116,3 +116,8 @@ None - aucune configuration de service externe. Les jobs lisent les tables déj�
 ---
 *Phase: 03-moteur-d-analyse-d-terministe*
 *Completed: 2026-06-13*
+
+## Self-Check: PASSED
+- 4 fichiers créés + 1 modifié vérifiés sur disque.
+- 6 commits (2 RED, 2 GREEN, 1 feat dispatch, 1 docs) présents.
+- Suite complète : 159/159 verts ; `pnpm tsc -p apps/jobs/tsconfig.json --noEmit` clean.
