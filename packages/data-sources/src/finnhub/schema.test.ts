@@ -48,9 +48,9 @@ describe('parseFinnhubNews — golden values', () => {
     expect(r1[0]?.url_hash).toBe(r2[0]?.url_hash)
   })
 
-  it('article 0 : published_at ISO UTC correct (datetime 1749463200)', () => {
+  it('article 0 : published_at ISO UTC correct (datetime 1749463200 = 2025-06-09T10:00:00.000Z)', () => {
     const result = parseFinnhubNews(rawFixture, CATEGORY)
-    expect(result[0]?.published_at).toBe('2026-06-09T09:00:00.000Z')
+    expect(result[0]?.published_at).toBe('2025-06-09T10:00:00.000Z')
   })
 
   it('article 0 : title correct', () => {

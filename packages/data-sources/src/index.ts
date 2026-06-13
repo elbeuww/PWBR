@@ -2,6 +2,7 @@
  * Barrel @app/data-sources
  *
  * Exports : clients Binance/OANDA, parsers normalisation UTC, mapping instruments.
+ *           Clients news (Finnhub/Marketaux), macro (FRED), calendrier (FairEconomy).
  */
 
 // Binance
@@ -12,3 +13,16 @@ export { parseBinanceKlines } from './binance/schema.js'
 export { fetchOandaCandles } from './oanda/client.js'
 export { parseOandaCandles } from './oanda/schema.js'
 export { OANDA_SYMBOLS } from './oanda/instruments.js'
+
+// Finnhub news (D-28 : marketNews par catégorie uniquement)
+export { fetchFinnhubNews, type FinnhubCategory } from './finnhub/client.js'
+export { parseFinnhubNews } from './finnhub/schema.js'
+
+// Marketaux news (fallback Finnhub — D-29, câblé dans le job plan 04)
+export { fetchMarketauxNews, parseMarketauxNews } from './marketaux/client.js'
+
+// FRED macro (DFF, CPIAUCSL, DTWEXBGS proxy DXY, DFII10)
+export { fetchFredSeries, parseFredObservations } from './fred/client.js'
+
+// FairEconomy calendrier économique (FOMC, CPI, NFP — sans clé, cache 24h)
+export { fetchFairEconomyCalendar, parseFairEconomyCalendar } from './faireconomy/client.js'
