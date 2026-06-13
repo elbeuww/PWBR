@@ -61,16 +61,10 @@ export async function fetchFinnhubNews(category: FinnhubCategory): Promise<NewsI
       },
       {
         retries: 3,
-        onFailedAttempt: async (error) => {
-          // Respect Retry-After si header présent (rate limit 429)
-          const retryAfter = (error as { headers?: Record<string, string> }).headers?.[
-            'retry-after'
-          ]
-          if (retryAfter) {
-            const waitMs = Number(retryAfter) * 1000
-            await new Promise((resolve) => setTimeout(resolve, waitMs))
-          }
-        },
+        // Note : le SDK finnhub (callback) ne propage pas les headers HTTP dans
+        // son callback error — impossible d'extraire Retry-After ici. Le backoff
+        // exponentiel par défaut de p-retry reste actif. pLimit(1) borne la
+        // concurrence pour éviter les 429.
       },
     ),
   )

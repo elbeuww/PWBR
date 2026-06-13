@@ -75,7 +75,16 @@ export async function fetchOandaCandles(
         })
 
         if (!res.ok) {
-          throw new Error(`OANDA ${sourceSymbol} ${granularity}: HTTP ${res.status} ${res.statusText}`)
+          const err = new Error(`OANDA ${sourceSymbol} ${granularity}: HTTP ${res.status} ${res.statusText}`)
+          // Propager Retry-After pour onFailedAttempt (p-retry v8)
+          if (res.status === 429) {
+            const retryAfterSec = Number(res.headers.get('retry-after') ?? 0)
+            ;(err as Error & { retryAfterMs?: number }).retryAfterMs =
+              Number.isFinite(retryAfterSec) && retryAfterSec > 0
+                ? retryAfterSec * 1000
+                : undefined
+          }
+          throw err
         }
 
         const json: unknown = await res.json()
@@ -83,13 +92,10 @@ export async function fetchOandaCandles(
       },
       {
         retries: 3,
-        onFailedAttempt: async (error) => {
-          // Respect Retry-After si header présent
-          const retryAfter = (error as { headers?: Record<string, string> }).headers?.[
-            'retry-after'
-          ]
-          if (retryAfter) {
-            const waitMs = Number(retryAfter) * 1000
+        onFailedAttempt: async ({ error }) => {
+          // Respect Retry-After propagé depuis la Response (voir throw ci-dessus)
+          const waitMs = (error as Error & { retryAfterMs?: number }).retryAfterMs
+          if (waitMs && Number.isFinite(waitMs)) {
             await new Promise((resolve) => setTimeout(resolve, waitMs))
           }
         },

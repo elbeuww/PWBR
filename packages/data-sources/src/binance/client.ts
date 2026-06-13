@@ -47,16 +47,10 @@ export async function fetchBinanceKlines(
       },
       {
         retries: 3,
-        onFailedAttempt: async (error) => {
-          // Respect Retry-After si header présent
-          const retryAfter = (error as { headers?: Record<string, string> }).headers?.[
-            'retry-after'
-          ]
-          if (retryAfter) {
-            const waitMs = Number(retryAfter) * 1000
-            await new Promise((resolve) => setTimeout(resolve, waitMs))
-          }
-        },
+        // Note : le SDK binance (MainClient) ne propage pas les headers HTTP dans
+        // ses erreurs — impossible d'extraire Retry-After ici. Le backoff
+        // exponentiel par défaut de p-retry reste actif. pLimit(3) borne la
+        // concurrence pour limiter le risque de 429.
       },
     ),
   )
