@@ -57,7 +57,7 @@ describe('parseFredObservations — golden values', () => {
   })
 
   it('retourne un tableau vide si observations vides', () => {
-    const empty = { ...rawFixture, observations: [] } as unknown
+    const empty = { ...(rawFixture as Record<string, unknown>), observations: [] } as unknown
     const result = parseFredObservations(empty, SERIES_CODE)
     expect(result).toHaveLength(0)
   })

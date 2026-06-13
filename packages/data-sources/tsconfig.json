@@ -2,11 +2,12 @@
   "$schema": "https://json.schemastore.org/tsconfig",
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
-    "outDir": "./dist",
-    "rootDir": "./src",
-    "composite": true,
+    // Package consommé en source (tsx jobs / Vitest) comme @app/supabase :
+    // résolution bundler, pas de build — rootDir/composite interdiraient
+    // les imports workspace @app/supabase résolus vers les sources sœurs.
+    "module": "Preserve",
     "moduleResolution": "Bundler",
-    "module": "ESNext"
+    "noEmit": true
   },
   "include": ["src/**/*.ts", "src/**/*.d.ts"],
   "exclude": ["node_modules", "dist"]
