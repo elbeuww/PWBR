@@ -3,7 +3,7 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-last_updated: "2026-06-13T02:10:00.000Z"
+last_updated: "2026-06-13T02:30:00.000Z"
 progress:
   total_phases: 9
   completed_phases: 1
@@ -20,17 +20,17 @@ progress:
 ## Project Reference
 
 **Core value:** Produire, pour chaque opportunité, une analyse fiable et explicable — score /100 + niveau de risque + plan de trade (entrée/SL/TP/R:R) — qui aide à décider avec discipline.
-**Current focus:** Phase 02 — ingestion-fiable-des-donn-es (plan 02-03 complete, plan 02-04 next)
+**Current focus:** Phase 02 — ingestion-fiable-des-donn-es (COMPLETE — tous les plans 02-01..02-04 livrés)
 **Mode:** mvp (Vertical MVP)
 **Granularity:** fine (9 phases)
 
 ## Current Position
 
-Phase: 02 (ingestion-fiable-des-donn-es) — EXECUTING
-Plan: 4 of 4 (02-03 complete)
+Phase: 02 (ingestion-fiable-des-donn-es) — COMPLETE
+Plan: 4 of 4 (02-04 complete)
 **Phase:** 2
 **Plan:** 02-04
-**Status:** Executing Phase 02
+**Status:** Phase 02 Complete — en attente Phase 03
 
 **Progress:** [███████░░░] 63%
 
@@ -51,8 +51,8 @@ Phase 9  [ ] Backtest & calibration
 | Metric | Value |
 |--------|-------|
 | Phases complete | 1/9 |
-| Plans complete | 6 (02-01, 02-02, 02-03 inclus) |
-| Requirements covered | DATA-06 + Phase 01 + DATA-01/02/05 + DATA-03 (clients) |
+| Plans complete | 8 (Phase 01 + 02-01..02-04) |
+| Requirements covered | DATA-06 + Phase 01 + DATA-01/02/05 + DATA-03 + DATA-04 + DATA-07 |
 
 ## Accumulated Context
 
@@ -81,6 +81,9 @@ Phase 9  [ ] Backtest & calibration
 - D-23 (2026-06-13, plan 02-02) : computeGapFillWindow exporté depuis market-ingest.ts pour tests unitaires sans réseau — séparer la logique de borne du job = pattern de testabilité pour les autres jobs d'ingestion.
 - D-24 (2026-06-13, plan 02-03) : parseFinnhubNews laisse instrument_ids=[] — le job (plan 04) injecte le mapping catégorie→instruments. Sentiment Finnhub free = null (free tier ne retourne pas sentiment crypto/forex).
 - D-25 (2026-06-13, plan 02-03) : FairEconomy cache in-process 24h (singleton par process, reset au restart) — acceptable pour le job cron quotidien. Pour cache multi-process : stocker en DB (hors scope plan 03).
+- D-26 (2026-06-13, plan 02-04) : vendor.d.ts dans apps/jobs/src/ = déclaration ambiante finnhub dans le scope compilateur jobs — pattern à reproduire pour tout SDK npm sans types natifs.
+- D-27 (2026-06-13, plan 02-04) : vi.mock top-level (hoisted) obligatoire pour mocker les imports ESM statiques des jobs — vi.mock dynamique dans les fonctions de test n'affecte pas les modules déjà résolus.
+- D-28 (2026-06-13, plan 02-04) : fallback Marketaux dans newsIngest déclenché sur erreur Finnhub (catch), pas sur 0 résultats — garantit que Finnhub est toujours tenté en premier (D-29 respecté).
 
 ### Open todos / risques à lever
 
@@ -99,11 +102,11 @@ Aucun.
 
 ## Session Continuity
 
-**Last session:** 2026-06-13T02:10:00.000Z
+**Last session:** 2026-06-13T02:30:00.000Z
 
-**Next action:** Exécuter le plan 02-04 (jobs news-ingest/macro-ingest/calendar-ingest + isolation des pannes DATA-04/07).
+**Next action:** Commencer Phase 03 — Moteur d'analyse déterministe.
 
-**Notes pour la session suivante:** Plan 02-03 complet. finnhub@2.0.14 installé. 4 clients news/macro/calendrier livrés + 33 golden tests verts. Suite 84/84. tsc clean. Barrel @app/data-sources étendu (8 exports). instrument_ids=[] dans parsers news — mapping câblé par le job plan 04. FairEconomy cache 24h in-process. Prêt pour 02-04 (jobs news-ingest/macro-ingest/calendar-ingest + fault-isolation.test.ts prouvant DATA-07).
+**Notes pour la session suivante:** Phase 02 COMPLETE (4/4 plans). 3 jobs d'ingestion livrés (news/macro/calendar), enregistrés dans dispatch.ts (5 jobs au total). fault-isolation.test.ts vert (DATA-07). Suite 86/86. tsc clean. vendor.d.ts pour finnhub sans types. D-29 fallback Marketaux = catch Finnhub. Phase 3 consommera economic_calendar + macro_series + news déjà prêts en base.
 
 ---
 *State initialized: 2026-06-09*

@@ -20,7 +20,7 @@ Décision fondateur : produit par abonnement **9 $/mois**, distribution **Telegr
 ## Phases
 
 - [x] **Phase 1: Fondations & Sécurité** - Monorepo, Supabase + RLS + auth, conventions temporelles verrouillées, modèle d'exécution des Routines Claude vérifié — COMPLETE 2026-06-12
-- [ ] **Phase 2: Ingestion fiable des données** - Clients data-sources et jobs d'ingestion idempotents (OHLCV, news, macro) tolérants aux pannes
+- [x] **Phase 2: Ingestion fiable des données** - Clients data-sources et jobs d'ingestion idempotents (OHLCV, news, macro) tolérants aux pannes — COMPLETE 2026-06-13
 - [ ] **Phase 3: Moteur d'analyse déterministe** - Indicateurs, détection de structure de marché maison et snapshots technique/fondamental/news
 - [ ] **Phase 4: Moteur IA "vétéran" & scoring** - Routines Claude planifiées produisant des setups JSON validés par Zod et garde-fous déterministes
 - [ ] **Phase 5: Dashboard des opportunités** - Liste triée par score, filtres, temps réel et disclaimers légaux
@@ -68,6 +68,9 @@ Plans:
 
 **Wave 3** *(blocked on Wave 2 completion)*
 - [x] 02-03-PLAN.md — Clients Finnhub/Marketaux/FRED/FairEconomy + parsers Zod + golden tests (DATA-03 clients) — COMPLETE 2026-06-13
+
+**Wave 4** *(blocked on Wave 3 completion)*
+- [x] 02-04-PLAN.md — Jobs news-ingest/macro-ingest/calendar-ingest + dispatcher + fault-isolation.test.ts (DATA-04/07) — COMPLETE 2026-06-13
 
 ### Phase 3: Moteur d'analyse déterministe
 **Goal**: À partir des bougies et des données macro/news, le système produit en code déterministe (sans IA) les snapshots technique, fondamental et news que le moteur vétéran consommera — y compris la détection de structure de marché maison.
