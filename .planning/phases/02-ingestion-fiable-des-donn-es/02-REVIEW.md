@@ -40,7 +40,22 @@ findings:
   warning: 6
   info: 6
   total: 13
-status: issues_found
+status: fixed
+fix_status:
+  CR-01: fixed
+  WR-01: fixed
+  WR-02: fixed
+  WR-03: fixed
+  WR-04: fixed
+  WR-05: fixed_pending_apply  # migration 0004 ecrite, apply via MCP requis
+  WR-06: fixed
+  IN-01: deferred
+  IN-02: deferred
+  IN-03: deferred
+  IN-04: deferred
+  IN-05: deferred
+  IN-06: deferred
+fixed_at: 2026-06-13T02:35:00Z
 ---
 
 # Phase 02 : Code Review Report — Ingestion fiable des données
