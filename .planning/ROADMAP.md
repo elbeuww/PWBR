@@ -61,7 +61,7 @@ Plans:
 **Plans**: 3 plans
 Plans:
 **Wave 1**
-- [ ] 02-01-PLAN.md — Schéma d'ingestion (candles/news/macro/calendrier) + RLS + seed 12 instruments + vue freshness + repositories d'upsert idempotent (DATA-06)
+- [x] 02-01-PLAN.md — Schéma d'ingestion (candles/news/macro/calendrier) + RLS + seed 12 instruments + vue freshness + repositories d'upsert idempotent (DATA-06)
 
 **Wave 2** *(blocked on Wave 1 completion)*
 - [ ] 02-02-PLAN.md — Slice OHLCV : clients Binance/OANDA + parsers UTC + job market-ingest gap-fill (DATA-01/02/05)
@@ -163,7 +163,7 @@ Plans:
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Fondations & Sécurité | 1/3 | Executing | - |
-| 2. Ingestion fiable des données | 0/3 | Planned | - |
+| 2. Ingestion fiable des données | 1/4 | In Progress|  |
 | 3. Moteur d'analyse déterministe | 0/0 | Not started | - |
 | 4. Moteur IA "vétéran" & scoring | 0/0 | Not started | - |
 | 5. Dashboard des opportunités | 0/0 | Not started | - |

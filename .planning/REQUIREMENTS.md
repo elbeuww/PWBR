@@ -14,7 +14,7 @@ Périmètre MVP (Phase 0 fondations + Phase 1 day/swing, usage perso/démo). Cha
 - [ ] **DATA-03**: Le système ingère les news et leur sentiment par instrument depuis Finnhub/Marketaux
 - [ ] **DATA-04**: Le système ingère les séries macro pertinentes (taux, CPI, DXY) depuis FRED
 - [ ] **DATA-05**: Toutes les bougies sont normalisées en UTC avec une convention de bougie clôturée explicite (exclut la bougie en cours)
-- [ ] **DATA-06**: L'ingestion est idempotente (upsert sur clés uniques) — un re-run ne crée pas de doublons
+- [x] **DATA-06**: L'ingestion est idempotente (upsert sur clés uniques) — un re-run ne crée pas de doublons
 - [ ] **DATA-07**: Une source en échec n'interrompt pas les autres ; la donnée périmée est marquée `stale`
 
 ### Technical Analysis Engine (TECH)
@@ -166,7 +166,7 @@ Reporté (après lancement abonnement + bloquants levés). Suivi mais hors roadm
 | DATA-02 | Phase 2 | Pending |
 | DATA-03 | Phase 2 | Pending |
 | DATA-04 | Phase 2 | Pending |
-| DATA-06 | Phase 2 | Pending |
+| DATA-06 | Phase 2 | Complete |
 | DATA-07 | Phase 2 | Pending |
 | TECH-01 | Phase 3 | Pending |
 | TECH-02 | Phase 3 | Pending |

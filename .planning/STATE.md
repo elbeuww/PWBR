@@ -3,36 +3,36 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-last_updated: "2026-06-12T23:53:34.467Z"
+last_updated: "2026-06-13T00:44:17.448Z"
 progress:
   total_phases: 9
   completed_phases: 1
   total_plans: 7
-  completed_plans: 3
-  percent: 43
+  completed_plans: 4
+  percent: 57
 ---
 
 # Project State
 
 **Project:** Plateforme d'Analyse de Trading "Vétéran"
-**Last updated:** 2026-06-12
+**Last updated:** 2026-06-13
 
 ## Project Reference
 
 **Core value:** Produire, pour chaque opportunité, une analyse fiable et explicable — score /100 + niveau de risque + plan de trade (entrée/SL/TP/R:R) — qui aide à décider avec discipline.
-**Current focus:** Phase 01 — fondations-s-curit
+**Current focus:** Phase 02 — ingestion-fiable-des-donn-es (plan 02-01 complete, plan 02-02 next)
 **Mode:** mvp (Vertical MVP)
 **Granularity:** fine (9 phases)
 
 ## Current Position
 
-Phase: 01 (fondations-s-curit) — COMPLETE
-Plan: 3 of 3
+Phase: 02 (ingestion-fiable-des-donn-es) — EXECUTING
+Plan: 2 of 4 (02-01 complete)
 **Phase:** 2
-**Plan:** Not started
-**Status:** Ready to execute
+**Plan:** 02-02
+**Status:** Executing Phase 02
 
-**Progress:** [+         ] 1/9 phases complete (3/3 plans phase 01)
+**Progress:** [██████░░░░] 57%
 
 ```
 Phase 1  [ ] Fondations & Sécurité          ← next
@@ -50,9 +50,9 @@ Phase 9  [ ] Backtest & calibration
 
 | Metric | Value |
 |--------|-------|
-| Phases complete | 0/9 |
-| Plans complete | 0 |
-| Requirements covered | 0/44 (planned) |
+| Phases complete | 1/9 |
+| Plans complete | 4 (02-01 inclus) |
+| Requirements covered | DATA-06 + Phase 01 |
 
 ## Accumulated Context
 
@@ -75,6 +75,8 @@ Phase 9  [ ] Backtest & calibration
 - D-17 (2026-06-12) : MCP Supabase projet (`.mcp.json`, OAuth) opérationnel — migrations via `apply_migration`, types via `generate_typescript_types`, gate sécurité via `get_advisors` (0 alerte après migration 0002 revoke execute). Emails de test = `@gmail.com` uniques (Supabase Auth rejette example.com), cleanup via SQL service.
 - D-18 (2026-06-12) : Client service_role lazy dans runJob.ts (instancié à l'exécution, pas à l'import) — permet la compatibilité Vitest/dotenv sans modifier packages/supabase/service-client.ts. Mock server-only via __mocks__/ + alias vitest.config.ts.
 - D-19 (2026-06-12) : Aucune Routine Claude planifiée en Phase 1 — ingestion déterministe via Windows Task Scheduler (run-job.cmd). Routines Remote (cloud Anthropic, ~15 runs/j quota partagé Max) = Phase 4 uniquement (analyse IA).
+- D-20 (2026-06-13, plan 02-01) : onConflict miroir des index uniques SQL (candles_uniq/news_uniq/macro_series_uniq/economic_calendar_uniq) — garantie idempotence DATA-06 au niveau DB.
+- D-21 (2026-06-13, plan 02-01) : Env loading dans tests packages/ : process.loadEnvFile (Node natif) + getters lazy pour contourner le hoist ESM Vitest. Chemin 3 niveaux depuis packages/supabase/__tests__.
 
 ### Open todos / risques à lever
 
@@ -93,11 +95,11 @@ Aucun.
 
 ## Session Continuity
 
-**Last session:** 2026-06-12T15:49:17.268Z
+**Last session:** 2026-06-13T00:44:17.441Z
 
-**Next action:** Démarrer la Phase 02 — Ingestion fiable des données (`/gsd-execute-phase 2`).
+**Next action:** Exécuter le plan 02-02 (data-sources : clients OANDA/Binance/Finnhub/FRED + jobs d'ingestion).
 
-**Notes pour la session suivante:** Phase 01 complète (3/3 plans). Prêt pour Phase 02 (data-sources : OANDA/Binance/Finnhub/FRED, candles, packages/data-sources). `apps/jobs/.env` rempli. MCP Supabase opérationnel. Dispatcher jobs fonctionnel via `pnpm --filter jobs exec tsx src/dispatch.ts <job>`.
+**Notes pour la session suivante:** Plan 02-01 complet. Tables candles/news/macro_series/economic_calendar sur le cloud (migration 0003 appliquée), 4 repositories upsert idempotents exportés depuis @app/supabase, DATA-06 prouvée (26/26 tests verts). apps/jobs/.env rempli (SUPABASE_URL + SERVICE_ROLE_KEY). Prêt pour 02-02 (packages/data-sources : clients fetch OANDA/Binance/Finnhub/FRED + jobs d'ingestion).
 
 ---
 *State initialized: 2026-06-09*
