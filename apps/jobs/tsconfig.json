@@ -7,7 +7,9 @@
     "baseUrl": ".",
     "paths": {
       "@app/supabase": ["../../packages/supabase/src/index.ts"],
-      "@app/supabase/*": ["../../packages/supabase/src/*"]
+      "@app/supabase/*": ["../../packages/supabase/src/*"],
+      "@app/indicators": ["../../packages/indicators/src/index.ts"],
+      "@app/indicators/*": ["../../packages/indicators/src/*"]
     },
     "noEmit": true
   },

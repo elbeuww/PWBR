@@ -47,6 +47,9 @@ importers:
       '@app/data-sources':
         specifier: workspace:*
         version: link:../../packages/data-sources
+      '@app/indicators':
+        specifier: workspace:*
+        version: link:../../packages/indicators
       '@app/supabase':
         specifier: workspace:*
         version: link:../../packages/supabase

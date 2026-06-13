@@ -9,6 +9,7 @@
   "dependencies": {
     "@app/core": "workspace:*",
     "@app/data-sources": "workspace:*",
+    "@app/indicators": "workspace:*",
     "@app/supabase": "workspace:*",
     "dotenv": "^16.4.5",
     "luxon": "3.7.2",
