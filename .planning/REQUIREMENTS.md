@@ -22,13 +22,13 @@ Périmètre MVP (Phase 0 fondations + Phase 1 day/swing, usage perso/démo). Cha
 - [ ] **TECH-01**: Le système calcule en code déterministe les indicateurs (RSI, MACD, EMA, ATR, Bollinger) à partir des bougies
 - [ ] **TECH-02**: Le système détecte la structure de marché (HH/HL, swings, BOS/CHoCH) de façon déterministe
 - [ ] **TECH-03**: Le système identifie les niveaux clés (support/résistance, POC volume) avec une mesure de force
-- [ ] **TECH-04**: Le système produit un `technical_snapshot` structuré (tendance HTF/LTF, momentum, volatilité, niveaux, structure) par instrument/style
+- [x] **TECH-04**: Le système produit un `technical_snapshot` structuré (tendance HTF/LTF, momentum, volatilité, niveaux, structure) par instrument/style
 
 ### Fundamental & News Engine (FUND)
 
-- [ ] **FUND-01**: Le système produit un `fundamental_context` (biais macro risk-on/off, environnement de taux, drivers par actif) à partir des données macro
-- [ ] **FUND-02**: Le système produit un `news_context` (sentiment net, catalyseurs récents, events à venir) par instrument
-- [ ] **FUND-03**: Le système flag les events économiques à fort impact imminents (`news_risk`) par instrument/style
+- [x] **FUND-01**: Le système produit un `fundamental_context` (biais macro risk-on/off, environnement de taux, drivers par actif) à partir des données macro
+- [x] **FUND-02**: Le système produit un `news_context` (sentiment net, catalyseurs récents, events à venir) par instrument
+- [x] **FUND-03**: Le système flag les events économiques à fort impact imminents (`news_risk`) par instrument/style
 
 ### Veteran Analysis & Scoring (SCORE)
 
@@ -171,10 +171,10 @@ Reporté (après lancement abonnement + bloquants levés). Suivi mais hors roadm
 | TECH-01 | Phase 3 | Pending |
 | TECH-02 | Phase 3 | Pending |
 | TECH-03 | Phase 3 | Pending |
-| TECH-04 | Phase 3 | Pending |
-| FUND-01 | Phase 3 | Pending |
-| FUND-02 | Phase 3 | Pending |
-| FUND-03 | Phase 3 | Pending |
+| TECH-04 | Phase 3 | Complete |
+| FUND-01 | Phase 3 | Complete |
+| FUND-02 | Phase 3 | Complete |
+| FUND-03 | Phase 3 | Complete |
 | SCORE-01 | Phase 4 | Pending |
 | SCORE-02 | Phase 4 | Pending |
 | SCORE-03 | Phase 4 | Pending |

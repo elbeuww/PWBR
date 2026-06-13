@@ -85,7 +85,7 @@ Plans:
 **Plans**: 4 plans
 Plans:
 **Wave 1**
-- [ ] 03-01-PLAN.md — Persistance partagée : migration 0005 snapshots + asset_drivers + RLS + [BLOCKING] apply MCP + repos idempotents (TECH-04, FUND-01..03)
+- [x] 03-01-PLAN.md — Persistance partagée : migration 0005 snapshots + asset_drivers + RLS + [BLOCKING] apply MCP + repos idempotents (TECH-04, FUND-01..03) — COMPLETE 2026-06-13
 
 **Wave 2** *(blocked on Wave 1 — types régénérés)*
 - [ ] 03-02-PLAN.md — `packages/indicators` : wrappers golden + structure maison (swings/BOS-CHoCH/S-R/POC) + schéma Zod §3 + hash déterministe (TECH-01/02/03)

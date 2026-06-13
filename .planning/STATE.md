@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-last_updated: "2026-06-13T03:08:03.491Z"
+last_updated: "2026-06-13T14:14:25.771Z"
 progress:
   total_phases: 9
   completed_phases: 2
   total_plans: 11
-  completed_plans: 7
-  percent: 64
+  completed_plans: 8
+  percent: 73
 ---
 
 # Project State
@@ -20,19 +20,19 @@ progress:
 ## Project Reference
 
 **Core value:** Produire, pour chaque opportunité, une analyse fiable et explicable — score /100 + niveau de risque + plan de trade (entrée/SL/TP/R:R) — qui aide à décider avec discipline.
-**Current focus:** Phase 02 — ingestion-fiable-des-donn-es (COMPLETE — tous les plans 02-01..02-04 livrés)
+**Current focus:** Phase 03 — moteur-d-analyse-d-terministe
 **Mode:** mvp (Vertical MVP)
 **Granularity:** fine (9 phases)
 
 ## Current Position
 
-Phase: 02 (ingestion-fiable-des-donn-es) — COMPLETE
-Plan: 4 of 4 (02-04 complete)
+Phase: 03 (moteur-d-analyse-d-terministe) — EXECUTING
+Plan: 2 of 4 (03-01 COMPLETE, next 03-02)
 **Phase:** 3
-**Plan:** Not started
-**Status:** Ready to execute
+**Plan:** 03-01 complete
+**Status:** Executing Phase 03
 
-**Progress:** [███████░░░] 63%
+**Progress:** [███████░░░] 73%
 
 ```
 Phase 1  [ ] Fondations & Sécurité          ← next
@@ -50,9 +50,9 @@ Phase 9  [ ] Backtest & calibration
 
 | Metric | Value |
 |--------|-------|
-| Phases complete | 1/9 |
-| Plans complete | 8 (Phase 01 + 02-01..02-04) |
-| Requirements covered | DATA-06 + Phase 01 + DATA-01/02/05 + DATA-03 + DATA-04 + DATA-07 |
+| Phases complete | 2/9 |
+| Plans complete | 8 (Phase 01 + 02-01..02-04 + 03-01) |
+| Requirements covered | DATA-06 + Phase 01 + DATA-01/02/05 + DATA-03 + DATA-04 + DATA-07 + TECH-04 + FUND-01/02/03 |
 
 ## Accumulated Context
 
@@ -83,7 +83,8 @@ Phase 9  [ ] Backtest & calibration
 - D-25 (2026-06-13, plan 02-03) : FairEconomy cache in-process 24h (singleton par process, reset au restart) — acceptable pour le job cron quotidien. Pour cache multi-process : stocker en DB (hors scope plan 03).
 - D-26 (2026-06-13, plan 02-04) : vendor.d.ts dans apps/jobs/src/ = déclaration ambiante finnhub dans le scope compilateur jobs — pattern à reproduire pour tout SDK npm sans types natifs.
 - D-27 (2026-06-13, plan 02-04) : vi.mock top-level (hoisted) obligatoire pour mocker les imports ESM statiques des jobs — vi.mock dynamique dans les fonctions de test n'affecte pas les modules déjà résolus.
-- D-28 (2026-06-13, plan 02-04) : fallback Marketaux dans newsIngest déclenché sur erreur Finnhub (catch), pas sur 0 résultats — garantit que Finnhub est toujours tenté en premier (D-29 respecté).
+- D-28 (2026-06-13, plan 02-04) : fallback Marketaux dans newsIngest déclenché sur erreur Finnhub (catch), pas sur 0 résultats — garantit que Finnhub est toujours tenté en premier.
+- D-30 (2026-06-13, plan 03-01) : Frontière `snapshots` = table horizontale écrite par 3 moteurs verticaux (technical/fundamental/news), référencée par `content_hash` (= raw_indicators_ref, D-41) en aval ; `getSnapshotByHash` exposé pour la Phase 4. `asset_drivers` = data-not-code (D-38), 13 lignes seedées (or↔DXY/REAL_YIELDS, JPY↔RATE_DIFF, crypto↔RISK_SENTIMENT/DXY). RLS select-only dès 0005, AUCUNE write policy (service_role bypass, D-05). idempotence snapshots_uniq prouvée par test golden DB.
 
 ### Open todos / risques à lever
 
@@ -102,7 +103,7 @@ Aucun.
 
 ## Session Continuity
 
-**Last session:** 2026-06-13T02:29:38.089Z
+**Last session:** 2026-06-13T14:14:25.764Z
 
 **Next action:** Commencer Phase 03 — Moteur d'analyse déterministe.
 
