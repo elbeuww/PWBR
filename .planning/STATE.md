@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-last_updated: "2026-06-13T01:55:00.000Z"
+last_updated: "2026-06-13T02:10:00.000Z"
 progress:
   total_phases: 9
   completed_phases: 1
   total_plans: 7
-  completed_plans: 5
-  percent: 57
+  completed_plans: 7
+  percent: 100
 ---
 
 # Project State
@@ -20,19 +20,19 @@ progress:
 ## Project Reference
 
 **Core value:** Produire, pour chaque opportunité, une analyse fiable et explicable — score /100 + niveau de risque + plan de trade (entrée/SL/TP/R:R) — qui aide à décider avec discipline.
-**Current focus:** Phase 02 — ingestion-fiable-des-donn-es (plan 02-02 complete, plan 02-03 next)
+**Current focus:** Phase 02 — ingestion-fiable-des-donn-es (plan 02-03 complete, plan 02-04 next)
 **Mode:** mvp (Vertical MVP)
 **Granularity:** fine (9 phases)
 
 ## Current Position
 
 Phase: 02 (ingestion-fiable-des-donn-es) — EXECUTING
-Plan: 3 of 4 (02-02 complete)
+Plan: 4 of 4 (02-03 complete)
 **Phase:** 2
-**Plan:** 02-03
+**Plan:** 02-04
 **Status:** Executing Phase 02
 
-**Progress:** [██████░░░░] 57%
+**Progress:** [███████░░░] 63%
 
 ```
 Phase 1  [ ] Fondations & Sécurité          ← next
@@ -51,8 +51,8 @@ Phase 9  [ ] Backtest & calibration
 | Metric | Value |
 |--------|-------|
 | Phases complete | 1/9 |
-| Plans complete | 4 (02-01 inclus) |
-| Requirements covered | DATA-06 + Phase 01 + DATA-01/02/05 |
+| Plans complete | 6 (02-01, 02-02, 02-03 inclus) |
+| Requirements covered | DATA-06 + Phase 01 + DATA-01/02/05 + DATA-03 (clients) |
 
 ## Accumulated Context
 
@@ -79,6 +79,8 @@ Phase 9  [ ] Backtest & calibration
 - D-21 (2026-06-13, plan 02-01) : Env loading dans tests packages/ : process.loadEnvFile (Node natif) + getters lazy pour contourner le hoist ESM Vitest. Chemin 3 niveaux depuis packages/supabase/__tests__.
 - D-22 (2026-06-13, plan 02-02) : Alias Vitest @app/* déclarés dans vitest.config.ts resolve.alias — obligatoire, Vite ne lit pas tsconfig paths automatiquement. Pattern à reproduire pour tout nouveau package workspace.
 - D-23 (2026-06-13, plan 02-02) : computeGapFillWindow exporté depuis market-ingest.ts pour tests unitaires sans réseau — séparer la logique de borne du job = pattern de testabilité pour les autres jobs d'ingestion.
+- D-24 (2026-06-13, plan 02-03) : parseFinnhubNews laisse instrument_ids=[] — le job (plan 04) injecte le mapping catégorie→instruments. Sentiment Finnhub free = null (free tier ne retourne pas sentiment crypto/forex).
+- D-25 (2026-06-13, plan 02-03) : FairEconomy cache in-process 24h (singleton par process, reset au restart) — acceptable pour le job cron quotidien. Pour cache multi-process : stocker en DB (hors scope plan 03).
 
 ### Open todos / risques à lever
 
@@ -97,11 +99,11 @@ Aucun.
 
 ## Session Continuity
 
-**Last session:** 2026-06-13T01:55:00.000Z
+**Last session:** 2026-06-13T02:10:00.000Z
 
-**Next action:** Exécuter le plan 02-03 (news/macro/calendrier : clients Finnhub/Marketaux/FRED + jobs + isolation des pannes).
+**Next action:** Exécuter le plan 02-04 (jobs news-ingest/macro-ingest/calendar-ingest + isolation des pannes DATA-04/07).
 
-**Notes pour la session suivante:** Plan 02-02 complet. Package @app/data-sources créé (binance@3.5.9, p-retry@8, p-limit@7.3, luxon@3.7.2). Job market-ingest gap-fill opérationnel, enregistré dans dispatch.ts. Suite 51/51 tests verts. Alias Vitest @app/* ajoutés dans vitest.config.ts. Prêt pour 02-03 (Finnhub/Marketaux/FRED clients + news-ingest/macro-ingest/calendar-ingest + fault-isolation.test.ts).
+**Notes pour la session suivante:** Plan 02-03 complet. finnhub@2.0.14 installé. 4 clients news/macro/calendrier livrés + 33 golden tests verts. Suite 84/84. tsc clean. Barrel @app/data-sources étendu (8 exports). instrument_ids=[] dans parsers news — mapping câblé par le job plan 04. FairEconomy cache 24h in-process. Prêt pour 02-04 (jobs news-ingest/macro-ingest/calendar-ingest + fault-isolation.test.ts prouvant DATA-07).
 
 ---
 *State initialized: 2026-06-09*

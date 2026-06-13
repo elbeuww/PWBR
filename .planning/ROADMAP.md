@@ -67,7 +67,7 @@ Plans:
 - [x] 02-02-PLAN.md — Slice OHLCV : clients Binance/OANDA + parsers UTC + job market-ingest gap-fill (DATA-01/02/05) — COMPLETE 2026-06-13
 
 **Wave 3** *(blocked on Wave 2 completion)*
-- [ ] 02-03-PLAN.md — Slices news/macro/calendrier + jobs + isolation des pannes prouvée (DATA-03/04/07)
+- [x] 02-03-PLAN.md — Clients Finnhub/Marketaux/FRED/FairEconomy + parsers Zod + golden tests (DATA-03 clients) — COMPLETE 2026-06-13
 
 ### Phase 3: Moteur d'analyse déterministe
 **Goal**: À partir des bougies et des données macro/news, le système produit en code déterministe (sans IA) les snapshots technique, fondamental et news que le moteur vétéran consommera — y compris la détection de structure de marché maison.
