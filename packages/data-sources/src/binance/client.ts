@@ -47,14 +47,14 @@ export async function fetchBinanceKlines(
       },
       {
         retries: 3,
-        onFailedAttempt: (error) => {
+        onFailedAttempt: async (error) => {
           // Respect Retry-After si header présent
           const retryAfter = (error as { headers?: Record<string, string> }).headers?.[
             'retry-after'
           ]
           if (retryAfter) {
             const waitMs = Number(retryAfter) * 1000
-            return new Promise((resolve) => setTimeout(resolve, waitMs))
+            await new Promise((resolve) => setTimeout(resolve, waitMs))
           }
         },
       },
