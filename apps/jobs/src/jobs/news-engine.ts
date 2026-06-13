@@ -24,6 +24,7 @@ import {
   NewsContextSchema,
   type NewsContext,
 } from '@app/indicators'
+import { lastClosedCandleStart, TIMEFRAMES } from '@app/core'
 import { listActiveInstruments, upsertSnapshot } from '@app/supabase'
 import type {
   Json,
@@ -189,6 +190,14 @@ async function readCalendar(client: ServiceClient, now: DateTime): Promise<Econo
 const STYLES: Style[] = ['day', 'swing']
 const TIMEFRAME_SET: Record<Style, string> = { day: 'news-24h', swing: 'news-7d' }
 
+// CR-01 : computed_for_ts est une colonne de la clé d'upsert
+// (instrument_id, style, kind, computed_for_ts). Il DOIT être stable pour un même
+// état de données, sinon chaque run insère au lieu d'upsert (idempotence D-41 cassée).
+// On l'ancre sur la dernière bougie LTF clôturée du style — miroir exact de
+// technical-engine (day→H1, swing→H4) — pendant que `now` reste l'instant de
+// référence pour la décroissance de sentiment (D-39) et les fenêtres news_risk (D-40).
+const STYLE_LTF: Record<Style, 'H1' | 'H4'> = { day: 'H1', swing: 'H4' }
+
 /**
  * Job news-engine : pour chaque instrument actif × style, dérive et persiste un
  * news_context §3 déterministe. Isolé par instrument (Pitfall 5).
@@ -215,12 +224,19 @@ export async function newsEngine(): Promise<Json> {
         const validated = NewsContextSchema.parse(context)
         const payload = validated as unknown as Json
 
+        // CR-01 : clé d'upsert stable = dernière bougie LTF clôturée (un snapshot
+        // news par bar × style), jamais l'instant courant.
+        const computedForTs = lastClosedCandleStart(
+          now,
+          TIMEFRAMES[STYLE_LTF[style]],
+        ).toISO()!
+
         const row: SnapshotInsert = {
           instrument_id: instrument.id,
           style,
           timeframe_set: TIMEFRAME_SET[style],
           kind: 'news',
-          computed_for_ts: now.toISO()!,
+          computed_for_ts: computedForTs,
           content_hash: snapshotContentHash(payload),
           payload,
           partial: false,
