@@ -2,14 +2,14 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: ready_to_plan
-last_updated: "2026-06-13T14:43:59.004Z"
+status: planning
+last_updated: "2026-06-13T15:37:18.926Z"
 progress:
   total_phases: 9
-  completed_phases: 4
+  completed_phases: 3
   total_plans: 11
   completed_plans: 11
-  percent: 44
+  percent: 100
 ---
 
 # Project State
@@ -110,7 +110,7 @@ Aucun.
 
 ## Session Continuity
 
-**Last session:** 2026-06-13T15:42:00Z
+**Last session:** 2026-06-13T15:37:18.919Z
 
 **Next action:** Phase 04 — moteur IA "vétéran" & scoring. Les 3 snapshots §3 (technical/fundamental/news) par instrument×style sont prêts en base ; Phase 4 les consomme via getSnapshotByHash.
 
