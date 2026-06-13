@@ -42,7 +42,8 @@ Produire, pour chaque opportunité, une analyse fiable et explicable — score /
 
 - [ ] Vitrine publique trilingue (arabe RTL / anglais / français) : présentation, % de réussite, funnel d'abonnement
 - [ ] Espace membre gated par abonnement : liste des signaux triés par score, filtres, vue détail trade (chart lightweight-charts + niveaux + explication simple + analyse approfondie dépliable)
-- [ ] Paiement abonnement en USDT : détection des paiements on-chain, association paiement → compte, activation/renouvellement/expiration automatiques (méthode de détection à trancher : processeur crypto vs watcher maison)
+- [ ] Paiement abonnement en USDT (TRC-20) — **deux étages** : (1) MVP lancement : adresse de paiement affichée + l'utilisateur soumet le hash de transaction (+ screenshot optionnel) → vérification du hash on-chain via TronGrid (montant/destinataire/confirmations) avec activation auto, file de validation manuelle dans le superadmin pour les cas tordus ; (2) ensuite : processeur crypto (NOWPayments/Cryptomus) pour l'automatisation complète (adresse unique par facture + webhooks). Renouvellement/expiration automatiques dans les deux étages.
+- [ ] Offre découverte : **3 $ pour 15 jours** d'essai de la plateforme (en plus du 9 $/mois)
 - [ ] Système d'affiliation à paliers : codes promo, tracking des abonnés ramenés, dashboard affilié, calcul et suivi des commissions (palier max 20 % récurrent), paiement des commissions en crypto
 - [ ] Dashboard superadmin : membres (actifs/inactifs/paiements), affiliés et leurs stats, signaux, santé jobs/données
 - [ ] CMS articles/cours gratuits vulgarisés (de la base : outils, portefeuille, …) sur la vitrine
@@ -90,6 +91,9 @@ Produire, pour chaque opportunité, une analyse fiable et explicable — score /
 | **2026-06-13** — % de réussite affiché = taux des patterns backtestés d'abord, track record réel ensuite | Honnêteté produit : jamais un chiffre non mesuré | — Pending |
 | % de réussite des patterns = mesuré par notre backtest, jamais affirmé | Honnêteté produit + risque légal | — Pending |
 | Revue légale obligatoire AVANT d'encaisser le premier abonnement (conseil non agréé + statut crypto dans les pays cibles, dont l'Algérie) | Exposition réglementaire réelle | — Pending |
+| **2026-06-13** — Paiement en deux étages : MVP = soumission TX hash (+ screenshot) vérifiée via TronGrid + file superadmin ; ensuite processeur crypto automatisé | Démarrer immédiatement sans dépendre d'un tiers, automatiser ensuite | — Pending |
+| **2026-06-13** — Moteur : routines Claude Max pendant la construction, migration clé API Anthropic au lancement payant | Coût zéro avant revenus, fiabilité 24/7 quand des abonnés paient | — Pending |
+| **2026-06-13** — Lancement payant direct (influenceurs déjà engagés) + offre découverte 3 $/15 jours | Pas d'attente de track record ; l'offre d'essai abaisse la barrière ; le Telegram public accumule le track record en parallèle | — Pending |
 | Phases 1-2 (fondations, ingestion) inchangées par le pivot ; roadmap aval (phases 3+) à réviser | Le cœur analytique sert les deux visions ; ne pas geler l'exécution | — Pending |
 
 ## Evolution
