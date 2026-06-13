@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    // Package consommé en source (tsx jobs / Vitest) comme @app/data-sources :
+    // résolution bundler, pas de build — rootDir/composite interdiraient
+    // les imports workspace @app/* résolus vers les sources sœurs.
+    "module": "Preserve",
+    "moduleResolution": "Bundler",
+    "noEmit": true
+  },
+  "include": ["src/**/*.ts", "src/**/*.d.ts"],
+  "exclude": ["node_modules", "dist"]
+}

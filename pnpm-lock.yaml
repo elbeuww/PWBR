@@ -136,6 +136,28 @@ importers:
         specifier: ^3.4.2
         version: 3.7.1
 
+  packages/indicators:
+    dependencies:
+      '@app/core':
+        specifier: workspace:*
+        version: link:../core
+      '@app/supabase':
+        specifier: workspace:*
+        version: link:../supabase
+      luxon:
+        specifier: 3.7.2
+        version: 3.7.2
+      technicalindicators:
+        specifier: 3.1.0
+        version: 3.1.0
+      zod:
+        specifier: 4.4.3
+        version: 4.4.3
+    devDependencies:
+      '@types/luxon':
+        specifier: ^3.4.2
+        version: 3.7.1
+
   packages/supabase:
     dependencies:
       '@supabase/ssr':
@@ -759,6 +781,9 @@ packages:
 
   '@types/node@22.19.20':
     resolution: {integrity: sha512-6tELRwSDYWW9EdZhbeZmYGZ1/7Djkt+Ah3/ScEYT9cDord7UJzasR/4D3VONg9tQI5CDp+/CZC1AXj2pCFOvpw==}
+
+  '@types/node@6.14.13':
+    resolution: {integrity: sha512-J1F0XJ/9zxlZel5ZlbeSuHW2OpabrUAqpFuC2sm2I3by8sERQ8+KCjNKUcq8QHuzpGMWiJpo9ZxeHrqrP2KzQw==}
 
   '@types/react-dom@19.2.3':
     resolution: {integrity: sha512-jp2L/eY6fn+KgVVQAOqYItbF0VY/YApe5Mz2F0aykSO8gx31bYCZyvSeYxCHKvzHG5eZjc+zyaS5BrBWya2+kQ==}
@@ -2005,6 +2030,9 @@ packages:
     resolution: {integrity: sha512-uxc/zpqFg6x7C8vOE7lh6Lbda8eEL9zmVm/PLeTPBRhh1xCgdWaQ+J1CUieGpIfm2HdtsUpRv+HshiasBMcc6A==}
     engines: {node: '>=6'}
 
+  technicalindicators@3.1.0:
+    resolution: {integrity: sha512-f16mOc+Y05hNy/of+UbGxhxQQmxUztCiluhsqC5QLUYz4WowUgKde9m6nIjK1Kay0wGHigT0IkOabpp0+22UfA==}
+
   terser-webpack-plugin@5.6.1:
     resolution: {integrity: sha512-201R5j+sJpK8nFWwKVyNfZot8FaJbLZDq5evriVzbV1wDtSXDjRUDRfJzHpAaxFDMEhsZL1QkeqM61wgsS3KaQ==}
     engines: {node: '>= 10.13.0'}
@@ -2762,6 +2790,8 @@ snapshots:
     dependencies:
       undici-types: 6.21.0
 
+  '@types/node@6.14.13': {}
+
   '@types/react-dom@19.2.3(@types/react@19.2.17)':
     dependencies:
       '@types/react': 19.2.17
@@ -2993,19 +3023,19 @@ snapshots:
       '@xtuc/long': 4.2.2
     optional: true
 
-  '@webpack-cli/configtest@2.1.1(webpack-cli@5.1.4)(webpack@5.107.2)':
+  '@webpack-cli/configtest@2.1.1(webpack-cli@5.1.4(webpack-bundle-analyzer@5.3.0)(webpack@5.107.2))(webpack@5.107.2)':
     dependencies:
       webpack: 5.107.2(esbuild@0.28.0)(webpack-cli@5.1.4)
       webpack-cli: 5.1.4(webpack-bundle-analyzer@5.3.0)(webpack@5.107.2)
     optional: true
 
-  '@webpack-cli/info@2.0.2(webpack-cli@5.1.4)(webpack@5.107.2)':
+  '@webpack-cli/info@2.0.2(webpack-cli@5.1.4(webpack-bundle-analyzer@5.3.0)(webpack@5.107.2))(webpack@5.107.2)':
     dependencies:
       webpack: 5.107.2(esbuild@0.28.0)(webpack-cli@5.1.4)
       webpack-cli: 5.1.4(webpack-bundle-analyzer@5.3.0)(webpack@5.107.2)
     optional: true
 
-  '@webpack-cli/serve@2.0.5(webpack-cli@5.1.4)(webpack@5.107.2)':
+  '@webpack-cli/serve@2.0.5(webpack-cli@5.1.4(webpack-bundle-analyzer@5.3.0)(webpack@5.107.2))(webpack@5.107.2)':
     dependencies:
       webpack: 5.107.2(esbuild@0.28.0)(webpack-cli@5.1.4)
       webpack-cli: 5.1.4(webpack-bundle-analyzer@5.3.0)(webpack@5.107.2)
@@ -4133,6 +4163,10 @@ snapshots:
   tapable@2.3.3:
     optional: true
 
+  technicalindicators@3.1.0:
+    dependencies:
+      '@types/node': 6.14.13
+
   terser-webpack-plugin@5.6.1(esbuild@0.28.0)(webpack@5.107.2):
     dependencies:
       '@jridgewell/trace-mapping': 0.3.31
@@ -4299,9 +4333,9 @@ snapshots:
   webpack-cli@5.1.4(webpack-bundle-analyzer@5.3.0)(webpack@5.107.2):
     dependencies:
       '@discoveryjs/json-ext': 0.5.7
-      '@webpack-cli/configtest': 2.1.1(webpack-cli@5.1.4)(webpack@5.107.2)
-      '@webpack-cli/info': 2.0.2(webpack-cli@5.1.4)(webpack@5.107.2)
-      '@webpack-cli/serve': 2.0.5(webpack-cli@5.1.4)(webpack@5.107.2)
+      '@webpack-cli/configtest': 2.1.1(webpack-cli@5.1.4(webpack-bundle-analyzer@5.3.0)(webpack@5.107.2))(webpack@5.107.2)
+      '@webpack-cli/info': 2.0.2(webpack-cli@5.1.4(webpack-bundle-analyzer@5.3.0)(webpack@5.107.2))(webpack@5.107.2)
+      '@webpack-cli/serve': 2.0.5(webpack-cli@5.1.4(webpack-bundle-analyzer@5.3.0)(webpack@5.107.2))(webpack@5.107.2)
       colorette: 2.0.20
       commander: 10.0.1
       cross-spawn: 7.0.6

@@ -23,6 +23,7 @@ export default defineConfig({
       '@app/core': path.resolve(__dirname, 'packages/core/src/index.ts'),
       '@app/supabase': path.resolve(__dirname, 'packages/supabase/src/index.ts'),
       '@app/data-sources': path.resolve(__dirname, 'packages/data-sources/src/index.ts'),
+      '@app/indicators': path.resolve(__dirname, 'packages/indicators/src/index.ts'),
     },
   },
   test: {

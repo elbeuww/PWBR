@@ -1,0 +1,20 @@
+{
+  "name": "@app/indicators",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./*": "./src/*.ts"
+  },
+  "dependencies": {
+    "@app/core": "workspace:*",
+    "@app/supabase": "workspace:*",
+    "luxon": "3.7.2",
+    "technicalindicators": "3.1.0",
+    "zod": "4.4.3"
+  },
+  "devDependencies": {
+    "@types/luxon": "^3.4.2"
+  }
+}

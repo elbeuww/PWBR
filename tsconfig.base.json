@@ -23,7 +23,9 @@
       "@app/supabase": ["./packages/supabase/src/index.ts"],
       "@app/supabase/*": ["./packages/supabase/src/*"],
       "@app/data-sources": ["./packages/data-sources/src/index.ts"],
-      "@app/data-sources/*": ["./packages/data-sources/src/*"]
+      "@app/data-sources/*": ["./packages/data-sources/src/*"],
+      "@app/indicators": ["./packages/indicators/src/index.ts"],
+      "@app/indicators/*": ["./packages/indicators/src/*"]
     }
   },
   "exclude": ["node_modules", "dist", ".next"]
