@@ -19,6 +19,9 @@ export default defineConfig({
       // server-only lève une erreur dans Next.js mais doit être un no-op dans Vitest
       // (les tests jobs s'exécutent dans Node, pas dans un bundle Next)
       'server-only': path.resolve(__dirname, '__mocks__/server-only.ts'),
+      // Alias workspace pour les tests packages/data-sources et apps/jobs
+      '@app/core': path.resolve(__dirname, 'packages/core/src/index.ts'),
+      '@app/supabase': path.resolve(__dirname, 'packages/supabase/src/index.ts'),
     },
   },
   test: {
