@@ -26,9 +26,27 @@ export type {
   JobRunUpdate,
   JobRunStatus,
   Json,
+  // Phase 2 — ingestion
+  CandleRow,
+  CandleInsert,
+  NewsRow,
+  NewsInsert,
+  MacroSeriesRow,
+  MacroSeriesInsert,
+  EconomicCalendarRow,
+  EconomicCalendarInsert,
+  DataFreshnessRow,
+  Timeframe,
+  QuoteHours,
+  CalendarImpact,
 } from './database.types'
 
 // Repositories
 export { listActiveInstruments } from './repositories/instruments'
 export { getOwnProfile } from './repositories/profiles'
 export { startRun, finishRun } from './repositories/jobRuns'
+// Phase 2 — ingestion repositories
+export { upsertCandles, getLastCandleTs } from './repositories/candles'
+export { upsertNews } from './repositories/news'
+export { upsertMacroSeries } from './repositories/macroSeries'
+export { upsertEconomicCalendar } from './repositories/economicCalendar'
