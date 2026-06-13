@@ -203,7 +203,9 @@ create unique index economic_calendar_uniq
 -- Note : la vue ne bloque pas les analyses (Phase 4). Elle expose l'état (D-27).
 -- ─────────────────────────────────────────────────────────────────────────────
 
-create view public.v_data_freshness as
+create view public.v_data_freshness
+  with (security_invoker = true)  -- respecte la RLS du lecteur (advisor security_definer_view)
+as
 with latest_candles as (
   -- Dernière bougie connue par (instrument_id, timeframe)
   select distinct on (instrument_id, timeframe)

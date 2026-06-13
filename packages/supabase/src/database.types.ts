@@ -1,11 +1,11 @@
 /**
- * Types Supabase générés depuis le schéma live (MCP `generate_typescript_types`, 2026-06-12).
+ * Types Supabase générés depuis le schéma live (MCP `generate_typescript_types`, 2026-06-13).
  *
  * Regénération : `supabase gen types typescript --linked > packages/supabase/src/database.types.ts`
  * (ou MCP Supabase generate_typescript_types), puis ré-appliquer la section
  * « Raccourcis pratiques » en bas de fichier.
  *
- * NB : broker/asset_class/status sont des CHECK constraints SQL — le générateur les
+ * NB : broker/asset_class/status/timeframe sont des CHECK constraints SQL — le générateur les
  * rend en `string`. Les unions littérales correspondantes vivent dans les raccourcis.
  */
 
@@ -25,38 +25,130 @@ export type Database = {
   }
   public: {
     Tables: {
+      candles: {
+        Row: {
+          close: number
+          high: number
+          id: string
+          instrument_id: string
+          low: number
+          open: number
+          timeframe: string
+          ts: string
+          volume: number | null
+        }
+        Insert: {
+          close: number
+          high: number
+          id?: string
+          instrument_id: string
+          low: number
+          open: number
+          timeframe: string
+          ts: string
+          volume?: number | null
+        }
+        Update: {
+          close?: number
+          high?: number
+          id?: string
+          instrument_id?: string
+          low?: number
+          open?: number
+          timeframe?: string
+          ts?: string
+          volume?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "candles_instrument_id_fkey"
+            columns: ["instrument_id"]
+            isOneToOne: false
+            referencedRelation: "instruments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      economic_calendar: {
+        Row: {
+          country: string | null
+          event_at: string
+          event_key: string
+          forecast: string | null
+          id: string
+          impact: string | null
+          previous: string | null
+          source: string
+          title: string
+        }
+        Insert: {
+          country?: string | null
+          event_at: string
+          event_key: string
+          forecast?: string | null
+          id?: string
+          impact?: string | null
+          previous?: string | null
+          source: string
+          title: string
+        }
+        Update: {
+          country?: string | null
+          event_at?: string
+          event_key?: string
+          forecast?: string | null
+          id?: string
+          impact?: string | null
+          previous?: string | null
+          source?: string
+          title?: string
+        }
+        Relationships: []
+      }
       instruments: {
         Row: {
           active: boolean
           asset_class: string
           broker: string
+          canonical_symbol: string | null
           display_name: string
           id: string
           min_size: number | null
           pip_size: number | null
           precision: number | null
+          price_decimals: number | null
+          quote_hours: string | null
+          source_symbol: string | null
           symbol: string
         }
         Insert: {
           active?: boolean
           asset_class: string
           broker: string
+          canonical_symbol?: string | null
           display_name: string
           id?: string
           min_size?: number | null
           pip_size?: number | null
           precision?: number | null
+          price_decimals?: number | null
+          quote_hours?: string | null
+          source_symbol?: string | null
           symbol: string
         }
         Update: {
           active?: boolean
           asset_class?: string
           broker?: string
+          canonical_symbol?: string | null
           display_name?: string
           id?: string
           min_size?: number | null
           pip_size?: number | null
           precision?: number | null
+          price_decimals?: number | null
+          quote_hours?: string | null
+          source_symbol?: string | null
           symbol?: string
         }
         Relationships: []
@@ -91,6 +183,63 @@ export type Database = {
         }
         Relationships: []
       }
+      macro_series: {
+        Row: {
+          id: string
+          series_code: string
+          ts: string
+          value: number
+        }
+        Insert: {
+          id?: string
+          series_code: string
+          ts: string
+          value: number
+        }
+        Update: {
+          id?: string
+          series_code?: string
+          ts?: string
+          value?: number
+        }
+        Relationships: []
+      }
+      news: {
+        Row: {
+          id: string
+          impact: string | null
+          instrument_ids: string[]
+          published_at: string
+          sentiment: number | null
+          source: string
+          summary: string | null
+          title: string
+          url_hash: string
+        }
+        Insert: {
+          id?: string
+          impact?: string | null
+          instrument_ids?: string[]
+          published_at: string
+          sentiment?: number | null
+          source: string
+          summary?: string | null
+          title: string
+          url_hash: string
+        }
+        Update: {
+          id?: string
+          impact?: string | null
+          instrument_ids?: string[]
+          published_at?: string
+          sentiment?: number | null
+          source?: string
+          summary?: string | null
+          title?: string
+          url_hash?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string
@@ -111,7 +260,25 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      v_data_freshness: {
+        Row: {
+          canonical_symbol: string | null
+          instrument_id: string | null
+          is_stale: boolean | null
+          last_ts: string | null
+          quote_hours: string | null
+          timeframe: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "candles_instrument_id_fkey"
+            columns: ["instrument_id"]
+            isOneToOne: false
+            referencedRelation: "instruments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Functions: {
       [_ in never]: never
@@ -250,11 +417,14 @@ export const Constants = {
 
 // ─────────────────────────────────────────────
 // Raccourcis pratiques (maintenus à la main — à ré-appliquer après regénération)
-// Les unions littérales reflètent les CHECK constraints de la migration 0001.
+// Les unions littérales reflètent les CHECK constraints des migrations 0001 et 0003.
 // ─────────────────────────────────────────────
 export type Broker = 'oanda' | 'binance'
 export type AssetClass = 'crypto' | 'forex' | 'metal' | 'energy'
 export type JobRunStatus = 'running' | 'success' | 'error'
+export type Timeframe = 'H1' | 'H4' | 'D'
+export type QuoteHours = '24/7' | 'fx'
+export type CalendarImpact = 'High' | 'Medium' | 'Low'
 
 export type ProfileRow = Database['public']['Tables']['profiles']['Row']
 export type ProfileInsert = Database['public']['Tables']['profiles']['Insert']
@@ -263,3 +433,12 @@ export type InstrumentInsert = Database['public']['Tables']['instruments']['Inse
 export type JobRunRow = Database['public']['Tables']['job_runs']['Row']
 export type JobRunInsert = Database['public']['Tables']['job_runs']['Insert']
 export type JobRunUpdate = Database['public']['Tables']['job_runs']['Update']
+export type CandleRow = Database['public']['Tables']['candles']['Row']
+export type CandleInsert = Database['public']['Tables']['candles']['Insert']
+export type NewsRow = Database['public']['Tables']['news']['Row']
+export type NewsInsert = Database['public']['Tables']['news']['Insert']
+export type MacroSeriesRow = Database['public']['Tables']['macro_series']['Row']
+export type MacroSeriesInsert = Database['public']['Tables']['macro_series']['Insert']
+export type EconomicCalendarRow = Database['public']['Tables']['economic_calendar']['Row']
+export type EconomicCalendarInsert = Database['public']['Tables']['economic_calendar']['Insert']
+export type DataFreshnessRow = Database['public']['Views']['v_data_freshness']['Row']
