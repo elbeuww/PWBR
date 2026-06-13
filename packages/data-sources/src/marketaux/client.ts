@@ -83,10 +83,9 @@ export async function fetchMarketauxNews(symbols: string[], limit = 10): Promise
         // Propager Retry-After pour onFailedAttempt (p-retry v8)
         if (res.status === 429) {
           const retryAfterSec = Number(res.headers.get('retry-after') ?? 0)
-          ;(err as Error & { retryAfterMs?: number }).retryAfterMs =
-            Number.isFinite(retryAfterSec) && retryAfterSec > 0
-              ? retryAfterSec * 1000
-              : undefined
+          if (Number.isFinite(retryAfterSec) && retryAfterSec > 0) {
+            ;(err as Error & { retryAfterMs?: number }).retryAfterMs = retryAfterSec * 1000
+          }
         }
         throw err
       }
