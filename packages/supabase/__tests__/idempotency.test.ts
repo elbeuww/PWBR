@@ -7,11 +7,16 @@
  * Pré-requis : SUPABASE_URL + SUPABASE_SERVICE_ROLE_KEY dans apps/jobs/.env
  * Stratégie :
  *  1. Récupérer l'ID de BTCUSDT via le symbol seedé.
- *  2. Upsert un petit lot de candles synthétiques (2 lignes test).
+ *  2. Upsert un petit lot de candles SYNTHÉTIQUES (ts=2020-01-01, marqueur TEST_TS_*)
+ *     sur timeframe H1 — valeurs clairement fictives (open=10000) hors plage réelle.
  *  3. Vérifier count = 2 après la première passe.
  *  4. Upsert les mêmes lignes une seconde fois.
  *  5. Vérifier count = 2 (inchangé) → idempotence prouvée.
- *  6. Cleanup : delete les lignes test en afterAll.
+ *  6. Cleanup : delete les lignes test avec vérification d'absence post-delete (WR-06).
+ *
+ * Note WR-06 : le delete afterAll vérifie son propre résultat (error + count post-delete).
+ * Un échec réseau ou process tué entre upsert et afterAll laisse des données synthétiques
+ * résiduelles détectables : le count post-delete != 0 fait échouer bruyamment.
  */
 
 import { existsSync } from 'fs'
@@ -100,13 +105,29 @@ describe('Idempotence upsert candles (DATA-06)', () => {
 
   afterAll(async () => {
     if (!getSupabaseUrl() || !getServiceRoleKey() || !btcInstrumentId) return
-    // Cleanup : supprimer les lignes test insérées durant ce test
-    await serviceClient
+
+    // WR-06 : cleanup des lignes test — vérifier le delete pour détecter des
+    // données synthétiques résiduelles en cas d'échec réseau ou interruption.
+    const { error: deleteError } = await serviceClient
       .from('candles')
       .delete()
       .eq('instrument_id', btcInstrumentId)
       .eq('timeframe', 'H1')
       .in('ts', [TEST_TS_1, TEST_TS_2])
+
+    if (deleteError) {
+      throw new Error(
+        `[idempotency.test] cleanup candles échoué — données synthétiques résiduelles dans la base : ${deleteError.message}`,
+      )
+    }
+
+    // Vérification post-delete : les lignes ne doivent plus exister
+    const residualCount = await countCandles(btcInstrumentId, 'H1')
+    if (residualCount !== 0) {
+      throw new Error(
+        `[idempotency.test] cleanup incomplet — ${residualCount} ligne(s) synthétique(s) résiduelles détectées (instrument_id=${btcInstrumentId}, timeframe=H1, ts in [${TEST_TS_1}, ${TEST_TS_2}])`,
+      )
+    }
   })
 
   it("upsert x2 du même lot => count inchangé (DATA-06)", async () => {
