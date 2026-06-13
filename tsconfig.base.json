@@ -21,7 +21,9 @@
       "@app/core": ["./packages/core/src/index.ts"],
       "@app/core/*": ["./packages/core/src/*"],
       "@app/supabase": ["./packages/supabase/src/index.ts"],
-      "@app/supabase/*": ["./packages/supabase/src/*"]
+      "@app/supabase/*": ["./packages/supabase/src/*"],
+      "@app/data-sources": ["./packages/data-sources/src/index.ts"],
+      "@app/data-sources/*": ["./packages/data-sources/src/*"]
     }
   },
   "exclude": ["node_modules", "dist", ".next"]

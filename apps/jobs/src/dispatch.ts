@@ -17,6 +17,7 @@ import 'dotenv/config'
 import pino from 'pino'
 import { runJob } from './runJob'
 import { heartbeat } from './jobs/heartbeat'
+import { marketIngest } from './jobs/market-ingest'
 import type { Json } from '@app/supabase'
 
 const logger = pino({ level: 'info' })
@@ -25,6 +26,7 @@ const logger = pino({ level: 'info' })
 
 const JOB_REGISTRY: Record<string, () => Promise<Json | undefined>> = {
   heartbeat,
+  'market-ingest': marketIngest,
 }
 
 // ─── Dispatch ────────────────────────────────────────────────────────────────

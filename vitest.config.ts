@@ -22,6 +22,7 @@ export default defineConfig({
       // Alias workspace pour les tests packages/data-sources et apps/jobs
       '@app/core': path.resolve(__dirname, 'packages/core/src/index.ts'),
       '@app/supabase': path.resolve(__dirname, 'packages/supabase/src/index.ts'),
+      '@app/data-sources': path.resolve(__dirname, 'packages/data-sources/src/index.ts'),
     },
   },
   test: {
