@@ -3,12 +3,12 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-last_updated: "2026-06-13T00:44:17.448Z"
+last_updated: "2026-06-13T01:55:00.000Z"
 progress:
   total_phases: 9
   completed_phases: 1
   total_plans: 7
-  completed_plans: 4
+  completed_plans: 5
   percent: 57
 ---
 
@@ -20,16 +20,16 @@ progress:
 ## Project Reference
 
 **Core value:** Produire, pour chaque opportunité, une analyse fiable et explicable — score /100 + niveau de risque + plan de trade (entrée/SL/TP/R:R) — qui aide à décider avec discipline.
-**Current focus:** Phase 02 — ingestion-fiable-des-donn-es (plan 02-01 complete, plan 02-02 next)
+**Current focus:** Phase 02 — ingestion-fiable-des-donn-es (plan 02-02 complete, plan 02-03 next)
 **Mode:** mvp (Vertical MVP)
 **Granularity:** fine (9 phases)
 
 ## Current Position
 
 Phase: 02 (ingestion-fiable-des-donn-es) — EXECUTING
-Plan: 2 of 4 (02-01 complete)
+Plan: 3 of 4 (02-02 complete)
 **Phase:** 2
-**Plan:** 02-02
+**Plan:** 02-03
 **Status:** Executing Phase 02
 
 **Progress:** [██████░░░░] 57%
@@ -52,7 +52,7 @@ Phase 9  [ ] Backtest & calibration
 |--------|-------|
 | Phases complete | 1/9 |
 | Plans complete | 4 (02-01 inclus) |
-| Requirements covered | DATA-06 + Phase 01 |
+| Requirements covered | DATA-06 + Phase 01 + DATA-01/02/05 |
 
 ## Accumulated Context
 
@@ -77,6 +77,8 @@ Phase 9  [ ] Backtest & calibration
 - D-19 (2026-06-12) : Aucune Routine Claude planifiée en Phase 1 — ingestion déterministe via Windows Task Scheduler (run-job.cmd). Routines Remote (cloud Anthropic, ~15 runs/j quota partagé Max) = Phase 4 uniquement (analyse IA).
 - D-20 (2026-06-13, plan 02-01) : onConflict miroir des index uniques SQL (candles_uniq/news_uniq/macro_series_uniq/economic_calendar_uniq) — garantie idempotence DATA-06 au niveau DB.
 - D-21 (2026-06-13, plan 02-01) : Env loading dans tests packages/ : process.loadEnvFile (Node natif) + getters lazy pour contourner le hoist ESM Vitest. Chemin 3 niveaux depuis packages/supabase/__tests__.
+- D-22 (2026-06-13, plan 02-02) : Alias Vitest @app/* déclarés dans vitest.config.ts resolve.alias — obligatoire, Vite ne lit pas tsconfig paths automatiquement. Pattern à reproduire pour tout nouveau package workspace.
+- D-23 (2026-06-13, plan 02-02) : computeGapFillWindow exporté depuis market-ingest.ts pour tests unitaires sans réseau — séparer la logique de borne du job = pattern de testabilité pour les autres jobs d'ingestion.
 
 ### Open todos / risques à lever
 
@@ -95,11 +97,11 @@ Aucun.
 
 ## Session Continuity
 
-**Last session:** 2026-06-13T00:44:17.441Z
+**Last session:** 2026-06-13T01:55:00.000Z
 
-**Next action:** Exécuter le plan 02-02 (data-sources : clients OANDA/Binance/Finnhub/FRED + jobs d'ingestion).
+**Next action:** Exécuter le plan 02-03 (news/macro/calendrier : clients Finnhub/Marketaux/FRED + jobs + isolation des pannes).
 
-**Notes pour la session suivante:** Plan 02-01 complet. Tables candles/news/macro_series/economic_calendar sur le cloud (migration 0003 appliquée), 4 repositories upsert idempotents exportés depuis @app/supabase, DATA-06 prouvée (26/26 tests verts). apps/jobs/.env rempli (SUPABASE_URL + SERVICE_ROLE_KEY). Prêt pour 02-02 (packages/data-sources : clients fetch OANDA/Binance/Finnhub/FRED + jobs d'ingestion).
+**Notes pour la session suivante:** Plan 02-02 complet. Package @app/data-sources créé (binance@3.5.9, p-retry@8, p-limit@7.3, luxon@3.7.2). Job market-ingest gap-fill opérationnel, enregistré dans dispatch.ts. Suite 51/51 tests verts. Alias Vitest @app/* ajoutés dans vitest.config.ts. Prêt pour 02-03 (Finnhub/Marketaux/FRED clients + news-ingest/macro-ingest/calendar-ingest + fault-isolation.test.ts).
 
 ---
 *State initialized: 2026-06-09*
