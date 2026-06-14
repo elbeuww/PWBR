@@ -1,24 +1,40 @@
 /**
- * middleware.ts — racine de apps/web
+ * middleware.ts — racine de apps/web (unique middleware)
  *
- * Rafraîchit la session Supabase à chaque requête via updateSession.
- * Obligatoire pour que les RSC voient la session à jour.
+ * Compose deux responsabilités sur UNE seule response (Pattern 2) :
+ *   1. handleI18n(request) → next-intl résout la locale depuis l'URL brute,
+ *      applique le rewrite /[locale]/… et pose le cookie NEXT_LOCALE.
+ *   2. updateSession(request, response) → rafraîchit la session Supabase
+ *      (getUser()) en MUTANT cette même response (Pitfall 2).
  *
- * Source : 01-RESEARCH.md §Pattern 2
+ * Le header x-pathname est posé pour que le gate RSC (gate.ts) reconstruise
+ * le returnTo (D-08) — RSC n'a pas accès direct à l'URL demandée.
+ *
+ * Source : 01-RESEARCH.md §Pattern 2 ; Q2 (returnTo via header)
  */
+import createMiddleware from 'next-intl/middleware'
 import { type NextRequest } from 'next/server'
+import { routing } from './src/i18n/routing'
 import { updateSession } from './src/lib/supabase/middleware'
 
+const handleI18n = createMiddleware(routing)
+
 export async function middleware(request: NextRequest) {
-  return updateSession(request)
+  // 1. Locale d'abord : produit la response (rewrite + cookie NEXT_LOCALE).
+  const response = handleI18n(request)
+  // Header consommé par le gate RSC pour le returnTo (D-08).
+  response.headers.set('x-pathname', request.nextUrl.pathname)
+  // 2. Session ensuite : MUTE la response next-intl (ne la recrée pas).
+  return await updateSession(request, response)
 }
 
 export const config = {
   matcher: [
     /*
-     * Exclure les assets statiques et les routes internes Next.
-     * Appliquer le middleware à toutes les routes UI et API.
+     * Exclure les routes internes Next, l'API et les assets statiques.
+     * Appliquer le middleware à toutes les routes UI (next-intl recommande
+     * son propre matcher incluant l'exclusion de `api`).
      */
-    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
+    '/((?!api|_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
   ],
 }
