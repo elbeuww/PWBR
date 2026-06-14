@@ -90,4 +90,48 @@
 
 ## Traceability
 
-*(rempli par le roadmapper — chaque REQ-ID mappé à exactement une phase.)*
+> Chaque REQ-ID v2.0 mappé à exactement une phase. Couverture 41/41, 0 orphelin, 0 doublon. (Numérotation reset à Phase 1 pour v2.0.)
+
+| Requirement | Phase | Status |
+|-------------|-------|--------|
+| I18N-01 | Phase 1 | Pending |
+| I18N-02 | Phase 1 | Pending |
+| I18N-03 | Phase 1 | Pending |
+| I18N-04 | Phase 1 | Pending |
+| ACCESS-01 | Phase 1 | Pending |
+| ACCESS-02 | Phase 1 | Pending |
+| ACCESS-03 | Phase 1 | Pending |
+| ACCESS-04 | Phase 1 | Pending |
+| VITR-01 | Phase 2 | Pending |
+| VITR-02 | Phase 2 | Pending |
+| VITR-03 | Phase 2 | Pending |
+| LEGAL-01 | Phase 2 | Pending |
+| LEGAL-02 | Phase 2 | Pending |
+| MEMB-01 | Phase 3 | Pending |
+| MEMB-02 | Phase 3 | Pending |
+| MEMB-03 | Phase 3 | Pending |
+| MEMB-04 | Phase 3 | Pending |
+| MEMB-05 | Phase 3 | Pending |
+| PAY-01 | Phase 4 | Pending |
+| PAY-02 | Phase 4 | Pending |
+| PAY-03 | Phase 4 | Pending |
+| PAY-04 | Phase 4 | Pending |
+| PAY-05 | Phase 4 | Pending |
+| PAY-06 | Phase 4 | Pending |
+| ADMIN-01 | Phase 4 | Pending |
+| ADMIN-02 | Phase 4 | Pending |
+| TRACK-01 | Phase 5 | Pending |
+| TRACK-02 | Phase 5 | Pending |
+| TRACK-03 | Phase 5 | Pending |
+| TG-01 | Phase 6 | Pending |
+| TG-02 | Phase 6 | Pending |
+| TG-03 | Phase 6 | Pending |
+| AFF-01 | Phase 7 | Pending |
+| AFF-02 | Phase 7 | Pending |
+| AFF-03 | Phase 7 | Pending |
+| AFF-04 | Phase 7 | Pending |
+| AFF-05 | Phase 7 | Pending |
+| ADMIN-03 | Phase 8 | Pending |
+| ADMIN-04 | Phase 8 | Pending |
+| CMS-01 | Phase 9 | Pending |
+| CMS-02 | Phase 9 | Pending |
