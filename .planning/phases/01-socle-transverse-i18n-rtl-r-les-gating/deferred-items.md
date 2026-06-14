@@ -2,7 +2,7 @@
 
 Out-of-scope discoveries logged during execution (not fixed — SCOPE BOUNDARY).
 
-## Pre-existing typecheck errors in `packages/supabase` (discovered Plan 01-02)
+## [RESOLVED] typecheck errors in `packages/supabase` (discovered Plan 01-02)
 
 `pnpm --filter web tsc --noEmit` reports ~50 errors of the form:
 `Module '"./database.types"' has no exported member 'ProfileRow' / 'TradeSetupRow' / ...`
@@ -13,6 +13,9 @@ plus `src/lib/supabase/__lint_fixtures__/forbidden-service-import.ts` (intention
   does not re-export under those names.
 - **Scope:** NONE of these errors are in Plan 01-02 files (`apps/web/src/i18n/*`,
   `apps/web/src/messages/*`, `next.config.ts`). Confirmed by filtering tsc output.
-- **Disposition:** DEFERRED. Pre-existing condition in the `@app/supabase` package,
-  unrelated to i18n/RTL config. Should be addressed where database.types.ts type
-  aliases are owned (likely a follow-up to Plan 01-01's type regeneration).
+- **Disposition:** RESOLVED (orchestrator, after Plan 01-02). NOT pre-existing — it was a
+  regression introduced by Plan 01-01's checkpoint type regeneration: the raw `supabase gen`
+  output overwrote the hand-maintained alias block (ProfileRow, TradeSetupRow, CandleInsert, …)
+  that the repositories import. Fix: re-appended the hand-maintained alias block verbatim and
+  added the Phase-1 v2.0 aliases (UserRole, SubscriptionStatus, SubscriptionPlan,
+  SubscriptionRow/Insert) for the new 0008/0009 schema. `tsc -b packages/supabase` → exit 0.

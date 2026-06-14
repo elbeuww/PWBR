@@ -646,3 +646,54 @@ export const Constants = {
     Enums: {},
   },
 } as const
+
+// ─────────────────────────────────────────────
+// Raccourcis pratiques (maintenus à la main — à ré-appliquer après regénération)
+// Les unions littérales reflètent les CHECK constraints des migrations 0001, 0003 et 0005.
+// ─────────────────────────────────────────────
+export type Broker = 'oanda' | 'binance'
+export type AssetClass = 'crypto' | 'forex' | 'metal' | 'energy'
+export type JobRunStatus = 'running' | 'success' | 'error'
+export type Timeframe = 'H1' | 'H4' | 'D'
+export type QuoteHours = '24/7' | 'fx'
+export type CalendarImpact = 'High' | 'Medium' | 'Low'
+export type SnapshotStyle = 'day' | 'swing'
+export type SnapshotKind = 'technical' | 'fundamental' | 'news' | 'combined'
+
+export type ProfileRow = Database['public']['Tables']['profiles']['Row']
+export type ProfileInsert = Database['public']['Tables']['profiles']['Insert']
+export type InstrumentRow = Database['public']['Tables']['instruments']['Row']
+export type InstrumentInsert = Database['public']['Tables']['instruments']['Insert']
+export type JobRunRow = Database['public']['Tables']['job_runs']['Row']
+export type JobRunInsert = Database['public']['Tables']['job_runs']['Insert']
+export type JobRunUpdate = Database['public']['Tables']['job_runs']['Update']
+export type CandleRow = Database['public']['Tables']['candles']['Row']
+export type CandleInsert = Database['public']['Tables']['candles']['Insert']
+export type NewsRow = Database['public']['Tables']['news']['Row']
+export type NewsInsert = Database['public']['Tables']['news']['Insert']
+export type MacroSeriesRow = Database['public']['Tables']['macro_series']['Row']
+export type MacroSeriesInsert = Database['public']['Tables']['macro_series']['Insert']
+export type EconomicCalendarRow = Database['public']['Tables']['economic_calendar']['Row']
+export type EconomicCalendarInsert = Database['public']['Tables']['economic_calendar']['Insert']
+export type DataFreshnessRow = Database['public']['Views']['v_data_freshness']['Row']
+export type SnapshotRow = Database['public']['Tables']['snapshots']['Row']
+export type SnapshotInsert = Database['public']['Tables']['snapshots']['Insert']
+export type AssetDriverRow = Database['public']['Tables']['asset_drivers']['Row']
+export type AssetDriverInsert = Database['public']['Tables']['asset_drivers']['Insert']
+
+// Phase 4 — moteur IA vétéran & scoring (CHECK constraints migration 0006)
+export type TradeDirection = 'long' | 'short'
+export type RiskLevel = 'low' | 'medium' | 'high' | 'extreme'
+export type Confidence = 'low' | 'moderate' | 'high'
+export type SetupStatus = 'active' | 'invalidated' | 'expired'
+export type AnalysisRow = Database['public']['Tables']['analyses']['Row']
+export type AnalysisInsert = Database['public']['Tables']['analyses']['Insert']
+export type TradeSetupRow = Database['public']['Tables']['trade_setups']['Row']
+export type TradeSetupInsert = Database['public']['Tables']['trade_setups']['Insert']
+
+// Phase 1 v2.0 — rôles & gating (CHECK constraints migrations 0008 et 0009)
+export type UserRole = 'member' | 'affiliate' | 'superadmin'
+export type SubscriptionStatus = 'pending' | 'active' | 'expired' | 'canceled'
+export type SubscriptionPlan = 'discovery' | 'standard'
+export type SubscriptionRow = Database['public']['Tables']['subscriptions']['Row']
+export type SubscriptionInsert = Database['public']['Tables']['subscriptions']['Insert']
