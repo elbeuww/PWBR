@@ -2,15 +2,14 @@
 gsd_state_version: 1.0
 milestone: v2.0
 milestone_name: Plateforme publique
-status: roadmap_ready
-last_updated: "2026-06-14T04:00:00.000Z"
-last_activity: 2026-06-14
+status: Roadmap v2.0 prête — en attente de planification de la Phase 1
+last_updated: "2026-06-14T11:59:55.948Z"
+last_activity: 2026-06-14 — ROADMAP.md v2.0 créée (9 phases, 41/41 requirements mappés)
 progress:
   total_phases: 9
   completed_phases: 0
   total_plans: 0
   completed_plans: 0
-  percent: 0
 ---
 
 # Project State
@@ -97,7 +96,7 @@ Aucun.
 
 ## Session Continuity
 
-**Last session:** 2026-06-14T04:00:00.000Z
+**Last session:** 2026-06-14T11:59:55.941Z
 
 **Next action:** Planifier la **Phase 1 — Socle transverse i18n/RTL & rôles/gating** (`/gsd:plan-phase 1`). Poser `[locale]` + RTL natif Tailwind v4 + `profiles.role` (migration 0008) + `lib/auth/gate.ts` + RLS `has_active_subscription()` sur `trade_setups`/`analyses` AVANT toute UI publique. Couvre I18N-01..04 + ACCESS-01..04.
 
