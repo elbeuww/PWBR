@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-last_updated: "2026-06-14T02:55:00.000Z"
+last_updated: "2026-06-14T02:02:58.144Z"
 progress:
   total_phases: 9
   completed_phases: 3
   total_plans: 15
-  completed_plans: 13
-  percent: 87
+  completed_plans: 14
+  percent: 93
 ---
 
 # Project State
@@ -27,12 +27,12 @@ progress:
 ## Current Position
 
 Phase: 04 (moteur-ia-v-t-ran-scoring) — EXECUTING
-Plan: 3 of 4
+Plan: 4 of 4
 **Phase:** 4
-**Plan:** 04-03 (next — persist.ts frontière de confiance)
-**Status:** Executing Phase 04 (Wave 2 livrée)
+**Plan:** 04-04 (next — ANALYZE agent + dispatch wiring)
+**Status:** Executing Phase 04 (Wave 3 livrée — frontière de confiance persist.ts)
 
-**Progress:** [██████████] 100%
+**Progress:** [█████████░] 93%
 
 ```
 Phase 1  [x] Fondations & Sécurité
@@ -93,6 +93,9 @@ Phase 9  [ ] Backtest & calibration
 - D-47 (2026-06-13, plan 03-04) : fundamental-engine déterministe (zéro IA). deriveFundamentalContext (pure, D-23) : règles nommées macro_bias (DXY+real_yields ↗↗→risk_off, ↘↘→risk_on, mixte→neutral, TREND_EPSILON 0.1%) + rate_environment (DFF ↗→hawkish, ↘→dovish). Drivers par actif lus depuis asset_drivers (data-not-code, D-38), jamais codés — libellé `CODE(±dir)`. Contexte macro partagé par instrument, seuls asset_specific_drivers varient (1 derive, 2 upserts day/swing). Codes FRED : DTWEXBGS=DXY, DFII10=real_yields, DFF=fed funds.
 - D-49 (2026-06-14, plan 04-02) : types §3 d'entrée du scoring = miroir structurel local dans `packages/core/src/scoring/snapshot-input.ts`, JAMAIS `import type` depuis `@app/indicators`. `@app/core` est le package le plus BAS (indicators dépend de core) ; résoudre le type via les paths tsconfig tire la source d'indicators hors du `rootDir` composite de core (TS6059/6307) + traîne `@app/supabase`. Contrat structurel côté consommateur (Zod reste la source de vérité à la production P3) → graphe unidirectionnel, anti-cycle. scoreSetup orchestre rr(bord conservateur D-50)→opportunity_score décomposable(cap 45 condition exacte, clamp inputs)→confidence→risk (ordre figé). Golden 32/32, core 67/67, tsc core+indicators verts. Aucune dépendance npm ajoutée.
 - D-48 (2026-06-13, plan 03-04) : news-engine déterministe. deriveNewsContext (pure, now injectable) : net_sentiment = moyenne pondérée décroissance EWMA-like (HALF_LIFE_HOURS=12), fenêtre day≈24h / swing≈7j (STYLE_PARAMS). Sentiment null (free tier, D-24) exclu de la moyenne (absence, pas 0 faux). net_sentiment borné [-1,1]. news_risk (D-40) = event High-impact (insensible casse) dans <2h (day) / <24h (swing), calculé via luxon (jamais Date maison, T-03-17). Les trois moteurs (technical/fundamental/news) dans JOB_REGISTRY. Suite 159/159 verte.
+- D-04-03-A (2026-06-14, plan 04-03) : `structure_against` dérivé déterministe. Le modèle §3 réel type `bos_choch` en `'bos'|'choch'|null` (aucune direction baked-in, contrairement au brief qui supposait 'bearish_bos'). Direction structurelle effective = BOS continue `trend_ltf`, CHoCH le retourne ; si elle contredit `output.direction` → `reject('structure_against')` (règle dure §3). `structureDirection()` pur + testé (3+1 tests).
+- D-04-03-B (2026-06-14, plan 04-03) : `CombinedSnapshot` résolu via `snapshot.payload` (`raw_indicators_ref`→`getSnapshotByHash`) casté en CombinedSnapshot (aligné RESEARCH l.206). L'ANALYZE 04-04 doit fournir un payload combiné `{technical, fundamental, news}` §3 pour que `scoreSetup` reçoive les 3 kinds.
+- D-04-03-C (2026-06-14, plan 04-03) : erreur IO inattendue par artefact → `reject('insert_error')` isolé (code normalisé, Pitfall 5), ne crash pas le run ; cohérent avec stats.reasons = codes seuls (T-02-13). persist = frontière unique (D-43) : run_id sanitisé anti path traversal (RUN_ID_RE+resolve+startsWith, liste vide→throw), garde-fous purs (R:R bord conservateur, cohérence SL/TP, alloc≠100→tp_bounds), session_day UTC déterministe, valid_until 24h/72h luxon, snapshot.partial→risk relevé (jamais low). 34/34 golden, suite 244/244, tsc jobs clean. Aucune dép npm.
 
 ### Open todos / risques à lever
 
@@ -111,9 +114,11 @@ Aucun.
 
 ## Session Continuity
 
-**Last session:** 2026-06-13T15:37:18.919Z
+**Last session:** 2026-06-14T03:02:00.000Z
 
-**Next action:** Phase 04 Wave 3 — plan 04-03 `persist.ts` (frontière de confiance) : Zod OutputSchema (04-01) + garde-fous (R:R<1.2 rejet, structure cassée contre = rejet) + `scoreSetup` (04-02) + immuabilité/expiry (`expirePriorSetups`, `session_day`) + upsert service_role. scoreSetup attend un `CombinedSnapshot` ({technical, fundamental, news} §3) ; persist dérivera ce wrapper depuis les 3 snapshots par hash.
+**Next action:** Phase 04 Wave 4 — plan 04-04 (ANALYZE agent vétéran + dispatch wiring). L'ANALYZE écrit `run-artifacts/<run_id>/<instrument>_<style>.json` (Output §3), résout/exporte `RUN_ID` (format `RUN_ID_RE`)/`MODEL_LABEL`/`PROMPT_VERSION`, et fournit un snapshot payload **combiné** `{technical, fundamental, news}` (référencé par `raw_indicators_ref`). Câbler `persist` dans `apps/jobs/src/dispatch.ts` JOB_REGISTRY via `runJob`.
+
+**Notes (04-03 livré) :** Frontière de confiance unique `persist()` livrée (D-43). `apps/jobs/src/jobs/runArtifacts.ts` (anti path traversal 3 couches, liste vide→throw) + `persist.ts` (stripFence+OutputSchema.parse+getSnapshotByHash+runGuardrails+scoreSetup+expirePriorSetups AVANT insert+insertAnalysis/insertTradeSetups). Garde-fous : R:R bord conservateur <1.2→rr_below_min, cohérence SL/TP→sl_coherence, alloc≠100→tp_bounds, structure_against (D-04-03-A). session_day UTC (concern #1), valid_until 24h/72h luxon (concern #3), snapshot.partial→risk relevé jamais low (concern #4, D-44). stats.reasons codes seuls (T-02-13). 34/34 golden, suite 244/244, tsc jobs exit 0.
 
 **Notes pour la session suivante (04-02):** Scoring core déterministe livré, golden 32/32. `scoreSetup(snapshot, output, style, opts) → {opportunity_score, breakdown, risk_level, confidence}` exporté de `@app/core` ; `computeRiskReward`/`deriveRiskLevel`/`deriveConfidence`/`WEIGHTS`/`hasStrongCatalyst` aussi. R:R bord conservateur D-50 (long=zone.max, short=zone.min). Cap 45 = HTF contredit ET pas de `news_catalysts` high+même direction. Clamp RSI/atr_pct/sentiment ; ATR<0 → throw 'invalid_atr'. Ordre figé score→confidence→risk. D-49 : pas d'import (même type) d'`@app/indicators` dans core — type §3 miroir local `snapshot-input.ts`. Notes pour la suite (03-04) :
 

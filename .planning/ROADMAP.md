@@ -116,7 +116,7 @@ Plans:
 - [x] 04-02-PLAN.md — Scoring core pur golden : weights §3 + rr bord conservateur + risk_level + confidence + score /100 décomposable + cap 45 (SCORE-02/03) — COMPLETE 2026-06-14
 
 **Wave 3** *(blocked on Wave 1+2)*
-- [ ] 04-03-PLAN.md — Frontière de confiance `persist.ts` : Zod + garde-fous + scoring + immuabilité/expiry + upsert service_role (SCORE-04/05)
+- [x] 04-03-PLAN.md — Frontière de confiance `persist.ts` : Zod + garde-fous + scoring + immuabilité/expiry + upsert service_role (SCORE-04/05)
 
 **Wave 4** *(blocked on Wave 3 — partage persist.ts/dispatch.ts)*
 - [ ] 04-04-PLAN.md — Scheduling : config sessions + univers + prompt veteran.md versionné + prompt_version sha256 + dispatch + [BLOCKING] routines + run réel (JOB-01/02, SCORE-01)
