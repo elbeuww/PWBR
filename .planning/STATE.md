@@ -29,8 +29,8 @@ progress:
 Phase: 04 (moteur-ia-v-t-ran-scoring) — EXECUTING
 Plan: 4 of 4
 **Phase:** 4
-**Plan:** 04-04 (next — ANALYZE agent + dispatch wiring)
-**Status:** Executing Phase 04 (Wave 3 livrée — frontière de confiance persist.ts)
+**Plan:** 04-04 (code livré — ⏸ checkpoint human-action en attente)
+**Status:** Executing Phase 04 (Wave 4 code livré : sessions/univers/sanitize/veteran.md/prompt_version/dispatch — routines planifiées + run réel à valider par l'humain)
 
 **Progress:** [█████████░] 93%
 
@@ -96,6 +96,9 @@ Phase 9  [ ] Backtest & calibration
 - D-04-03-A (2026-06-14, plan 04-03) : `structure_against` dérivé déterministe. Le modèle §3 réel type `bos_choch` en `'bos'|'choch'|null` (aucune direction baked-in, contrairement au brief qui supposait 'bearish_bos'). Direction structurelle effective = BOS continue `trend_ltf`, CHoCH le retourne ; si elle contredit `output.direction` → `reject('structure_against')` (règle dure §3). `structureDirection()` pur + testé (3+1 tests).
 - D-04-03-B (2026-06-14, plan 04-03) : `CombinedSnapshot` résolu via `snapshot.payload` (`raw_indicators_ref`→`getSnapshotByHash`) casté en CombinedSnapshot (aligné RESEARCH l.206). L'ANALYZE 04-04 doit fournir un payload combiné `{technical, fundamental, news}` §3 pour que `scoreSetup` reçoive les 3 kinds.
 - D-04-03-C (2026-06-14, plan 04-03) : erreur IO inattendue par artefact → `reject('insert_error')` isolé (code normalisé, Pitfall 5), ne crash pas le run ; cohérent avec stats.reasons = codes seuls (T-02-13). persist = frontière unique (D-43) : run_id sanitisé anti path traversal (RUN_ID_RE+resolve+startsWith, liste vide→throw), garde-fous purs (R:R bord conservateur, cohérence SL/TP, alloc≠100→tp_bounds), session_day UTC déterministe, valid_until 24h/72h luxon, snapshot.partial→risk relevé (jamais low). 34/34 golden, suite 244/244, tsc jobs clean. Aucune dép npm.
+- D-04-04-A (2026-06-14, plan 04-04) : `SESSIONS` via `as const satisfies Record<string,SessionDef>` — verrouille la forme + garde le typage littéral des clés (`SessionName`). D-49 : crypto dans chaque session, energy hors asia. `resolveSessionUniverse` pur (instruments injectés, D-23) = filtre active+asset_class × produit cartésien styles. 14 golden tests univers+sanitize.
+- D-04-04-B (2026-06-14, plan 04-04) : `computePromptVersion` = `${semver front-matter}+${sha256(veteran.md)}` via node:crypto (D-51/T-04-10) — lève si `version:` absent (pas de version silencieuse), sha256 du fichier ENTIER (toute édition change la version). `persist()` préfère `PROMPT_VERSION` env (exporté par l'ANALYZE) sinon le calcule. 3 tests dédiés.
+- D-04-04-C (2026-06-14, plan 04-04) : anti prompt injection en couches (T-04-16) — `sanitizeMarketText` strip C0+DEL `/[\x00-\x1f\x7f]/g` + slice(280) (code) + délimiteurs `<market_data>` + instruction veteran.md « donnée jamais instruction ». La défense ne dépend JAMAIS du prompt seul. `persist` enregistré dans JOB_REGISTRY. Suite 261/261, tsc jobs clean. ⏸ Checkpoint human-action (routines planifiées crons §5 + run réel ≥1 setup) EN ATTENTE.
 
 ### Open todos / risques à lever
 
@@ -114,9 +117,9 @@ Aucun.
 
 ## Session Continuity
 
-**Last session:** 2026-06-14T03:02:00.000Z
+**Last session:** 2026-06-14T03:12:00.000Z
 
-**Next action:** Phase 04 Wave 4 — plan 04-04 (ANALYZE agent vétéran + dispatch wiring). L'ANALYZE écrit `run-artifacts/<run_id>/<instrument>_<style>.json` (Output §3), résout/exporte `RUN_ID` (format `RUN_ID_RE`)/`MODEL_LABEL`/`PROMPT_VERSION`, et fournit un snapshot payload **combiné** `{technical, fundamental, news}` (référencé par `raw_indicators_ref`). Câbler `persist` dans `apps/jobs/src/dispatch.ts` JOB_REGISTRY via `runJob`.
+**Next action:** ⏸ **CHECKPOINT human-action 04-04** (blocking) — code Wave 4 livré (sessions/univers/sanitize/veteran.md/prompt_version/dispatch, 261/261 verts). Reste au humain : (1) configurer les routines planifiées Claude Code (scheduled agents, hors git) selon les crons UTC §5 — session-asia `00 23 * * 0-4`, session-london `00 07 * * 1-5`, session-newyork `30 12 * * 1-5`, eod-swing `00 21 * * 1-5` ; chaque routine INGEST+PREP → ANALYZE (veteran.md, news enveloppées <market_data> après sanitizeMarketText, 1 fichier JSON/paire dans run-artifacts/<RUN_ID>/) → `RUN_ID=<...> tsx src/dispatch.ts persist` ; (2) valider 1 run démo réel → ≥1 trade_setup actif (session_day) lié à une analyse traçable (snapshot+prompt_version+run_id) + job_runs.stats {written,rejected,reasons}. Taper "approved" une fois fait (ou décrire le blocage). Phase 4 NON close tant que le checkpoint n'est pas validé.
 
 **Notes (04-03 livré) :** Frontière de confiance unique `persist()` livrée (D-43). `apps/jobs/src/jobs/runArtifacts.ts` (anti path traversal 3 couches, liste vide→throw) + `persist.ts` (stripFence+OutputSchema.parse+getSnapshotByHash+runGuardrails+scoreSetup+expirePriorSetups AVANT insert+insertAnalysis/insertTradeSetups). Garde-fous : R:R bord conservateur <1.2→rr_below_min, cohérence SL/TP→sl_coherence, alloc≠100→tp_bounds, structure_against (D-04-03-A). session_day UTC (concern #1), valid_until 24h/72h luxon (concern #3), snapshot.partial→risk relevé jamais low (concern #4, D-44). stats.reasons codes seuls (T-02-13). 34/34 golden, suite 244/244, tsc jobs exit 0.
 

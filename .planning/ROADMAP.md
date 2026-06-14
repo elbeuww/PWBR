@@ -119,7 +119,7 @@ Plans:
 - [x] 04-03-PLAN.md — Frontière de confiance `persist.ts` : Zod + garde-fous + scoring + immuabilité/expiry + upsert service_role (SCORE-04/05)
 
 **Wave 4** *(blocked on Wave 3 — partage persist.ts/dispatch.ts)*
-- [ ] 04-04-PLAN.md — Scheduling : config sessions + univers + prompt veteran.md versionné + prompt_version sha256 + dispatch + [BLOCKING] routines + run réel (JOB-01/02, SCORE-01)
+- [~] 04-04-PLAN.md — Scheduling : config sessions + univers + prompt veteran.md versionné + prompt_version sha256 + dispatch **(code livré, 261/261 verts)** — ⏸ [BLOCKING] human-action en attente : configurer routines planifiées (crons §5) + valider 1 run réel ≥1 setup (JOB-01/02, SCORE-01)
 **Research flag**: yes — point à plus haut risque : robustesse du prompt vétéran, taux de rejet Zod acceptable, méthode de scoring. À itérer.
 
 ### Phase 5: Dashboard des opportunités
