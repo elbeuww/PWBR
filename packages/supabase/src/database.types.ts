@@ -619,7 +619,7 @@ export type Timeframe = 'H1' | 'H4' | 'D'
 export type QuoteHours = '24/7' | 'fx'
 export type CalendarImpact = 'High' | 'Medium' | 'Low'
 export type SnapshotStyle = 'day' | 'swing'
-export type SnapshotKind = 'technical' | 'fundamental' | 'news'
+export type SnapshotKind = 'technical' | 'fundamental' | 'news' | 'combined'
 
 export type ProfileRow = Database['public']['Tables']['profiles']['Row']
 export type ProfileInsert = Database['public']['Tables']['profiles']['Insert']
