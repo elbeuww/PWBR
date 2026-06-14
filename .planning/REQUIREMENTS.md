@@ -17,9 +17,9 @@
 
 ### ACCESS — Rôles & gating (Wave 1)
 - [ ] **ACCESS-01**: Un visiteur non authentifié voit la vitrine publique mais ne peut pas atteindre l'espace membre (signaux).
-- [ ] **ACCESS-02**: Un utilisateur authentifié SANS abonnement actif est bloqué hors des signaux — UI ET RLS : un appel direct au client Supabase ne retourne aucun setup.
-- [ ] **ACCESS-03**: Les rôles (member / affiliate / superadmin) sont portés par `profiles.role` (jamais le JWT) ; chaque rôle n'accède qu'à ses surfaces.
-- [ ] **ACCESS-04**: L'accès aux signaux est conditionné par un abonnement actif via RLS (`has_active_subscription()`), prouvé par des tests cross-user/cross-role.
+- [x] **ACCESS-02**: Un utilisateur authentifié SANS abonnement actif est bloqué hors des signaux — UI ET RLS : un appel direct au client Supabase ne retourne aucun setup.
+- [x] **ACCESS-03**: Les rôles (member / affiliate / superadmin) sont portés par `profiles.role` (jamais le JWT) ; chaque rôle n'accède qu'à ses surfaces.
+- [x] **ACCESS-04**: L'accès aux signaux est conditionné par un abonnement actif via RLS (`has_active_subscription()`), prouvé par des tests cross-user/cross-role.
 
 ### VITR — Vitrine publique & funnel (Wave 2)
 - [ ] **VITR-01**: Un visiteur voit une page d'accueil présentant le produit, le % de réussite mesuré et un appel à l'abonnement, dans sa langue.
@@ -99,9 +99,9 @@
 | I18N-03 | Phase 1 | Pending |
 | I18N-04 | Phase 1 | Pending |
 | ACCESS-01 | Phase 1 | Pending |
-| ACCESS-02 | Phase 1 | Pending |
-| ACCESS-03 | Phase 1 | Pending |
-| ACCESS-04 | Phase 1 | Pending |
+| ACCESS-02 | Phase 1 | Complete |
+| ACCESS-03 | Phase 1 | Complete |
+| ACCESS-04 | Phase 1 | Complete |
 | VITR-01 | Phase 2 | Pending |
 | VITR-02 | Phase 2 | Pending |
 | VITR-03 | Phase 2 | Pending |

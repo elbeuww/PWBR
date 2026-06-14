@@ -4,12 +4,12 @@ milestone: v2.0
 milestone_name: Plateforme publique
 status: executing
 last_updated: "2026-06-14T12:58:36.024Z"
-last_activity: 2026-06-14 -- Plan 01-01 Tasks 1-2 (migrations + gating-rls test RED) commités
+last_activity: 2026-06-14 -- Plan 01-01 COMPLET (push live 0008/0009 + gating-rls GREEN 4/4, rls 6/6)
 progress:
   total_phases: 9
   completed_phases: 0
   total_plans: 4
-  completed_plans: 0
+  completed_plans: 1
   percent: 0
 ---
 
@@ -28,9 +28,9 @@ progress:
 ## Current Position
 
 Phase: 01 (socle-transverse-i18n-rtl-r-les-gating) — EXECUTING
-Plan: 1 of 4 — Tasks 1-2 commités, BLOQUÉ sur Task 3 (checkpoint human-action)
-Status: Executing Phase 01 — en attente push 0008/0009 + regen types
-Last activity: 2026-06-14 -- Plan 01-01 Tasks 1-2 (migrations + gating-rls test RED) commités
+Plan: 1 of 4 — COMPLET (3 tasks, gating-rls GREEN 4/4, rls 6/6 non régressé) ; prochain plan 01-02
+Status: Executing Phase 01 — plan 01-01 livré, RLS gating en place
+Last activity: 2026-06-14 -- Plan 01-01 COMPLET (push live 0008/0009 + gating-rls GREEN)
 
 Progress: [          ] 0/9 phases (v2.0)
 
@@ -87,7 +87,8 @@ Progress: [          ] 0/9 phases (v2.0)
 
 - **D-01-01-A** : migrations 0008 (profiles.role text+check member/affiliate/superadmin défaut member + `is_superadmin()` security definer `search_path=public`) et 0009 (table `subscriptions` RÉELLE D-04 + `has_active_subscription()` security definer + drop/recreate RLS `trade_setups`/`analyses` using `has_active_subscription()`) écrites localement.
 - **D-01-01-B (A6 tranché)** : colonne d'expiry = `current_period_end` (PAS `expires_at` d'ARCHITECTURE) ; le helper RLS référence ce même nom.
-- **D-01-01-C** : test anon-client `gating-rls.test.ts` couvre ACCESS-02/03/04 (non-abonné→0 trade_setup, 0 analyses, isolation subscriptions cross-user). RED jusqu'au push (Task 3, checkpoint human-action).
+- **D-01-01-C** : test anon-client `gating-rls.test.ts` couvre ACCESS-02/03/04 (non-abonné→0 trade_setup, 0 analyses, isolation subscriptions cross-user). GREEN après push (4/4) ; `rls.test.ts` 6/6 non régressé.
+- **D-01-01-D** : 0008/0009 poussées LIVE via MCP `apply_migration` (canal 0006), aucun `supabase link` local. 2 WARN advisors security-definer (`has_active_subscription`/`is_superadmin` callable par authenticated) EXPECTED BY DESIGN (D-V2-05/Pitfall 6), non bloquants. ACCESS-02/03/04 couverts.
 
 ### Open todos / research flags (v2.0)
 
