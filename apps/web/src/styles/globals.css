@@ -1,0 +1,18 @@
+@import "tailwindcss";
+
+/*
+ * D-11 : @theme minimal — primitive RTL uniquement, design system de marque reporté P2.
+ * --font-arabic : support de script dédié obligatoire pour l'arabe (a11y multi-script).
+ */
+@theme {
+  --font-arabic: "Noto Sans Arabic", system-ui, sans-serif;
+}
+
+/*
+ * L'arabe exige une police couvrant le script + un interlignage généreux pour les
+ * diacritiques. Appliqué via :lang(ar) ; le RTL lui-même vient de <html dir="rtl">
+ * (posé au layout [locale], Plan 03) + propriétés logiques Tailwind v4.
+ */
+:lang(ar) {
+  font-family: var(--font-arabic);
+}
