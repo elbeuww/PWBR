@@ -22,8 +22,8 @@
 - [x] **ACCESS-04**: L'accès aux signaux est conditionné par un abonnement actif via RLS (`has_active_subscription()`), prouvé par des tests cross-user/cross-role.
 
 ### VITR — Vitrine publique & funnel (Wave 2)
-- [ ] **VITR-01**: Un visiteur voit une page d'accueil présentant le produit et un appel à l'abonnement, dans sa langue. *(Sous-clause « % de réussite mesuré » reportée en Phase 5 — slot construit mais masqué ; cf. CONTEXT D-08.)*
-- [ ] **VITR-02**: Un visiteur voit la page tarifs (9 $/mois + offre découverte 3 $/7 j, utilisable une seule fois) et démarre le parcours d'abonnement.
+- [x] **VITR-01**: Un visiteur voit une page d'accueil présentant le produit et un appel à l'abonnement, dans sa langue. *(Sous-clause « % de réussite mesuré » reportée en Phase 5 — slot construit mais masqué ; cf. CONTEXT D-08.)*
+- [x] **VITR-02**: Un visiteur voit la page tarifs (9 $/mois + offre découverte 3 $/7 j, utilisable une seule fois) et démarre le parcours d'abonnement.
 - [x] **VITR-03**: La vitrine n'affiche aucune promesse de gain et présente les disclaimers légaux.
 
 ### MEMB — Espace membre signaux (Wave 2)
@@ -102,8 +102,8 @@
 | ACCESS-02 | Phase 1 | Complete |
 | ACCESS-03 | Phase 1 | Complete |
 | ACCESS-04 | Phase 1 | Complete |
-| VITR-01 | Phase 2 | Pending |
-| VITR-02 | Phase 2 | Pending |
+| VITR-01 | Phase 2 | Complete |
+| VITR-02 | Phase 2 | Complete |
 | VITR-03 | Phase 2 | Complete |
 | LEGAL-01 | Phase 2 | Complete |
 | LEGAL-02 | Phase 2 | Complete |

@@ -9,8 +9,8 @@ progress:
   total_phases: 9
   completed_phases: 1
   total_plans: 7
-  completed_plans: 6
-  percent: 86
+  completed_plans: 7
+  percent: 100
 ---
 
 # Project State
@@ -27,12 +27,12 @@ progress:
 
 ## Current Position
 
-Phase: 02 (vitrine-publique-trilingue-gate-l-gal) — EXECUTING
-Plan: 3 of 3
-Status: Ready to execute
+Phase: 02 (vitrine-publique-trilingue-gate-l-gal) — PHASE COMPLETE (3/3 plans)
+Plan: 3 of 3 — COMPLETE
+Status: Phase 02 terminée — prête pour gate de phase / Phase 03
 Last activity: 2026-06-14
 
-Progress: [████████░░] 86%
+Progress: [██████████] 100%
 
 ## Performance Metrics
 
@@ -47,6 +47,7 @@ Progress: [████████░░] 86%
 | Phase 01 P04 | 30min | 3 tasks | 9 files |
 | Phase 02 P01 | 25min | 3 tasks | 24 files |
 | Phase 02 P02 | 12min | 3 tasks | 14 files |
+| Phase 02 P03 | ~18min | 3 tasks | 9 files |
 
 ## Roadmap v2.0 (9 phases)
 
@@ -134,6 +135,14 @@ Progress: [████████░░] 86%
 - **D-02-02-C** : pages légales `legal/[doc]` = allowlist `DOCS=[cgu,risques,confidentialite,mentions]` + `generateStaticParams` + `notFound()` avant rendu (T-02-04) ; corps = placeholder `reviewPending` (D-15, aucun texte faisant foi) ; aucun HTML brut (T-02-07). `<Disclaimer>` RSC unique (D-13) réutilisable P3/P6. `<Footer>` greffé dans le slot du shell → disclaimer sur toutes les pages, 3 langues (LEGAL-01).
 - **D-02-02-D (Rule 1)** : cast `theme-parity.test.ts` élargi `as unknown as` (régression tsc induite par le namespace imbriqué `legal`) ; EN disclaimer = « No promise of gains » (évite le grep no-perf « profit », VITR-03). Baseline P1 inchangée.
 
+### Decisions exécution (Plan 02-03)
+
+- **D-02-03-A** : classes de couleur = tokens shadcn réels mappés marque en 02-01 (`bg-card`/`bg-primary`/`text-muted-foreground`/`border-border`) plutôt que les noms bruts du plan (`text-muted`/`text-accent`). Vert/rouge absents (D-04). Prix en `<bdi>` (anti-inversion RTL).
+- **D-02-03-B (D-09)** : redirection succès signup = SEUL le `href` de `actions.ts:signUp` passe de `/dashboard` à `/paiement-bientot`. Aucune modification de `supabase.auth`/`getUser`/`getSession` — invariant auth P1 intact (`getSession` dans actions = 0). Funnel câblé bout en bout home→tarifs→signup→paiement-bientot.
+- **D-02-03-C** : test no-perf-claims au chemin EXIGÉ par le plan (`apps/web/test/no-perf-claims.test.ts`) ; glob `vitest.config.ts` racine étendu de `apps/web/test/**` (RED structurel « No test files found » → GREEN après include). Diverge de D-02-02-B (chemin figé par le frontmatter du plan).
+- **D-02-03-D** : « take-profit(s) » (terme de plan de trade, copy canonique UI-SPEC) contient le substring « profit » mais n'est PAS une allégation de gain → le détecteur le neutralise avant de chercher le mot « profit ». Sanity « 90% » prouve le détecteur non trivial (VITR-03).
+- **D-02-03-E** : proof slot home `SHOW_PROOF=false` (D-08, zéro chiffre, activé en P5) ; écran « paiement bientôt » sans adresse/flux (D-09, paiement réel = P4) ; offre 3 $/7 j une seule fois (D-11, l'ancien 3 $/15 j absent). Métrique factuelle « marchés couverts » ajoutée pour éviter une home creuse (jamais un taux de réussite).
+
 ### Open todos / research flags (v2.0)
 
 - **Phase 4 (research flag) :** TronGrid endpoint `walletsolidity`, parsing logs TRC-20, normalisation hex↔base58 — doc TS peu dense, recherche de phase recommandée.
@@ -150,9 +159,9 @@ Aucun.
 
 **Last session:** 2026-06-14T21:33:26.377Z
 
-**Last session:** 2026-06-14 — Completed 02-02-PLAN.md (3 tasks committés : 68a9887 gate LEGAL-02 server-only + artefact + .env.example, 2e01b62 Disclaimer + pages légales allowlist + namespaces, 47dd740 Footer + greffe layout). Couche conformité transverse posée (disclaimer factuel sur toutes les pages 3 langues, pages légales placeholder sécurisées D-15, gate légal défaut sûr lu par P4). 12 tests verts, tsc/lint:i18n OK. Phase 02 : 2/3 plans. Stopped at : Plan 02-02 terminé.
+**Last session:** 2026-06-14 — Completed 02-03-PLAN.md (4 commits : 38c1894 tarifs 9$/3$ + paiement-bientot + funnel signup→paiement-bientot, 86e7001 home bénéfice-first + proof slot masqué, 49ac57e RED no-perf-claims, fa8a5d0 GREEN glob vitest). Cœur conversion de la vitrine livré : home VITR-01, tarifs VITR-02 (USDT TRC-20, D-10/D-11/D-12), funnel honnête D-09, garde no-perf-claims VITR-03/D-08. 15 tests verts, tsc/lint:i18n OK, invariant auth P1 intact. **Phase 02 COMPLETE (3/3 plans).** Stopped at : Plan 02-03 terminé.
 
-**Next action:** Exécuter **Plan 02-03** (pages home VITR-01 / tarifs VITR-02 étoffé / paiement-bientôt D-09) — consomme tokens marque, composants ui/, Footer/Disclaimer désormais en place. Revue visuelle RTL arabe des 2 thèmes = Manual-UAT (dev server + bascule toggle). Revue juridique LEGAL-02 (crypto Algérie/MENA) à lancer en parallèle (bloque encaissement P4).
+**Next action:** Phase 02 terminée. Étapes hors code restantes avant Phase 04 (encaissement) : (1) revue juridique LEGAL-02 signée (`docs/legal/LEGAL-REVIEW.md` + flag `LEGAL_REVIEW_DONE`) ; (2) revue visuelle RTL arabe des 2 thèmes (Manual-UAT dev server + toggle). Prochaine phase code : **Phase 03 — Espace membre signaux gated RLS (MEMB-01..05)**.
 
 ---
 *State updated: 2026-06-14 — milestone v2.0, roadmap 9 phases créée. Cœur analytique v1.0 (P1-4) livré et archivé, sert de socle.*

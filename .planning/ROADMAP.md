@@ -55,7 +55,7 @@ i18n/RTL+rôles avant toute UI publique · RLS signaux avant exposition espace m
 **Plans**: 3 plans
 - [x] 02-01-PLAN.md — design system de marque (tokens 2 thèmes, shadcn/ui v4, polices self-hostées, shell layout) [VITR-01]
 - [x] 02-02-PLAN.md — Disclaimer + Footer + bundle légal placeholder + gate légal (env var + LEGAL-REVIEW.md) [LEGAL-01, LEGAL-02, VITR-03]
-- [ ] 02-03-PLAN.md — home bénéfice-first + tarifs (9$/3$) + funnel « paiement bientôt » + garde no-perf [VITR-01, VITR-02, VITR-03]
+- [x] 02-03-PLAN.md — home bénéfice-first + tarifs (9$/3$) + funnel « paiement bientôt » + garde no-perf [VITR-01, VITR-02, VITR-03]
 **UI hint**: yes
 
 ### Phase 3: Espace membre signaux (gated RLS)
