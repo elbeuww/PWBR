@@ -33,8 +33,8 @@ Périmètre MVP (Phase 0 fondations + Phase 1 day/swing, usage perso/démo). Cha
 ### Veteran Analysis & Scoring (SCORE)
 
 - [ ] **SCORE-01**: Une routine planifiée (agent Claude) produit, par instrument/style retenu, un setup de trade en JSON structuré (direction, entrée, SL, TP multiples, R:R, raisons technique/fondamentale/news, invalidation, note du vétéran)
-- [ ] **SCORE-02**: Chaque setup reçoit une note d'opportunité /100 dérivée d'une pondération explicite et décomposable
-- [ ] **SCORE-03**: Chaque setup reçoit un niveau de risque séparé (low/medium/high/extreme)
+- [x] **SCORE-02**: Chaque setup reçoit une note d'opportunité /100 dérivée d'une pondération explicite et décomposable
+- [x] **SCORE-03**: Chaque setup reçoit un niveau de risque séparé (low/medium/high/extreme)
 - [ ] **SCORE-04**: Le `scoring-aggregator` valide chaque sortie IA via Zod et applique des garde-fous déterministes (recalcul du R:R, cohérence SL/TP, seuil de rejet) ; les sorties non conformes sont rejetées et loggées
 - [ ] **SCORE-05**: Chaque analyse stocke le `snapshot` exact utilisé (traçabilité) et n'est jamais mutée (versions immuables, ancien marqué expired/invalidated)
 
@@ -176,8 +176,8 @@ Reporté (après lancement abonnement + bloquants levés). Suivi mais hors roadm
 | FUND-02 | Phase 3 | Complete |
 | FUND-03 | Phase 3 | Complete |
 | SCORE-01 | Phase 4 | Pending |
-| SCORE-02 | Phase 4 | Pending |
-| SCORE-03 | Phase 4 | Pending |
+| SCORE-02 | Phase 4 | Done (04-02) |
+| SCORE-03 | Phase 4 | Done (04-02) |
 | SCORE-04 | Phase 4 | Pending |
 | SCORE-05 | Phase 4 | Pending |
 | JOB-01 | Phase 4 | Pending |

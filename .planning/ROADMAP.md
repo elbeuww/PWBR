@@ -113,7 +113,7 @@ Plans:
 - [x] 04-01-PLAN.md — Fondation : migration 0006 analyses+trade_setups + RLS + [BLOCKING] apply MCP + OutputSchema §3 + repos insert/expiry (SCORE-01/05)
 
 **Wave 2** *(blocked on Wave 1 — types + OutputSchema)*
-- [ ] 04-02-PLAN.md — Scoring core pur golden : weights §3 + rr bord conservateur + risk_level + confidence + score /100 décomposable + cap 45 (SCORE-02/03)
+- [x] 04-02-PLAN.md — Scoring core pur golden : weights §3 + rr bord conservateur + risk_level + confidence + score /100 décomposable + cap 45 (SCORE-02/03) — COMPLETE 2026-06-14
 
 **Wave 3** *(blocked on Wave 1+2)*
 - [ ] 04-03-PLAN.md — Frontière de confiance `persist.ts` : Zod + garde-fous + scoring + immuabilité/expiry + upsert service_role (SCORE-04/05)

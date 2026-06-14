@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-last_updated: "2026-06-14T01:32:17.914Z"
+last_updated: "2026-06-14T02:55:00.000Z"
 progress:
   total_phases: 9
   completed_phases: 3
   total_plans: 15
-  completed_plans: 11
-  percent: 73
+  completed_plans: 13
+  percent: 87
 ---
 
 # Project State
@@ -27,10 +27,10 @@ progress:
 ## Current Position
 
 Phase: 04 (moteur-ia-v-t-ran-scoring) — EXECUTING
-Plan: 1 of 4
+Plan: 3 of 4
 **Phase:** 4
-**Plan:** Not started
-**Status:** Executing Phase 04
+**Plan:** 04-03 (next — persist.ts frontière de confiance)
+**Status:** Executing Phase 04 (Wave 2 livrée)
 
 **Progress:** [██████████] 100%
 
@@ -51,8 +51,8 @@ Phase 9  [ ] Backtest & calibration
 | Metric | Value |
 |--------|-------|
 | Phases complete | 3/9 |
-| Plans complete | 11 (Phase 01 + 02-01..02-04 + 03-01..03-04) |
-| Requirements covered | DATA-06 + Phase 01 + DATA-01/02/05 + DATA-03 + DATA-04 + DATA-07 + TECH-01/02/03/04 + FUND-01/02/03 (03-04 : moteurs fondamental + news déterministes) |
+| Plans complete | 13 (Phase 01 + 02-01..02-04 + 03-01..03-04 + 04-01 + 04-02) |
+| Requirements covered | DATA-06 + Phase 01 + DATA-01/02/05 + DATA-03 + DATA-04 + DATA-07 + TECH-01/02/03/04 + FUND-01/02/03 + SCORE-01/05 (04-01) + SCORE-02/03 (04-02 : scoring core déterministe golden) |
 
 ## Accumulated Context
 
@@ -91,6 +91,7 @@ Phase 9  [ ] Backtest & calibration
 - D-45 (2026-06-13, plan 03-02) : wrappers exposent valeur at(-1) (null si historique insuffisant) ET série complète. La série permet le pin de longueur anti-warmup dans les golden tests et le calcul percentile/slope en aval. Type lib jamais exposé (MacdValue/BollingerValue propres). @app/indicators câblé dans tsconfig.base paths + vitest alias.
 - D-46 (2026-06-13, plan 03-03) : technical-engine = premier slice vertical complet. buildTechnicalSnapshot (pure, D-23) séparée du harness IO pour testabilité offline. trend = close vs EMA200 (repli EMA50) + bande neutre 0.1% ; slope = MACD−signal ; volume_state = volume récent (1/4 final) vs antérieur ; POC ajouté comme key_level dédié portant volume_source (D-35). Gap EMA200 → partial:true + missing['ema200'] (Pitfall 2, jamais zéro silencieux). Zod §3 validé AVANT upsert (T-03-10). @app/indicators ajouté en dep workspace + path mapping apps/jobs.
 - D-47 (2026-06-13, plan 03-04) : fundamental-engine déterministe (zéro IA). deriveFundamentalContext (pure, D-23) : règles nommées macro_bias (DXY+real_yields ↗↗→risk_off, ↘↘→risk_on, mixte→neutral, TREND_EPSILON 0.1%) + rate_environment (DFF ↗→hawkish, ↘→dovish). Drivers par actif lus depuis asset_drivers (data-not-code, D-38), jamais codés — libellé `CODE(±dir)`. Contexte macro partagé par instrument, seuls asset_specific_drivers varient (1 derive, 2 upserts day/swing). Codes FRED : DTWEXBGS=DXY, DFII10=real_yields, DFF=fed funds.
+- D-49 (2026-06-14, plan 04-02) : types §3 d'entrée du scoring = miroir structurel local dans `packages/core/src/scoring/snapshot-input.ts`, JAMAIS `import type` depuis `@app/indicators`. `@app/core` est le package le plus BAS (indicators dépend de core) ; résoudre le type via les paths tsconfig tire la source d'indicators hors du `rootDir` composite de core (TS6059/6307) + traîne `@app/supabase`. Contrat structurel côté consommateur (Zod reste la source de vérité à la production P3) → graphe unidirectionnel, anti-cycle. scoreSetup orchestre rr(bord conservateur D-50)→opportunity_score décomposable(cap 45 condition exacte, clamp inputs)→confidence→risk (ordre figé). Golden 32/32, core 67/67, tsc core+indicators verts. Aucune dépendance npm ajoutée.
 - D-48 (2026-06-13, plan 03-04) : news-engine déterministe. deriveNewsContext (pure, now injectable) : net_sentiment = moyenne pondérée décroissance EWMA-like (HALF_LIFE_HOURS=12), fenêtre day≈24h / swing≈7j (STYLE_PARAMS). Sentiment null (free tier, D-24) exclu de la moyenne (absence, pas 0 faux). net_sentiment borné [-1,1]. news_risk (D-40) = event High-impact (insensible casse) dans <2h (day) / <24h (swing), calculé via luxon (jamais Date maison, T-03-17). Les trois moteurs (technical/fundamental/news) dans JOB_REGISTRY. Suite 159/159 verte.
 
 ### Open todos / risques à lever
@@ -112,9 +113,11 @@ Aucun.
 
 **Last session:** 2026-06-13T15:37:18.919Z
 
-**Next action:** Phase 04 — moteur IA "vétéran" & scoring. Les 3 snapshots §3 (technical/fundamental/news) par instrument×style sont prêts en base ; Phase 4 les consomme via getSnapshotByHash.
+**Next action:** Phase 04 Wave 3 — plan 04-03 `persist.ts` (frontière de confiance) : Zod OutputSchema (04-01) + garde-fous (R:R<1.2 rejet, structure cassée contre = rejet) + `scoreSetup` (04-02) + immuabilité/expiry (`expirePriorSetups`, `session_day`) + upsert service_role. scoreSetup attend un `CombinedSnapshot` ({technical, fundamental, news} §3) ; persist dérivera ce wrapper depuis les 3 snapshots par hash.
 
-**Notes pour la session suivante:** Phase 03 COMPLETE (plan 03-04 livré). `fundamental-engine` + `news-engine` en TDD, déterministes (zéro IA). deriveFundamentalContext : règles FRED nommées (D-47, DXY/real_yields→macro_bias, DFF→rate_environment) + drivers asset_drivers (D-38, data-not-code). deriveNewsContext : sentiment pondéré-décroissant (D-48, half-life 12h, fenêtre day/swing), news_risk High-impact <2h/<24h via luxon (D-40). Les deux assemblent §3 → Zod (T-03-14) → hash (D-41) → upsertSnapshot (kind fundamental/news). Les trois moteurs enregistrés dans JOB_REGISTRY → runJob écrit job_runs. 10+14 golden tests verts ; suite complète 159/159 ; tsc apps/jobs clean. Aucune déviation. Entrée complète Phase 4 prête.
+**Notes pour la session suivante (04-02):** Scoring core déterministe livré, golden 32/32. `scoreSetup(snapshot, output, style, opts) → {opportunity_score, breakdown, risk_level, confidence}` exporté de `@app/core` ; `computeRiskReward`/`deriveRiskLevel`/`deriveConfidence`/`WEIGHTS`/`hasStrongCatalyst` aussi. R:R bord conservateur D-50 (long=zone.max, short=zone.min). Cap 45 = HTF contredit ET pas de `news_catalysts` high+même direction. Clamp RSI/atr_pct/sentiment ; ATR<0 → throw 'invalid_atr'. Ordre figé score→confidence→risk. D-49 : pas d'import (même type) d'`@app/indicators` dans core — type §3 miroir local `snapshot-input.ts`. Notes pour la suite (03-04) :
+
+**Notes archivées (03-04):** Phase 03 COMPLETE (plan 03-04 livré). `fundamental-engine` + `news-engine` en TDD, déterministes (zéro IA). deriveFundamentalContext : règles FRED nommées (D-47, DXY/real_yields→macro_bias, DFF→rate_environment) + drivers asset_drivers (D-38, data-not-code). deriveNewsContext : sentiment pondéré-décroissant (D-48, half-life 12h, fenêtre day/swing), news_risk High-impact <2h/<24h via luxon (D-40). Les deux assemblent §3 → Zod (T-03-14) → hash (D-41) → upsertSnapshot (kind fundamental/news). Les trois moteurs enregistrés dans JOB_REGISTRY → runJob écrit job_runs. 10+14 golden tests verts ; suite complète 159/159 ; tsc apps/jobs clean. Aucune déviation. Entrée complète Phase 4 prête.
 
 ---
 *State initialized: 2026-06-09*
