@@ -9,7 +9,7 @@
  * - Toutes les chaînes via getTranslations (namespace `legal`) — zéro chaîne en dur.
  * - RTL-safe (classes logiques ps/pe/ms/me, text-start) ; cible tappable ≥44px
  *   (min-h-11 + padding) + focus-visible (a11y, cohérent avec LanguageSwitcher).
- * - Surface secondaire de marque (bg-surface, token Plan 01). Aucune promesse de
+ * - Surface secondaire de marque (bg-muted, token Plan 01). Aucune promesse de
  *   gain ni '%' (VITR-03).
  *
  * Source : 02-PATTERNS.md §Footer.tsx ; 02-UI-SPEC §Color/Spacing.
@@ -26,14 +26,14 @@ export async function Footer() {
   const t = await getTranslations('legal')
 
   return (
-    <footer className="bg-surface px-4 py-8 md:px-6">
+    <footer className="bg-muted px-4 py-8 md:px-6">
       <nav aria-label={t('navTitle')} className="mb-6">
         <ul className="flex flex-wrap gap-x-6 gap-y-2 text-sm">
           {DOCS.map((doc) => (
             <li key={doc}>
               <Link
                 href={`/legal/${doc}`}
-                className="inline-flex min-h-11 items-center rounded-md px-2 py-2 text-muted hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+                className="inline-flex min-h-11 items-center rounded-md px-2 py-2 text-muted-foreground hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
               >
                 {t(`${doc}.navLabel`)}
               </Link>

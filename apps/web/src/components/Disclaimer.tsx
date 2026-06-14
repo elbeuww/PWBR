@@ -11,5 +11,5 @@ import { getTranslations } from 'next-intl/server'
 
 export async function Disclaimer() {
   const t = await getTranslations('disclaimer')
-  return <p className="text-sm text-muted ps-4 pe-4">{t('footer')}</p>
+  return <p className="text-sm text-muted-foreground ps-4 pe-4">{t('footer')}</p>
 }

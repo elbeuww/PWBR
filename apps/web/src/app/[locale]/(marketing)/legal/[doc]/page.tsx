@@ -36,7 +36,7 @@ export default async function LegalPage({
   return (
     <main className="mx-auto max-w-prose px-4 py-12 text-start">
       <h1 className="text-2xl font-semibold">{t(`${doc}.title`)}</h1>
-      <p className="mt-6 text-muted">{t('reviewPending')}</p>
+      <p className="mt-6 text-muted-foreground">{t('reviewPending')}</p>
     </main>
   )
 }
