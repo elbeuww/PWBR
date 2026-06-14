@@ -39,7 +39,7 @@ export default async function LocaleLayout({
       <body>
         <NextIntlClientProvider messages={messages}>
           <header className="flex h-14 items-center justify-between bg-secondary px-4 md:px-6">
-            <span className="font-semibold">Vétéran Trading</span>
+            <span className="font-semibold">Vétéran Trading</span> {/* i18n-ignore: marque */}
             <div className="ms-auto">
               <LanguageSwitcher />
             </div>
