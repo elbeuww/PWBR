@@ -25,5 +25,17 @@
   "pricing": {
     "title": "الأسعار",
     "body": "تفاصيل العروض ستتوفر قريبًا."
+  },
+  "dashboard": {
+    "title": "لوحة التحكم — Veteran Trading",
+    "signOut": "تسجيل الخروج",
+    "connectedAs": "متصل: {email}",
+    "instrumentsTitle": "الأدوات النشطة",
+    "instrumentsEmpty": "لا توجد أدوات نشطة.",
+    "loadError": "فشل تحميل الأدوات.",
+    "colSymbol": "الرمز",
+    "colName": "الاسم",
+    "colBroker": "الوسيط",
+    "colClass": "الفئة"
   }
 }

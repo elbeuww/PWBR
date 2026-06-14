@@ -25,5 +25,17 @@
   "pricing": {
     "title": "Tarifs",
     "body": "Le détail des offres arrive bientôt."
+  },
+  "dashboard": {
+    "title": "Tableau de bord — Vétéran Trading",
+    "signOut": "Déconnexion",
+    "connectedAs": "Connecté : {email}",
+    "instrumentsTitle": "Instruments actifs",
+    "instrumentsEmpty": "Aucun instrument actif.",
+    "loadError": "Erreur de chargement des instruments.",
+    "colSymbol": "Symbole",
+    "colName": "Nom",
+    "colBroker": "Broker",
+    "colClass": "Classe"
   }
 }

@@ -25,5 +25,17 @@
   "pricing": {
     "title": "Pricing",
     "body": "Plan details are coming soon."
+  },
+  "dashboard": {
+    "title": "Dashboard — Veteran Trading",
+    "signOut": "Sign out",
+    "connectedAs": "Signed in: {email}",
+    "instrumentsTitle": "Active instruments",
+    "instrumentsEmpty": "No active instruments.",
+    "loadError": "Failed to load instruments.",
+    "colSymbol": "Symbol",
+    "colName": "Name",
+    "colBroker": "Broker",
+    "colClass": "Class"
   }
 }
