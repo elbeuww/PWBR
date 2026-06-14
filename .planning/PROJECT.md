@@ -22,22 +22,38 @@ L'IA se comporte comme un trader vétéran (50 ans d'expérience). L'analyse cha
 
 Produire, pour chaque opportunité, une analyse fiable et explicable — score /100 + niveau de risque + plan de trade (entrée/SL/TP/R:R/levier) — vulgarisée pour un public non technique. Si tout le reste échoue, **la qualité et la traçabilité de l'analyse d'un trade** doit fonctionner : le % de réussite affiché est toujours mesuré, jamais inventé — c'est le socle de confiance qui fait payer l'abonnement.
 
+## Current Milestone: v2.0 Plateforme publique d'analyse & signaux (MENA)
+
+**Goal:** Transformer le moteur analytique livré (P1-4) en plateforme publique payante (9 $/mois USDT) — vitrine trilingue, espace membre signaux, paiement crypto on-chain, affiliation, superadmin, contenu éducatif, Telegram — avec un % de réussite mesuré (jamais inventé).
+
+**Target features:**
+- Vitrine publique trilingue AR(RTL)/EN/FR + funnel d'abonnement
+- Espace membre gated par abonnement : liste des signaux triés/filtrés + détail trade (chart + explication simple/approfondie)
+- Paiement USDT TRC-20 (MVP : soumission TX hash + vérif on-chain TronGrid → activation auto + file de validation superadmin) + renouvellement/expiration auto ; offre découverte 3 $/15 j
+- Affiliation à paliers (codes promo, dashboard affilié, commissions crypto, max 20 % récurrent)
+- Dashboard superadmin (membres/paiements/affiliés/signaux/santé jobs)
+- CMS articles/cours gratuits vulgarisés
+- Bot/canal Telegram public (résultats journaliers + win rate permanent)
+- Boucle track record : catalogue de patterns + backtest mesuré → % de réussite affiché ; prediction_outcomes + calibration
+- Disclaimers + revue légale (conseil non agréé + statut crypto MENA/Algérie) AVANT le 1er encaissement
+- i18n trilingue (transverse)
+
+**Prérequis livré (v1.0, P1-4) :** moteur analytique déterministe + frontière de persistance des setups scorés. Numérotation des phases reset à 1 pour v2.0 ; roadmap v1.0 archivée (`.planning/archive/v1.0-moteur-analytique/`, voir `MILESTONES.md`).
+
 ## Requirements
 
 ### Validated
 
 - [x] **Fondations & sécurité (Phase 1, 2026-06-12)** : monorepo pnpm + auth Supabase SSR (signup→login→session, E2E 5/5), RLS active 3 tables avec isolation cross-user prouvée (6/6), double barrière service_role (lint + server-only), constantes temps anti look-ahead (16/16 golden values), runner de jobs `job_runs` + dispatcher Windows Task Scheduler exécuté hors agent (exit 0, ligne cloud vérifiée). Requirements AUTH-01/02/03, DATA-05, JOB-03/04.
 - [x] **Ingestion fiable des données (Phase 2, 2026-06-13)** : 4 tables RLS (candles/news/macro_series/economic_calendar) + 12 instruments seedés + vue `v_data_freshness` (horaires de cotation NY-DST), 5 clients data-sources (Binance mainnet public, OANDA démo, Finnhub, Marketaux, FRED, FairEconomy) avec parsers Zod golden-testés, 4 jobs idempotents gap-fill avec isolation des pannes. 88/88 tests, idempotence prouvée contre le cloud. Requirements DATA-01/02/03/04/06/07. Reste UAT humain : clés API + premier run live (02-HUMAN-UAT.md).
+- [x] **Moteur d'analyse déterministe (Phase 3, 2026-06-13)** : indicateurs golden-testés (RSI/MACD/EMA/ATR/Bollinger) + détection de structure de marché maison (swings, BOS/CHoCH, S/R, POC volume), snapshots technique/fondamental/news par instrument/style. Requirements TECH-01..04, FUND-01..03.
+- [x] **Moteur IA « vétéran » & scoring (Phase 4, 2026-06-14, code livré 261/261 tests)** : setups JSON structurés, frontière de confiance unique `persist.ts` (Zod + garde-fous déterministes + scoring /100 décomposable + immuabilité/expiry), prompt versionné sha256, anti-injection. Migrations 0006/0007 appliquées. Requirements SCORE-01..05, JOB-01/02. **Ops restant (reporté) :** configurer les routines planifiées Claude + 1 run réel.
 
-### Active — Cœur analytique (inchangé par le pivot 2026-06-13)
+### Active — Milestone v2.0 (plateforme publique, pivot 2026-06-13)
 
-- [ ] Moteur d'indicateurs techniques déterministe (RSI, MACD, EMA, ATR, Bollinger, structure de marché, S/R)
-- [ ] Moteur d'analyse "vétéran" produisant un JSON structuré par trade (score/100, risque, entrée, SL, TP, marge/levier, R:R, raisons techniques/fondamentales/news, invalidation)
-- [ ] Persistance des analyses + setups dans Supabase avec validation Zod et garde-fous déterministes
-- [ ] Catalogue de patterns chartiques déterministes + **taux de réussite mesuré par backtest** alimentant le % affiché (PATT-01..02 — remonté du v1.1 au cœur)
-- [ ] Boucle d'apprentissage : prédiction vs résultat (prediction_outcomes) + backtest + métriques (win rate, calibration, expectancy) → track record réel de la plateforme
+> Le cœur analytique (indicateurs, moteur vétéran, persistance) est **livré** ci-dessus. Restent pour v2.0 le track record mesuré + toute la couche produit.
 
-### Active — Plateforme produit (pivot 2026-06-13)
+- [ ] Boucle track record : catalogue de patterns chartiques déterministes + **taux de réussite mesuré par backtest** (PATT-01..02) + prédiction vs résultat (prediction_outcomes) + métriques (win rate, calibration, expectancy) → % de réussite réel affiché
 
 - [ ] Vitrine publique trilingue (arabe RTL / anglais / français) : présentation, % de réussite, funnel d'abonnement
 - [ ] Espace membre gated par abonnement : liste des signaux triés par score, filtres, vue détail trade (chart lightweight-charts + niveaux + explication simple + analyse approfondie dépliable)
@@ -113,4 +129,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-06-13 — Phase 2 (ingestion) COMPLÈTE : pipeline data OHLCV/news/macro/calendrier idempotent et tolérant aux pannes, 88/88 tests. PIVOT actif : plateforme publique payante (9 $/mois en USDT), affiliation à paliers, audience MENA trilingue AR/EN/FR, Telegram résultats journaliers ; trajectoire outil perso 500 $ abandonnée. Roadmap aval (3+) à réviser.*
+*Last updated: 2026-06-14 — Milestone v1.0 (moteur analytique P1-4) clôturé et archivé ; démarrage du milestone v2.0 « Plateforme publique d'analyse & signaux (MENA) ». Cœur analytique livré (P1-4, 261/261 tests). v2.0 = vitrine trilingue + espace membre + paiement USDT + affiliation + superadmin + CMS + Telegram + track record mesuré. Numérotation des phases reset à 1 ; roadmap v1.0 dans `.planning/archive/v1.0-moteur-analytique/`.*

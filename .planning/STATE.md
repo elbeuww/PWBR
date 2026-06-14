@@ -1,15 +1,16 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.0
-milestone_name: milestone
-status: executing
-last_updated: "2026-06-14T02:02:58.144Z"
+milestone: v2.0
+milestone_name: Plateforme publique
+status: planning
+last_updated: "2026-06-14T02:39:40.217Z"
+last_activity: 2026-06-14
 progress:
-  total_phases: 9
-  completed_phases: 3
-  total_plans: 15
-  completed_plans: 14
-  percent: 93
+  total_phases: 0
+  completed_phases: 0
+  total_plans: 0
+  completed_plans: 0
+  percent: 0
 ---
 
 # Project State
@@ -20,31 +21,16 @@ progress:
 ## Project Reference
 
 **Core value:** Produire, pour chaque opportunité, une analyse fiable et explicable — score /100 + niveau de risque + plan de trade (entrée/SL/TP/R:R) — qui aide à décider avec discipline.
-**Current focus:** Phase 04 — moteur-ia-v-t-ran-scoring
+**Current focus:** Milestone v2.0 — définition des requirements (plateforme publique)
 **Mode:** mvp (Vertical MVP)
-**Granularity:** fine (9 phases)
+**Granularity:** fine
 
 ## Current Position
 
-Phase: 04 (moteur-ia-v-t-ran-scoring) — EXECUTING
-Plan: 4 of 4
-**Phase:** 4
-**Plan:** 04-04 (code livré — ⏸ checkpoint human-action en attente)
-**Status:** Executing Phase 04 (Wave 4 code livré : sessions/univers/sanitize/veteran.md/prompt_version/dispatch — routines planifiées + run réel à valider par l'humain)
-
-**Progress:** [█████████░] 93%
-
-```
-Phase 1  [x] Fondations & Sécurité
-Phase 2  [x] Ingestion fiable des données
-Phase 3  [x] Moteur d'analyse déterministe
-Phase 4  [ ] Moteur IA "vétéran" & scoring   ← next
-Phase 5  [ ] Dashboard des opportunités
-Phase 6  [ ] Détail trade & charting
-Phase 7  [ ] Risque & dimensionnement
-Phase 8  [ ] Journal & boucle de feedback
-Phase 9  [ ] Backtest & calibration
-```
+Phase: Not started (defining requirements)
+Plan: —
+Status: Defining requirements
+Last activity: 2026-06-14 — Milestone v2.0 started
 
 ## Performance Metrics
 
