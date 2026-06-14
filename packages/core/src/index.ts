@@ -16,3 +16,23 @@ export type { DataSource } from './time/sessions.js'
 // Contrat JSON §3 de l'agent IA (Phase 4) — PERMISSIF (A1)
 export { OutputSchema } from './schemas/output.js'
 export type { Output } from './schemas/output.js'
+
+// Scoring déterministe §3 (Phase 4, D-42/46/48/50, SCORE-02/03)
+export {
+  scoreSetup,
+  computeRiskReward,
+  deriveRiskLevel,
+  deriveConfidence,
+  WEIGHTS,
+  PENALTIES,
+  INPUT_BOUNDS,
+  hasStrongCatalyst,
+} from './scoring/index.js'
+export type {
+  ScoreResult,
+  ScoreBreakdown,
+  ScoreStyle,
+  CombinedSnapshot,
+  RiskLevel,
+  Confidence,
+} from './scoring/index.js'

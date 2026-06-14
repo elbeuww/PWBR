@@ -9,18 +9,9 @@
  * produits par le code (opportunity_score/risk_level/confidence/risk_reward).
  */
 import type { Output } from '../../../src/schemas/output.js'
-import type {
-  TechnicalSnapshot,
-  FundamentalContext,
-  NewsContext,
-} from '@app/indicators'
+import type { CombinedSnapshot } from '../../../src/scoring/snapshot-input.js'
 
-/** Snapshot combiné §3 consommé par scoreSetup (les 3 kinds assemblés). */
-export interface CombinedSnapshot {
-  technical: TechnicalSnapshot
-  fundamental: FundamentalContext
-  news: NewsContext
-}
+export type { CombinedSnapshot }
 
 // ─── Output LONG figé (XAU_USD, §3) ──────────────────────────────────────────
 export const longOutput: Output = {

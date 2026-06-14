@@ -10,15 +10,9 @@
  * Système de points additif (data-not-magic, seuils nommés). Fonction PURE.
  */
 import type { Output } from '../schemas/output.js'
-import type { TechnicalSnapshot, FundamentalContext, NewsContext } from '@app/indicators'
+import type { TechnicalSnapshotInput, CombinedSnapshot } from './snapshot-input.js'
 
 export type RiskLevel = 'low' | 'medium' | 'high' | 'extreme'
-
-interface CombinedSnapshot {
-  technical: TechnicalSnapshot
-  fundamental: FundamentalContext
-  news: NewsContext
-}
 
 /** Seuils nommés (data-not-magic). */
 const RISK_THRESHOLDS = {
@@ -40,7 +34,7 @@ function pointsToLevel(points: number): RiskLevel {
 }
 
 /** Le HTF contredit-il la direction du setup ? */
-function htfContradicts(technical: TechnicalSnapshot, direction: Output['direction']): boolean {
+function htfContradicts(technical: TechnicalSnapshotInput, direction: Output['direction']): boolean {
   const wanted = direction === 'long' ? 'bullish' : 'bearish'
   // contredit = HTF a une tendance opposée franche (pas range)
   return technical.trend_htf !== 'range' && technical.trend_htf !== wanted
