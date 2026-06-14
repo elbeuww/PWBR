@@ -52,7 +52,10 @@ i18n/RTL+rôles avant toute UI publique · RLS signaux avant exposition espace m
   2. Un visiteur voit la page tarifs (9 $/mois + offre découverte 3 $/7 j, utilisable une seule fois) et peut démarrer le parcours d'abonnement.
   3. Des disclaimers « contenu éducatif, pas de conseil personnalisé, aucune promesse de gain, risque de perte total » rédigés par un juriste sont présents sur la vitrine.
   4. Une revue juridique (conseil non agréé + statut crypto Algérie/MENA) est complétée et tracée — gate non-code bloquant le 1er encaissement (Phase 4) en production.
-**Plans**: TBD
+**Plans**: 3 plans
+- [ ] 02-01-PLAN.md — design system de marque (tokens 2 thèmes, shadcn/ui v4, polices self-hostées, shell layout) [VITR-01]
+- [ ] 02-02-PLAN.md — Disclaimer + Footer + bundle légal placeholder + gate légal (env var + LEGAL-REVIEW.md) [LEGAL-01, LEGAL-02, VITR-03]
+- [ ] 02-03-PLAN.md — home bénéfice-first + tarifs (9$/3$) + funnel « paiement bientôt » + garde no-perf [VITR-01, VITR-02, VITR-03]
 **UI hint**: yes
 
 ### Phase 3: Espace membre signaux (gated RLS)
@@ -137,8 +140,8 @@ i18n/RTL+rôles avant toute UI publique · RLS signaux avant exposition espace m
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Socle transverse i18n/rôles | 0/4 | Not started | - |
-| 2. Vitrine & gate légal | 0/? | Not started | - |
+| 1. Socle transverse i18n/rôles | 4/4 | Complete | 2026-06-14 |
+| 2. Vitrine & gate légal | 0/3 | Planned | - |
 | 3. Espace membre signaux | 0/? | Not started | - |
 | 4. Paiement USDT (encaissement) | 0/? | Not started | - |
 | 5. Track record & % mesuré | 0/? | Not started | - |
