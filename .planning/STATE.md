@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v2.0
 milestone_name: Plateforme publique
-status: executing
+status: ready_to_plan
 last_updated: "2026-06-14T21:34:16.829Z"
 last_activity: 2026-06-14
 progress:
   total_phases: 9
-  completed_phases: 1
+  completed_phases: 2
   total_plans: 7
   completed_plans: 7
-  percent: 100
+  percent: 22
 ---
 
 # Project State
@@ -27,9 +27,9 @@ progress:
 
 ## Current Position
 
-Phase: 02 (vitrine-publique-trilingue-gate-l-gal) — PHASE COMPLETE (3/3 plans)
-Plan: 3 of 3 — COMPLETE
-Status: Phase 02 terminée — prête pour gate de phase / Phase 03
+Phase: 3
+Plan: Not started
+Status: Ready to plan
 Last activity: 2026-06-14
 
 Progress: [██████████] 100%
