@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v2.0
 milestone_name: Plateforme publique
-status: ready_to_plan
-last_updated: "2026-06-14T21:34:16.829Z"
+status: planning
+last_updated: "2026-06-14T22:54:55.076Z"
 last_activity: 2026-06-14
 progress:
   total_phases: 9
   completed_phases: 2
   total_plans: 7
   completed_plans: 7
-  percent: 22
+  percent: 100
 ---
 
 # Project State
@@ -157,7 +157,7 @@ Aucun.
 
 ## Session Continuity
 
-**Last session:** 2026-06-14T21:33:26.377Z
+**Last session:** 2026-06-14T22:54:55.069Z
 
 **Last session:** 2026-06-14 — Completed 02-03-PLAN.md (4 commits : 38c1894 tarifs 9$/3$ + paiement-bientot + funnel signup→paiement-bientot, 86e7001 home bénéfice-first + proof slot masqué, 49ac57e RED no-perf-claims, fa8a5d0 GREEN glob vitest). Cœur conversion de la vitrine livré : home VITR-01, tarifs VITR-02 (USDT TRC-20, D-10/D-11/D-12), funnel honnête D-09, garde no-perf-claims VITR-03/D-08. 15 tests verts, tsc/lint:i18n OK, invariant auth P1 intact. **Phase 02 COMPLETE (3/3 plans).** Stopped at : Plan 02-03 terminé.
 
