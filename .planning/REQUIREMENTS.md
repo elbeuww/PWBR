@@ -24,7 +24,7 @@
 ### VITR — Vitrine publique & funnel (Wave 2)
 - [ ] **VITR-01**: Un visiteur voit une page d'accueil présentant le produit et un appel à l'abonnement, dans sa langue. *(Sous-clause « % de réussite mesuré » reportée en Phase 5 — slot construit mais masqué ; cf. CONTEXT D-08.)*
 - [ ] **VITR-02**: Un visiteur voit la page tarifs (9 $/mois + offre découverte 3 $/7 j, utilisable une seule fois) et démarre le parcours d'abonnement.
-- [ ] **VITR-03**: La vitrine n'affiche aucune promesse de gain et présente les disclaimers légaux.
+- [x] **VITR-03**: La vitrine n'affiche aucune promesse de gain et présente les disclaimers légaux.
 
 ### MEMB — Espace membre signaux (Wave 2)
 - [ ] **MEMB-01**: Un abonné voit la liste des signaux actifs triés par score décroissant ; chaque carte montre actif, direction, score, risque, R:R, fraîcheur.
@@ -69,8 +69,8 @@
 - [ ] **CMS-02**: Le superadmin crée / édite / publie des articles (MDX rendu RSC).
 
 ### LEGAL — Conformité & disclaimers (Wave 2, gate de lancement)
-- [ ] **LEGAL-01**: Des disclaimers « contenu éducatif, pas un conseil en investissement, aucune promesse de gain » sont présents sur la vitrine, l'espace membre et les posts Telegram.
-- [ ] **LEGAL-02**: Une revue juridique (conseil non agréé + statut crypto Algérie/MENA) est complétée et tracée AVANT d'encaisser le premier abonnement en production (gate non-code).
+- [x] **LEGAL-01**: Des disclaimers « contenu éducatif, pas un conseil en investissement, aucune promesse de gain » sont présents sur la vitrine, l'espace membre et les posts Telegram.
+- [x] **LEGAL-02**: Une revue juridique (conseil non agréé + statut crypto Algérie/MENA) est complétée et tracée AVANT d'encaisser le premier abonnement en production (gate non-code).
 
 ## Future Requirements (v2.1 — Automatisation, Wave 5 reportée)
 
@@ -104,9 +104,9 @@
 | ACCESS-04 | Phase 1 | Complete |
 | VITR-01 | Phase 2 | Pending |
 | VITR-02 | Phase 2 | Pending |
-| VITR-03 | Phase 2 | Pending |
-| LEGAL-01 | Phase 2 | Pending |
-| LEGAL-02 | Phase 2 | Pending |
+| VITR-03 | Phase 2 | Complete |
+| LEGAL-01 | Phase 2 | Complete |
+| LEGAL-02 | Phase 2 | Complete |
 | MEMB-01 | Phase 3 | Pending |
 | MEMB-02 | Phase 3 | Pending |
 | MEMB-03 | Phase 3 | Pending |

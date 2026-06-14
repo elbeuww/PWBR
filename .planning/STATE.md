@@ -9,8 +9,8 @@ progress:
   total_phases: 9
   completed_phases: 1
   total_plans: 7
-  completed_plans: 5
-  percent: 71
+  completed_plans: 6
+  percent: 86
 ---
 
 # Project State
@@ -28,11 +28,11 @@ progress:
 ## Current Position
 
 Phase: 02 (vitrine-publique-trilingue-gate-l-gal) — EXECUTING
-Plan: 2 of 3
+Plan: 3 of 3
 Status: Ready to execute
 Last activity: 2026-06-14
 
-Progress: [███████░░░] 71%
+Progress: [████████░░] 86%
 
 ## Performance Metrics
 
@@ -46,6 +46,7 @@ Progress: [███████░░░] 71%
 | Phase 01 P03 | 25 min | 4 tasks | 19 files |
 | Phase 01 P04 | 30min | 3 tasks | 9 files |
 | Phase 02 P01 | 25min | 3 tasks | 24 files |
+| Phase 02 P02 | 12min | 3 tasks | 14 files |
 
 ## Roadmap v2.0 (9 phases)
 
@@ -126,6 +127,13 @@ Progress: [███████░░░] 71%
 - **D-02-01-F (Rule 1 i18n)** : labels « Close » en dur de `ui/dialog` (générés par shadcn) externalisés en prop `closeLabel` (l'appelant fournit le label traduit) → `lint:i18n` exit 0.
 - **D-02-01-BASELINE** : baseline P1 inchangée (`forbidden-service-import.ts` reste la seule erreur tsc/ESLint ; `next build` = `✓ Compiled successfully`, échec final = fixture intentionnelle).
 
+### Decisions exécution (Plan 02-02)
+
+- **D-02-02-A** : gate légal LEGAL-02 = env var `LEGAL_REVIEW_DONE` lu par `lib/legal-gate.ts` (`import 'server-only'`, défaut SÛR `=== 'true'`, jamais permissif) ; consommé par P4 avant 1ᵉʳ encaissement, appelé NULLE PART en P2. Artefact traçabilité `docs/legal/LEGAL-REVIEW.md` (checklist crypto Algérie/MENA + sign-off). `.env.example` créé (var gate documentée, sans NEXT_PUBLIC_ → jamais bundlé client).
+- **D-02-02-B** : tests sous `apps/web/**/__tests__/` (pas `*.test.ts` libre ni `apps/web/test/`) — le glob `vitest.config.ts` racine n'inclut que `packages/**` + `apps/**/__tests__/**` ; web sans vitest local. Exécution `npx vitest run` racine (le `pnpm --filter web exec vitest` du plan était inopérant).
+- **D-02-02-C** : pages légales `legal/[doc]` = allowlist `DOCS=[cgu,risques,confidentialite,mentions]` + `generateStaticParams` + `notFound()` avant rendu (T-02-04) ; corps = placeholder `reviewPending` (D-15, aucun texte faisant foi) ; aucun HTML brut (T-02-07). `<Disclaimer>` RSC unique (D-13) réutilisable P3/P6. `<Footer>` greffé dans le slot du shell → disclaimer sur toutes les pages, 3 langues (LEGAL-01).
+- **D-02-02-D (Rule 1)** : cast `theme-parity.test.ts` élargi `as unknown as` (régression tsc induite par le namespace imbriqué `legal`) ; EN disclaimer = « No promise of gains » (évite le grep no-perf « profit », VITR-03). Baseline P1 inchangée.
+
 ### Open todos / research flags (v2.0)
 
 - **Phase 4 (research flag) :** TronGrid endpoint `walletsolidity`, parsing logs TRC-20, normalisation hex↔base58 — doc TS peu dense, recherche de phase recommandée.
@@ -142,9 +150,9 @@ Aucun.
 
 **Last session:** 2026-06-14T21:33:26.377Z
 
-**Last session:** 2026-06-14 — Completed 02-01-PLAN.md (3 tasks committés : 013eccf init shadcn+deps+fonts, f1bf813 RED parité theme, 4fb42cf GREEN tokens+toggle+shell). Design system de marque initialisé (tokens 2 thèmes CSS-first, next-themes no-flash, polices self-hostées D-03, shadcn/ui stylé marque, shell layout étendu sans régression P1). Phase 02 : 1/3 plans. Stopped at : Plan 02-01 terminé.
+**Last session:** 2026-06-14 — Completed 02-02-PLAN.md (3 tasks committés : 68a9887 gate LEGAL-02 server-only + artefact + .env.example, 2e01b62 Disclaimer + pages légales allowlist + namespaces, 47dd740 Footer + greffe layout). Couche conformité transverse posée (disclaimer factuel sur toutes les pages 3 langues, pages légales placeholder sécurisées D-15, gate légal défaut sûr lu par P4). 12 tests verts, tsc/lint:i18n OK. Phase 02 : 2/3 plans. Stopped at : Plan 02-02 terminé.
 
-**Next action:** Exécuter **Plan 02-02** (Footer global + composant `<Disclaimer>` transverse + gate légal `LEGAL-REVIEW.md`/flag `LEGAL_REVIEW_DONE`) — il consomme le shell et le slot Footer posés ici. Puis Plan 02-03 (pages home/tarifs/légales). Revue visuelle RTL arabe des 2 thèmes = Manual-UAT (dev server + bascule toggle).
+**Next action:** Exécuter **Plan 02-03** (pages home VITR-01 / tarifs VITR-02 étoffé / paiement-bientôt D-09) — consomme tokens marque, composants ui/, Footer/Disclaimer désormais en place. Revue visuelle RTL arabe des 2 thèmes = Manual-UAT (dev server + bascule toggle). Revue juridique LEGAL-02 (crypto Algérie/MENA) à lancer en parallèle (bloque encaissement P4).
 
 ---
 *State updated: 2026-06-14 — milestone v2.0, roadmap 9 phases créée. Cœur analytique v1.0 (P1-4) livré et archivé, sert de socle.*
