@@ -92,6 +92,10 @@ P1 = **neutres système uniquement**. Aucune couleur de marque, aucun accent dé
 
 > Les 4 contrats transverses de la phase. Chacun doit fonctionner en LTR (fr/en) ET RTL (ar).
 
+**Points focaux (ancres visuelles).** P1 étant infrastructurel, les ancres sont volontairement minimales :
+- **Header :** le **sélecteur de langue** (seul élément interactif) est l'unique point focal, ancré à l'`end` logique.
+- **Pages placeholder (tarifs/login/404) :** le **titre Heading 24px/600** est l'unique ancre visuelle ; aucun point focal produit (CTA/marketing) en P1 (déféré P2).
+
 ### 1. Shell de layout `[locale]`
 - **Structure :** `<html lang={locale} dir={locale==='ar'?'rtl':'ltr'}>` (un seul `<html>`/`<body>`, dans `[locale]/layout.tsx` — jamais dupliqué avec le root layout, Pitfall #7 RESEARCH).
 - **Header minimal :** barre horizontale, hauteur 56px, padding inline `md` (16px), fond `secondary`. Contient à l'`end` (logique) le **sélecteur de langue**. Pas de nav de marque en P1 (P2).
