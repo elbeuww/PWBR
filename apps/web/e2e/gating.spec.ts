@@ -33,6 +33,7 @@ const TEST_PASSWORD = 'TestPassword123!'
 
 const MEMBER_SURFACE = '/fr/signaux'
 const ADMIN_SURFACE = '/admin'
+const BASE_ORIGIN = new URL(process.env['PLAYWRIGHT_BASE_URL'] ?? 'http://localhost:3000').origin
 
 function uniqueEmail(tag: string): string {
   return `e2e-gating-${tag}-${tsMillis}@gmail.com`
@@ -105,7 +106,8 @@ test.describe('T-01-07 : open-redirect returnTo //evil.com non suivi', () => {
     // contenir le domaine externe (gate.ts safeReturnTo rejette '//…').
     await expect(page).toHaveURL(/\/fr\/dashboard/, { timeout: 10000 })
     expect(page.url()).not.toContain('evil.com')
-    expect(new URL(page.url()).origin).toBe(new URL(page.url()).origin) // même origine
+    // L'origine finale DOIT rester celle de baseURL (jamais le domaine externe).
+    expect(new URL(page.url()).origin).toBe(BASE_ORIGIN)
   })
 
   test('returnTo=//evil.com au gate (non-auth → login) reste sur l’origine', async ({ page }) => {

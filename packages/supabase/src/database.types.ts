@@ -697,3 +697,8 @@ export type SubscriptionStatus = 'pending' | 'active' | 'expired' | 'canceled'
 export type SubscriptionPlan = 'discovery' | 'standard'
 export type SubscriptionRow = Database['public']['Tables']['subscriptions']['Row']
 export type SubscriptionInsert = Database['public']['Tables']['subscriptions']['Insert']
+
+// WR-06 : l'écriture de `role` est réservée au service_role (aucune policy UPDATE
+// pour authenticated). Utiliser ce type côté app pour qu'un update client de role
+// échoue à la compilation (défense en profondeur, en plus de la RLS).
+export type ProfileUpdateSafe = Omit<Database['public']['Tables']['profiles']['Update'], 'role'>

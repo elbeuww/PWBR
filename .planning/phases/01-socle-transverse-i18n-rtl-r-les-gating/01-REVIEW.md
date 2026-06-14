@@ -40,7 +40,8 @@ findings:
   warning: 6
   info: 3
   total: 14
-status: issues_found
+status: resolved
+resolution: "5 BLOCKER + 6 WARNING corrigés par l'orchestrateur (2026-06-14). CR-05 = migration 0010 poussée live. CR-01/02/03/04 + WR-01/02/04/06 = code. WR-03/05 documentés (non-déclenchables / limitation connue). IN-01 (police arabe) reporté Phase 2 UI ; IN-02/03 = polish optionnel non bloquant. tsc supabase clean, web = seule la fixture v1.0 baseline, RLS 10/10."
 ---
 
 # Phase 01 : Rapport de revue de code

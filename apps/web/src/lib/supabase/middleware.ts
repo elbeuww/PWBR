@@ -32,8 +32,10 @@ export async function updateSession(
           cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value))
           // MUTER la response transmise (préserve le rewrite locale next-intl,
           // Pitfall 2) — ne PAS recréer NextResponse.next().
+          // Forme objet typée (CR-04) : conserve httpOnly/secure/sameSite (les options
+          // de @supabase/ssr sont structurellement compatibles avec ResponseCookie).
           cookiesToSet.forEach(({ name, value, options }) =>
-            response.cookies.set(name, value, options as Record<string, unknown>),
+            response.cookies.set({ name, value, ...options }),
           )
         },
       },
