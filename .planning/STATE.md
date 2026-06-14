@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v2.0
 milestone_name: Plateforme publique
 status: executing
-last_updated: "2026-06-14T13:30:02.699Z"
+last_updated: "2026-06-14T13:42:25.954Z"
 last_activity: 2026-06-14
 progress:
   total_phases: 9
-  completed_phases: 0
+  completed_phases: 1
   total_plans: 4
-  completed_plans: 3
-  percent: 75
+  completed_plans: 4
+  percent: 100
 ---
 
 # Project State
@@ -27,12 +27,12 @@ progress:
 
 ## Current Position
 
-Phase: 01 (socle-transverse-i18n-rtl-r-les-gating) — EXECUTING
-Plan: 3 of 4 — COMPLET (4 tasks : middleware composé, shell [locale]+LanguageSwitcher, gate.ts 3 portes, déplacement auth+dashboard ; typecheck vert hors baseline fixture) ; prochain plan 01-04
-Status: Ready to execute
+Phase: 01 (socle-transverse-i18n-rtl-r-les-gating) — COMPLET (4/4 plans)
+Plan: 4 of 4 — COMPLET (3 tasks : i18n.spec + gating.spec E2E des 8 success criteria, check statique lint:i18n I18N-03, auth.spec localisé /fr/…). 18 tests Playwright listés/parse OK ; typecheck --force vert ; lint:i18n exit 0. Exécution GREEN des E2E = human-verify (dev server + .env).
+Status: Phase 01 terminée — prêt pour vérification (/gsd:verify-work) puis Phase 02
 Last activity: 2026-06-14
 
-Progress: [████████░░] 75%
+Progress: [██████████] 100%
 
 ## Performance Metrics
 
@@ -44,6 +44,7 @@ Progress: [████████░░] 75%
 | Cœur analytique (v1.0) | Livré P1-4, 261/261 tests (socle, non re-roadmappé) |
 | Phase 01 P02 | 3 min | 3 tasks | 11 files |
 | Phase 01 P03 | 25 min | 4 tasks | 19 files |
+| Phase 01 P04 | 30min | 3 tasks | 9 files |
 
 ## Roadmap v2.0 (9 phases)
 
@@ -108,6 +109,12 @@ Progress: [████████░░] 75%
 - **D-01-03-E (Pitfall 7)** : un SEUL `<html lang dir>` dans `[locale]/layout.tsx` ; root `app/layout.tsx` réduit à pass-through (`return children`).
 - **D-01-03-BASELINE** : 1 erreur tsc pré-existante acceptée (`__lint_fixtures__/forbidden-service-import.ts`, fixture ESLint v1.0 AUTH-03) — hors scope, gate vert si aucune NOUVELLE erreur au-delà.
 
+### Decisions exécution (Plan 01-04)
+
+- **D-01-04-A** : surface membre minimale `[locale]/(member)/signaux/page.tsx` créée (Rule 2) — le groupe `(member)` n'avait qu'un `layout.tsx`, aucune URL membre ne déclenchait `requireActiveSub`, rendant D-07 (auth-sans-abo→/tarifs) non testable en E2E. Stub i18n (namespace `signals` fr/en/ar), contenu réel en Phase 3.
+- **D-01-04-B** : check statique `scripts/check-i18n-hardcoded.mjs` (Node natif, zéro dépendance, script `lint:i18n`) — interdit le texte JSX littéral et les attributs visibles hors `t(...)` (I18N-03, threat T-01-10). Détection prouvée sur chaîne plantée ; nom de marque `Vétéran Trading` exclu via `// i18n-ignore`.
+- **D-01-04-C** : 18 tests Playwright (i18n.spec + gating.spec + auth.spec localisé) authorés, parse/`--list` OK, mais exécution GREEN = **human-verify** (dev server :3000 + `.env.local` Supabase requis ; aucun GREEN fabriqué). I18N-04 reste Manual-Only en P1 (skip explicite). `tsc -b --force` vert ; `lint:i18n` exit 0.
+
 ### Open todos / research flags (v2.0)
 
 - **Phase 4 (research flag) :** TronGrid endpoint `walletsolidity`, parsing logs TRC-20, normalisation hex↔base58 — doc TS peu dense, recherche de phase recommandée.
@@ -122,9 +129,11 @@ Aucun.
 
 ## Session Continuity
 
-**Last session:** 2026-06-14 — Completed 01-03-PLAN.md (4 tasks committés : b4cbf97, 04e773c, 63694b8, 3bbcda3). Stopped at : plan 01-03 complet. Resume file : None.
+**Last session:** 2026-06-14T13:41:19.862Z
 
-**Next action:** Exécuter le **Plan 01-04** (Wave 3) — tests E2E (Playwright) des redirections de gate (ACCESS-01/03), bascule de langue + RTL visuel (I18N-01/02/04), et toute validation restante de phase. Le socle i18n+gating (shell `[locale]`, middleware composé, `gate.ts`, LanguageSwitcher) est en place et typecheck-vert (hors fixture baseline).
+**Last session:** 2026-06-14 — Completed 01-04-PLAN.md (3 tasks committés : 700cffb, 5cf68db, 8a6e59e). Phase 01 COMPLÈTE (4/4 plans). Stopped at : phase 01 terminée.
+
+**Next action:** Lancer `/gsd:verify-work` sur la Phase 01 (exécuter la suite E2E avec dev server + `.env.local` pour passer les 18 tests Playwright en GREEN ; revue visuelle RTL arabe Manual-Only), puis planifier **Phase 02** (Vitrine publique trilingue & gate légal). Socle i18n/RTL + rôles/gating complet et vérifiable (E2E authorés + lint:i18n CI + RLS Plan 01).
 
 ---
 *State updated: 2026-06-14 — milestone v2.0, roadmap 9 phases créée. Cœur analytique v1.0 (P1-4) livré et archivé, sert de socle.*

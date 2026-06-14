@@ -40,7 +40,7 @@ i18n/RTL+rôles avant toute UI publique · RLS signaux avant exposition espace m
 - [x] 01-01-PLAN.md — RLS gating (migrations 0008/0009) + helpers + test anon-client (DB layer)
 - [x] 01-02-PLAN.md — next-intl 4.13 + Tailwind v4 + routing/messages fr/en/ar (i18n/RTL config)
 - [x] 01-03-PLAN.md — restructure [locale] + middleware composé + gate.ts + LanguageSwitcher (jointure)
-- [ ] 01-04-PLAN.md — E2E i18n/gating + check anti-chaîne-dure (vérification)
+- [x] 01-04-PLAN.md — E2E i18n/gating + check anti-chaîne-dure (vérification)
 **UI hint**: yes
 
 ### Phase 2: Vitrine publique trilingue & gate légal
