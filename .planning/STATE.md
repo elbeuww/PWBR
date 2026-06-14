@@ -3,8 +3,8 @@ gsd_state_version: 1.0
 milestone: v2.0
 milestone_name: Plateforme publique
 status: executing
-last_updated: "2026-06-14T12:50:03.267Z"
-last_activity: 2026-06-14 -- Phase 01 planning complete
+last_updated: "2026-06-14T12:58:36.024Z"
+last_activity: 2026-06-14 -- Plan 01-01 Tasks 1-2 (migrations + gating-rls test RED) commités
 progress:
   total_phases: 9
   completed_phases: 0
@@ -21,16 +21,16 @@ progress:
 ## Project Reference
 
 **Core value:** Produire, pour chaque opportunité, une analyse fiable et explicable — vulgarisée pour un public non technique — avec un % de réussite TOUJOURS mesuré, jamais inventé : c'est le socle de confiance qui fait payer l'abonnement.
-**Current focus:** Milestone v2.0 — roadmap créée (9 phases). Prochain pas : planifier Phase 1 (socle transverse i18n/RTL + rôles/gating).
+**Current focus:** Phase 01 — socle-transverse-i18n-rtl-r-les-gating
 **Mode:** interactive (MVP vertical)
 **Granularity:** fine
 
 ## Current Position
 
-Phase: Phase 1 — Socle transverse i18n/RTL & rôles/gating (Not started)
-Plan: —
-Status: Ready to execute
-Last activity: 2026-06-14 -- Phase 01 planning complete
+Phase: 01 (socle-transverse-i18n-rtl-r-les-gating) — EXECUTING
+Plan: 1 of 4 — Tasks 1-2 commités, BLOQUÉ sur Task 3 (checkpoint human-action)
+Status: Executing Phase 01 — en attente push 0008/0009 + regen types
+Last activity: 2026-06-14 -- Plan 01-01 Tasks 1-2 (migrations + gating-rls test RED) commités
 
 Progress: [          ] 0/9 phases (v2.0)
 
@@ -83,6 +83,12 @@ Progress: [          ] 0/9 phases (v2.0)
 - **D-V2-07 (légal)** : revue juriste signée = gate non-code bloquant Phase 4 en prod ; signaux génériques jamais personnalisés ; disclaimers rédigés par juriste.
 - **D-V2-08 (track record)** : % TOUJOURS mesuré (backtest puis réel, distingués) ; seuil d'échantillon sinon « en construction » ; réutiliser constantes anti look-ahead du cœur.
 
+### Decisions exécution (Plan 01-01)
+
+- **D-01-01-A** : migrations 0008 (profiles.role text+check member/affiliate/superadmin défaut member + `is_superadmin()` security definer `search_path=public`) et 0009 (table `subscriptions` RÉELLE D-04 + `has_active_subscription()` security definer + drop/recreate RLS `trade_setups`/`analyses` using `has_active_subscription()`) écrites localement.
+- **D-01-01-B (A6 tranché)** : colonne d'expiry = `current_period_end` (PAS `expires_at` d'ARCHITECTURE) ; le helper RLS référence ce même nom.
+- **D-01-01-C** : test anon-client `gating-rls.test.ts` couvre ACCESS-02/03/04 (non-abonné→0 trade_setup, 0 analyses, isolation subscriptions cross-user). RED jusqu'au push (Task 3, checkpoint human-action).
+
 ### Open todos / research flags (v2.0)
 
 - **Phase 4 (research flag) :** TronGrid endpoint `walletsolidity`, parsing logs TRC-20, normalisation hex↔base58 — doc TS peu dense, recherche de phase recommandée.
@@ -97,7 +103,7 @@ Aucun.
 
 ## Session Continuity
 
-**Last session:** 2026-06-14T12:19:35.420Z
+**Last session:** 2026-06-14T12:57:59.213Z
 
 **Next action:** Planifier la **Phase 1 — Socle transverse i18n/RTL & rôles/gating** (`/gsd:plan-phase 1`). Poser `[locale]` + RTL natif Tailwind v4 + `profiles.role` (migration 0008) + `lib/auth/gate.ts` + RLS `has_active_subscription()` sur `trade_setups`/`analyses` AVANT toute UI publique. Couvre I18N-01..04 + ACCESS-01..04.
 
