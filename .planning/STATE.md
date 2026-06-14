@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v2.0
 milestone_name: Plateforme publique
 status: executing
-last_updated: "2026-06-14T13:13:42.675Z"
+last_updated: "2026-06-14T13:30:02.699Z"
 last_activity: 2026-06-14
 progress:
   total_phases: 9
   completed_phases: 0
   total_plans: 4
-  completed_plans: 2
-  percent: 50
+  completed_plans: 3
+  percent: 75
 ---
 
 # Project State
@@ -28,11 +28,11 @@ progress:
 ## Current Position
 
 Phase: 01 (socle-transverse-i18n-rtl-r-les-gating) — EXECUTING
-Plan: 2 of 4 — COMPLET (3 tasks, gating-rls GREEN 4/4, rls 6/6 non régressé) ; prochain plan 01-02
+Plan: 3 of 4 — COMPLET (4 tasks : middleware composé, shell [locale]+LanguageSwitcher, gate.ts 3 portes, déplacement auth+dashboard ; typecheck vert hors baseline fixture) ; prochain plan 01-04
 Status: Ready to execute
 Last activity: 2026-06-14
 
-Progress: [█████░░░░░] 50%
+Progress: [████████░░] 75%
 
 ## Performance Metrics
 
@@ -43,6 +43,7 @@ Progress: [█████░░░░░] 50%
 | Requirements covered (v2.0) | 0/41 (couche produit non démarrée) |
 | Cœur analytique (v1.0) | Livré P1-4, 261/261 tests (socle, non re-roadmappé) |
 | Phase 01 P02 | 3 min | 3 tasks | 11 files |
+| Phase 01 P03 | 25 min | 4 tasks | 19 files |
 
 ## Roadmap v2.0 (9 phases)
 
@@ -98,6 +99,15 @@ Progress: [█████░░░░░] 50%
 - **D-01-02-C (D-11)** : `@theme` minimal (`--font-arabic` sur `:lang(ar)`) ; RTL via propriétés logiques natives Tailwind v4, INTERDIT `tailwindcss-rtl`/`tailwindcss-logical` ; design system de marque reporté P2. `next.config.ts` wrappé `withNextIntl` en préservant transpilePackages/turbopack.root.
 - **D-01-02-DEFER** : ~50 erreurs tsc pré-existantes dans `packages/supabase` (`database.types.ts` n'exporte pas ProfileRow/TradeSetupRow/… ) hors scope — loggées `deferred-items.md`, aucune dans les fichiers du plan.
 
+### Decisions exécution (Plan 01-03)
+
+- **D-01-03-A** : `gate.ts` réutilise `createClient()` (`lib/supabase/server.ts`, déjà typé `Database`) plutôt que recâbler `createServerSupabaseClient(await cookies())`. Les `redirect` localisés de next-intl 4.13 exigent un `locale` explicite → résolu serveur via `getLocale()` (gate.ts + actions.ts).
+- **D-01-03-B (Pitfall 2)** : middleware composé — `handleI18n` produit la response (rewrite + cookie NEXT_LOCALE), `updateSession(request, response)` la MUTE (jamais `NextResponse.next()` recréée). Header `x-pathname` posé pour le returnTo du gate (D-08).
+- **D-01-03-C (RESEARCH Q1)** : `dashboard` placé HORS `(member)` sous `[locale]/dashboard` — il ne lit que `instruments` (authenticated, non sub-gated) ; le sub-gater bloquerait tout le monde en P1. `(member)` réservé aux surfaces de signaux.
+- **D-01-03-D (threat T-01-SC)** : `lucide-react` absent du package.json → icônes globe/chevron du LanguageSwitcher en SVG inline ; aucun nouvel install npm dans ce plan.
+- **D-01-03-E (Pitfall 7)** : un SEUL `<html lang dir>` dans `[locale]/layout.tsx` ; root `app/layout.tsx` réduit à pass-through (`return children`).
+- **D-01-03-BASELINE** : 1 erreur tsc pré-existante acceptée (`__lint_fixtures__/forbidden-service-import.ts`, fixture ESLint v1.0 AUTH-03) — hors scope, gate vert si aucune NOUVELLE erreur au-delà.
+
 ### Open todos / research flags (v2.0)
 
 - **Phase 4 (research flag) :** TronGrid endpoint `walletsolidity`, parsing logs TRC-20, normalisation hex↔base58 — doc TS peu dense, recherche de phase recommandée.
@@ -112,9 +122,9 @@ Aucun.
 
 ## Session Continuity
 
-**Last session:** 2026-06-14T13:13:42.669Z
+**Last session:** 2026-06-14 — Completed 01-03-PLAN.md (4 tasks committés : b4cbf97, 04e773c, 63694b8, 3bbcda3). Stopped at : plan 01-03 complet. Resume file : None.
 
-**Next action:** Exécuter le **Plan 01-03** — câbler le shell `[locale]/layout.tsx` (`<html lang dir>` ar→rtl), le `middleware.ts` (`createMiddleware(routing)`), le sélecteur de langue (`usePathname`/`useRouter` de `i18n/navigation`) et les redirections de gate, en consommant le socle i18n livré au Plan 01-02. Toutes les chaînes via `messages/*` (I18N-03).
+**Next action:** Exécuter le **Plan 01-04** (Wave 3) — tests E2E (Playwright) des redirections de gate (ACCESS-01/03), bascule de langue + RTL visuel (I18N-01/02/04), et toute validation restante de phase. Le socle i18n+gating (shell `[locale]`, middleware composé, `gate.ts`, LanguageSwitcher) est en place et typecheck-vert (hors fixture baseline).
 
 ---
 *State updated: 2026-06-14 — milestone v2.0, roadmap 9 phases créée. Cœur analytique v1.0 (P1-4) livré et archivé, sert de socle.*

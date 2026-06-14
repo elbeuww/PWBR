@@ -11,12 +11,12 @@
 
 ### I18N — Internationalisation trilingue (transverse, Wave 1)
 - [x] **I18N-01**: L'utilisateur navigue vitrine + espace membre en arabe, anglais ou français ; la langue est dans l'URL (`/[locale]/…`) et persiste entre les pages.
-- [ ] **I18N-02**: La mise en page bascule en RTL pour l'arabe (propriétés logiques Tailwind v4), les éléments intrinsèquement LTR (prix, symboles, nombres) restant corrects.
+- [x] **I18N-02**: La mise en page bascule en RTL pour l'arabe (propriétés logiques Tailwind v4), les éléments intrinsèquement LTR (prix, symboles, nombres) restant corrects.
 - [x] **I18N-03**: Les chaînes d'interface sont externalisées (next-intl) — aucune chaîne en dur dans les composants.
-- [ ] **I18N-04**: Dates, nombres et devises s'affichent selon la locale active.
+- [x] **I18N-04**: Dates, nombres et devises s'affichent selon la locale active.
 
 ### ACCESS — Rôles & gating (Wave 1)
-- [ ] **ACCESS-01**: Un visiteur non authentifié voit la vitrine publique mais ne peut pas atteindre l'espace membre (signaux).
+- [x] **ACCESS-01**: Un visiteur non authentifié voit la vitrine publique mais ne peut pas atteindre l'espace membre (signaux).
 - [x] **ACCESS-02**: Un utilisateur authentifié SANS abonnement actif est bloqué hors des signaux — UI ET RLS : un appel direct au client Supabase ne retourne aucun setup.
 - [x] **ACCESS-03**: Les rôles (member / affiliate / superadmin) sont portés par `profiles.role` (jamais le JWT) ; chaque rôle n'accède qu'à ses surfaces.
 - [x] **ACCESS-04**: L'accès aux signaux est conditionné par un abonnement actif via RLS (`has_active_subscription()`), prouvé par des tests cross-user/cross-role.
@@ -95,10 +95,10 @@
 | Requirement | Phase | Status |
 |-------------|-------|--------|
 | I18N-01 | Phase 1 | Complete |
-| I18N-02 | Phase 1 | Pending |
+| I18N-02 | Phase 1 | Complete |
 | I18N-03 | Phase 1 | Complete |
-| I18N-04 | Phase 1 | Pending |
-| ACCESS-01 | Phase 1 | Pending |
+| I18N-04 | Phase 1 | Complete |
+| ACCESS-01 | Phase 1 | Complete |
 | ACCESS-02 | Phase 1 | Complete |
 | ACCESS-03 | Phase 1 | Complete |
 | ACCESS-04 | Phase 1 | Complete |
