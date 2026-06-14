@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v2.0
 milestone_name: Plateforme publique
-status: executing
+status: ready_to_plan
 last_updated: "2026-06-14T13:42:25.954Z"
 last_activity: 2026-06-14
 progress:
   total_phases: 9
-  completed_phases: 1
+  completed_phases: 2
   total_plans: 4
   completed_plans: 4
-  percent: 100
+  percent: 22
 ---
 
 # Project State
@@ -27,9 +27,9 @@ progress:
 
 ## Current Position
 
-Phase: 01 (socle-transverse-i18n-rtl-r-les-gating) — COMPLET (4/4 plans)
-Plan: 4 of 4 — COMPLET (3 tasks : i18n.spec + gating.spec E2E des 8 success criteria, check statique lint:i18n I18N-03, auth.spec localisé /fr/…). 18 tests Playwright listés/parse OK ; typecheck --force vert ; lint:i18n exit 0. Exécution GREEN des E2E = human-verify (dev server + .env).
-Status: Phase 01 terminée — prêt pour vérification (/gsd:verify-work) puis Phase 02
+Phase: 2
+Plan: Not started
+Status: Ready to plan
 Last activity: 2026-06-14
 
 Progress: [██████████] 100%
