@@ -110,7 +110,7 @@ Plans:
 **Plans**: 4 plans
 Plans:
 **Wave 1**
-- [ ] 04-01-PLAN.md — Fondation : migration 0006 analyses+trade_setups + RLS + [BLOCKING] apply MCP + OutputSchema §3 + repos insert/expiry (SCORE-01/05)
+- [x] 04-01-PLAN.md — Fondation : migration 0006 analyses+trade_setups + RLS + [BLOCKING] apply MCP + OutputSchema §3 + repos insert/expiry (SCORE-01/05)
 
 **Wave 2** *(blocked on Wave 1 — types + OutputSchema)*
 - [ ] 04-02-PLAN.md — Scoring core pur golden : weights §3 + rr bord conservateur + risk_level + confidence + score /100 décomposable + cap 45 (SCORE-02/03)
