@@ -50,6 +50,8 @@ import {
   sessionDayOf,
   validUntilOf,
   raiseRisk,
+  computePromptVersion,
+  VETERAN_PROMPT_PATH,
   DAY_VALID_HOURS,
   SWING_VALID_HOURS,
 } from '../src/jobs/persist'
@@ -334,5 +336,34 @@ describe('persist — chemin succès + immuabilité (SCORE-05, D-45)', () => {
     expect(stats.written).toBe(1)
     const setups = mockInsertTradeSetups.mock.calls[0]![1] as Array<Record<string, unknown>>
     expect(setups[0]!['risk_level']).not.toBe('low')
+  })
+})
+
+// ════════════════════════════════════════════════════════════════════════════
+// Task 2 — prompt_version traçable (D-51, T-04-10)
+// ════════════════════════════════════════════════════════════════════════════
+
+describe('computePromptVersion (D-51)', () => {
+  it('retourne semver + hash hex sha256 depuis veteran.md (défaut)', () => {
+    const pv = computePromptVersion()
+    // format `${semver}+${sha256hex}`
+    const [semver, hash] = pv.split('+')
+    expect(semver).toMatch(/^\d+\.\d+\.\d+$/) // semver front-matter
+    expect(hash).toMatch(/^[a-f0-9]{64}$/) // sha256 hex 64 chars
+  })
+
+  it('VETERAN_PROMPT_PATH pointe sur veteran.md', () => {
+    expect(VETERAN_PROMPT_PATH).toMatch(/veteran\.md$/)
+  })
+
+  it('lève si le front-matter version: est absent', () => {
+    // un fichier sans front-matter version → throw (pas de version silencieuse)
+    const fs = require('node:fs') as typeof import('node:fs')
+    const os = require('node:os') as typeof import('node:os')
+    const path = require('node:path') as typeof import('node:path')
+    const tmp = path.join(os.tmpdir(), `noversion-${Date.now()}.md`)
+    fs.writeFileSync(tmp, '# pas de front-matter\ncontenu')
+    expect(() => computePromptVersion(tmp)).toThrow(/version:/)
+    fs.unlinkSync(tmp)
   })
 })

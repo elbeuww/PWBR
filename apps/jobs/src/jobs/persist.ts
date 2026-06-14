@@ -25,6 +25,10 @@
  *  - JSON non conforme → rejet + raison loggée, PAS de retry en P1.
  */
 import 'dotenv/config'
+import { readFileSync } from 'node:fs'
+import { createHash } from 'node:crypto'
+import { fileURLToPath } from 'node:url'
+import path from 'node:path'
 import { createClient } from '@supabase/supabase-js'
 import { DateTime } from 'luxon'
 import {
@@ -58,6 +62,33 @@ export const DAY_VALID_HOURS = 24
 export const SWING_VALID_HOURS = 72
 /** R:R minimum (règle dure §3) en dessous duquel un setup est rejeté. */
 export const MIN_RR = 1.2
+
+/** Chemin par défaut du prompt vétéran versionné (relatif à ce module). */
+export const VETERAN_PROMPT_PATH = fileURLToPath(
+  new URL('../../prompts/veteran.md', import.meta.url),
+)
+
+/**
+ * prompt_version traçable (D-51, T-04-10) = `${semver front-matter}+${sha256(fichier)}`.
+ *
+ * Le semver (front-matter `version:`) reste lisible ; le sha256 du fichier ENTIER
+ * rend la version infalsifiable (toute édition du prompt change le hash). On NE
+ * réinvente JAMAIS de hash maison : node:crypto sha256 builtin.
+ *
+ * Lève si le front-matter `version:` est absent (pas de version silencieuse).
+ *
+ * @param promptPath chemin du fichier prompt (défaut : veteran.md).
+ */
+export function computePromptVersion(promptPath: string = VETERAN_PROMPT_PATH): string {
+  const content = readFileSync(promptPath, 'utf8')
+  const match = /^version:\s*(.+)$/m.exec(content)
+  if (!match?.[1]) {
+    throw new Error(`computePromptVersion: front-matter 'version:' absent dans ${path.basename(promptPath)}`)
+  }
+  const semver = match[1].trim()
+  const hash = createHash('sha256').update(content).digest('hex')
+  return `${semver}+${hash}`
+}
 
 /** Codes de rejet normalisés (T-02-13) — jamais de valeur de clé dans les logs. */
 export type RejectReason =
@@ -229,7 +260,9 @@ export async function persist(): Promise<Json> {
     throw new Error('persist: RUN_ID must be set (résolu/exporté par l\'ANALYZE en 04-04)')
   }
   const model = process.env['MODEL_LABEL'] ?? 'claude-code-max'
-  const promptVersion = process.env['PROMPT_VERSION'] ?? 'veteran-v1'
+  // prompt_version traçable (D-51) : l'ANALYZE l'exporte ; sinon on le calcule depuis
+  // veteran.md (semver front-matter + sha256 du fichier) — jamais de fallback opaque.
+  const promptVersion = process.env['PROMPT_VERSION'] ?? computePromptVersion()
 
   const client = getServiceClient()
   const stats: PersistStats = { written: 0, rejected: 0, reasons: [] }
