@@ -14,6 +14,53 @@ export type Database = {
   }
   public: {
     Tables: {
+      analyses: {
+        Row: {
+          created_at: string
+          id: string
+          instrument_id: string
+          model: string
+          prompt_version: string
+          run_id: string
+          schema_version: string
+          session: string
+          snapshot: Json
+          style: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          instrument_id: string
+          model: string
+          prompt_version: string
+          run_id: string
+          schema_version: string
+          session: string
+          snapshot: Json
+          style: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          instrument_id?: string
+          model?: string
+          prompt_version?: string
+          run_id?: string
+          schema_version?: string
+          session?: string
+          snapshot?: Json
+          style?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "analyses_instrument_id_fkey"
+            columns: ["instrument_id"]
+            isOneToOne: false
+            referencedRelation: "instruments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       asset_drivers: {
         Row: {
           direction: number
@@ -326,6 +373,84 @@ export type Database = {
           },
         ]
       }
+      trade_setups: {
+        Row: {
+          analysis_id: string
+          confidence: string
+          created_at: string
+          direction: string
+          entry_price: number
+          id: string
+          instrument_id: string
+          opportunity_score: number
+          payload: Json
+          risk_level: string
+          risk_reward: number
+          session: string
+          session_day: string
+          status: string
+          stop_loss: number
+          style: string
+          take_profits: Json
+          valid_until: string
+        }
+        Insert: {
+          analysis_id: string
+          confidence: string
+          created_at?: string
+          direction: string
+          entry_price: number
+          id?: string
+          instrument_id: string
+          opportunity_score: number
+          payload: Json
+          risk_level: string
+          risk_reward: number
+          session: string
+          session_day: string
+          status?: string
+          stop_loss: number
+          style: string
+          take_profits: Json
+          valid_until: string
+        }
+        Update: {
+          analysis_id?: string
+          confidence?: string
+          created_at?: string
+          direction?: string
+          entry_price?: number
+          id?: string
+          instrument_id?: string
+          opportunity_score?: number
+          payload?: Json
+          risk_level?: string
+          risk_reward?: number
+          session?: string
+          session_day?: string
+          status?: string
+          stop_loss?: number
+          style?: string
+          take_profits?: Json
+          valid_until?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "trade_setups_analysis_id_fkey"
+            columns: ["analysis_id"]
+            isOneToOne: false
+            referencedRelation: "analyses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "trade_setups_instrument_id_fkey"
+            columns: ["instrument_id"]
+            isOneToOne: false
+            referencedRelation: "instruments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       v_data_freshness: {
@@ -516,3 +641,13 @@ export type SnapshotRow = Database['public']['Tables']['snapshots']['Row']
 export type SnapshotInsert = Database['public']['Tables']['snapshots']['Insert']
 export type AssetDriverRow = Database['public']['Tables']['asset_drivers']['Row']
 export type AssetDriverInsert = Database['public']['Tables']['asset_drivers']['Insert']
+
+// Phase 4 — moteur IA vétéran & scoring (CHECK constraints migration 0006)
+export type TradeDirection = 'long' | 'short'
+export type RiskLevel = 'low' | 'medium' | 'high' | 'extreme'
+export type Confidence = 'low' | 'moderate' | 'high'
+export type SetupStatus = 'active' | 'invalidated' | 'expired'
+export type AnalysisRow = Database['public']['Tables']['analyses']['Row']
+export type AnalysisInsert = Database['public']['Tables']['analyses']['Insert']
+export type TradeSetupRow = Database['public']['Tables']['trade_setups']['Row']
+export type TradeSetupInsert = Database['public']['Tables']['trade_setups']['Insert']

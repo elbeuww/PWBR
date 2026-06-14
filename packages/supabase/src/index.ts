@@ -44,6 +44,15 @@ export type {
   SnapshotInsert,
   AssetDriverRow,
   AssetDriverInsert,
+  // Phase 4 — moteur IA vétéran & scoring
+  AnalysisRow,
+  AnalysisInsert,
+  TradeSetupRow,
+  TradeSetupInsert,
+  TradeDirection,
+  RiskLevel,
+  Confidence,
+  SetupStatus,
 } from './database.types'
 
 // Repositories
@@ -58,3 +67,7 @@ export { upsertEconomicCalendar } from './repositories/economicCalendar'
 // Phase 3 — moteur déterministe repositories
 export { upsertSnapshot, getSnapshotByHash } from './repositories/snapshots'
 export { getAssetDrivers } from './repositories/assetDrivers'
+// Phase 4 — moteur IA vétéran & scoring repositories
+export { insertAnalysis } from './repositories/analyses'
+export { insertTradeSetups, expirePriorSetups } from './repositories/tradeSetups'
+export type { ImmutabilityKey } from './repositories/tradeSetups'
