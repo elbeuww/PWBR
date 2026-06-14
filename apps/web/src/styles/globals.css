@@ -1,156 +1,121 @@
 @import "tailwindcss";
 @import "tw-animate-css";
-@import "shadcn/tailwind.css";
-/*
- ---break---
- */
-@custom-variant dark (&:is(.dark *));
 
 /*
- * D-11 : @theme minimal — primitive RTL uniquement, design system de marque reporté P2.
- * --font-arabic : support de script dédié obligatoire pour l'arabe (a11y multi-script).
+ * Design system de marque — Phase 2 (D-01/D-02/D-04, 02-UI-SPEC §Color).
+ * Tailwind v4 CSS-first : variant `dark` déclaré en CSS, AUCUN tailwind.config.
+ * next-themes pose `.dark` sur <html> (class strategy) → bascule des tokens.
+ */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/*
+ * D-03 : police arabe self-hostée. --font-arabic pointe sur la variable exposée
+ * par next/font/local (lib/fonts.ts), --font-latin sur Inter (next/font/google).
+ * Le sélecteur de langue arabe plus bas applique la police ; le RTL vient de
+ * <html dir="rtl"> ([locale]/layout).
  */
 @theme {
-  --font-arabic: "Noto Sans Arabic", system-ui, sans-serif;
+  --font-latin: var(--font-inter);
+  --font-arabic: var(--font-ibm-plex-arabic);
+}
+
+/*
+ * @theme inline : mappe les tokens de couleur Tailwind (--color-*) sur les
+ * variables de marque définies dans :root / .dark ci-dessous. Les composants
+ * shadcn/ui (bg-primary, text-foreground, border-border…) consomment ces tokens
+ * → stylés automatiquement à la palette de marque bleue (D-01).
+ */
+@theme inline {
+  --font-sans: var(--font-inter);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+}
+
+/*
+ * Tokens de marque — valeurs LIGHT (02-UI-SPEC §Color).
+ * Bleu institutionnel #1E5FBF. Vert/rouge ABSENTS (D-04 : réservés au trading,
+ * aucun widget trading en P2). `--destructive` mappé sur l'accent neutre (jamais rouge).
+ */
+:root {
+  --radius: 0.625rem;
+  --background: #FFFFFF;        /* dominant 60% */
+  --foreground: #0B1220;        /* texte primaire */
+  --card: #F4F6F9;              /* surface secondaire 30% */
+  --card-foreground: #0B1220;
+  --popover: #FFFFFF;
+  --popover-foreground: #0B1220;
+  --primary: #1E5FBF;           /* accent 10% — CTA, focus, états actifs */
+  --primary-foreground: #FFFFFF;
+  --secondary: #F4F6F9;         /* header/footer/cartes */
+  --secondary-foreground: #0B1220;
+  --muted: #F4F6F9;
+  --muted-foreground: #5B6675;  /* texte atténué */
+  --accent: #F4F6F9;
+  --accent-foreground: #0B1220;
+  --destructive: #5B6675;       /* D-04 : jamais rouge en P2 (neutre) */
+  --border: #E2E7EE;
+  --input: #E2E7EE;
+  --ring: #1E5FBF;              /* focus ring = accent */
+}
+
+/* Tokens de marque — valeurs DARK (02-UI-SPEC §Color). */
+.dark {
+  --background: #0B1220;        /* near-black navy */
+  --foreground: #E6EBF2;
+  --card: #141C2B;             /* slate navy */
+  --card-foreground: #E6EBF2;
+  --popover: #141C2B;
+  --popover-foreground: #E6EBF2;
+  --primary: #3B82F6;           /* accent dark (contraste) */
+  --primary-foreground: #0B1220;
+  --secondary: #141C2B;
+  --secondary-foreground: #E6EBF2;
+  --muted: #141C2B;
+  --muted-foreground: #9AA7B8;
+  --accent: #141C2B;
+  --accent-foreground: #E6EBF2;
+  --destructive: #9AA7B8;       /* D-04 : neutre, jamais rouge */
+  --border: #26303F;
+  --input: #26303F;
+  --ring: #3B82F6;
 }
 
 /*
  * L'arabe exige une police couvrant le script + un interlignage généreux pour les
- * diacritiques. Appliqué via :lang(ar) ; le RTL lui-même vient de <html dir="rtl">
- * (posé au layout [locale], Plan 03) + propriétés logiques Tailwind v4.
+ * diacritiques. Le RTL lui-même vient de <html dir="rtl"> ([locale]/layout) +
+ * propriétés logiques Tailwind v4.
  */
 :lang(ar) {
   font-family: var(--font-arabic);
+  line-height: 1.6;
 }
-/*
- ---break---
- */
-@theme inline {
-  --font-heading: var(--font-sans);
-  --font-sans: var(--font-sans);
-  --color-sidebar-ring: var(--sidebar-ring);
-  --color-sidebar-border: var(--sidebar-border);
-  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
-  --color-sidebar-accent: var(--sidebar-accent);
-  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
-  --color-sidebar-primary: var(--sidebar-primary);
-  --color-sidebar-foreground: var(--sidebar-foreground);
-  --color-sidebar: var(--sidebar);
-  --color-chart-5: var(--chart-5);
-  --color-chart-4: var(--chart-4);
-  --color-chart-3: var(--chart-3);
-  --color-chart-2: var(--chart-2);
-  --color-chart-1: var(--chart-1);
-  --color-ring: var(--ring);
-  --color-input: var(--input);
-  --color-border: var(--border);
-  --color-destructive: var(--destructive);
-  --color-accent-foreground: var(--accent-foreground);
-  --color-accent: var(--accent);
-  --color-muted-foreground: var(--muted-foreground);
-  --color-muted: var(--muted);
-  --color-secondary-foreground: var(--secondary-foreground);
-  --color-secondary: var(--secondary);
-  --color-primary-foreground: var(--primary-foreground);
-  --color-primary: var(--primary);
-  --color-popover-foreground: var(--popover-foreground);
-  --color-popover: var(--popover);
-  --color-card-foreground: var(--card-foreground);
-  --color-card: var(--card);
-  --color-foreground: var(--foreground);
-  --color-background: var(--background);
-  --radius-sm: calc(var(--radius) * 0.6);
-  --radius-md: calc(var(--radius) * 0.8);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) * 1.4);
-  --radius-2xl: calc(var(--radius) * 1.8);
-  --radius-3xl: calc(var(--radius) * 2.2);
-  --radius-4xl: calc(var(--radius) * 2.6);
-}
-/*
- ---break---
- */
-:root {
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --radius: 0.625rem;
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
-}
-/*
- ---break---
- */
-.dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
-}
-/*
- ---break---
- */
+
 @layer base {
   * {
     @apply border-border outline-ring/50;
   }
   body {
     @apply bg-background text-foreground;
-  }
-  html {
-    @apply font-sans;
+    font-family: var(--font-latin), system-ui, sans-serif;
   }
 }

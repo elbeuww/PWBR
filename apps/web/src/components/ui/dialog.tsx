@@ -51,9 +51,12 @@ function DialogContent({
   className,
   children,
   showCloseButton = true,
+  closeLabel,
   ...props
 }: React.ComponentProps<typeof DialogPrimitive.Content> & {
   showCloseButton?: boolean
+  // Label a11y du bouton de fermeture — fourni traduit par l'appelant (i18n, I18N-03).
+  closeLabel?: string
 }) {
   return (
     <DialogPortal>
@@ -76,7 +79,7 @@ function DialogContent({
             >
               <XIcon
               />
-              <span className="sr-only">Close</span>
+              {closeLabel ? <span className="sr-only">{closeLabel}</span> : null}
             </Button>
           </DialogPrimitive.Close>
         )}
@@ -98,10 +101,13 @@ function DialogHeader({ className, ...props }: React.ComponentProps<"div">) {
 function DialogFooter({
   className,
   showCloseButton = false,
+  closeLabel,
   children,
   ...props
 }: React.ComponentProps<"div"> & {
   showCloseButton?: boolean
+  // Libellé du bouton de fermeture — fourni traduit par l'appelant (i18n, I18N-03).
+  closeLabel?: string
 }) {
   return (
     <div
@@ -113,11 +119,11 @@ function DialogFooter({
       {...props}
     >
       {children}
-      {showCloseButton && (
+      {showCloseButton && closeLabel ? (
         <DialogPrimitive.Close asChild>
-          <Button variant="outline">Close</Button>
+          <Button variant="outline">{closeLabel}</Button>
         </DialogPrimitive.Close>
-      )}
+      ) : null}
     </div>
   )
 }
