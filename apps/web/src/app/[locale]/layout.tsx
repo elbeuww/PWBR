@@ -18,6 +18,7 @@ import { routing } from '../../i18n/routing'
 import { LanguageSwitcher } from '../../components/LanguageSwitcher'
 import { ThemeProvider } from '../../components/ThemeProvider'
 import { ThemeToggle } from '../../components/ThemeToggle'
+import { Footer } from '../../components/Footer'
 import { inter, ibmPlexArabic } from '../../lib/fonts'
 import '../../styles/globals.css'
 
@@ -56,7 +57,7 @@ export default async function LocaleLayout({
               </div>
             </header>
             {children}
-            {/* Slot Footer global (<Footer /> avec <Disclaimer />) — arrive au Plan 02-02. */}
+            <Footer />
           </NextIntlClientProvider>
         </ThemeProvider>
       </body>
