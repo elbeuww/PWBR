@@ -1,10 +1,11 @@
 ---
 phase: 3
 slug: espace-membre-signaux-gated-rls
-status: draft
+status: approved
 shadcn_initialized: true
 preset: radix-nova
 created: 2026-06-14
+reviewed_at: 2026-06-15
 ---
 
 # Phase 3 — UI Design Contract
