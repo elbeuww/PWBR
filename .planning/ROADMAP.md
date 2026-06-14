@@ -48,8 +48,8 @@ i18n/RTL+rôles avant toute UI publique · RLS signaux avant exposition espace m
 **Depends on**: Phase 1 (locale/RTL/strings)
 **Requirements**: VITR-01, VITR-02, VITR-03, LEGAL-01, LEGAL-02
 **Success Criteria** (what must be TRUE):
-  1. Un visiteur voit une page d'accueil dans sa langue présentant le produit, le % de réussite mesuré et un appel clair à l'abonnement, sans aucune promesse de gain.
-  2. Un visiteur voit la page tarifs (9 $/mois + offre découverte 3 $/15 j) et peut démarrer le parcours d'abonnement.
+  1. Un visiteur voit une page d'accueil dans sa langue présentant le produit et un appel clair à l'abonnement, sans aucune promesse de gain. *(Le slot « % de réussite mesuré » est construit mais masqué jusqu'en Phase 5 — track record réel ; cf. CONTEXT D-08. Aucun chiffre de performance affiché en P2.)*
+  2. Un visiteur voit la page tarifs (9 $/mois + offre découverte 3 $/7 j, utilisable une seule fois) et peut démarrer le parcours d'abonnement.
   3. Des disclaimers « contenu éducatif, pas de conseil personnalisé, aucune promesse de gain, risque de perte total » rédigés par un juriste sont présents sur la vitrine.
   4. Une revue juridique (conseil non agréé + statut crypto Algérie/MENA) est complétée et tracée — gate non-code bloquant le 1er encaissement (Phase 4) en production.
 **Plans**: TBD
@@ -75,7 +75,7 @@ i18n/RTL+rôles avant toute UI publique · RLS signaux avant exposition espace m
   1. Un utilisateur voit l'adresse de réception USDT TRC-20 (réseau affiché en grand + QR + copie 1-tap) et le montant atomique exact dû pour l'offre choisie.
   2. À la soumission d'un hash, le système vérifie on-chain via TronGrid que le `Transfer` provient EXACTEMENT du contrat USDT officiel (`.env`, jamais saisi), avec montant en decimals 6 (BigInt atomique ×10^6, zéro float), destinataire normalisé hex↔base58 et `only_confirmed:true` (anti-réorg) ; un paiement valide active l'abonnement (période + expiration) sans intervention manuelle.
   3. Un hash déjà utilisé est rejeté par `UNIQUE(tx_hash)` GLOBAL (le même hash ne crédite jamais deux comptes) ; faux token, mauvais montant/destinataire ou TX non confirmée sont rejetés et tracés ; les cas ambigus (sur/sous-paiement) tombent dans la file de validation superadmin que celui-ci traite (activer/rejeter). L'utilisateur ne peut écrire QUE `payments(pending)` ; seul le service_role transitionne vers `verified`/`active`.
-  4. L'abonnement expire automatiquement en fin de période (job `subscription-expiry`), l'utilisateur est informé et perd l'accès aux signaux ; l'offre découverte 3 $/15 j est utilisable une seule fois par utilisateur puis bascule sur le tarif standard.
+  4. L'abonnement expire automatiquement en fin de période (job `subscription-expiry`), l'utilisateur est informé et perd l'accès aux signaux ; l'offre découverte 3 $/7 j est utilisable une seule fois par utilisateur puis bascule sur le tarif standard.
   5. Le superadmin voit les membres (actifs/inactifs, état d'abonnement et de paiement).
 **Plans**: TBD
 **UI hint**: yes

@@ -22,8 +22,8 @@
 - [x] **ACCESS-04**: L'accès aux signaux est conditionné par un abonnement actif via RLS (`has_active_subscription()`), prouvé par des tests cross-user/cross-role.
 
 ### VITR — Vitrine publique & funnel (Wave 2)
-- [ ] **VITR-01**: Un visiteur voit une page d'accueil présentant le produit, le % de réussite mesuré et un appel à l'abonnement, dans sa langue.
-- [ ] **VITR-02**: Un visiteur voit la page tarifs (9 $/mois + offre découverte 3 $/15 j) et démarre le parcours d'abonnement.
+- [ ] **VITR-01**: Un visiteur voit une page d'accueil présentant le produit et un appel à l'abonnement, dans sa langue. *(Sous-clause « % de réussite mesuré » reportée en Phase 5 — slot construit mais masqué ; cf. CONTEXT D-08.)*
+- [ ] **VITR-02**: Un visiteur voit la page tarifs (9 $/mois + offre découverte 3 $/7 j, utilisable une seule fois) et démarre le parcours d'abonnement.
 - [ ] **VITR-03**: La vitrine n'affiche aucune promesse de gain et présente les disclaimers légaux.
 
 ### MEMB — Espace membre signaux (Wave 2)
@@ -39,7 +39,7 @@
 - [ ] **PAY-03**: Un paiement valide active automatiquement l'abonnement (période + date d'expiration) sans intervention manuelle.
 - [ ] **PAY-04**: Un hash déjà utilisé (replay), un mauvais montant/token/destinataire ou un paiement non confirmé est rejeté et tracé ; les cas ambigus (sur/sous-paiement) tombent dans une file de validation superadmin.
 - [ ] **PAY-05**: L'abonnement expire automatiquement en fin de période ; l'utilisateur est informé et perd l'accès aux signaux.
-- [ ] **PAY-06**: L'offre découverte (3 $/15 j) est utilisable une seule fois par utilisateur puis bascule sur le tarif standard.
+- [ ] **PAY-06**: L'offre découverte (3 $/7 j) est utilisable une seule fois par utilisateur puis bascule sur le tarif standard.
 
 ### TRACK — Track record & % mesuré (Wave 3)
 - [ ] **TRACK-01**: Le système rejoue les setups expirés depuis leur snapshot/candles et enregistre le résultat (hit_tp / hit_sl / realized_r) dans `prediction_outcomes`, indépendamment de toute exécution utilisateur.
