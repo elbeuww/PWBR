@@ -21,6 +21,9 @@
     ],
     "baseUrl": ".",
     "paths": {
+      "@/*": [
+        "./src/*"
+      ],
       "@app/core": [
         "../../packages/core/src/index.ts"
       ],
