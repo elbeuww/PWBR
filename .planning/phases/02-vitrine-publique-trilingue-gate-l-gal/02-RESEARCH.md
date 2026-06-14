@@ -497,20 +497,11 @@ export function isLegalReviewDone(): boolean {
 | A5 | Inter via `next/font/google` (self-host build) est acceptable vis-à-vis de D-03 (« zéro CDN au runtime ») | §Stack | Faible — `next/font/google` self-host au build, aucune requête CDN runtime. Si l'esprit D-03 exige zéro accès Google même au build → `@fontsource-variable/inter`. À confirmer si strict. |
 | A6 | Le signup réutilisé (P1) suffit au funnel D-09 sans écriture métier | §Architecture | Faible — vérifié : `(auth)/signup` existe (P1) ; l'écran « paiement bientôt » est statique. |
 
-## Open Questions
+## Open Questions (RESOLVED)
 
-1. **Métriques factuelles sur la home (anti-vide) ?**
-   - On sait : le proof slot est masqué (D-08) ; la home pourrait paraître creuse.
-   - Flou : afficher ou non nb d'analyses / marchés / R:R visé (Claude's Discretion CONTEXT).
-   - Recommandation : préparer le namespace `home` pour accueillir 2-3 métriques **factuelles non-perf** ; décider à la revue UI. JAMAIS un %.
-
-2. **`@supabase/ssr` import strict pour le signup réutilisé ?**
-   - On sait : invariant P1 = `getUser()` jamais `getSession()`.
-   - Flou : le funnel D-09 touche-t-il l'auth au-delà du signup existant ?
-   - Recommandation : ne rien recâbler ; clic « s'abonner » → route signup existante → succès → `/paiement-bientot`. Pas de gate nouveau.
-
-3. **Inter strict zéro-Google (A5) ?**
-   - Recommandation : trancher au planning ; par défaut `next/font/google` (self-host build) ; si le fondateur veut zéro Google → `@fontsource-variable/inter`.
+1. **Métriques factuelles sur la home (anti-vide) ?** — **TRANCHÉ (planning) :** le namespace `home` est préparé pour accueillir des métriques factuelles non-perf, mais P2 n'en affiche aucune obligatoire ; décision visuelle déférée à la revue UI. JAMAIS un %. (Plan 02-03 T2.)
+2. **`@supabase/ssr` import strict pour le signup réutilisé ?** — **TRANCHÉ (planning) :** aucun recâblage auth ; clic « s'abonner » → route signup P1 existante → succès → `/paiement-bientot`. Invariant `getUser()` jamais `getSession()` inchangé. (Plan 02-03 T1, câblage redirect rendu OBLIGATOIRE après revue plan-checker WARN-03.)
+3. **Inter strict zéro-Google (A5) ?** — **TRANCHÉ (planning) :** par défaut `next/font/google` (self-host au build, conforme à l'esprit D-03) ; `@fontsource-variable/inter` retenu uniquement si le fondateur exige zéro Google ou si le build échoue. (Plan 02-01 T2, Assumption A5.)
 
 ## Environment Availability
 
