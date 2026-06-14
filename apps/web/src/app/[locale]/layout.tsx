@@ -1,0 +1,52 @@
+/**
+ * app/[locale]/layout.tsx — SEUL <html lang dir> de l'application (Pitfall 7).
+ *
+ * - Valide la locale (hasLocale) sinon notFound() (frontière d'entrée).
+ * - setRequestLocale(locale) : garde le rendu statique (sinon dynamique forcé, Pitfall 3).
+ * - <html lang dir> : dir="rtl" en arabe, "ltr" sinon (I18N-02).
+ * - NextIntlClientProvider : passe les messages aux client components.
+ * - Header avec LanguageSwitcher ancré à l'`end` logique (RTL-aware).
+ *
+ * Source : 01-RESEARCH.md §Pattern 1 ; D-10 ; UI-SPEC §Shell
+ */
+import { NextIntlClientProvider, hasLocale } from 'next-intl'
+import { setRequestLocale, getMessages } from 'next-intl/server'
+import { notFound } from 'next/navigation'
+import { routing } from '../../i18n/routing'
+import { LanguageSwitcher } from '../../components/LanguageSwitcher'
+import '../../styles/globals.css'
+
+export function generateStaticParams() {
+  return routing.locales.map((locale) => ({ locale }))
+}
+
+export default async function LocaleLayout({
+  children,
+  params,
+}: {
+  children: React.ReactNode
+  params: Promise<{ locale: string }>
+}) {
+  const { locale } = await params
+  if (!hasLocale(routing.locales, locale)) {
+    notFound()
+  }
+  setRequestLocale(locale)
+  const messages = await getMessages()
+
+  return (
+    <html lang={locale} dir={locale === 'ar' ? 'rtl' : 'ltr'}>
+      <body>
+        <NextIntlClientProvider messages={messages}>
+          <header className="flex h-14 items-center justify-between bg-secondary px-4 md:px-6">
+            <span className="font-semibold">Vétéran Trading</span>
+            <div className="ms-auto">
+              <LanguageSwitcher />
+            </div>
+          </header>
+          {children}
+        </NextIntlClientProvider>
+      </body>
+    </html>
+  )
+}
