@@ -36,7 +36,11 @@ i18n/RTL+rôles avant toute UI publique · RLS signaux avant exposition espace m
   2. En arabe la mise en page bascule en RTL via propriétés logiques (`ms-*`/`me-*`, `start/end`), tandis que prix, symboles, nombres et dates restent corrects et formatés selon la locale (`<bdi>`/`Intl`).
   3. Le rôle (member/affiliate/superadmin) est porté par `profiles.role`, lu serveur après `getUser()` — jamais dans le JWT ; un token périmé/forgé ne confère aucun privilège.
   4. Un visiteur non authentifié atteint la vitrine mais est redirigé hors des signaux ; un utilisateur authentifié sans abonnement actif ne lit AUCUN setup, prouvé par un test anon-client direct (UI ET RLS `has_active_subscription()`).
-**Plans**: TBD
+**Plans**: 4 plans
+- [ ] 01-01-PLAN.md — RLS gating (migrations 0008/0009) + helpers + test anon-client (DB layer)
+- [ ] 01-02-PLAN.md — next-intl 4.13 + Tailwind v4 + routing/messages fr/en/ar (i18n/RTL config)
+- [ ] 01-03-PLAN.md — restructure [locale] + middleware composé + gate.ts + LanguageSwitcher (jointure)
+- [ ] 01-04-PLAN.md — E2E i18n/gating + check anti-chaîne-dure (vérification)
 **UI hint**: yes
 
 ### Phase 2: Vitrine publique trilingue & gate légal
@@ -133,7 +137,7 @@ i18n/RTL+rôles avant toute UI publique · RLS signaux avant exposition espace m
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Socle transverse i18n/rôles | 0/? | Not started | - |
+| 1. Socle transverse i18n/rôles | 0/4 | Not started | - |
 | 2. Vitrine & gate légal | 0/? | Not started | - |
 | 3. Espace membre signaux | 0/? | Not started | - |
 | 4. Paiement USDT (encaissement) | 0/? | Not started | - |
