@@ -47,8 +47,10 @@ export async function signUp(formData: FormData): Promise<void> {
     redirect({ href: { pathname: '/signup', query: { error: toSafeErrorKey(error.message) } }, locale })
   }
 
-  // Session déjà active (D-02 : pas de confirmation) → dashboard.
-  redirect({ href: '/dashboard', locale })
+  // Session déjà active (D-02 : pas de confirmation). D-09 : le funnel d'abonnement
+  // s'arrête sur l'écran honnête « paiement bientôt » (pas de flux de paiement en P2).
+  // Seule la cible de succès change — l'auth (signUp / getUser côté gate) est inchangée.
+  redirect({ href: '/paiement-bientot', locale })
 }
 
 export async function signIn(formData: FormData): Promise<void> {

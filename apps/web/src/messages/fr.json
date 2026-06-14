@@ -29,7 +29,31 @@
   },
   "pricing": {
     "title": "Tarifs",
-    "body": "Le détail des offres arrive bientôt."
+    "plan1Title": "Standard",
+    "plan1Price": "9 $ / mois",
+    "plan1Usdt": "payable en USDT (TRC-20)",
+    "plan2Title": "Découverte",
+    "plan2Price": "3 $ / 7 jours",
+    "plan2Note": "offre découverte, utilisable une seule fois",
+    "plan2Usdt": "payable en USDT (TRC-20)",
+    "plan2Badge": "découverte",
+    "cta": "S'abonner"
+  },
+  "paiement": {
+    "title": "Paiement disponible très bientôt",
+    "body": "Votre compte est créé. Le paiement en USDT (TRC-20) arrive prochainement — vous serez notifié dès son ouverture."
+  },
+  "home": {
+    "heroTitle": "Décidez avec discipline.",
+    "heroLede": "Chaque opportunité notée sur 100, son niveau de risque, et un plan clair : entrée, stop-loss, take-profits, ratio R:R.",
+    "heroCta": "S'abonner / Voir les tarifs",
+    "methodTitle": "Comment ça marche",
+    "methodBody": "Une IA façon trader vétéran qui combine analyse technique, fondamentale et news pour chaque opportunité.",
+    "marketsTitle": "Marchés couverts",
+    "marketsBody": "Crypto, forex, métaux et énergie.",
+    "pricingTeaserTitle": "Tarifs simples et transparents",
+    "pricingTeaserBody": "Abonnement mensuel ou offre découverte. Voir les tarifs.",
+    "pricingTeaserCta": "Voir les tarifs"
   },
   "disclaimer": {
     "footer": "Contenu éducatif. Aucune promesse de gain. Le trading comporte un risque de perte en capital, pouvant aller jusqu'à la totalité des fonds. Ceci ne constitue pas un conseil en investissement."

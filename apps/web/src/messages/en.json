@@ -29,7 +29,31 @@
   },
   "pricing": {
     "title": "Pricing",
-    "body": "Plan details are coming soon."
+    "plan1Title": "Standard",
+    "plan1Price": "$9 / month",
+    "plan1Usdt": "payable in USDT (TRC-20)",
+    "plan2Title": "Discovery",
+    "plan2Price": "$3 / 7 days",
+    "plan2Note": "discovery offer, usable once",
+    "plan2Usdt": "payable in USDT (TRC-20)",
+    "plan2Badge": "discovery",
+    "cta": "Subscribe"
+  },
+  "paiement": {
+    "title": "Payment available very soon",
+    "body": "Your account is created. Payment in USDT (TRC-20) is coming soon — you'll be notified as soon as it opens."
+  },
+  "home": {
+    "heroTitle": "Decide with discipline.",
+    "heroLede": "Every opportunity scored out of 100, its risk level, and a clear plan: entry, stop-loss, take-profits, R:R ratio.",
+    "heroCta": "Subscribe / See pricing",
+    "methodTitle": "How it works",
+    "methodBody": "A veteran-trader-style AI that combines technical, fundamental and news analysis for every opportunity.",
+    "marketsTitle": "Covered markets",
+    "marketsBody": "Crypto, forex, metals and energy.",
+    "pricingTeaserTitle": "Simple, transparent pricing",
+    "pricingTeaserBody": "Monthly subscription or discovery offer. See pricing.",
+    "pricingTeaserCta": "See pricing"
   },
   "disclaimer": {
     "footer": "Educational content. No promise of gains. Trading carries a risk of capital loss, up to the full amount of your funds. This is not investment advice."
