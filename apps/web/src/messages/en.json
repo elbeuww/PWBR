@@ -1,0 +1,29 @@
+{
+  "common": {
+    "errorGeneric": "Something went wrong. Try again or reload the page.",
+    "emptyTitle": "Nothing to show",
+    "emptyBody": "No items yet."
+  },
+  "language": {
+    "label": "Language",
+    "fr": "Français",
+    "en": "English",
+    "ar": "العربية"
+  },
+  "auth": {
+    "loginTitle": "Sign in",
+    "signupTitle": "Sign up",
+    "emailLabel": "Email",
+    "passwordLabel": "Password",
+    "loginButton": "Sign in",
+    "signupButton": "Create account"
+  },
+  "access": {
+    "redirectingToLogin": "Sign in required. Redirecting…",
+    "redirectingToPricing": "Subscription required. Redirecting to pricing…"
+  },
+  "pricing": {
+    "title": "Pricing",
+    "body": "Plan details are coming soon."
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "common": {
+    "errorGeneric": "Une erreur est survenue. Réessayez ou rechargez la page.",
+    "emptyTitle": "Rien à afficher",
+    "emptyBody": "Aucun élément pour le moment."
+  },
+  "language": {
+    "label": "Langue",
+    "fr": "Français",
+    "en": "English",
+    "ar": "العربية"
+  },
+  "auth": {
+    "loginTitle": "Connexion",
+    "signupTitle": "Inscription",
+    "emailLabel": "E-mail",
+    "passwordLabel": "Mot de passe",
+    "loginButton": "Se connecter",
+    "signupButton": "Créer un compte"
+  },
+  "access": {
+    "redirectingToLogin": "Connexion requise. Redirection en cours…",
+    "redirectingToPricing": "Abonnement requis. Redirection vers les tarifs…"
+  },
+  "pricing": {
+    "title": "Tarifs",
+    "body": "Le détail des offres arrive bientôt."
+  }
+}

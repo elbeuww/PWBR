@@ -1,0 +1,29 @@
+{
+  "common": {
+    "errorGeneric": "حدث خطأ ما. حاول مرة أخرى أو أعد تحميل الصفحة.",
+    "emptyTitle": "لا شيء لعرضه",
+    "emptyBody": "لا توجد عناصر بعد."
+  },
+  "language": {
+    "label": "اللغة",
+    "fr": "Français",
+    "en": "English",
+    "ar": "العربية"
+  },
+  "auth": {
+    "loginTitle": "تسجيل الدخول",
+    "signupTitle": "إنشاء حساب",
+    "emailLabel": "البريد الإلكتروني",
+    "passwordLabel": "كلمة المرور",
+    "loginButton": "تسجيل الدخول",
+    "signupButton": "إنشاء حساب"
+  },
+  "access": {
+    "redirectingToLogin": "تسجيل الدخول مطلوب. جارٍ إعادة التوجيه…",
+    "redirectingToPricing": "الاشتراك مطلوب. جارٍ إعادة التوجيه إلى الأسعار…"
+  },
+  "pricing": {
+    "title": "الأسعار",
+    "body": "تفاصيل العروض ستتوفر قريبًا."
+  }
+}
