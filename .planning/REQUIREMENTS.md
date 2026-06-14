@@ -10,9 +10,9 @@
 ## v2.0 Requirements
 
 ### I18N — Internationalisation trilingue (transverse, Wave 1)
-- [ ] **I18N-01**: L'utilisateur navigue vitrine + espace membre en arabe, anglais ou français ; la langue est dans l'URL (`/[locale]/…`) et persiste entre les pages.
+- [x] **I18N-01**: L'utilisateur navigue vitrine + espace membre en arabe, anglais ou français ; la langue est dans l'URL (`/[locale]/…`) et persiste entre les pages.
 - [ ] **I18N-02**: La mise en page bascule en RTL pour l'arabe (propriétés logiques Tailwind v4), les éléments intrinsèquement LTR (prix, symboles, nombres) restant corrects.
-- [ ] **I18N-03**: Les chaînes d'interface sont externalisées (next-intl) — aucune chaîne en dur dans les composants.
+- [x] **I18N-03**: Les chaînes d'interface sont externalisées (next-intl) — aucune chaîne en dur dans les composants.
 - [ ] **I18N-04**: Dates, nombres et devises s'affichent selon la locale active.
 
 ### ACCESS — Rôles & gating (Wave 1)
@@ -94,9 +94,9 @@
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| I18N-01 | Phase 1 | Pending |
+| I18N-01 | Phase 1 | Complete |
 | I18N-02 | Phase 1 | Pending |
-| I18N-03 | Phase 1 | Pending |
+| I18N-03 | Phase 1 | Complete |
 | I18N-04 | Phase 1 | Pending |
 | ACCESS-01 | Phase 1 | Pending |
 | ACCESS-02 | Phase 1 | Complete |

@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v2.0
 milestone_name: Plateforme publique
 status: executing
-last_updated: "2026-06-14T12:58:36.024Z"
-last_activity: 2026-06-14 -- Plan 01-01 COMPLET (push live 0008/0009 + gating-rls GREEN 4/4, rls 6/6)
+last_updated: "2026-06-14T13:13:42.675Z"
+last_activity: 2026-06-14
 progress:
   total_phases: 9
   completed_phases: 0
   total_plans: 4
-  completed_plans: 1
-  percent: 0
+  completed_plans: 2
+  percent: 50
 ---
 
 # Project State
@@ -28,11 +28,11 @@ progress:
 ## Current Position
 
 Phase: 01 (socle-transverse-i18n-rtl-r-les-gating) — EXECUTING
-Plan: 1 of 4 — COMPLET (3 tasks, gating-rls GREEN 4/4, rls 6/6 non régressé) ; prochain plan 01-02
-Status: Executing Phase 01 — plan 01-01 livré, RLS gating en place
-Last activity: 2026-06-14 -- Plan 01-01 COMPLET (push live 0008/0009 + gating-rls GREEN)
+Plan: 2 of 4 — COMPLET (3 tasks, gating-rls GREEN 4/4, rls 6/6 non régressé) ; prochain plan 01-02
+Status: Ready to execute
+Last activity: 2026-06-14
 
-Progress: [          ] 0/9 phases (v2.0)
+Progress: [█████░░░░░] 50%
 
 ## Performance Metrics
 
@@ -42,6 +42,7 @@ Progress: [          ] 0/9 phases (v2.0)
 | Plans complete (v2.0) | 0 |
 | Requirements covered (v2.0) | 0/41 (couche produit non démarrée) |
 | Cœur analytique (v1.0) | Livré P1-4, 261/261 tests (socle, non re-roadmappé) |
+| Phase 01 P02 | 3 min | 3 tasks | 11 files |
 
 ## Roadmap v2.0 (9 phases)
 
@@ -90,6 +91,13 @@ Progress: [          ] 0/9 phases (v2.0)
 - **D-01-01-C** : test anon-client `gating-rls.test.ts` couvre ACCESS-02/03/04 (non-abonné→0 trade_setup, 0 analyses, isolation subscriptions cross-user). GREEN après push (4/4) ; `rls.test.ts` 6/6 non régressé.
 - **D-01-01-D** : 0008/0009 poussées LIVE via MCP `apply_migration` (canal 0006), aucun `supabase link` local. 2 WARN advisors security-definer (`has_active_subscription`/`is_superadmin` callable par authenticated) EXPECTED BY DESIGN (D-V2-05/Pitfall 6), non bloquants. ACCESS-02/03/04 couverts.
 
+### Decisions exécution (Plan 01-02)
+
+- **D-01-02-A** : i18n posé (next-intl 4.13 `routing`/`navigation`/`request` + messages fr/en/ar à parité de clés STRICTE) AVANT toute UI ; aucune route déplacée (réservé Plan 03). routing = locales fr/en/ar, defaultLocale fr, localePrefix `always` (D-01/02/03).
+- **D-01-02-B (A1 tranché)** : imports next-intl 4.13 validés contre la map `exports` installée — `next-intl/routing`, `next-intl/navigation`, `next-intl/server`, root `next-intl` (`hasLocale`).
+- **D-01-02-C (D-11)** : `@theme` minimal (`--font-arabic` sur `:lang(ar)`) ; RTL via propriétés logiques natives Tailwind v4, INTERDIT `tailwindcss-rtl`/`tailwindcss-logical` ; design system de marque reporté P2. `next.config.ts` wrappé `withNextIntl` en préservant transpilePackages/turbopack.root.
+- **D-01-02-DEFER** : ~50 erreurs tsc pré-existantes dans `packages/supabase` (`database.types.ts` n'exporte pas ProfileRow/TradeSetupRow/… ) hors scope — loggées `deferred-items.md`, aucune dans les fichiers du plan.
+
 ### Open todos / research flags (v2.0)
 
 - **Phase 4 (research flag) :** TronGrid endpoint `walletsolidity`, parsing logs TRC-20, normalisation hex↔base58 — doc TS peu dense, recherche de phase recommandée.
@@ -104,9 +112,9 @@ Aucun.
 
 ## Session Continuity
 
-**Last session:** 2026-06-14T12:57:59.213Z
+**Last session:** 2026-06-14T13:13:42.669Z
 
-**Next action:** Planifier la **Phase 1 — Socle transverse i18n/RTL & rôles/gating** (`/gsd:plan-phase 1`). Poser `[locale]` + RTL natif Tailwind v4 + `profiles.role` (migration 0008) + `lib/auth/gate.ts` + RLS `has_active_subscription()` sur `trade_setups`/`analyses` AVANT toute UI publique. Couvre I18N-01..04 + ACCESS-01..04.
+**Next action:** Exécuter le **Plan 01-03** — câbler le shell `[locale]/layout.tsx` (`<html lang dir>` ar→rtl), le `middleware.ts` (`createMiddleware(routing)`), le sélecteur de langue (`usePathname`/`useRouter` de `i18n/navigation`) et les redirections de gate, en consommant le socle i18n livré au Plan 01-02. Toutes les chaînes via `messages/*` (I18N-03).
 
 ---
 *State updated: 2026-06-14 — milestone v2.0, roadmap 9 phases créée. Cœur analytique v1.0 (P1-4) livré et archivé, sert de socle.*
