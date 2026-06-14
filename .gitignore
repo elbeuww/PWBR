@@ -33,3 +33,6 @@ Thumbs.db
 
 # TypeScript
 *.tsbuildinfo
+
+# Artefacts éphémères de l'ANALYZE (JSON agent par run, lus par persist.ts — D-43)
+run-artifacts/

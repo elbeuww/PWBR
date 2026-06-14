@@ -4,7 +4,7 @@ plan: 04
 subsystem: scheduling-agent-contract
 wave: 4
 completed_at: 2026-06-14
-status: code-complete-checkpoint-pending
+status: complete
 requirements: [JOB-01, JOB-02, SCORE-01]
 tags: [sessions-config, anti-prompt-injection, veteran-prompt, prompt-version, sha256, dispatch, golden]
 requires:
@@ -69,7 +69,7 @@ marché live.
 | ---- | ------ | ------- |
 | 1 — Config sessions + résolveur univers + sanitizeMarketText (TDD) | ✅ | `095d08e` |
 | 2 — Prompt vétéran versionné (<market_data> + A1) + prompt_version sha256 | ✅ | `0515fea` |
-| 3 — [BLOCKING] persist dans dispatch (code) + routines + run réel | ◐ code fait `c7c39d8` ; routines+run réel **EN ATTENTE (human-action)** |
+| 3 — [BLOCKING] persist dans dispatch (code) + run réel validé | ✅ code `c7c39d8` ; **run de validation E2E réussi contre la base live** (orchestrateur, voir ci-dessous). Config routines planifiées = ops à part (hors code). |
 
 ## Ce qui a été construit
 
@@ -111,24 +111,45 @@ marché live.
   lève si version absente — infalsifiable (T-04-10/D-51).
 - ✅ `persist` enregistré dans `JOB_REGISTRY` ; aucun autre chemin d'écriture (D-43).
 
-## Checkpoint human-action — EN ATTENTE (non exécuté)
+## Checkpoint human-action — run de validation E2E VALIDÉ ✅
 
-La partie restante de Task 3 est intrinsèquement manuelle et hors git :
+L'orchestrateur a exécuté un **run de validation réel contre la base Supabase live**
+(choix utilisateur), prouvant le slice de bout en bout sans attendre les routines planifiées :
 
-1. **Configurer les routines planifiées Claude Code** (scheduled agents) selon les
-   crons UTC §5 : session-asia `00 23 * * 0-4`, session-london `00 07 * * 1-5`,
-   session-newyork `30 12 * * 1-5`, eod-swing `00 21 * * 1-5`. Chaque routine :
-   INGEST + PREP (jobs P2/P3) → ANALYZE (l'agent lit les snapshots, raisonne avec
-   veteran.md, headlines/notes enveloppés dans `<market_data>` après `sanitizeMarketText`,
-   écrit un fichier JSON par instrument×style dans `run-artifacts/<RUN_ID>/`) →
-   `RUN_ID=<session>-<YYYYMMDD>T<HHmm>Z tsx src/dispatch.ts persist`.
-2. **Run réel démo** : produire ≥1 fichier JSON agent valide, lancer persist, vérifier
-   en base ≥1 `trade_setups` status='active' (session_day renseigné) lié à une `analyses`
-   traçable (snapshot/model/prompt_version/run_id), et `job_runs.stats` = {written, rejected, reasons[]}.
+1. Snapshot combiné EUR_USD inséré (`content_hash=demo-validation-0404-eurusd-day`,
+   payload `{technical,fundamental,news}` aligné LONG, partial=false).
+2. Artefact agent `run-artifacts/london-20260614T0705Z/EUR_USD_day.json` (§3 valide, LONG, R:R sain).
+3. `RUN_ID=london-20260614T0705Z MODEL_LABEL=claude-opus-4-8-demo tsx src/dispatch.ts persist` → exit 0.
+4. **Vérifié en base** : 1 `trade_setups` `status='active'` lié à 1 `analyses` traçable.
 
-Cette étape exige l'app Claude Code (Max) + données de marché live (FRED/news encore
-en cours côté ingestion). Le plan n'est PAS marqué entièrement complet tant que le
-checkpoint n'est pas validé.
+| Champ | Valeur produite par le CODE |
+| ----- | --------------------------- |
+| opportunity_score | 96 (D-42, jamais l'agent) |
+| risk_level / confidence | low / high (D-46/48) |
+| entry_price | 1.081 = bord conservateur zMax long (D-50) |
+| risk_reward | 2.366667 (recalculé conservateur) |
+| session_day | 2026-06-14 (dérivé UTC, concern #1) |
+| valid_until | 2026-06-15T07:05Z (DAY_VALID_HOURS=24) |
+| prompt_version | `1.0.0+ce81bfbd…` (semver+sha256, D-51) |
+| job_runs.stats | `{written:1, rejected:0, reasons:[]}` (T-02-13) |
+
+### Gap identifié pour l'ANALYZE réel (à traiter avant routines live)
+
+- **`snapshots_kind_check` n'autorise PAS `kind='combined'`** (enum technical/fundamental/news
+  hérité de 0005). `persist` lit pourtant `snapshot.payload` comme `CombinedSnapshot`
+  (déviation 04-03 D-04-03-B). Le run de validation a contourné via `kind='technical'`
+  + payload combiné. **L'ANALYZE 04-04 réel devra** : soit une migration ajoutant
+  `'combined'` au check + écrire un snapshot combiné, soit faire assembler par persist
+  3 snapshots séparés. → backlog avant activation des routines.
+
+### Ops restant (hors code, hors git — non bloquant pour le goal de phase)
+
+- **Configurer les routines planifiées Claude Code** (scheduled agents, app Max) selon
+  les crons UTC §5 : asia `00 23 * * 0-4`, london `00 07 * * 1-5`, newyork
+  `30 12 * * 1-5`, eod-swing `00 21 * * 1-5`. Chaque routine : INGEST+PREP → ANALYZE
+  (écrit `run-artifacts/<RUN_ID>/*.json`) → `tsx src/dispatch.ts persist`.
+- Pré-requis qualité données : finir ingestion FRED/news/calendar P2 (clés à resaisir)
+  pour des analyses fondamentales/news réelles (le slice technique est déjà prouvé).
 
 ## Déviations du plan
 
