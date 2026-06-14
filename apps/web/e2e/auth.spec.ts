@@ -26,11 +26,11 @@ function uniqueEmail(tag: string): string {
 }
 
 async function signUp(page: Page, email: string): Promise<void> {
-  await page.goto('/signup')
+  await page.goto('/fr/signup')
   await page.locator('input[name="email"]').fill(email)
   await page.locator('input[name="password"]').fill(TEST_PASSWORD)
   await page.locator('button[type="submit"]').click()
-  await expect(page).toHaveURL('/dashboard', { timeout: 10000 })
+  await expect(page).toHaveURL('/fr/dashboard', { timeout: 10000 })
 }
 
 test.describe('AUTH-01 : signup → login → session persiste', () => {
@@ -48,14 +48,16 @@ test.describe('AUTH-01 : signup → login → session persiste', () => {
 
     // Rechargement : la session doit persister (cookies httpOnly)
     await page.reload()
-    await expect(page).toHaveURL('/dashboard')
+    await expect(page).toHaveURL('/fr/dashboard')
     await expect(page.locator('p')).toContainText(email)
   })
 
-  test('visiteur non authentifié sur /dashboard est redirigé vers /login', async ({ page }) => {
+  test('visiteur non authentifié sur /fr/dashboard est redirigé vers /fr/login', async ({
+    page,
+  }) => {
     // Accès direct sans session
-    await page.goto('/dashboard')
-    await expect(page).toHaveURL('/login', { timeout: 5000 })
+    await page.goto('/fr/dashboard')
+    await expect(page).toHaveURL('/fr/login', { timeout: 5000 })
   })
 
   test('login avec des credentials valides connecte et redirige', async ({ page, context }) => {
@@ -64,11 +66,11 @@ test.describe('AUTH-01 : signup → login → session persiste', () => {
     await signUp(page, email)
     await context.clearCookies()
 
-    await page.goto('/login')
+    await page.goto('/fr/login')
     await page.locator('input[name="email"]').fill(email)
     await page.locator('input[name="password"]').fill(TEST_PASSWORD)
     await page.locator('button[type="submit"]').click()
-    await expect(page).toHaveURL('/dashboard', { timeout: 10000 })
+    await expect(page).toHaveURL('/fr/dashboard', { timeout: 10000 })
   })
 
   test('/dashboard affiche au moins un instrument (seed)', async ({ page }) => {
