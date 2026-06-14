@@ -26,6 +26,10 @@
     "title": "Tarifs",
     "body": "Le détail des offres arrive bientôt."
   },
+  "signals": {
+    "title": "Signaux",
+    "body": "Les signaux réservés aux abonnés arrivent bientôt."
+  },
   "dashboard": {
     "title": "Tableau de bord — Vétéran Trading",
     "signOut": "Déconnexion",

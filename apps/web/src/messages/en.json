@@ -26,6 +26,10 @@
     "title": "Pricing",
     "body": "Plan details are coming soon."
   },
+  "signals": {
+    "title": "Signals",
+    "body": "Subscriber-only signals are coming soon."
+  },
   "dashboard": {
     "title": "Dashboard — Veteran Trading",
     "signOut": "Sign out",
