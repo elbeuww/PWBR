@@ -49,6 +49,8 @@ Produire, pour chaque opportunité, une analyse fiable et explicable — score /
 - [x] **Moteur d'analyse déterministe (Phase 3, 2026-06-13)** : indicateurs golden-testés (RSI/MACD/EMA/ATR/Bollinger) + détection de structure de marché maison (swings, BOS/CHoCH, S/R, POC volume), snapshots technique/fondamental/news par instrument/style. Requirements TECH-01..04, FUND-01..03.
 - [x] **Moteur IA « vétéran » & scoring (Phase 4, 2026-06-14, code livré 261/261 tests)** : setups JSON structurés, frontière de confiance unique `persist.ts` (Zod + garde-fous déterministes + scoring /100 décomposable + immuabilité/expiry), prompt versionné sha256, anti-injection. Migrations 0006/0007 appliquées. Requirements SCORE-01..05, JOB-01/02. **Ops restant (reporté) :** configurer les routines planifiées Claude + 1 run réel.
 
+- [x] **Socle transverse i18n/RTL & rôles/gating (v2.0 Phase 1, 2026-06-14)** : next-intl 4.13 (locales fr/en/ar, `localePrefix:'always'`, ar→`dir=rtl`, un seul `<html lang dir>`), Tailwind v4 RTL natif (propriétés logiques, pas de tailwindcss-rtl), middleware composé (handleI18n muté par updateSession, `getUser()`), primitive d'accès `gate.ts` (requireUser/requireActiveSub/requireRole, returnTo same-origin anti open-redirect), `profiles.role` hors JWT + barrière RLS `has_active_subscription()`/`is_superadmin()` (migrations 0008/0009/0010 live) — non-abonné lit 0 ligne (prouvé 4/4). 5 BLOCKER + 6 WARNING de revue corrigés. 265/265 tests ; E2E (18 specs) authorés, exécution runtime → 01-HUMAN-UAT.md. Requirements I18N-01..04, ACCESS-01..04.
+
 ### Active — Milestone v2.0 (plateforme publique, pivot 2026-06-13)
 
 > Le cœur analytique (indicateurs, moteur vétéran, persistance) est **livré** ci-dessus. Restent pour v2.0 le track record mesuré + toute la couche produit.
@@ -129,4 +131,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-06-14 — Milestone v1.0 (moteur analytique P1-4) clôturé et archivé ; démarrage du milestone v2.0 « Plateforme publique d'analyse & signaux (MENA) ». Cœur analytique livré (P1-4, 261/261 tests). v2.0 = vitrine trilingue + espace membre + paiement USDT + affiliation + superadmin + CMS + Telegram + track record mesuré. Numérotation des phases reset à 1 ; roadmap v1.0 dans `.planning/archive/v1.0-moteur-analytique/`.*
+*Last updated: 2026-06-14 — Milestone v1.0 (moteur analytique P1-4) clôturé et archivé ; milestone v2.0 « Plateforme publique » en cours, **Phase 1 (socle transverse i18n/RTL & rôles/gating) complète** (I18N-01..04, ACCESS-01..04 ; migrations 0008/0009/0010 live ; 265/265 tests). Cœur analytique livré (P1-4). Prochaine : Phase 2 (vitrine publique trilingue & gate légal). Numérotation des phases reset à 1 ; roadmap v1.0 dans `.planning/archive/v1.0-moteur-analytique/`.*
