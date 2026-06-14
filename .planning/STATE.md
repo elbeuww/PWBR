@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v2.0
 milestone_name: Plateforme publique
-status: planning
-last_updated: "2026-06-14T20:53:29.495Z"
+status: executing
+last_updated: "2026-06-14T21:34:16.829Z"
 last_activity: 2026-06-14
 progress:
   total_phases: 9
   completed_phases: 1
   total_plans: 7
-  completed_plans: 4
-  percent: 57
+  completed_plans: 5
+  percent: 71
 ---
 
 # Project State
@@ -21,18 +21,18 @@ progress:
 ## Project Reference
 
 **Core value:** Produire, pour chaque opportunité, une analyse fiable et explicable — vulgarisée pour un public non technique — avec un % de réussite TOUJOURS mesuré, jamais inventé : c'est le socle de confiance qui fait payer l'abonnement.
-**Current focus:** Phase 01 — socle-transverse-i18n-rtl-r-les-gating
+**Current focus:** Phase 02 — vitrine-publique-trilingue-gate-l-gal
 **Mode:** interactive (MVP vertical)
 **Granularity:** fine
 
 ## Current Position
 
-Phase: 2
-Plan: Not started
-Status: Ready to plan
+Phase: 02 (vitrine-publique-trilingue-gate-l-gal) — EXECUTING
+Plan: 2 of 3
+Status: Ready to execute
 Last activity: 2026-06-14
 
-Progress: [██████████] 100%
+Progress: [███████░░░] 71%
 
 ## Performance Metrics
 
@@ -45,6 +45,7 @@ Progress: [██████████] 100%
 | Phase 01 P02 | 3 min | 3 tasks | 11 files |
 | Phase 01 P03 | 25 min | 4 tasks | 19 files |
 | Phase 01 P04 | 30min | 3 tasks | 9 files |
+| Phase 02 P01 | 25min | 3 tasks | 24 files |
 
 ## Roadmap v2.0 (9 phases)
 
@@ -115,6 +116,16 @@ Progress: [██████████] 100%
 - **D-01-04-B** : check statique `scripts/check-i18n-hardcoded.mjs` (Node natif, zéro dépendance, script `lint:i18n`) — interdit le texte JSX littéral et les attributs visibles hors `t(...)` (I18N-03, threat T-01-10). Détection prouvée sur chaîne plantée ; nom de marque `Vétéran Trading` exclu via `// i18n-ignore`.
 - **D-01-04-C** : 18 tests Playwright (i18n.spec + gating.spec + auth.spec localisé) authorés, parse/`--list` OK, mais exécution GREEN = **human-verify** (dev server :3000 + `.env.local` Supabase requis ; aucun GREEN fabriqué). I18N-04 reste Manual-Only en P1 (skip explicite). `tsc -b --force` vert ; `lint:i18n` exit 0.
 
+### Decisions exécution (Plan 02-01)
+
+- **D-02-01-A** : tokens de marque mappés sur les variables shadcn (`--primary`/`--background`/`--secondary`/…) via `@theme inline` dans globals.css → les composants `ui/` héritent automatiquement de la palette bleue institutionnelle (must_have « shadcn stylés à la marque »), pas de double système de couleurs. `@destructive` = gris neutre dans les 2 thèmes (D-04 : vert/rouge réservés au trading, absents en P2).
+- **D-02-01-B** : Inter via `next/font/google` (self-host AU BUILD, A5 du RESEARCH) ; `@fontsource-variable/inter` non installé (build Google OK). IBM Plex Sans Arabic via `next/font/local` (subset arabic 400/600 .woff2 dans `src/fonts/`, D-03 zéro CDN runtime).
+- **D-02-01-C** : alias `@/*` → `./src/*` ajouté au `tsconfig.json` web pour les imports shadcn (`@/lib/utils`, `@/components/ui`) ; non régressif vs imports relatifs P1.
+- **D-02-01-D** : composant shadcn `form` indisponible en standalone dans le registre nova/radix → reporté au Plan 02-03 (signup, avec react-hook-form). 8 composants `ui/` livrés (button/card/badge/dialog/input/label/dropdown-menu/separator). `shadcn` CLI retiré des deps runtime.
+- **D-02-01-E (Pitfall D)** : `npx shadcn init` committé séparément (013eccf) ; il avait posé `@theme inline`+`:root`/`.dark` oklch neutres (surchargés par la palette marque en Task 3) et injecté `Geist` dans le root `app/layout.tsx` (restauré pass-through — invariant Pitfall 7). `:lang(ar)` P1 préservé. Greps acceptance exacts respectés (`:lang(ar)`=1, `suppressHydrationWarning`=1, Noto=0, `@custom-variant dark`=1).
+- **D-02-01-F (Rule 1 i18n)** : labels « Close » en dur de `ui/dialog` (générés par shadcn) externalisés en prop `closeLabel` (l'appelant fournit le label traduit) → `lint:i18n` exit 0.
+- **D-02-01-BASELINE** : baseline P1 inchangée (`forbidden-service-import.ts` reste la seule erreur tsc/ESLint ; `next build` = `✓ Compiled successfully`, échec final = fixture intentionnelle).
+
 ### Open todos / research flags (v2.0)
 
 - **Phase 4 (research flag) :** TronGrid endpoint `walletsolidity`, parsing logs TRC-20, normalisation hex↔base58 — doc TS peu dense, recherche de phase recommandée.
@@ -129,11 +140,11 @@ Aucun.
 
 ## Session Continuity
 
-**Last session:** 2026-06-14T20:53:29.488Z
+**Last session:** 2026-06-14T21:33:26.377Z
 
-**Last session:** 2026-06-14 — Completed 01-04-PLAN.md (3 tasks committés : 700cffb, 5cf68db, 8a6e59e). Phase 01 COMPLÈTE (4/4 plans). Stopped at : phase 01 terminée.
+**Last session:** 2026-06-14 — Completed 02-01-PLAN.md (3 tasks committés : 013eccf init shadcn+deps+fonts, f1bf813 RED parité theme, 4fb42cf GREEN tokens+toggle+shell). Design system de marque initialisé (tokens 2 thèmes CSS-first, next-themes no-flash, polices self-hostées D-03, shadcn/ui stylé marque, shell layout étendu sans régression P1). Phase 02 : 1/3 plans. Stopped at : Plan 02-01 terminé.
 
-**Next action:** Lancer `/gsd:verify-work` sur la Phase 01 (exécuter la suite E2E avec dev server + `.env.local` pour passer les 18 tests Playwright en GREEN ; revue visuelle RTL arabe Manual-Only), puis planifier **Phase 02** (Vitrine publique trilingue & gate légal). Socle i18n/RTL + rôles/gating complet et vérifiable (E2E authorés + lint:i18n CI + RLS Plan 01).
+**Next action:** Exécuter **Plan 02-02** (Footer global + composant `<Disclaimer>` transverse + gate légal `LEGAL-REVIEW.md`/flag `LEGAL_REVIEW_DONE`) — il consomme le shell et le slot Footer posés ici. Puis Plan 02-03 (pages home/tarifs/légales). Revue visuelle RTL arabe des 2 thèmes = Manual-UAT (dev server + bascule toggle).
 
 ---
 *State updated: 2026-06-14 — milestone v2.0, roadmap 9 phases créée. Cœur analytique v1.0 (P1-4) livré et archivé, sert de socle.*
