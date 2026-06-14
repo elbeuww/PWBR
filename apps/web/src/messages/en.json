@@ -31,6 +31,29 @@
     "title": "Pricing",
     "body": "Plan details are coming soon."
   },
+  "disclaimer": {
+    "footer": "Educational content. No promise of gains. Trading carries a risk of capital loss, up to the full amount of your funds. This is not investment advice."
+  },
+  "legal": {
+    "reviewPending": "⚠️ Text under legal review.",
+    "navTitle": "Legal information",
+    "cgu": {
+      "title": "Terms of Service",
+      "navLabel": "Terms"
+    },
+    "risques": {
+      "title": "Risk Warning",
+      "navLabel": "Risk"
+    },
+    "confidentialite": {
+      "title": "Privacy Policy",
+      "navLabel": "Privacy"
+    },
+    "mentions": {
+      "title": "Legal Notice",
+      "navLabel": "Legal Notice"
+    }
+  },
   "signals": {
     "title": "Signals",
     "body": "Subscriber-only signals are coming soon."

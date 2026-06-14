@@ -23,7 +23,7 @@ describe('messages: namespace `theme` parité fr/en/ar', () => {
 
   it('contient toutes les clés requises (toggleLabel, light, dark) dans chaque locale', () => {
     for (const [name, messages] of Object.entries(LOCALES)) {
-      const theme = (messages as Record<string, Record<string, string>>).theme ?? {}
+      const theme = (messages as unknown as Record<string, Record<string, string>>).theme ?? {}
       for (const key of REQUIRED_THEME_KEYS) {
         expect(theme[key], `${name}.json theme.${key} manquant`).toBeTruthy()
       }
@@ -32,7 +32,7 @@ describe('messages: namespace `theme` parité fr/en/ar', () => {
 
   it('a une parité de clés stricte du namespace theme entre les 3 locales', () => {
     const keysOf = (m: unknown) =>
-      Object.keys((m as Record<string, Record<string, string>>).theme ?? {}).sort()
+      Object.keys((m as unknown as Record<string, Record<string, string>>).theme ?? {}).sort()
     const frKeys = keysOf(fr)
     expect(keysOf(en), 'en.theme doit avoir les mêmes clés que fr.theme').toEqual(frKeys)
     expect(keysOf(ar), 'ar.theme doit avoir les mêmes clés que fr.theme').toEqual(frKeys)

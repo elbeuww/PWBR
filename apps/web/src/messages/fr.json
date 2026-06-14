@@ -31,6 +31,29 @@
     "title": "Tarifs",
     "body": "Le détail des offres arrive bientôt."
   },
+  "disclaimer": {
+    "footer": "Contenu éducatif. Aucune promesse de gain. Le trading comporte un risque de perte en capital, pouvant aller jusqu'à la totalité des fonds. Ceci ne constitue pas un conseil en investissement."
+  },
+  "legal": {
+    "reviewPending": "⚠️ Texte en cours de revue juridique.",
+    "navTitle": "Informations légales",
+    "cgu": {
+      "title": "Conditions générales d'utilisation",
+      "navLabel": "CGU"
+    },
+    "risques": {
+      "title": "Avertissement sur les risques",
+      "navLabel": "Risques"
+    },
+    "confidentialite": {
+      "title": "Politique de confidentialité",
+      "navLabel": "Confidentialité"
+    },
+    "mentions": {
+      "title": "Mentions légales",
+      "navLabel": "Mentions légales"
+    }
+  },
   "signals": {
     "title": "Signaux",
     "body": "Les signaux réservés aux abonnés arrivent bientôt."
