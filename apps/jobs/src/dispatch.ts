@@ -26,6 +26,7 @@ import { fundamentalEngine } from './jobs/fundamental-engine'
 import { newsEngine } from './jobs/news-engine'
 import { persist } from './jobs/persist'
 import { subscriptionExpiry } from './jobs/subscription-expiry'
+import { outcomeTracker } from './jobs/outcome-tracker'
 import type { Json } from '@app/supabase'
 
 const logger = pino({ level: 'info' })
@@ -47,6 +48,8 @@ const JOB_REGISTRY: Record<string, () => Promise<Json | undefined>> = {
   // PAY-05 — cycle de vie abonnement (expire échus) + sweep réservations d'offset expirées
   // (Plan 06). Windows Task Scheduler : run-job.cmd subscription-expiry.
   'subscription-expiry': subscriptionExpiry,
+  // TRACK-01 — replay déterministe des setups expirés. Windows Task Scheduler : run-job.cmd outcome-tracker.
+  'outcome-tracker': outcomeTracker,
 }
 
 // ─── Dispatch ────────────────────────────────────────────────────────────────
