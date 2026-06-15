@@ -71,3 +71,28 @@ export { getAssetDrivers } from './repositories/assetDrivers'
 export { insertAnalysis } from './repositories/analyses'
 export { insertTradeSetups, expirePriorSetups } from './repositories/tradeSetups'
 export type { ImmutabilityKey } from './repositories/tradeSetups'
+// Phase 4 — paiement USDT & abonnement repositories (service_role)
+export {
+  OFFSET_RESERVATION_MINUTES,
+  ReplayError,
+  OffsetExhaustedError,
+  reserveOffset,
+  insertPendingPayment,
+  getByHash,
+  transitionPayment,
+} from './repositories/payments'
+export type {
+  ReserveOffsetInput,
+  ReserveOffsetResult,
+  InsertPendingPaymentInput,
+  TransitionPaymentExtra,
+} from './repositories/payments'
+export {
+  activateForPayment,
+  expireDue,
+  changePlan,
+} from './repositories/subscriptions'
+export type {
+  ActivateForPaymentInput,
+  ChangePlanInput,
+} from './repositories/subscriptions'
