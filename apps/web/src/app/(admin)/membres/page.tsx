@@ -113,6 +113,8 @@ export default async function AdminMembersPage({
   searchParams: Promise<{ status?: string; email?: string }>
 }) {
   const t = await getTranslations('admin')
+  const tPay = await getTranslations('payment')
+  const unit = tPay('amountUnit') // « USDT » — autonyme via le système de messages
   const params = await searchParams
   const statusFilter = params.status ?? 'all'
   const emailFilter = params.email ?? ''
@@ -196,9 +198,7 @@ export default async function AdminMembersPage({
                   <TableCell>{fmtDate(m.currentPeriodEnd)}</TableCell>
                   <TableCell>
                     {m.lastPaymentAmountAtomic !== null ? (
-                      <bdi>
-                        {formatAtomic(BigInt(m.lastPaymentAmountAtomic))} USDT
-                      </bdi>
+                      <bdi>{`${formatAtomic(BigInt(m.lastPaymentAmountAtomic))} ${unit}`}</bdi>
                     ) : (
                       '—'
                     )}
