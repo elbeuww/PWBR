@@ -100,9 +100,21 @@
       "wrong_token": "Token not recognized — make sure you sent USDT on the TRC-20 network.",
       "not_confirmed": "Transaction not confirmed on the blockchain yet. Try again in a few minutes.",
       "replay": "This hash has already been used for a payment. Each transaction can only be used once.",
+      "wrong_recipient": "This transaction was not sent to our receiving address. Check the address and submit another hash.",
+      "tx_not_found": "Transaction not found yet. If you just paid, wait a few minutes and try again.",
+      "legal_gate": "Production payments are not open yet. Please try again later.",
+      "offset_exhausted": "Too many payments in progress right now. Try again in a few minutes.",
+      "not_authenticated": "Your session has expired. Sign in again to continue.",
+      "discovery_consumed": "Discovery offer already used. Choose the standard plan.",
+      "internal": "Something went wrong. Try again or contact us if it persists.",
       "resubmit": "Submit another hash",
       "manual_review": "Your payment is under manual review. We'll get back to you very soon."
     },
+    "reservation": {
+      "countdown": "Amount reserved for {minutes} more min",
+      "expired": "Reservation expired — choose your plan again to get an up-to-date amount."
+    },
+    "submitting": "Verifying…",
     "expiryBanner": "Your subscription expires in {n, plural, one {# day} other {# days}} — renew to keep your access.",
     "renew": "Renew",
     "status": {

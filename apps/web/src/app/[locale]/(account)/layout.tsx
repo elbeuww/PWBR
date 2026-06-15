@@ -14,8 +14,16 @@
  * reste la vraie barrière des données ; ici c'est juste la porte UX du parcours d'achat.
  */
 import { requireUser } from '../../../lib/auth/gate'
+import { Toaster } from '@/components/ui/sonner'
 
 export default async function AccountLayout({ children }: { children: React.ReactNode }) {
   await requireUser()
-  return <>{children}</>
+  // Toaster monté ici : les boutons copie (adresse/montant) et la réservation de plan
+  // émettent des toasts sonner (succès/erreur) sur le parcours d'achat.
+  return (
+    <>
+      {children}
+      <Toaster />
+    </>
+  )
 }

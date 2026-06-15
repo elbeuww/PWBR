@@ -344,3 +344,24 @@ export async function getPaymentStatus(paymentId: string): Promise<StatusResult>
     reject_reason: data.reject_reason,
   }
 }
+
+/**
+ * Server action `getDiscoveryAvailability()` — la découverte est-elle encore
+ * proposable pour l'user courant (D-12) ? Appelée par la page RSC pour décider de
+ * l'affichage de la carte découverte. Calcul via service_role LOCAL (la page web ne
+ * peut PAS importer le service-client — frontière producteur-unique) + décision pure
+ * canConsumeDiscovery (testée). Défaut sûr : false si non authentifié.
+ */
+export async function getDiscoveryAvailability(): Promise<boolean> {
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  if (!user) {
+    return false
+  }
+
+  const service = serviceClientLocal()
+  const prior = await priorPlans(service, user.id)
+  return canConsumeDiscovery(prior)
+}
