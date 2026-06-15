@@ -1,10 +1,11 @@
 ---
 phase: 5
 slug: track-record-mesur-affich
-status: draft
+status: approved
 shadcn_initialized: true
 preset: radix-nova
 created: 2026-06-15
+reviewed_at: 2026-06-15
 ---
 
 # Phase 5 — UI Design Contract
