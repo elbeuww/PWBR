@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v2.0
 milestone_name: Plateforme publique
 status: executing
-last_updated: "2026-06-15T00:07:38.136Z"
+last_updated: "2026-06-15T00:21:55.125Z"
 last_activity: 2026-06-15
 progress:
   total_phases: 9
   completed_phases: 2
   total_plans: 10
-  completed_plans: 8
-  percent: 80
+  completed_plans: 9
+  percent: 90
 ---
 
 # Project State
@@ -28,11 +28,11 @@ progress:
 ## Current Position
 
 Phase: 03 (espace-membre-signaux-gated-rls) — EXECUTING
-Plan: 2 of 3
+Plan: 3 of 3
 Status: Ready to execute
 Last activity: 2026-06-15
 
-Progress: [████████░░] 80%
+Progress: [█████████░] 90%
 
 ## Performance Metrics
 
@@ -48,6 +48,7 @@ Progress: [████████░░] 80%
 | Phase 02 P01 | 25min | 3 tasks | 24 files |
 | Phase 02 P02 | 12min | 3 tasks | 14 files |
 | Phase 02 P03 | ~18min | 3 tasks | 9 files |
+| Phase 03 P02 | 25min | 4 tasks | 12 files |
 
 ## Roadmap v2.0 (9 phases)
 
@@ -165,7 +166,7 @@ Aucun.
 
 ## Session Continuity
 
-**Last session:** 2026-06-15T01:10:00.000Z
+**Last session:** 2026-06-15T00:21:55.118Z
 
 **Last session:** 2026-06-15 — Completed 03-01-PLAN.md (segment final). Task 1 (2dde589) + Task 2 (e8df555, migration 0011 appliquée live via MCP) faits par exécuteurs précédents ; ce segment a confirmé que les types Supabase n'ont pas besoin de régénération (0011 = replica identity + publication + RLS candles, aucune colonne) puis exécuté Task 3 en TDD : 5a70533 (RED searchParams), 26a3c41 (GREEN searchParams + format + QueryProvider + i18n fr/en/ar). Vérifs : vitest 10/10, parité i18n OK, `pnpm typecheck` 0 erreur, `lint:i18n` exit 0. Décision RLS candles = ALIGN. **Plan 03-01 COMPLETE (socle DB + plumbing).** Stopped at : Plan 03-01 terminé.
 
