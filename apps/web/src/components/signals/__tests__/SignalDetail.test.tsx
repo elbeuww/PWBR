@@ -77,9 +77,30 @@ describe('SignalDetail : contenu IA VERBATIM (MEMB-04 / D-10)', () => {
   })
 
   it('n’utilise JAMAIS dangerouslySetInnerHTML (rendu échappé)', () => {
-    // renderToStaticMarkup ne sérialise pas la prop, mais une injection HTML
-    // produirait des balises non échappées. On vérifie qu'aucun fragment HTML
-    // brut issu d'un contenu IA n'est présent + absence de la prop en source.
+    // Le markup nominal ne contient aucune balise injectée.
     expect(html).not.toContain('<script')
+    expect(html).not.toContain('dangerouslySetInnerHTML')
+
+    // WR-03 : prouver l'échappement réel avec un payload XSS multi-vecteurs.
+    // React échappe les enfants texte → les balises brutes deviennent des entités.
+    const xssSetup = makeSetup()
+    const XSS = '<img src=x onerror=alert(1)><script>alert(2)</script>'
+    xssSetup.payload.veteran_note = XSS
+    xssSetup.payload.invalidation = XSS
+    xssSetup.payload.technical_reasons = [XSS]
+    const xssHtml = renderToStaticMarkup(
+      createElement(SignalDetail, { setup: xssSetup, locale: 'fr' }),
+    )
+
+    // Aucune balise HTML brute issue du payload ne doit survivre au rendu :
+    // les chevrons ouvrants sont échappés → le handler onerror reste du texte
+    // inerte (jamais un attribut exécutable), car aucun élément n'est créé.
+    expect(xssHtml).not.toContain('<img')
+    expect(xssHtml).not.toContain('<script>alert')
+    expect(xssHtml).not.toContain('onerror=alert(1)>') // pas de '>' brut → balise impossible
+    // Le texte IA est bien présent mais sous forme échappée (entités HTML).
+    expect(xssHtml).toContain('&lt;img')
+    expect(xssHtml).toContain('&lt;script&gt;')
+    expect(xssHtml).toContain('onerror=alert(1)&gt;') // le '>' est encodé
   })
 })
