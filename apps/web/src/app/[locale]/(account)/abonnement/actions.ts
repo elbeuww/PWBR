@@ -262,9 +262,11 @@ export async function verifyPayment(paymentId: string, txHash: string): Promise<
 
   // 0 ligne armée = le payment n'est plus 'pending' (réservation expirée ou déjà
   // traité). On NE lit PAS le réseau et on N'active PAS : retour 'expired' (hard-stop).
-  // NB : sur le chemin légitime de re-soumission (tx_not_found), la ligne reste
-  // pending avec le MÊME tx_hash déjà armé ; un re-arm matche cette ligne (1 ligne,
-  // pas de 23505) et le flux continue normalement — on ne casse pas le polling.
+  // LIMITE CONNUE (WR-02/WR-04, suivi dédié) : le chemin tx_not_found ci-dessous passe
+  // la ligne en 'rejected' SANS libérer le tx_hash armé. Une re-soumission du MÊME hash
+  // (nouvelle réservation après reload) est alors refusée par UNIQUE(tx_hash). Le
+  // correctif propre = tx_hash nullable + libération du hash sur tx_not_found + réemploi
+  // de la réservation (migration 0013). Hors périmètre de ce correctif sécurité CR-01.
   if (!armed || armed.length === 0) {
     return { ok: false, status: 'rejected', code: 'expired' }
   }
