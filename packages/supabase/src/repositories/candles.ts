@@ -53,3 +53,40 @@ export async function getLastCandleTs(
 
   return data?.ts ?? null
 }
+
+/** Bougie H1 minimale nécessaire au replay first-touch (TRACK-01, miroir ReplayCandle de @app/core). */
+export interface ReplayCandleRow {
+  ts: string
+  open: number
+  high: number
+  low: number
+  close: number
+}
+
+/**
+ * Charge les bougies H1 d'un instrument dans la fenêtre [from, to], ordonnées par
+ * ts croissant (anti look-ahead — l'appelant borne à valid_until). Modèle getLastCandleTs.
+ *
+ * Filtre timeframe='H1' (D-03) ; ordre `ts asc` requis par replayOutcome (@app/core).
+ */
+export async function getCandlesForReplay(
+  client: ServiceClient,
+  instrumentId: string,
+  from: string,
+  to: string,
+): Promise<ReplayCandleRow[]> {
+  const { data, error } = await client
+    .from('candles')
+    .select('ts, open, high, low, close')
+    .eq('instrument_id', instrumentId)
+    .eq('timeframe', 'H1')
+    .gte('ts', from)
+    .lte('ts', to)
+    .order('ts', { ascending: true })
+
+  if (error) {
+    throw new Error(`getCandlesForReplay failed: ${error.message}`)
+  }
+
+  return (data ?? []) as ReplayCandleRow[]
+}
