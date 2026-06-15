@@ -65,14 +65,18 @@ create unique index payments_tx_hash_global_idx
 
 -- (b) Réservation d'offset (D-05) : un seul montant attendu actif à la fois.
 -- D-05 : durée de réservation = OFFSET_RESERVATION_MINUTES (60 min), valeur canonique partagée avec packages/supabase/repositories/payments.ts et Plan 05
--- L'index unique partiel ne couvre QUE les pending non expirés → deux réservations
--- du même `expected_amount_atomic` actif sont impossibles. Saturation (toutes les
--- valeurs d'offset prises) → repli documenté : `reserveOffset` boucle sur l'offset
--- suivant en millièmes (micro-unités) ; si la file est saturée, l'appelant doit
--- réessayer après expiration d'une réservation (Open Question 1).
+-- L'index unique partiel garantit qu'un même `expected_amount_atomic` ne peut être
+-- réservé par deux lignes `pending` simultanément (unicité GLOBALE du montant attendu).
+-- NOTE (fix 0012) : le prédicat ne peut PAS référencer `now()` — Postgres exige un
+-- prédicat IMMUTABLE (`42P17: functions in index predicate must be marked IMMUTABLE`).
+-- La fenêtre d'expiration (`reservation_expires_at`) reste portée par la COLONNE et
+-- libérée par un SWEEP applicatif explicite : les réservations `pending` expirées sont
+-- transitionnées hors de `pending` (job `subscription-expiry`, Plan 06) → le montant
+-- redevient réservable. Saturation (offsets pris) → `reserveOffset` boucle sur l'offset
+-- suivant en micro-unités (Open Question 1) ; si saturé, réessayer après le sweep.
 create unique index payments_expected_amount_active_idx
   on public.payments (expected_amount_atomic)
-  where status = 'pending' and reservation_expires_at > now();
+  where status = 'pending';
 
 -- Index de lecture admin/back-office (superadmin liste tout, plus récent d'abord).
 create index payments_status_created_idx

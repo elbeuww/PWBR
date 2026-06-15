@@ -6,12 +6,6 @@
  * (T-04-INCONSIST — jamais de divergence). La RPC est `revoke execute` pour
  * public/anon/authenticated → seul le service_role peut l'invoquer (A8).
  *
- * NOTE TYPES : tant que la migration 0012 n'est pas appliquée live et que
- * `database.types.ts` n'est pas régénéré (Task 2, owned par l'orchestrateur), la
- * signature de la fonction `activate_subscription_for_payment` est ABSENTE de
- * `Database['public']['Functions']`. L'appel est donc casté localement ; il deviendra
- * pleinement typé après régénération des types. Voir 04-02-SUMMARY (blocker live-apply).
- *
  * JAMAIS importé depuis apps/web (D-07 — service_role réservé aux jobs/serveur).
  */
 
@@ -30,24 +24,13 @@ export interface ActivateForPaymentInput {
 
 /**
  * Active l'abonnement lié à un paiement via la RPC atomique (D-11 prolongation).
- * En attendant la régénération des types (Task 2), l'appel `.rpc(...)` est casté.
+ * Typé sur `database.types.ts` (migration 0012 appliquée live).
  */
 export async function activateForPayment(
   client: ServiceClient,
   input: ActivateForPaymentInput,
 ): Promise<void> {
-  // Cast nécessaire tant que 0012 n'est pas appliquée live (types non régénérés).
-  const rpc = client.rpc as unknown as (
-    fn: 'activate_subscription_for_payment',
-    args: {
-      p_payment_id: string
-      p_user_id: string
-      p_plan: string
-      p_period: string
-    },
-  ) => Promise<{ error: { message: string } | null }>
-
-  const { error } = await rpc('activate_subscription_for_payment', {
+  const { error } = await client.rpc('activate_subscription_for_payment', {
     p_payment_id: input.payment_id,
     p_user_id: input.user_id,
     p_plan: input.plan,
