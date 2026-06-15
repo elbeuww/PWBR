@@ -20,6 +20,10 @@ export { USDT_DECIMALS, SCALE, toAtomic, formatAtomic } from './money/atomic.js'
 export { OutputSchema } from './schemas/output.js'
 export type { Output } from './schemas/output.js'
 
+// Replay first-touch déterministe des setups expirés (Phase 5, TRACK-01)
+export { replayOutcome } from './replay/outcome.js'
+export type { Outcome, ReplaySetup, ReplayCandle } from './replay/outcome.js'
+
 // Scoring déterministe §3 (Phase 4, D-42/46/48/50, SCORE-02/03)
 export {
   scoreSetup,
