@@ -83,7 +83,13 @@ i18n/RTL+rôles avant toute UI publique · RLS signaux avant exposition espace m
   3. Un hash déjà utilisé est rejeté par `UNIQUE(tx_hash)` GLOBAL (le même hash ne crédite jamais deux comptes) ; faux token, mauvais montant/destinataire ou TX non confirmée sont rejetés et tracés ; les cas ambigus (sur/sous-paiement) tombent dans la file de validation superadmin que celui-ci traite (activer/rejeter). L'utilisateur ne peut écrire QUE `payments(pending)` ; seul le service_role transitionne vers `verified`/`active`.
   4. L'abonnement expire automatiquement en fin de période (job `subscription-expiry`), l'utilisateur est informé et perd l'accès aux signaux ; l'offre découverte 3 $/7 j est utilisable une seule fois par utilisateur puis bascule sur le tarif standard.
   5. Le superadmin voit les membres (actifs/inactifs, état d'abonnement et de paiement).
-**Plans**: TBD
+**Plans**: 6 plans (3 vagues)
+- [ ] 04-01-PLAN.md — fondations déterministes : checkpoint fixtures TronGrid Nile + atomic.ts (BigInt zéro-float) + address.ts (base58check golden)
+- [ ] 04-02-PLAN.md — migration 0012 (payments + RLS + UNIQUE tx_hash + RPC atomique) appliquée via MCP + repositories service_role
+- [ ] 04-03-PLAN.md — i18n payment/admin + 8 blocs shadcn + lib QR vettée (offline)
+- [ ] 04-04-PLAN.md — client TronGrid fetch+Zod + 5 invariants de vérification (golden sur fixtures)
+- [ ] 04-05-PLAN.md — parcours paiement : offre/adresse/QR/montant + hash + polling + server action service_role (gate légal mainnet)
+- [ ] 04-06-PLAN.md — job subscription-expiry idempotent + ExpiryBanner + admin membres + file de validation
 **UI hint**: yes
 
 ### Phase 5: Track record mesuré & % affiché
@@ -146,7 +152,7 @@ i18n/RTL+rôles avant toute UI publique · RLS signaux avant exposition espace m
 | 1. Socle transverse i18n/rôles | 4/4 | Complete | 2026-06-14 |
 | 2. Vitrine & gate légal | 0/3 | Planned | - |
 | 3. Espace membre signaux | 0/3 | Planned | - |
-| 4. Paiement USDT (encaissement) | 0/? | Not started | - |
+| 4. Paiement USDT (encaissement) | 0/6 | Planned | - |
 | 5. Track record & % mesuré | 0/? | Not started | - |
 | 6. Telegram public | 0/? | Not started | - |
 | 7. Affiliation à paliers | 0/? | Not started | - |
