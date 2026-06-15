@@ -1,0 +1,23 @@
+{
+  "data": [
+    {
+      "transaction_id": "2447022488064d2eb70d8beadbd1364218eed5d08246fd586f2f08a06277341f",
+      "token_info": {
+        "symbol": "USDT",
+        "address": "TXYZopYRdj2D9XRtbG411XZZ3kM5VkAeBf",
+        "decimals": 6,
+        "name": "Tether USD"
+      },
+      "block_timestamp": 1781527728000,
+      "from": "TVF2Mp9QY7FEGTnr3DBpFLobA6jguHyMvi",
+      "to": "TK5vKwGSazWAaJeXpPJLZ5V6jHuryeLzaK",
+      "type": "Transfer",
+      "value": "1000000000"
+    }
+  ],
+  "success": true,
+  "meta": {
+    "at": 1781527832239,
+    "page_size": 1
+  }
+}

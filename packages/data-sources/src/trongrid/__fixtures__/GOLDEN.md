@@ -1,47 +1,34 @@
-# GOLDEN values — TRON base58check (déterministe, crypto pure)
+# GOLDEN — Fixture TronGrid Nile (B-04-01)
 
-> Portée : ces valeurs sont **calculables hors-ligne** par double-SHA256 (`crypto`
-> natif) sur l'encodage base58check TRON. Elles ne dépendent PAS du réseau et sont
-> reproductibles à l'identique. Elles pilotent les golden tests de `address.ts`.
->
-> ⚠️ À NE PAS confondre avec la fixture API `nile-trc20-transfer.json` (forme de
-> réponse TronGrid), qui elle exige une frappe réseau réelle et reste **BLOQUÉE au
-> checkpoint Task 1** (clé TronGrid + TX Nile réelle non provisionnées). Voir
-> 04-01-SUMMARY.md.
+> Généré par `apps/jobs/scripts/freeze-nile-fixture.ts` depuis une transaction RÉELLE.
+> Réseau : **nile** (https://nile.trongrid.io). NE PAS éditer à la main : relancer le script.
 
-## Golden base58 <-> hex (préfixe TRON 0x41)
+## Transaction de référence
 
-| base58 | hex (lowercase, 21 octets, préfixe `41`) | checksum |
-|--------|------------------------------------------|----------|
-| `TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t` (USDT contract mainnet, D-V2-03) | `41a614f803b6fd780986a42c78ec9c7f77e6ded13c` | valide |
-| `TL1y3hnprGvKWAdAGRjZnoWJmEp5q8D9qR` (adresse échantillon valide pour test `sameAddress`) | `416e36db7034c9c00f631e7c95e44529525a09a10f` | valide |
+| Champ | Valeur réelle observée |
+|-------|------------------------|
+| `transaction_id` | `2447022488064d2eb70d8beadbd1364218eed5d08246fd586f2f08a06277341f` |
+| `from` | `TVF2Mp9QY7FEGTnr3DBpFLobA6jguHyMvi` |
+| `to` | `TK5vKwGSazWAaJeXpPJLZ5V6jHuryeLzaK` |
+| `to` (hex 0x41…) | `4163fe1fe54aa85b7b4686cef7bea275919a1424ba` |
+| `value` (atomique) | `1000000000` |
+| `token_info.symbol` | `USDT` |
+| `token_info.address` (CONTRAT) | `TXYZopYRdj2D9XRtbG411XZZ3kM5VkAeBf` |
+| `token_info.decimals` | `6` |
+| `type` | `Transfer` |
+| montant humain | `1000 USDT` |
 
-## Cas négatif (checksum corrompu → throw attendu)
+## Invariants confirmés (remplacent A1-A7)
 
-| base58 corrompu | dérivé de | attendu |
-|-----------------|-----------|---------|
-| `TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6u` | `TR7NH...6t` dernier char `t`→`u` | `base58ToHex` doit **throw** (jamais comparer une adresse non vérifiée) |
+- **A1 — forme JSON** : enveloppe `{ data: [...], success, meta }`, items TRC-20 avec
+  `transaction_id`, `token_info.{symbol,address,decimals}`, `from`, `to`, `value`, `type`, `block_timestamp`.
+- **A2 — adresses base58** : `from`/`to` renvoyés en base58 (T…), décodables en hex 0x41 (checksum OK).
+- **A3 — destinataire** : `to` == USDT_RECEIVE_ADDRESS → **OUI ✅** (hex 4163fe1fe54aa85b7b4686cef7bea275919a1424ba vs 4163fe1fe54aa85b7b4686cef7bea275919a1424ba).
+- **A4 — montant** : `value` est une **string atomique** entière (×10^decimals). decimals=6.
+- **A5 — only_confirmed** : requête avec `only_confirmed=true` → uniquement transactions confirmées.
+- **A6 — header clé** : authentification via header `TRON-PRO-API-KEY` (jamais en query/body).
+- **A7 — contrat** : `token_info.address` = **TXYZopYRdj2D9XRtbG411XZZ3kM5VkAeBf** → renseigner `USDT_CONTRACT_ADDRESS` avec CETTE valeur.
 
-## Méthode de calcul (reproductible)
+## Action requise
 
-```
-payload (21 octets) = 0x41 || 20 octets address body
-checksum (4 octets) = sha256(sha256(payload))[0..4]
-base58 = base58encode(payload || checksum)
-```
-
-Calculé via `node` + `crypto` (double sha256), confirmé `checksumOk: true` pour les
-deux adresses valides et `throw` pour le cas corrompu.
-
-## Valeurs ASSUMED encore bloquées au checkpoint Task 1 (réseau)
-
-Les éléments suivants NE peuvent PAS être figés sans frappe TronGrid Nile réelle et
-restent ASSUMED (RESEARCH §A1-A7) :
-
-- Forme exacte de la réponse `/v1/accounts/{addr}/transactions/trc20` (noms de
-  champs `from`/`to`/`value`/`token_info.address`/`token_info.decimals`, base58 vs hex).
-- `only_confirmed` + `contract_address` réellement supportés (A2).
-- Header `TRON-PRO-API-KEY` (A3).
-- `decimals === 6` confirmé côté API (A5).
-- Adresse du contrat USDT **Nile testnet** (A6, différente de la mainnet).
-- Seuil de confirmations / finalité (A7).
+- ⚠️ `USDT_CONTRACT_ADDRESS` est VIDE → y mettre **TXYZopYRdj2D9XRtbG411XZZ3kM5VkAeBf** (contrat réellement observé) après vérification sur https://nile.tronscan.org.
