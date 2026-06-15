@@ -25,6 +25,7 @@ import { technicalEngine } from './jobs/technical-engine'
 import { fundamentalEngine } from './jobs/fundamental-engine'
 import { newsEngine } from './jobs/news-engine'
 import { persist } from './jobs/persist'
+import { subscriptionExpiry } from './jobs/subscription-expiry'
 import type { Json } from '@app/supabase'
 
 const logger = pino({ level: 'info' })
@@ -43,6 +44,9 @@ const JOB_REGISTRY: Record<string, () => Promise<Json | undefined>> = {
   // PERSIST — frontière de confiance unique (D-43). Appelé après l'ANALYZE avec
   // RUN_ID exporté : `RUN_ID=<session>-<YYYYMMDD>T<HHmm>Z tsx src/dispatch.ts persist`.
   persist,
+  // PAY-05 — cycle de vie abonnement (expire échus) + sweep réservations d'offset expirées
+  // (Plan 06). Windows Task Scheduler : run-job.cmd subscription-expiry.
+  'subscription-expiry': subscriptionExpiry,
 }
 
 // ─── Dispatch ────────────────────────────────────────────────────────────────

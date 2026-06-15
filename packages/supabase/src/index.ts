@@ -74,12 +74,14 @@ export type { ImmutabilityKey } from './repositories/tradeSetups'
 // Phase 4 — paiement USDT & abonnement repositories (service_role)
 export {
   OFFSET_RESERVATION_MINUTES,
+  RESERVATION_EXPIRED_REASON,
   ReplayError,
   OffsetExhaustedError,
   reserveOffset,
   insertPendingPayment,
   getByHash,
   transitionPayment,
+  releaseExpiredReservations,
 } from './repositories/payments'
 export type {
   ReserveOffsetInput,

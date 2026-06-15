@@ -183,6 +183,42 @@ export async function getByHash(
   return data
 }
 
+/**
+ * Sweep applicatif des réservations d'offset expirées (Plan 06, job subscription-expiry).
+ *
+ * Pourquoi côté applicatif : l'index unique partiel `payments_expected_amount_active_idx`
+ * (migration 0012) ne peut PAS porter `reservation_expires_at > now()` dans son prédicat —
+ * Postgres exige un prédicat IMMUTABLE (`42P17`). Le prédicat a donc été réduit à
+ * `where status='pending'`, et la libération des réservations expirées DOIT se faire ici.
+ *
+ * Sans ce sweep, chaque `payments(pending)` expiré garde son `expected_amount_atomic`
+ * verrouillé pour toujours → `reserveOffset` (MAX_OFFSET_ATTEMPTS=999) finit par s'épuiser
+ * (DoS auto-infligé sur l'allocation des montants uniques).
+ *
+ * status='pending' AND reservation_expires_at <= now() → 'rejected' avec
+ * reject_reason='reservation_expired' (l'offset redevient réservable). Naturellement
+ * idempotent : un re-run ne trouve plus de ligne pending expirée (re-run = 0 ligne).
+ */
+export const RESERVATION_EXPIRED_REASON = 'reservation_expired'
+
+export async function releaseExpiredReservations(
+  client: ServiceClient,
+): Promise<{ released: number }> {
+  const { data, error } = await client
+    .from('payments')
+    .update({ status: 'rejected', reject_reason: RESERVATION_EXPIRED_REASON })
+    .eq('status', 'pending')
+    .not('reservation_expires_at', 'is', null)
+    .lte('reservation_expires_at', new Date().toISOString())
+    .select('id')
+
+  if (error) {
+    throw new Error(`releaseExpiredReservations failed: ${error.message}`)
+  }
+
+  return { released: data?.length ?? 0 }
+}
+
 export interface TransitionPaymentExtra {
   reject_reason?: string
   amount_atomic?: bigint
