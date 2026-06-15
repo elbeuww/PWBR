@@ -31,6 +31,7 @@ export default defineConfig({
     include: [
       'packages/**/*.test.ts',
       'apps/**/__tests__/**/*.test.ts',
+      'apps/**/__tests__/**/*.test.tsx',
       'apps/web/test/**/*.test.ts',
     ],
     globals: false,
