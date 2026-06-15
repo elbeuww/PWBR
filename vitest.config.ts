@@ -14,6 +14,12 @@ if (existsSync(envTestPath)) {
 }
 
 export default defineConfig({
+  // Vitest 4 (rolldown-vite) utilise oxc pour le transform : activer le runtime JSX
+  // automatique pour les composants testés (apps/web/**/*.tsx) → import implicite
+  // de react/jsx-runtime, aucune dépendance plugin supplémentaire.
+  oxc: {
+    jsx: 'automatic',
+  },
   resolve: {
     alias: {
       // server-only lève une erreur dans Next.js mais doit être un no-op dans Vitest
