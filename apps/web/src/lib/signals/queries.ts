@@ -60,6 +60,48 @@ export async function fetchActiveSignals(
   supabase: SupabaseClient<Database>,
   params: SignalsParams,
 ): Promise<FetchActiveSignalsResult> {
+  // CR-02 : PostgREST ignore silencieusement `.eq('instruments.asset_class', …)`
+  // (notation pointée non supportée sur un select standard) → tous les signaux
+  // étaient retournés sans filtrage par classe/actif. On pré-résout les
+  // instrument_ids correspondants via une requête séparée sur `instruments`
+  // (client anon + RLS), puis on filtre les setups par `.in/.eq('instrument_id')`.
+  // Lecture seule, AUCUN client service_role.
+  if (params.class) {
+    let instrQuery = supabase.from('instruments').select('id').eq('asset_class', params.class)
+    if (params.asset) instrQuery = instrQuery.eq('symbol', params.asset)
+    const { data: instrRows, error: instrError } = await instrQuery
+    if (instrError) return { data: [], error: instrError.message }
+    const ids = (instrRows ?? []).map((r) => r.id)
+    if (ids.length === 0) return { data: [], error: null }
+    return runSetupsQuery(supabase, params, (q) => q.in('instrument_id', ids))
+  }
+
+  if (params.asset) {
+    const { data: instrRow, error: instrError } = await supabase
+      .from('instruments')
+      .select('id')
+      .eq('symbol', params.asset)
+      .maybeSingle()
+    if (instrError) return { data: [], error: instrError.message }
+    if (!instrRow) return { data: [], error: null }
+    return runSetupsQuery(supabase, params, (q) => q.eq('instrument_id', instrRow.id))
+  }
+
+  return runSetupsQuery(supabase, params)
+}
+
+type SetupsQuery = ReturnType<ReturnType<SupabaseClient<Database>['from']>['select']>
+
+/**
+ * Construit et exécute la requête trade_setups (status=active + style/risk + tri),
+ * avec un filtre instrument_id optionnel pré-résolu (CR-02). Factorisé pour éviter
+ * la duplication entre les chemins class/asset/aucun filtre instrument.
+ */
+async function runSetupsQuery(
+  supabase: SupabaseClient<Database>,
+  params: SignalsParams,
+  applyInstrumentFilter?: (q: SetupsQuery) => SetupsQuery,
+): Promise<FetchActiveSignalsResult> {
   let query = supabase
     .from('trade_setups')
     .select(SELECT_COLUMNS)
@@ -69,8 +111,7 @@ export async function fetchActiveSignals(
   // Filtres cumulables (D-06) — valeurs paramétrées issues de la whitelist Zod.
   if (params.style) query = query.eq('style', params.style)
   if (params.risk) query = query.eq('risk_level', params.risk)
-  if (params.class) query = query.eq('instruments.asset_class', params.class)
-  if (params.asset) query = query.eq('instruments.symbol', params.asset)
+  if (applyInstrumentFilter) query = applyInstrumentFilter(query)
 
   // Tri (D-08) : défaut = score décroissant.
   query =
