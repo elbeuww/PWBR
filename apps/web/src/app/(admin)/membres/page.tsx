@@ -34,7 +34,8 @@ interface MemberView {
   status: EffectiveStatus
   plan: 'discovery' | 'standard'
   currentPeriodEnd: string | null
-  lastPaymentAmountAtomic: number | null
+  // bigint Postgres sérialisé en string par PostgREST (CR-02) — converti via BigInt() à l'affichage.
+  lastPaymentAmountAtomic: string | null
   lastPaymentAt: string | null
   lastPaymentId: string | null
 }
@@ -64,7 +65,7 @@ async function loadMembers(statusFilter: string | null, emailFilter: string | nu
 
   // Dernier paiement vérifié par user (pour la colonne D-14 + activer/prolonger).
   const userIds = (subs ?? []).map((s) => s.user_id)
-  const lastPaymentByUser = new Map<string, { amount: number | null; at: string | null; id: string }>()
+  const lastPaymentByUser = new Map<string, { amount: string | null; at: string | null; id: string }>()
   if (userIds.length > 0) {
     const { data: pays, error: payErr } = await client
       .from('payments')

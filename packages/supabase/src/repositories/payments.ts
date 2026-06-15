@@ -102,7 +102,8 @@ export async function reserveOffset(
         plan: input.plan,
         // placeholder déterministe : pas encore de tx réelle (réservation pré-paiement)
         tx_hash: `reservation:${input.user_id}:${expected.toString()}`,
-        expected_amount_atomic: Number(expected),
+        // bigint Postgres → string (PostgREST), JAMAIS Number() (perte de précision >2^53, CR-02).
+        expected_amount_atomic: expected.toString(),
         status: 'pending',
         reservation_expires_at: input.reservation_expires_at,
       })
@@ -148,7 +149,8 @@ export async function insertPendingPayment(
       user_id: input.user_id,
       tx_hash: input.tx_hash,
       plan: input.plan,
-      expected_amount_atomic: Number(input.expected_amount_atomic),
+      // bigint Postgres → string (PostgREST), JAMAIS Number() (CR-02).
+      expected_amount_atomic: input.expected_amount_atomic.toString(),
       status: 'pending',
       screenshot_url: input.screenshot_url ?? null,
     })
@@ -239,7 +241,9 @@ export async function transitionPayment(
     patch.reject_reason = extra.reject_reason
   }
   if (extra.amount_atomic !== undefined) {
-    patch.amount_atomic = Number(extra.amount_atomic)
+    // bigint Postgres → string (PostgREST), JAMAIS Number() : le montant reçu est
+    // attaquant-contrôlé et peut dépasser 2^53 (CR-02).
+    patch.amount_atomic = extra.amount_atomic.toString()
   }
 
   const { error } = await client.from('payments').update(patch).eq('id', id)

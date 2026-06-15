@@ -310,9 +310,9 @@ export type Database = {
       }
       payments: {
         Row: {
-          amount_atomic: number | null
+          amount_atomic: string | null
           created_at: string
-          expected_amount_atomic: number
+          expected_amount_atomic: string
           id: string
           plan: string
           reject_reason: string | null
@@ -324,9 +324,9 @@ export type Database = {
           verified_at: string | null
         }
         Insert: {
-          amount_atomic?: number | null
+          amount_atomic?: string | null
           created_at?: string
-          expected_amount_atomic: number
+          expected_amount_atomic: string
           id?: string
           plan: string
           reject_reason?: string | null
@@ -338,9 +338,9 @@ export type Database = {
           verified_at?: string | null
         }
         Update: {
-          amount_atomic?: number | null
+          amount_atomic?: string | null
           created_at?: string
-          expected_amount_atomic?: number
+          expected_amount_atomic?: string
           id?: string
           plan?: string
           reject_reason?: string | null

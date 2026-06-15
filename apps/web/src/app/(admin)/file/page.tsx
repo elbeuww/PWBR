@@ -30,8 +30,9 @@ interface QueueRow {
   userId: string
   email: string
   plan: 'discovery' | 'standard'
-  expectedAmountAtomic: number
-  receivedAmountAtomic: number | null
+  // bigint Postgres sérialisé en string par PostgREST (CR-02) — converti via BigInt() à l'affichage.
+  expectedAmountAtomic: string
+  receivedAmountAtomic: string | null
   txHash: string
   screenshotUrl: string | null
 }
