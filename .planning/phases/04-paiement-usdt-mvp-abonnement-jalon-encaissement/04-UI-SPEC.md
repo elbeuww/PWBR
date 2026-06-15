@@ -1,10 +1,11 @@
 ---
 phase: 4
 slug: paiement-usdt-mvp-abonnement-jalon-encaissement
-status: draft
+status: approved
 shadcn_initialized: true
 preset: radix-nova
 created: 2026-06-15
+reviewed_at: 2026-06-15
 ---
 
 # Phase 4 — UI Design Contract
