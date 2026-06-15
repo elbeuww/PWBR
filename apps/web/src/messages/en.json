@@ -80,7 +80,58 @@
   },
   "signals": {
     "title": "Signals",
-    "body": "Subscriber-only signals are coming soon."
+    "body": "Subscriber-only signals are coming soon.",
+    "cardAction": "View details",
+    "realtimeBadge": "{count, plural, one {# new signal — show} other {# new signals — show}}",
+    "realtimeLost": "Real-time updates unavailable — the list refreshes automatically.",
+    "sortLabel": "Sort",
+    "sort": {
+      "scoreDesc": "Highest score",
+      "recent": "Most recent",
+      "rr": "Best R:R"
+    },
+    "filters": {
+      "asset": "Asset",
+      "class": "Asset class",
+      "style": "Style",
+      "styleDay": "Day",
+      "styleSwing": "Swing",
+      "risk": "Risk",
+      "riskLow": "Low",
+      "riskMedium": "Medium",
+      "riskHigh": "High",
+      "reset": "Reset filters"
+    },
+    "scoreBands": {
+      "strong": "Strong conviction",
+      "moderate": "Moderate conviction",
+      "cautious": "Cautious conviction"
+    },
+    "emptyHeading": "No active signals right now",
+    "emptyBody": "Analyses are published at each market session. Check back soon — a new signal will appear here as soon as an opportunity is detected.",
+    "error": {
+      "heading": "Unable to load signals.",
+      "body": "Check your connection, then try again.",
+      "retry": "Try again"
+    },
+    "disclaimerBanner": "Educational content — not personalized advice. Trading involves a risk of capital loss."
+  },
+  "signalDetail": {
+    "explicationSimple": "Simple explanation",
+    "analyseApprofondie": "In-depth analysis",
+    "scenarioInvalidation": "Invalidation scenario",
+    "evenementsRisque": "Upcoming risk events",
+    "decompositionScore": "Score breakdown",
+    "facteursContributifs": "Contributing factors",
+    "notFound": "This signal is no longer active.",
+    "backLink": "Back to signals",
+    "disclaimerBanner": "Educational content — not personalized advice. Trading involves a risk of capital loss."
+  },
+  "glossary": {
+    "rsi": "Momentum indicator: measures whether an asset is overbought or oversold.",
+    "macd": "Trend indicator: compares two moving averages to spot a shift in momentum.",
+    "bos": "Break of structure: price breaks a significant high or low, a sign of a possible trend change.",
+    "atr": "Volatility measure: the average range of price moves, used to size the stop-loss."
   },
   "dashboard": {
     "title": "Dashboard — Veteran Trading",

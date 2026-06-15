@@ -80,7 +80,58 @@
   },
   "signals": {
     "title": "Signaux",
-    "body": "Les signaux réservés aux abonnés arrivent bientôt."
+    "body": "Les signaux réservés aux abonnés arrivent bientôt.",
+    "cardAction": "Voir le détail",
+    "realtimeBadge": "{count, plural, one {# nouveau signal — afficher} other {# nouveaux signaux — afficher}}",
+    "realtimeLost": "Mise à jour en temps réel indisponible — la liste se rafraîchit automatiquement.",
+    "sortLabel": "Trier",
+    "sort": {
+      "scoreDesc": "Score décroissant",
+      "recent": "Plus récents",
+      "rr": "Meilleur R:R"
+    },
+    "filters": {
+      "asset": "Actif",
+      "class": "Classe d'actif",
+      "style": "Style",
+      "styleDay": "Day",
+      "styleSwing": "Swing",
+      "risk": "Risque",
+      "riskLow": "Faible",
+      "riskMedium": "Moyen",
+      "riskHigh": "Élevé",
+      "reset": "Réinitialiser les filtres"
+    },
+    "scoreBands": {
+      "strong": "Forte conviction",
+      "moderate": "Conviction modérée",
+      "cautious": "Conviction prudente"
+    },
+    "emptyHeading": "Aucun signal actif en ce moment",
+    "emptyBody": "Les analyses sont publiées à chaque session de marché. Revenez bientôt — un nouveau signal apparaîtra ici dès qu'une opportunité est détectée.",
+    "error": {
+      "heading": "Impossible de charger les signaux.",
+      "body": "Vérifiez votre connexion, puis réessayez.",
+      "retry": "Réessayer"
+    },
+    "disclaimerBanner": "Contenu éducatif — pas un conseil personnalisé. Le trading comporte un risque de perte en capital."
+  },
+  "signalDetail": {
+    "explicationSimple": "Explication simple",
+    "analyseApprofondie": "Analyse approfondie",
+    "scenarioInvalidation": "Scénario d'invalidation",
+    "evenementsRisque": "Événements à risque à venir",
+    "decompositionScore": "Décomposition du score",
+    "facteursContributifs": "Facteurs contributifs",
+    "notFound": "Ce signal n'est plus actif.",
+    "backLink": "Retour aux signaux",
+    "disclaimerBanner": "Contenu éducatif — pas un conseil personnalisé. Le trading comporte un risque de perte en capital."
+  },
+  "glossary": {
+    "rsi": "Indicateur de momentum : mesure si un actif est suracheté ou survendu.",
+    "macd": "Indicateur de tendance : compare deux moyennes mobiles pour repérer un changement de dynamique.",
+    "bos": "Cassure de structure : le prix franchit un sommet ou un creux important, signe d'un possible changement de tendance.",
+    "atr": "Mesure de volatilité : amplitude moyenne des mouvements de prix, utilisée pour dimensionner le stop-loss."
   },
   "dashboard": {
     "title": "Tableau de bord — Vétéran Trading",
