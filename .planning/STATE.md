@@ -3,7 +3,7 @@ gsd_state_version: 1.0
 milestone: v2.0
 milestone_name: Plateforme publique
 status: planning
-last_updated: "2026-06-15T18:41:21.585Z"
+last_updated: "2026-06-15T18:51:59.477Z"
 last_activity: 2026-06-15
 progress:
   total_phases: 9
@@ -192,7 +192,7 @@ Progress: [██████████] 100%
 
 ## Session Continuity
 
-**Last session:** 2026-06-15T18:41:21.577Z
+**Last session:** 2026-06-15T18:51:59.470Z
 
 **Last session:** 2026-06-15 — Plan 04-03 PARTIEL (bloqué checkpoint vetting lib QR B-04-03, human-verify). Couche présentation paiement livrée hors lib QR : Task 2 (d5b38c8) 8 blocs shadcn — 7 via CLI officiel radix-nova (table/textarea/sonner/tabs/alert/alert-dialog/progress) + form.tsx écrit main (react-hook-form 7 + @hookform/resolvers 5, absent registry nova standalone D-02-01-D) ; sonner@2 dep ; existants intacts ; root layout.tsx inchangé (Pitfall 7). Task 3 (1fc7b9e) namespace payment 53 clés ×3 parité RÉCURSIVE stricte (polling.steps.*/errors.*/hash.*/screenshot.*/status.*/expiredGated.*, ICU plural expiryBanner, copy = 04-UI-SPEC) + namespace admin mono-FR + pricing D-12 + test messages-parity-payment.test.ts (4/4). Vérifs : flatten plan 53 clés OK, vitest 4/4, typecheck 0 erreur, lint:i18n exit 0. Rule 1 : i18n-ignore sur faux positif annotation CVA alert.tsx. **STOP au checkpoint Task 1** : lib QR = unique paquet npm vetté (bundle client phase argent), NON auto-approuvable → pnpm add non exécuté. PAY-01/04/05/06 + ADMIN-01/02 NON marqués complets. Stopped at : checkpoint vetting QR B-04-03.
 
