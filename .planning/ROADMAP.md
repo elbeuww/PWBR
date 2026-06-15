@@ -84,7 +84,7 @@ i18n/RTL+rôles avant toute UI publique · RLS signaux avant exposition espace m
   4. L'abonnement expire automatiquement en fin de période (job `subscription-expiry`), l'utilisateur est informé et perd l'accès aux signaux ; l'offre découverte 3 $/7 j est utilisable une seule fois par utilisateur puis bascule sur le tarif standard.
   5. Le superadmin voit les membres (actifs/inactifs, état d'abonnement et de paiement).
 **Plans**: 6 plans (3 vagues)
-- [ ] 04-01-PLAN.md — fondations déterministes : checkpoint fixtures TronGrid Nile + atomic.ts (BigInt zéro-float) + address.ts (base58check golden)
+- [~] 04-01-PLAN.md — PARTIEL : atomic.ts (BigInt zéro-float, 17/17) + address.ts (base58check golden, 10/10) livrés ; checkpoint fixture TronGrid Nile BLOQUÉ (B-04-01 : clé + TX réelle requises avant `nile-trc20-transfer.json`)
 - [ ] 04-02-PLAN.md — migration 0012 (payments + RLS + UNIQUE tx_hash + RPC atomique) appliquée via MCP + repositories service_role
 - [ ] 04-03-PLAN.md — i18n payment/admin + 8 blocs shadcn + lib QR vettée (offline)
 - [ ] 04-04-PLAN.md — client TronGrid fetch+Zod + 5 invariants de vérification (golden sur fixtures)

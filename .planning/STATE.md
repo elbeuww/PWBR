@@ -3,8 +3,8 @@ gsd_state_version: 1.0
 milestone: v2.0
 milestone_name: Plateforme publique
 status: executing
-last_updated: "2026-06-15T02:32:45.490Z"
-last_activity: 2026-06-15 -- Phase 04 planning complete
+last_updated: "2026-06-15T03:50:00.000Z"
+last_activity: 2026-06-15 -- Plan 04-01 PARTIEL (atomic + base58check livrés, checkpoint réseau TronGrid bloqué)
 progress:
   total_phases: 9
   completed_phases: 3
@@ -21,16 +21,16 @@ progress:
 ## Project Reference
 
 **Core value:** Produire, pour chaque opportunité, une analyse fiable et explicable — vulgarisée pour un public non technique — avec un % de réussite TOUJOURS mesuré, jamais inventé : c'est le socle de confiance qui fait payer l'abonnement.
-**Current focus:** Phase 03 — espace-membre-signaux-gated-rls
+**Current focus:** Phase 04 — paiement-usdt-mvp-abonnement-jalon-encaissement
 **Mode:** interactive (MVP vertical)
 **Granularity:** fine
 
 ## Current Position
 
-Phase: 4
-Plan: Not started
-Status: Ready to execute
-Last activity: 2026-06-15 -- Phase 04 planning complete
+Phase: 04 (paiement-usdt-mvp-abonnement-jalon-encaissement) — EXECUTING
+Plan: 1 of 6 — IN-PROGRESS (bloqué au checkpoint réseau Task 1)
+Status: Executing Phase 04 — Plan 04-01 PARTIEL (2/3 tâches déterministes vertes, fixture TronGrid Nile bloquée)
+Last activity: 2026-06-15 -- Plan 04-01 fondations déterministes (atomic + base58check) livrées, checkpoint réseau en attente
 
 Progress: [██████████] 100%
 
@@ -153,6 +153,13 @@ Progress: [██████████] 100%
 - **D-03-01-D (T-03-05)** : `searchParams.ts` parse champ par champ via `.safeParse` — une valeur hors enum est ignorée (undefined), jamais propagée dans `.eq/.in`. `asset` reste une valeur paramétrée, jamais concaténée. `sort` hors enum revient au défaut `score` (D-08). 10/10 tests verts.
 - **D-03-01-E** : i18n namespaces `signals`/`signalDetail`/`glossary` à parité stricte fr/en/ar (copy FR canonique = 03-UI-SPEC §Copywriting Contract ; `realtimeBadge` avec ICU plural). `signals.title`/`signals.body` existants préservés.
 
+### Decisions exécution (Plan 04-01 — PARTIEL, bloqué checkpoint)
+
+- **D-04-01-A** : golden values base58check **calculées hors-ligne** par double-sha256 (crypto natif) → déterministes/reproductibles, pas une frappe réseau. `address.ts` golden-testé SANS attendre le checkpoint réseau, qui ne concerne que la forme de réponse API (`nile-trc20-transfer.json`), pas la crypto d'adresse.
+- **D-04-01-B** : `__fixtures__/GOLDEN.md` créé (golden crypto-locales + section ASSUMED A1-A7) ; `nile-trc20-transfer.json` NON créé (séparation golden déterministes vs fixture réseau).
+- **D-04-01-C** : exécution Task 2 (atomic) + Task 3 (address) avant le checkpoint Task 1. Le checkpoint ne bloque que le Plan 04 aval (parseur Zod TronGrid), pas ces deux briques.
+- **Commits 04-01** : fc17427 (RED atomic), d1f83bb (GREEN atomic + barrel), b0d8c0a (RED address + GOLDEN.md), b6c9ae3 (GREEN address). 27 tests verts (atomic 17 + address 10). PAY-01/PAY-02 NON marqués complets (plan partiel).
+
 ### Open todos / research flags (v2.0)
 
 - **Phase 4 (research flag) :** TronGrid endpoint `walletsolidity`, parsing logs TRC-20, normalisation hex↔base58 — doc TS peu dense, recherche de phase recommandée.
@@ -163,17 +170,19 @@ Progress: [██████████] 100%
 
 ### Blockers
 
-Aucun.
+- **B-04-01 (checkpoint réseau, bloque Plan 04 aval)** : Task 1 de 04-01 non franchie. Aucune clé TronGrid provisionnée (pas de `apps/web/.env`, aucune entrée `TRON-PRO-API-KEY`/`TRON_*` dans les `.env.example`) et accès réseau TronGrid Nile indisponible. À fournir par ops (hors-code) : (1) clé TronGrid tier gratuit, (2) une vraie TX USDT-test Nile confirmée, (3) coller la réponse JSON brute dans `packages/data-sources/src/trongrid/__fixtures__/nile-trc20-transfer.json`, (4) confirmer A1-A7 dans `GOLDEN.md` (champs API, `only_confirmed`/`contract_address`, header, `decimals===6`, contrat USDT **Nile**, seuil de confirmations). Aucune fixture/golden API fabriquée (interdit). Resume-signal : `approved` + fixture collée.
 
 ## Session Continuity
 
-**Last session:** 2026-06-15T01:35:19.841Z
+**Last session:** 2026-06-15T03:50:00.000Z
 
-**Last session:** 2026-06-15 — Completed 03-01-PLAN.md (segment final). Task 1 (2dde589) + Task 2 (e8df555, migration 0011 appliquée live via MCP) faits par exécuteurs précédents ; ce segment a confirmé que les types Supabase n'ont pas besoin de régénération (0011 = replica identity + publication + RLS candles, aucune colonne) puis exécuté Task 3 en TDD : 5a70533 (RED searchParams), 26a3c41 (GREEN searchParams + format + QueryProvider + i18n fr/en/ar). Vérifs : vitest 10/10, parité i18n OK, `pnpm typecheck` 0 erreur, `lint:i18n` exit 0. Décision RLS candles = ALIGN. **Plan 03-01 COMPLETE (socle DB + plumbing).** Stopped at : Plan 03-01 terminé.
+**Last session:** 2026-06-15 — Plan 04-01 PARTIEL (bloqué checkpoint réseau). Exécuté les 2 tâches déterministes en TDD : atomic.ts BigInt zéro-float (fc17427 RED, d1f83bb GREEN, 17/17, 9.02→9020000n) et address.ts base58check TRON sans tronweb (b0d8c0a RED + GOLDEN.md, b6c9ae3 GREEN, 10/10, checksum corrompu→throw). Golden values base58 calculées hors-ligne par double-sha256 (déterministes, pas inventées). **STOP au checkpoint réseau Task 1** : aucune clé TronGrid ni TX Nile réelle → `nile-trc20-transfer.json` NON fabriqué (interdit). PAY-01/PAY-02 NON marqués complets. tsc sans nouvelle erreur. Stopped at : checkpoint réseau B-04-01, en attente de la fixture TronGrid Nile réelle.
+
+**Last session (archive):** 2026-06-15 — Completed 03-01-PLAN.md (segment final). Task 1 (2dde589) + Task 2 (e8df555, migration 0011 appliquée live via MCP) faits par exécuteurs précédents ; ce segment a confirmé que les types Supabase n'ont pas besoin de régénération (0011 = replica identity + publication + RLS candles, aucune colonne) puis exécuté Task 3 en TDD : 5a70533 (RED searchParams), 26a3c41 (GREEN searchParams + format + QueryProvider + i18n fr/en/ar). Vérifs : vitest 10/10, parité i18n OK, `pnpm typecheck` 0 erreur, `lint:i18n` exit 0. Décision RLS candles = ALIGN. **Plan 03-01 COMPLETE (socle DB + plumbing).** Stopped at : Plan 03-01 terminé.
 
 **Last session (archive):** 2026-06-14 — Completed 02-03-PLAN.md (4 commits : 38c1894 tarifs 9$/3$ + paiement-bientot + funnel signup→paiement-bientot, 86e7001 home bénéfice-first + proof slot masqué, 49ac57e RED no-perf-claims, fa8a5d0 GREEN glob vitest). Cœur conversion de la vitrine livré : home VITR-01, tarifs VITR-02 (USDT TRC-20, D-10/D-11/D-12), funnel honnête D-09, garde no-perf-claims VITR-03/D-08. 15 tests verts, tsc/lint:i18n OK, invariant auth P1 intact. **Phase 02 COMPLETE (3/3 plans).** Stopped at : Plan 02-03 terminé.
 
-**Next action:** Phase 03 en cours — Plan 03-01 (socle DB + plumbing) terminé. Prochains plans (Wave 2, parallélisables) : **03-02 (liste signaux : page RSC, SignalCard, FilterBar, SignalList Realtime)** et **03-03 (détail signal : CandleChart lightweight-charts, explication simple/approfondie)**. Rappel : lecture front via client anon uniquement (frontière producteur-unique) ; ne jamais importer un repo service_role dans apps/web.
+**Next action:** Phase 04 — Plan 04-01 PARTIEL, **bloqué au checkpoint réseau B-04-01**. Étape humaine requise (ops) : provisionner une clé TronGrid + frapper une vraie TX USDT-test Nile et coller la réponse dans `packages/data-sources/src/trongrid/__fixtures__/nile-trc20-transfer.json`, confirmer A1-A7 dans `GOLDEN.md`. Tant que ce checkpoint n'est pas franchi, le Plan 04 (parseur Zod TronGrid) reste bloqué ; les briques déterministes atomic.ts + address.ts sont déjà livrées et golden-testées. Ne pas marquer 04-01 complet avant la fixture réelle.
 
 ---
 *State updated: 2026-06-14 — milestone v2.0, roadmap 9 phases créée. Cœur analytique v1.0 (P1-4) livré et archivé, sert de socle.*
