@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v2.0
 milestone_name: Plateforme publique
-status: planning
-last_updated: "2026-06-14T22:54:55.076Z"
-last_activity: 2026-06-14
+status: executing
+last_updated: "2026-06-15T00:07:38.136Z"
+last_activity: 2026-06-15
 progress:
   total_phases: 9
   completed_phases: 2
-  total_plans: 7
-  completed_plans: 7
-  percent: 100
+  total_plans: 10
+  completed_plans: 8
+  percent: 80
 ---
 
 # Project State
@@ -21,18 +21,18 @@ progress:
 ## Project Reference
 
 **Core value:** Produire, pour chaque opportunité, une analyse fiable et explicable — vulgarisée pour un public non technique — avec un % de réussite TOUJOURS mesuré, jamais inventé : c'est le socle de confiance qui fait payer l'abonnement.
-**Current focus:** Phase 02 — vitrine-publique-trilingue-gate-l-gal
+**Current focus:** Phase 03 — espace-membre-signaux-gated-rls
 **Mode:** interactive (MVP vertical)
 **Granularity:** fine
 
 ## Current Position
 
-Phase: 3
-Plan: Not started
-Status: Ready to plan
-Last activity: 2026-06-14
+Phase: 03 (espace-membre-signaux-gated-rls) — EXECUTING
+Plan: 2 of 3
+Status: Ready to execute
+Last activity: 2026-06-15
 
-Progress: [██████████] 100%
+Progress: [████████░░] 80%
 
 ## Performance Metrics
 
@@ -143,6 +143,14 @@ Progress: [██████████] 100%
 - **D-02-03-D** : « take-profit(s) » (terme de plan de trade, copy canonique UI-SPEC) contient le substring « profit » mais n'est PAS une allégation de gain → le détecteur le neutralise avant de chercher le mot « profit ». Sanity « 90% » prouve le détecteur non trivial (VITR-03).
 - **D-02-03-E** : proof slot home `SHOW_PROOF=false` (D-08, zéro chiffre, activé en P5) ; écran « paiement bientôt » sans adresse/flux (D-09, paiement réel = P4) ; offre 3 $/7 j une seule fois (D-11, l'ancien 3 $/15 j absent). Métrique factuelle « marchés couverts » ajoutée pour éviter une home creuse (jamais un taux de réussite).
 
+### Decisions exécution (Plan 03-01)
+
+- **D-03-01-A (Open Question 1 tranchée, T-03-02)** : RLS candles = ALIGN sur `has_active_subscription()`. La policy `candles: lecture authentifiés` (0003) est drop/recreate en `candles: abonnés actifs` → un authentifié non-abonné ne lit NI les setups NI l'OHLCV. Cohérence de la barrière payante.
+- **D-03-01-B (A1/A4, MEMB-05)** : 0011 pose `replica identity full` (old record sur UPDATE → détecter active→expired, D-14) + ajout idempotent de `trade_setups` à `supabase_realtime` gardé par `pg_publication_tables` (re-run sûr). Appliquée live via MCP `apply_migration` (canal 0006/0009, PAS db push). Les events postgres_changes héritent de la RLS → non-abonné = zéro event (T-03-01).
+- **D-03-01-C** : types Supabase NON régénérés. 0011 n'ajoute aucune colonne ; `supabase gen types` ne reflète ni RLS policies, ni replica identity, ni publication membership → `packages/supabase/src/database.types.ts` inchangé, aucun commit vide. Projet non `link`é localement (`gen types --linked` échoue par design, D-01-01-D) ; le fichier committé reste la source.
+- **D-03-01-D (T-03-05)** : `searchParams.ts` parse champ par champ via `.safeParse` — une valeur hors enum est ignorée (undefined), jamais propagée dans `.eq/.in`. `asset` reste une valeur paramétrée, jamais concaténée. `sort` hors enum revient au défaut `score` (D-08). 10/10 tests verts.
+- **D-03-01-E** : i18n namespaces `signals`/`signalDetail`/`glossary` à parité stricte fr/en/ar (copy FR canonique = 03-UI-SPEC §Copywriting Contract ; `realtimeBadge` avec ICU plural). `signals.title`/`signals.body` existants préservés.
+
 ### Open todos / research flags (v2.0)
 
 - **Phase 4 (research flag) :** TronGrid endpoint `walletsolidity`, parsing logs TRC-20, normalisation hex↔base58 — doc TS peu dense, recherche de phase recommandée.
@@ -157,11 +165,13 @@ Aucun.
 
 ## Session Continuity
 
-**Last session:** 2026-06-14T22:54:55.069Z
+**Last session:** 2026-06-15T01:10:00.000Z
 
-**Last session:** 2026-06-14 — Completed 02-03-PLAN.md (4 commits : 38c1894 tarifs 9$/3$ + paiement-bientot + funnel signup→paiement-bientot, 86e7001 home bénéfice-first + proof slot masqué, 49ac57e RED no-perf-claims, fa8a5d0 GREEN glob vitest). Cœur conversion de la vitrine livré : home VITR-01, tarifs VITR-02 (USDT TRC-20, D-10/D-11/D-12), funnel honnête D-09, garde no-perf-claims VITR-03/D-08. 15 tests verts, tsc/lint:i18n OK, invariant auth P1 intact. **Phase 02 COMPLETE (3/3 plans).** Stopped at : Plan 02-03 terminé.
+**Last session:** 2026-06-15 — Completed 03-01-PLAN.md (segment final). Task 1 (2dde589) + Task 2 (e8df555, migration 0011 appliquée live via MCP) faits par exécuteurs précédents ; ce segment a confirmé que les types Supabase n'ont pas besoin de régénération (0011 = replica identity + publication + RLS candles, aucune colonne) puis exécuté Task 3 en TDD : 5a70533 (RED searchParams), 26a3c41 (GREEN searchParams + format + QueryProvider + i18n fr/en/ar). Vérifs : vitest 10/10, parité i18n OK, `pnpm typecheck` 0 erreur, `lint:i18n` exit 0. Décision RLS candles = ALIGN. **Plan 03-01 COMPLETE (socle DB + plumbing).** Stopped at : Plan 03-01 terminé.
 
-**Next action:** Phase 02 terminée. Étapes hors code restantes avant Phase 04 (encaissement) : (1) revue juridique LEGAL-02 signée (`docs/legal/LEGAL-REVIEW.md` + flag `LEGAL_REVIEW_DONE`) ; (2) revue visuelle RTL arabe des 2 thèmes (Manual-UAT dev server + toggle). Prochaine phase code : **Phase 03 — Espace membre signaux gated RLS (MEMB-01..05)**.
+**Last session (archive):** 2026-06-14 — Completed 02-03-PLAN.md (4 commits : 38c1894 tarifs 9$/3$ + paiement-bientot + funnel signup→paiement-bientot, 86e7001 home bénéfice-first + proof slot masqué, 49ac57e RED no-perf-claims, fa8a5d0 GREEN glob vitest). Cœur conversion de la vitrine livré : home VITR-01, tarifs VITR-02 (USDT TRC-20, D-10/D-11/D-12), funnel honnête D-09, garde no-perf-claims VITR-03/D-08. 15 tests verts, tsc/lint:i18n OK, invariant auth P1 intact. **Phase 02 COMPLETE (3/3 plans).** Stopped at : Plan 02-03 terminé.
+
+**Next action:** Phase 03 en cours — Plan 03-01 (socle DB + plumbing) terminé. Prochains plans (Wave 2, parallélisables) : **03-02 (liste signaux : page RSC, SignalCard, FilterBar, SignalList Realtime)** et **03-03 (détail signal : CandleChart lightweight-charts, explication simple/approfondie)**. Rappel : lecture front via client anon uniquement (frontière producteur-unique) ; ne jamais importer un repo service_role dans apps/web.
 
 ---
 *State updated: 2026-06-14 — milestone v2.0, roadmap 9 phases créée. Cœur analytique v1.0 (P1-4) livré et archivé, sert de socle.*

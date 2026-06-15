@@ -68,7 +68,7 @@ i18n/RTL+rôles avant toute UI publique · RLS signaux avant exposition espace m
   3. Un abonné ouvre le détail d'un trade avec un graphique chandeliers (lightweight-charts) où entrée, SL et TP sont tracés, suivi d'une explication simple puis de l'analyse approfondie dépliable (décomposition du score + raisons technique/fondamentale/news + scénario d'invalidation).
   4. La liste se met à jour en temps réel (Supabase Realtime) à la publication de nouveaux signaux.
 **Plans**: 3 plans (2 vagues)
-- [ ] 03-01-PLAN.md — migration 0011 realtime + replica identity + RLS candles + libs + searchParams/format + i18n [MEMB-01, MEMB-02, MEMB-05]
+- [x] 03-01-PLAN.md — migration 0011 realtime + replica identity + RLS candles + libs + searchParams/format + i18n [MEMB-01, MEMB-02, MEMB-05]
 - [ ] 03-02-PLAN.md — liste : page RSC gated + cartes + filtres URL + Realtime overlay + test RLS [MEMB-01, MEMB-02, MEMB-05]
 - [ ] 03-03-PLAN.md — détail : route [id] + CandleChart v5 + explication simple/approfondie verbatim + glossaire [MEMB-03, MEMB-04]
 **UI hint**: yes

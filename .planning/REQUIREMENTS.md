@@ -27,11 +27,11 @@
 - [x] **VITR-03**: La vitrine n'affiche aucune promesse de gain et présente les disclaimers légaux.
 
 ### MEMB — Espace membre signaux (Wave 2)
-- [ ] **MEMB-01**: Un abonné voit la liste des signaux actifs triés par score décroissant ; chaque carte montre actif, direction, score, risque, R:R, fraîcheur.
-- [ ] **MEMB-02**: Un abonné filtre les signaux par actif, classe d'actif, style (day/swing) et niveau de risque.
+- [x] **MEMB-01**: Un abonné voit la liste des signaux actifs triés par score décroissant ; chaque carte montre actif, direction, score, risque, R:R, fraîcheur.
+- [x] **MEMB-02**: Un abonné filtre les signaux par actif, classe d'actif, style (day/swing) et niveau de risque.
 - [ ] **MEMB-03**: Un abonné ouvre le détail d'un trade avec un graphique chandeliers (lightweight-charts) où entrée, SL et TP sont tracés.
 - [ ] **MEMB-04**: Le détail affiche une explication simple d'abord, puis l'analyse approfondie dépliable (décomposition du score + raisons technique/fondamentale/news + scénario d'invalidation).
-- [ ] **MEMB-05**: La liste se met à jour en temps réel (Supabase Realtime) à la publication de nouveaux signaux.
+- [x] **MEMB-05**: La liste se met à jour en temps réel (Supabase Realtime) à la publication de nouveaux signaux.
 
 ### PAY — Paiement USDT & abonnement (Wave 2)
 - [ ] **PAY-01**: Un utilisateur voit l'adresse de réception USDT TRC-20 et le montant exact dû pour l'offre choisie.
@@ -107,11 +107,11 @@
 | VITR-03 | Phase 2 | Complete |
 | LEGAL-01 | Phase 2 | Complete |
 | LEGAL-02 | Phase 2 | Complete |
-| MEMB-01 | Phase 3 | Pending |
-| MEMB-02 | Phase 3 | Pending |
+| MEMB-01 | Phase 3 | Complete |
+| MEMB-02 | Phase 3 | Complete |
 | MEMB-03 | Phase 3 | Pending |
 | MEMB-04 | Phase 3 | Pending |
-| MEMB-05 | Phase 3 | Pending |
+| MEMB-05 | Phase 3 | Complete |
 | PAY-01 | Phase 4 | Pending |
 | PAY-02 | Phase 4 | Pending |
 | PAY-03 | Phase 4 | Pending |
