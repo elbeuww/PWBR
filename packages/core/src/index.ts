@@ -13,6 +13,9 @@ export { lastClosedCandleStart } from './time/candle.js'
 export { DAILY_ANCHOR, dailyAnchorStart } from './time/sessions.js'
 export type { DataSource } from './time/sessions.js'
 
+// Conversion monétaire atomique BigInt zéro-float (Phase 4, PAY-01, T-04-PREC)
+export { USDT_DECIMALS, SCALE, toAtomic, formatAtomic } from './money/atomic.js'
+
 // Contrat JSON §3 de l'agent IA (Phase 4) — PERMISSIF (A1)
 export { OutputSchema } from './schemas/output.js'
 export type { Output } from './schemas/output.js'
