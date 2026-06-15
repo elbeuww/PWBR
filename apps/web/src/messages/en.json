@@ -37,11 +37,85 @@
     "plan2Note": "discovery offer, usable once",
     "plan2Usdt": "payable in USDT (TRC-20)",
     "plan2Badge": "discovery",
-    "cta": "Subscribe"
+    "cta": "Subscribe",
+    "discoveryConsumed": "Discovery offer already used",
+    "earlyUpgrade": "Switch to standard",
+    "earlyUpgradeNote": "No refund for the discovery period in progress."
   },
   "paiement": {
     "title": "Payment available very soon",
     "body": "Your account is created. Payment in USDT (TRC-20) is coming soon — you'll be notified as soon as it opens."
+  },
+  "payment": {
+    "planTitle": "Choose an offer",
+    "choosePlanCta": "Choose this offer",
+    "cadenceMonth": "/ month",
+    "cadenceDiscovery": "/ 7 days",
+    "usdtNote": "payable in USDT (TRC-20)",
+    "title": "Pay in USDT",
+    "networkLabel": "Network: TRC-20 (TRON)",
+    "addressLabel": "Receive address",
+    "copyAddress": "Copy address",
+    "copyAddressToast": "Address copied",
+    "qrAlt": "QR code of the USDT TRC-20 receive address",
+    "amountLabel": "Exact amount to send",
+    "amountUnit": "USDT",
+    "copyAmount": "Copy amount",
+    "copyAmountToast": "Amount copied",
+    "amountInstruction": "Send EXACTLY this amount. The cents let us identify your payment automatically.",
+    "copyFailed": "Copy failed — please select the text manually.",
+    "hash": {
+      "label": "Transaction hash",
+      "placeholder": "Paste your USDT transaction hash here",
+      "help": "You'll find it in your wallet or on TronScan after sending.",
+      "invalid": "Invalid hash format.",
+      "submit": "I've paid — verify"
+    },
+    "screenshot": {
+      "label": "Transaction screenshot (optional)",
+      "help": "Optional — only useful in case of manual review.",
+      "remove": "Remove screenshot",
+      "invalidType": "File type not accepted.",
+      "invalidSize": "File too large."
+    },
+    "polling": {
+      "heading": "Verification in progress…",
+      "subCopy": "This usually takes less than a minute. Don't close this page.",
+      "steps": {
+        "found": "Transaction found",
+        "verified": "Amount and recipient verified",
+        "confirmations": "On-chain confirmations",
+        "activated": "Subscription activated ✓"
+      },
+      "timeout": "Verification is taking longer than expected. You can continue — we'll activate your access as soon as it's confirmed.",
+      "background": "Continue in the background"
+    },
+    "success": {
+      "heading": "Payment confirmed ✓",
+      "body": "Your subscription is active. Trade well.",
+      "cta": "Go to signals"
+    },
+    "errors": {
+      "wrong_amount": "Received {received} USDT, expected {expected} USDT. Check the amount and submit another hash, or contact us if you sent the correct amount.",
+      "wrong_token": "Token not recognized — make sure you sent USDT on the TRC-20 network.",
+      "not_confirmed": "Transaction not confirmed on the blockchain yet. Try again in a few minutes.",
+      "replay": "This hash has already been used for a payment. Each transaction can only be used once.",
+      "resubmit": "Submit another hash",
+      "manual_review": "Your payment is under manual review. We'll get back to you very soon."
+    },
+    "expiryBanner": "Your subscription expires in {n, plural, one {# day} other {# days}} — renew to keep your access.",
+    "renew": "Renew",
+    "status": {
+      "activeUntil": "Active until {date}",
+      "expired": "Expired",
+      "pending": "Awaiting payment",
+      "suspended": "Suspended"
+    },
+    "expiredGated": {
+      "heading": "Your subscription has expired.",
+      "body": "Renew to regain access to the signals.",
+      "cta": "Renew"
+    }
   },
   "home": {
     "heroTitle": "Decide with discipline.",

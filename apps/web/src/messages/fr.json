@@ -37,11 +37,148 @@
     "plan2Note": "offre découverte, utilisable une seule fois",
     "plan2Usdt": "payable en USDT (TRC-20)",
     "plan2Badge": "découverte",
-    "cta": "S'abonner"
+    "cta": "S'abonner",
+    "discoveryConsumed": "Offre découverte déjà utilisée",
+    "earlyUpgrade": "Passer au standard",
+    "earlyUpgradeNote": "Sans remboursement de la période découverte en cours."
   },
   "paiement": {
     "title": "Paiement disponible très bientôt",
     "body": "Votre compte est créé. Le paiement en USDT (TRC-20) arrive prochainement — vous serez notifié dès son ouverture."
+  },
+  "payment": {
+    "planTitle": "Choisir une offre",
+    "choosePlanCta": "Choisir cette offre",
+    "cadenceMonth": "/ mois",
+    "cadenceDiscovery": "/ 7 jours",
+    "usdtNote": "payable en USDT (TRC-20)",
+    "title": "Payer en USDT",
+    "networkLabel": "Réseau : TRC-20 (TRON)",
+    "addressLabel": "Adresse de réception",
+    "copyAddress": "Copier l'adresse",
+    "copyAddressToast": "Adresse copiée",
+    "qrAlt": "QR de l'adresse de réception USDT TRC-20",
+    "amountLabel": "Montant exact à envoyer",
+    "amountUnit": "USDT",
+    "copyAmount": "Copier le montant",
+    "copyAmountToast": "Montant copié",
+    "amountInstruction": "Envoie EXACTEMENT ce montant. Les centimes nous permettent d'identifier ton paiement automatiquement.",
+    "copyFailed": "Copie impossible — sélectionne le texte manuellement.",
+    "hash": {
+      "label": "Hash de la transaction",
+      "placeholder": "Colle ici le hash de ta transaction USDT",
+      "help": "Tu le trouves dans ton wallet ou sur TronScan après l'envoi.",
+      "invalid": "Format de hash invalide.",
+      "submit": "J'ai payé — vérifier"
+    },
+    "screenshot": {
+      "label": "Capture d'écran de la transaction (optionnel)",
+      "help": "Facultatif — utile seulement en cas de revue manuelle.",
+      "remove": "Retirer la capture",
+      "invalidType": "Type de fichier non accepté.",
+      "invalidSize": "Fichier trop volumineux."
+    },
+    "polling": {
+      "heading": "Vérification en cours…",
+      "subCopy": "Cela prend généralement moins d'une minute. Ne ferme pas cette page.",
+      "steps": {
+        "found": "Transaction trouvée",
+        "verified": "Montant et destinataire vérifiés",
+        "confirmations": "Confirmations on-chain",
+        "activated": "Abonnement activé ✓"
+      },
+      "timeout": "La vérification prend plus longtemps que prévu. Tu peux continuer — nous activerons ton accès dès la confirmation.",
+      "background": "Continuer en arrière-plan"
+    },
+    "success": {
+      "heading": "Paiement confirmé ✓",
+      "body": "Ton abonnement est actif. Bon trading.",
+      "cta": "Accéder aux signaux"
+    },
+    "errors": {
+      "wrong_amount": "Montant reçu {received} USDT, attendu {expected} USDT. Vérifie le montant et soumets un autre hash, ou contacte-nous si tu as payé le bon montant.",
+      "wrong_token": "Jeton non reconnu — assure-toi d'avoir envoyé de l'USDT sur le réseau TRC-20.",
+      "not_confirmed": "Transaction pas encore confirmée sur la blockchain. Réessaie dans quelques minutes.",
+      "replay": "Ce hash a déjà été utilisé pour un paiement. Chaque transaction ne peut servir qu'une fois.",
+      "resubmit": "Soumettre un autre hash",
+      "manual_review": "Ton paiement est en cours de revue manuelle. Nous revenons vers toi très vite."
+    },
+    "expiryBanner": "Ton abonnement expire dans {n, plural, one {# jour} other {# jours}} — renouvelle pour ne pas perdre l'accès.",
+    "renew": "Renouveler",
+    "status": {
+      "activeUntil": "Actif jusqu'au {date}",
+      "expired": "Expiré",
+      "pending": "En attente de paiement",
+      "suspended": "Suspendu"
+    },
+    "expiredGated": {
+      "heading": "Ton abonnement a expiré.",
+      "body": "Renouvelle pour retrouver l'accès aux signaux.",
+      "cta": "Renouveler"
+    }
+  },
+  "admin": {
+    "membersTitle": "Membres",
+    "queueTitle": "File de validation",
+    "members": {
+      "colEmail": "Email",
+      "colStatus": "Statut",
+      "colPlan": "Plan",
+      "colExpiry": "Expiration",
+      "colLastPayment": "Dernier paiement",
+      "filterStatus": "Statut",
+      "filterStatusActive": "Actif",
+      "filterStatusInactive": "Inactif",
+      "filterStatusExpired": "Expiré",
+      "searchEmail": "Rechercher par email",
+      "statusActive": "Actif",
+      "statusInactive": "Inactif",
+      "statusExpired": "Expiré",
+      "planDiscovery": "Découverte",
+      "planStandard": "Standard",
+      "actionActivate": "Activer / Prolonger",
+      "actionChangePlan": "Changer de plan",
+      "actionRevoke": "Révoquer / Suspendre",
+      "emptyHeading": "Aucun membre pour ce filtre",
+      "emptyBody": "Ajuste le filtre de statut ou la recherche par email."
+    },
+    "queue": {
+      "colExpected": "Montant attendu",
+      "colReceived": "Montant reçu",
+      "colHash": "Hash",
+      "colMember": "Membre",
+      "colScreenshot": "Capture",
+      "colStatus": "Statut",
+      "badgeToValidate": "À valider",
+      "viewOnTronscan": "Voir sur TronScan",
+      "actionActivate": "Activer le paiement",
+      "actionReject": "Rejeter",
+      "actionAdjust": "Ajuster la durée / le plan",
+      "emptyHeading": "Aucun paiement à valider",
+      "emptyBody": "Les paiements ambigus (sur/sous-paiement) apparaîtront ici."
+    },
+    "rejectDialog": {
+      "title": "Rejeter ce paiement",
+      "motifLabel": "Motif du rejet",
+      "motifPlaceholder": "Explique brièvement la raison du rejet",
+      "confirm": "Confirmer le rejet",
+      "cancel": "Annuler"
+    },
+    "revokeDialog": {
+      "title": "Révoquer l'accès",
+      "body": "Cette action retire l'accès du membre. Confirmer ?",
+      "confirm": "Révoquer",
+      "cancel": "Annuler"
+    },
+    "adjustDialog": {
+      "title": "Ajuster la durée / le plan",
+      "durationLabel": "Durée",
+      "planLabel": "Plan",
+      "confirm": "Appliquer",
+      "cancel": "Annuler"
+    },
+    "actionSuccess": "Action effectuée",
+    "actionError": "Échec de l'action. Réessaie."
   },
   "home": {
     "heroTitle": "Décidez avec discipline.",
