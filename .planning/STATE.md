@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v2.0
 milestone_name: Plateforme publique
-status: executing
+status: ready_to_plan
 last_updated: "2026-06-15T06:15:00.000Z"
 last_activity: 2026-06-15 -- Plan 04-03 PARTIEL (8 blocs shadcn + form + i18n payment/admin livrés ; checkpoint vetting lib QR bloqué human-verify B-04-03)
 progress:
   total_phases: 9
-  completed_phases: 3
+  completed_phases: 4
   total_plans: 16
   completed_plans: 10
-  percent: 63
+  percent: 44
 ---
 
 # Project State
@@ -27,10 +27,10 @@ progress:
 
 ## Current Position
 
-Phase: 04 (paiement-usdt-mvp-abonnement-jalon-encaissement) — EXECUTING
-Plan: 3 of 6 — [~] IN-PROGRESS (bloqué au checkpoint vetting lib QR Task 1, human-verify B-04-03). 04-02 PARTIEL (checkpoint LIVE apply B-04-02). 04-01 PARTIEL (checkpoint réseau TronGrid B-04-01).
-Status: Executing Phase 04 — Plan 04-03 PARTIEL (couche présentation : 8 blocs shadcn + form + i18n payment/admin livrés ; install lib QR STOPPÉE au checkpoint argent)
-Last activity: 2026-06-15 -- Plan 04-03 Tasks 2+3 (shadcn + i18n) committés (d5b38c8, 1fc7b9e) ; Task 1 lib QR = checkpoint blocking-human non franchi
+Phase: 5
+Plan: Not started
+Status: Ready to plan
+Last activity: 2026-06-15
 
 Progress: [██████████] 100%
 
