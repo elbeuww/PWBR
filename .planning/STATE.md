@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v2.0
 milestone_name: Plateforme publique
-status: verifying
+status: ready_to_plan
 last_updated: "2026-06-15T00:35:46.762Z"
 last_activity: 2026-06-15
 progress:
   total_phases: 9
-  completed_phases: 3
+  completed_phases: 4
   total_plans: 10
   completed_plans: 10
-  percent: 100
+  percent: 44
 ---
 
 # Project State
@@ -27,9 +27,9 @@ progress:
 
 ## Current Position
 
-Phase: 03 (espace-membre-signaux-gated-rls) — EXECUTING
-Plan: 3 of 3
-Status: Phase complete — ready for verification
+Phase: 4
+Plan: Not started
+Status: Ready to plan
 Last activity: 2026-06-15
 
 Progress: [██████████] 100%
