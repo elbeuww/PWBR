@@ -12,7 +12,9 @@ import { defineConfig, devices } from '@playwright/test'
  * les plans aval puissent y déposer leurs tests sans recréer d'infra (D-13).
  */
 export default defineConfig({
-  testDir: 'apps/web/e2e',
+  // Scanne e2e/ (auth, gating, i18n) ET tests/ (signals-rls, Plan 03-02 Task 4).
+  testDir: 'apps/web',
+  testMatch: ['e2e/**/*.spec.ts', 'tests/**/*.spec.ts'],
 
   // Timeouts raisonnables pour des tests d'intégration contre Supabase cloud
   timeout: 30_000,
