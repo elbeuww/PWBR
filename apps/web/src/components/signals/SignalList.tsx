@@ -97,8 +97,15 @@ export function SignalList({ initialData, filters, locale }: SignalListProps) {
         },
       )
       .subscribe((status) => {
-        // D-16 : si le canal n'atteint pas SUBSCRIBED, basculer en repli refetch.
-        setRealtimeLost(status !== 'SUBSCRIBED')
+        // D-16 / WR-01 : ne basculer en repli QUE sur un échec réel. Les états
+        // transitoires ('SUBSCRIBING') ne sont PAS une perte de connexion — sinon
+        // une fausse alerte "connexion perdue" apparaît à chaque montage.
+        if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT' || status === 'CLOSED') {
+          setRealtimeLost(true)
+        } else if (status === 'SUBSCRIBED') {
+          setRealtimeLost(false)
+        }
+        // 'SUBSCRIBING' (et autres états intermédiaires) → connexion en cours, no-op.
       })
 
     return () => {
@@ -107,9 +114,12 @@ export function SignalList({ initialData, filters, locale }: SignalListProps) {
   }, [supabase])
 
   // Au clic du badge : applique les nouveaux (refetch) et remet le compteur à 0.
+  // WR-02 : NE PAS vider removedIds — les signaux retirés en direct (devenus
+  // expired/invalidated) doivent rester cachés. Les vider les ferait réapparaître
+  // brièvement avant que le refetch ne les retire à nouveau (flash incohérent).
+  // Le refetch renvoie uniquement les actifs ; le filtre removedIds reste cohérent.
   function revealNew() {
     setNewCount(0)
-    setRemovedIds(new Set())
     void refetchRef.current()
   }
 
