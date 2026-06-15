@@ -26,3 +26,23 @@ export { fetchFredSeries, parseFredObservations } from './fred/client.js'
 
 // FairEconomy calendrier économique (FOMC, CPI, NFP — sans clé, cache 24h)
 export { fetchFairEconomyCalendar, parseFairEconomyCalendar } from './faireconomy/client.js'
+
+// TronGrid — vérification on-chain paiements USDT TRC-20 (Phase 4, serveur/jobs only)
+export {
+  base58ToHex,
+  hexToBase58,
+  sameAddress,
+  Trc20TransfersResponseSchema,
+  Trc20TransferSchema,
+  Trc20TokenInfoSchema,
+  fetchTrc20TransfersForReceiver,
+  getTransferByHash,
+  verifyTransfer,
+} from './trongrid/index.js'
+export type {
+  Trc20Transfer,
+  Trc20TransfersResponse,
+  Trc20TokenInfo,
+  VerificationResult,
+  VerifyContext,
+} from './trongrid/index.js'
