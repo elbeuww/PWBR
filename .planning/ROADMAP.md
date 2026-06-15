@@ -85,7 +85,7 @@ i18n/RTL+rôles avant toute UI publique · RLS signaux avant exposition espace m
   5. Le superadmin voit les membres (actifs/inactifs, état d'abonnement et de paiement).
 **Plans**: 6 plans (3 vagues)
 - [~] 04-01-PLAN.md — PARTIEL : atomic.ts (BigInt zéro-float, 17/17) + address.ts (base58check golden, 10/10) livrés ; checkpoint fixture TronGrid Nile BLOQUÉ (B-04-01 : clé + TX réelle requises avant `nile-trc20-transfer.json`)
-- [ ] 04-02-PLAN.md — migration 0012 (payments + RLS + UNIQUE tx_hash + RPC atomique) appliquée via MCP + repositories service_role
+- [~] 04-02-PLAN.md — PARTIEL : migration 0012 (payments + RLS + UNIQUE tx_hash + offset D-05 + RPC atomique) écrite (72f49a5) + repos service_role payments/subscriptions + barrel + .env TRON (eccc956) ; checkpoint LIVE apply_migration MCP + gen types BLOQUÉ (orchestrateur)
 - [ ] 04-03-PLAN.md — i18n payment/admin + 8 blocs shadcn + lib QR vettée (offline)
 - [ ] 04-04-PLAN.md — client TronGrid fetch+Zod + 5 invariants de vérification (golden sur fixtures)
 - [ ] 04-05-PLAN.md — parcours paiement : offre/adresse/QR/montant + hash + polling + server action service_role (gate légal mainnet)

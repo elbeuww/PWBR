@@ -3,8 +3,8 @@ gsd_state_version: 1.0
 milestone: v2.0
 milestone_name: Plateforme publique
 status: executing
-last_updated: "2026-06-15T03:50:00.000Z"
-last_activity: 2026-06-15 -- Plan 04-01 PARTIEL (atomic + base58check livrés, checkpoint réseau TronGrid bloqué)
+last_updated: "2026-06-15T05:10:00.000Z"
+last_activity: 2026-06-15 -- Plan 04-02 PARTIEL (migration 0012 + repos service_role livrés, checkpoint LIVE apply_migration bloqué orchestrateur)
 progress:
   total_phases: 9
   completed_phases: 3
@@ -28,9 +28,9 @@ progress:
 ## Current Position
 
 Phase: 04 (paiement-usdt-mvp-abonnement-jalon-encaissement) — EXECUTING
-Plan: 1 of 6 — IN-PROGRESS (bloqué au checkpoint réseau Task 1)
-Status: Executing Phase 04 — Plan 04-01 PARTIEL (2/3 tâches déterministes vertes, fixture TronGrid Nile bloquée)
-Last activity: 2026-06-15 -- Plan 04-01 fondations déterministes (atomic + base58check) livrées, checkpoint réseau en attente
+Plan: 2 of 6 — IN-PROGRESS (bloqué au checkpoint LIVE apply_migration Task 2, owned orchestrateur). 04-01 reste PARTIEL (checkpoint réseau TronGrid B-04-01).
+Status: Executing Phase 04 — Plan 04-02 PARTIEL (migration 0012 écrite + repos service_role typés ; apply LIVE MCP non exécuté par design)
+Last activity: 2026-06-15 -- Plan 04-02 couche données paiement (0012 + payments/subscriptions repos) livrée, checkpoint LIVE apply en attente
 
 Progress: [██████████] 100%
 
@@ -160,6 +160,13 @@ Progress: [██████████] 100%
 - **D-04-01-C** : exécution Task 2 (atomic) + Task 3 (address) avant le checkpoint Task 1. Le checkpoint ne bloque que le Plan 04 aval (parseur Zod TronGrid), pas ces deux briques.
 - **Commits 04-01** : fc17427 (RED atomic), d1f83bb (GREEN atomic + barrel), b0d8c0a (RED address + GOLDEN.md), b6c9ae3 (GREEN address). 27 tests verts (atomic 17 + address 10). PAY-01/PAY-02 NON marqués complets (plan partiel).
 
+### Decisions exécution (Plan 04-02 — PARTIEL, bloqué checkpoint LIVE apply)
+
+- **D-04-02-A** : `reserveOffset` pose un `tx_hash` placeholder déterministe `reservation:{user_id}:{expected}` à la réservation pré-paiement (la colonne `tx_hash` est `not null`) ; le tx_hash réel arrive via `insertPendingPayment` (Plan 05). La collision 23505 (offset partiel OU tx_hash global) fait avancer l'offset (boucle bornée MAX 999, Open Q1). `expected_amount_atomic` JAMAIS dérivé d'une entrée client (D-05).
+- **D-04-02-B** : RPC `activate_subscription_for_payment` = upsert manuel (SELECT plus récent → INSERT/UPDATE) plutôt qu'`ON CONFLICT` (`subscriptions` n'a pas de unique sur `user_id`) ; prolongation D-11 `greatest(coalesce(current_period_end, now()), now()) + p_period`. UPDATE payment gardé `status='pending'` + `row_count=0 → raise` = anti double-activation (idempotence négative).
+- **D-04-02-C** : `activateForPayment` caste `client.rpc(...)` localement car la signature de la fonction est ABSENTE de `database.types.ts` tant que Task 2 (gen types LIVE) n'est pas faite — pas de stub de type inventé. Forme d'appel exacte préservée (`rpc('activate_subscription_for_payment', { p_payment_id, p_user_id, p_plan, p_period })`), cast retiré après régénération.
+- **Commits 04-02** : 72f49a5 (migration 0012 : table + RLS 1 insert/2 select/0 update-delete + UNIQUE tx_hash GLOBAL + offset partiel + RPC security definer + revoke), eccc956 (repos payments dont reserveOffset/ReplayError + subscriptions dont activateForPayment + barrel + .env TRON). Vérifs statiques : multi-critère 5/5, RLS/RPC count, 11 key-links, `tsc -b --force` vert. PAY-03/04/06 + ADMIN-01/02 NON marqués complets (apply LIVE non franchi).
+
 ### Open todos / research flags (v2.0)
 
 - **Phase 4 (research flag) :** TronGrid endpoint `walletsolidity`, parsing logs TRC-20, normalisation hex↔base58 — doc TS peu dense, recherche de phase recommandée.
@@ -170,19 +177,24 @@ Progress: [██████████] 100%
 
 ### Blockers
 
+- **B-04-02 (checkpoint LIVE apply, owned orchestrateur)** : Task 2 de 04-02 non franchie. La migration `supabase/migrations/0012_payments.sql` existe (72f49a5) mais n'est PAS dans la base live. À exécuter par l'orchestrateur via MCP (PAS `supabase db push`) après confirmation humaine : (1) `apply_migration` name `0012_payments` ; (2) `generate_typescript_types` → `packages/supabase/src/database.types.ts` (ajouter `payments` Row/Insert/Update + fonction `activate_subscription_for_payment` dans `Functions`) ; (3) `list_tables` (confirmer payments + UNIQUE tx_hash + RLS + RPC) ; (4) `get_advisors` security (WARN security-definer RPC = EXPECTED, non bloquant) ; (5) re-run `pnpm typecheck`. Les repos compilent contre les types actuels mais ne sont pleinement type-safe qu'après régénération. Aucun stub de type fabriqué (interdit). Resume-signal : `applied` + sortie list_tables/get_advisors.
 - **B-04-01 (checkpoint réseau, bloque Plan 04 aval)** : Task 1 de 04-01 non franchie. Aucune clé TronGrid provisionnée (pas de `apps/web/.env`, aucune entrée `TRON-PRO-API-KEY`/`TRON_*` dans les `.env.example`) et accès réseau TronGrid Nile indisponible. À fournir par ops (hors-code) : (1) clé TronGrid tier gratuit, (2) une vraie TX USDT-test Nile confirmée, (3) coller la réponse JSON brute dans `packages/data-sources/src/trongrid/__fixtures__/nile-trc20-transfer.json`, (4) confirmer A1-A7 dans `GOLDEN.md` (champs API, `only_confirmed`/`contract_address`, header, `decimals===6`, contrat USDT **Nile**, seuil de confirmations). Aucune fixture/golden API fabriquée (interdit). Resume-signal : `approved` + fixture collée.
 
 ## Session Continuity
 
-**Last session:** 2026-06-15T03:50:00.000Z
+**Last session:** 2026-06-15T05:10:00.000Z
 
-**Last session:** 2026-06-15 — Plan 04-01 PARTIEL (bloqué checkpoint réseau). Exécuté les 2 tâches déterministes en TDD : atomic.ts BigInt zéro-float (fc17427 RED, d1f83bb GREEN, 17/17, 9.02→9020000n) et address.ts base58check TRON sans tronweb (b0d8c0a RED + GOLDEN.md, b6c9ae3 GREEN, 10/10, checksum corrompu→throw). Golden values base58 calculées hors-ligne par double-sha256 (déterministes, pas inventées). **STOP au checkpoint réseau Task 1** : aucune clé TronGrid ni TX Nile réelle → `nile-trc20-transfer.json` NON fabriqué (interdit). PAY-01/PAY-02 NON marqués complets. tsc sans nouvelle erreur. Stopped at : checkpoint réseau B-04-01, en attente de la fixture TronGrid Nile réelle.
+**Last session:** 2026-06-15 — Plan 04-02 PARTIEL (bloqué checkpoint LIVE apply, owned orchestrateur). Écrit migration 0012_payments.sql (72f49a5) : table payments + RLS producteur-unique (1 insert pending+self / 2 select self+superadmin / 0 update-delete) + UNIQUE(tx_hash) GLOBAL anti-replay + index unique partiel offset D-05 + RPC atomique activate_subscription_for_payment security definer + revoke execute (A8). Écrit repos service_role (eccc956) : payments.ts (reserveOffset montant unique serveur boucle 23505, insertPendingPayment 23505→ReplayError, getByHash, transitionPayment, OFFSET_RESERVATION_MINUTES=60) + subscriptions.ts (activateForPayment via RPC castée D-04-02-C, expireDue, changePlan) + barrel + .env.example (TRONGRID/USDT/TRON vars sans valeurs). Vérifs : multi-critère 5/5, RLS/RPC count, 11 key-links, tsc -b --force vert. **STOP au checkpoint Task 2** : apply_migration LIVE + gen types réservés à l'orchestrateur (jamais db push). PAY-03/04/06 + ADMIN-01/02 NON marqués complets. Stopped at : checkpoint LIVE apply B-04-02.
+
+**Last session (archive):** 2026-06-15 — Plan 04-01 PARTIEL (bloqué checkpoint réseau). Exécuté les 2 tâches déterministes en TDD : atomic.ts BigInt zéro-float (fc17427 RED, d1f83bb GREEN, 17/17, 9.02→9020000n) et address.ts base58check TRON sans tronweb (b0d8c0a RED + GOLDEN.md, b6c9ae3 GREEN, 10/10, checksum corrompu→throw). Golden values base58 calculées hors-ligne par double-sha256 (déterministes, pas inventées). **STOP au checkpoint réseau Task 1** : aucune clé TronGrid ni TX Nile réelle → `nile-trc20-transfer.json` NON fabriqué (interdit). PAY-01/PAY-02 NON marqués complets. tsc sans nouvelle erreur. Stopped at : checkpoint réseau B-04-01, en attente de la fixture TronGrid Nile réelle.
 
 **Last session (archive):** 2026-06-15 — Completed 03-01-PLAN.md (segment final). Task 1 (2dde589) + Task 2 (e8df555, migration 0011 appliquée live via MCP) faits par exécuteurs précédents ; ce segment a confirmé que les types Supabase n'ont pas besoin de régénération (0011 = replica identity + publication + RLS candles, aucune colonne) puis exécuté Task 3 en TDD : 5a70533 (RED searchParams), 26a3c41 (GREEN searchParams + format + QueryProvider + i18n fr/en/ar). Vérifs : vitest 10/10, parité i18n OK, `pnpm typecheck` 0 erreur, `lint:i18n` exit 0. Décision RLS candles = ALIGN. **Plan 03-01 COMPLETE (socle DB + plumbing).** Stopped at : Plan 03-01 terminé.
 
 **Last session (archive):** 2026-06-14 — Completed 02-03-PLAN.md (4 commits : 38c1894 tarifs 9$/3$ + paiement-bientot + funnel signup→paiement-bientot, 86e7001 home bénéfice-first + proof slot masqué, 49ac57e RED no-perf-claims, fa8a5d0 GREEN glob vitest). Cœur conversion de la vitrine livré : home VITR-01, tarifs VITR-02 (USDT TRC-20, D-10/D-11/D-12), funnel honnête D-09, garde no-perf-claims VITR-03/D-08. 15 tests verts, tsc/lint:i18n OK, invariant auth P1 intact. **Phase 02 COMPLETE (3/3 plans).** Stopped at : Plan 02-03 terminé.
 
-**Next action:** Phase 04 — Plan 04-01 PARTIEL, **bloqué au checkpoint réseau B-04-01**. Étape humaine requise (ops) : provisionner une clé TronGrid + frapper une vraie TX USDT-test Nile et coller la réponse dans `packages/data-sources/src/trongrid/__fixtures__/nile-trc20-transfer.json`, confirmer A1-A7 dans `GOLDEN.md`. Tant que ce checkpoint n'est pas franchi, le Plan 04 (parseur Zod TronGrid) reste bloqué ; les briques déterministes atomic.ts + address.ts sont déjà livrées et golden-testées. Ne pas marquer 04-01 complet avant la fixture réelle.
+**Next action:** Phase 04 — Plan 04-02 PARTIEL, **bloqué au checkpoint LIVE apply B-04-02** (orchestrateur). Étape orchestrateur requise via MCP (après confirmation humaine, JAMAIS db push) : `apply_migration` 0012_payments → `generate_typescript_types` vers database.types.ts (payments + RPC activate_subscription_for_payment) → `list_tables` + `get_advisors security` → re-run `pnpm typecheck`. Le code (migration + repos) est prêt et committé (72f49a5, eccc956) ; il ne reste que l'application live. En parallèle, 04-01 reste bloqué au checkpoint réseau B-04-01 (fixture TronGrid Nile). Ne pas marquer 04-02 complet avant l'apply LIVE + gen types.
+
+**Next action (archive):** Phase 04 — Plan 04-01 PARTIEL, **bloqué au checkpoint réseau B-04-01**. Étape humaine requise (ops) : provisionner une clé TronGrid + frapper une vraie TX USDT-test Nile et coller la réponse dans `packages/data-sources/src/trongrid/__fixtures__/nile-trc20-transfer.json`, confirmer A1-A7 dans `GOLDEN.md`. Tant que ce checkpoint n'est pas franchi, le Plan 04 (parseur Zod TronGrid) reste bloqué ; les briques déterministes atomic.ts + address.ts sont déjà livrées et golden-testées. Ne pas marquer 04-01 complet avant la fixture réelle.
 
 ---
 *State updated: 2026-06-14 — milestone v2.0, roadmap 9 phases créée. Cœur analytique v1.0 (P1-4) livré et archivé, sert de socle.*
