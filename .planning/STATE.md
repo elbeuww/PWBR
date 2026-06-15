@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v2.0
 milestone_name: Plateforme publique
-status: ready_to_plan
-last_updated: "2026-06-15T00:35:46.762Z"
+status: planning
+last_updated: "2026-06-15T01:25:26.426Z"
 last_activity: 2026-06-15
 progress:
   total_phases: 9
-  completed_phases: 4
+  completed_phases: 3
   total_plans: 10
   completed_plans: 10
-  percent: 44
+  percent: 100
 ---
 
 # Project State
@@ -167,7 +167,7 @@ Aucun.
 
 ## Session Continuity
 
-**Last session:** 2026-06-15T00:35:36.794Z
+**Last session:** 2026-06-15T01:25:26.419Z
 
 **Last session:** 2026-06-15 — Completed 03-01-PLAN.md (segment final). Task 1 (2dde589) + Task 2 (e8df555, migration 0011 appliquée live via MCP) faits par exécuteurs précédents ; ce segment a confirmé que les types Supabase n'ont pas besoin de régénération (0011 = replica identity + publication + RLS candles, aucune colonne) puis exécuté Task 3 en TDD : 5a70533 (RED searchParams), 26a3c41 (GREEN searchParams + format + QueryProvider + i18n fr/en/ar). Vérifs : vitest 10/10, parité i18n OK, `pnpm typecheck` 0 erreur, `lint:i18n` exit 0. Décision RLS candles = ALIGN. **Plan 03-01 COMPLETE (socle DB + plumbing).** Stopped at : Plan 03-01 terminé.
 
