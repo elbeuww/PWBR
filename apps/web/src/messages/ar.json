@@ -82,6 +82,10 @@
     "title": "الإشارات",
     "body": "الإشارات الخاصة بالمشتركين ستتوفر قريبًا.",
     "cardAction": "عرض التفاصيل",
+    "direction": {
+      "long": "شراء",
+      "short": "بيع"
+    },
     "realtimeBadge": "{count, plural, one {# إشارة جديدة — عرض} other {# إشارات جديدة — عرض}}",
     "realtimeLost": "التحديث الفوري غير متاح — يتم تحديث القائمة تلقائيًا.",
     "sortLabel": "ترتيب",
@@ -100,6 +104,7 @@
       "riskLow": "منخفضة",
       "riskMedium": "متوسطة",
       "riskHigh": "عالية",
+      "riskExtreme": "قصوى",
       "reset": "إعادة ضبط عوامل التصفية"
     },
     "scoreBands": {

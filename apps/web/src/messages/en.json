@@ -82,6 +82,10 @@
     "title": "Signals",
     "body": "Subscriber-only signals are coming soon.",
     "cardAction": "View details",
+    "direction": {
+      "long": "Long",
+      "short": "Short"
+    },
     "realtimeBadge": "{count, plural, one {# new signal — show} other {# new signals — show}}",
     "realtimeLost": "Real-time updates unavailable — the list refreshes automatically.",
     "sortLabel": "Sort",
@@ -100,6 +104,7 @@
       "riskLow": "Low",
       "riskMedium": "Medium",
       "riskHigh": "High",
+      "riskExtreme": "Extreme",
       "reset": "Reset filters"
     },
     "scoreBands": {

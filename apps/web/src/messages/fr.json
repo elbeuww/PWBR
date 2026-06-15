@@ -82,6 +82,10 @@
     "title": "Signaux",
     "body": "Les signaux réservés aux abonnés arrivent bientôt.",
     "cardAction": "Voir le détail",
+    "direction": {
+      "long": "Long",
+      "short": "Short"
+    },
     "realtimeBadge": "{count, plural, one {# nouveau signal — afficher} other {# nouveaux signaux — afficher}}",
     "realtimeLost": "Mise à jour en temps réel indisponible — la liste se rafraîchit automatiquement.",
     "sortLabel": "Trier",
@@ -100,6 +104,7 @@
       "riskLow": "Faible",
       "riskMedium": "Moyen",
       "riskHigh": "Élevé",
+      "riskExtreme": "Extrême",
       "reset": "Réinitialiser les filtres"
     },
     "scoreBands": {
