@@ -13,6 +13,7 @@
  * Le chart (lightweight-charts) est client-only → monté via next/dynamic ssr:false
  * (Pitfall 5). Render-fail du chart → le plan résumé (SignalDetail) reste lisible.
  */
+import { z } from 'zod'
 import { notFound } from 'next/navigation'
 import dynamic from 'next/dynamic'
 import { setRequestLocale, getTranslations } from 'next-intl/server'
@@ -20,6 +21,41 @@ import { Link } from '../../../../../i18n/navigation'
 import { createClient } from '../../../../../lib/supabase/server'
 import { SignalDetail, type TradeSetupDetail } from '../../../../../components/signals/SignalDetail'
 import { SignalsDisclaimerBanner } from '../../../../../components/signals/SignalsDisclaimerBanner'
+
+/**
+ * Schéma Zod du payload §3 affiché (frontière Zod, convention packages/core /
+ * apps/jobs persist). Le payload JSONB n'est PAS de confiance (donnée externe au
+ * front) : on le valide avant tout accès à entry/stop_loss/take_profits/etc.
+ * Un payload IA malformé → safeParse échoue → notFound() (même UX que signal absent),
+ * jamais un crash 500. Le score breakdown n'est PAS persisté → absent du schéma.
+ * Forme alignée sur SignalPayload (SignalDetail.tsx).
+ */
+const SignalPayloadSchema = z.object({
+  direction: z.enum(['long', 'short']),
+  timeframe_analysis: z.string(),
+  entry: z.object({
+    type: z.string(),
+    price: z.number(),
+    zone: z.tuple([z.number(), z.number()]),
+  }),
+  stop_loss: z.number(),
+  take_profits: z.array(z.object({ price: z.number(), alloc_pct: z.number() })),
+  technical_reasons: z.array(z.string()),
+  fundamental_reasons: z.array(z.string()),
+  news_catalysts: z.array(
+    z.object({
+      headline: z.string(),
+      impact: z.string(),
+      direction: z.string(),
+      ts: z.string(),
+    }),
+  ),
+  upcoming_risk_events: z.array(
+    z.object({ event: z.string(), ts: z.string(), note: z.string() }),
+  ),
+  invalidation: z.string(),
+  veteran_note: z.string(),
+})
 
 // Chart client-only : jamais rendu côté serveur (référence window/canvas).
 const CandleChart = dynamic(
@@ -31,12 +67,29 @@ interface SignalDetailPageProps {
   params: Promise<{ locale: string; id: string }>
 }
 
-/** Mappe le timeframe d'analyse (payload §3) vers la valeur colonne candles. */
+/**
+ * Mappe le timeframe d'analyse (payload §3) vers la valeur colonne candles.
+ * Matching EXACT sur tokens whitelistés (WR-04) : `includes('D')` matchait
+ * n'importe quelle string contenant la lettre D ('INTRADAY','UNDEFINED'). Token
+ * non reconnu → repli sûr 'H1'.
+ */
 function mapTimeframe(raw: string): 'H1' | 'H4' | 'D' {
-  const v = (raw ?? '').toUpperCase()
-  if (v.includes('H4') || v.includes('4H')) return 'H4'
-  if (v.includes('D') || v.includes('1D') || v.includes('DAY')) return 'D'
-  return 'H1'
+  const v = (raw ?? '').toUpperCase().trim()
+  switch (v) {
+    case 'H4':
+    case '4H':
+      return 'H4'
+    case 'D':
+    case '1D':
+    case 'DAY':
+    case 'DAILY':
+      return 'D'
+    case 'H1':
+    case '1H':
+      return 'H1'
+    default:
+      return 'H1'
+  }
 }
 
 export default async function SignalDetailPage({ params }: SignalDetailPageProps) {
@@ -58,8 +111,17 @@ export default async function SignalDetailPage({ params }: SignalDetailPageProps
     notFound()
   }
 
-  const detail = setup as unknown as TradeSetupDetail
-  const payload = detail.payload
+  // CR-01 : valider le payload JSONB (donnée non de confiance) AVANT tout accès.
+  // entry/stop_loss/take_profits/timeframe_analysis manquants ou malformés →
+  // safeParse échoue → notFound() (même UX qu'un signal absent), jamais un 500.
+  const base = setup as unknown as Omit<TradeSetupDetail, 'payload'> & { payload: unknown }
+  const payloadResult = SignalPayloadSchema.safeParse(base.payload)
+  if (!payloadResult.success) {
+    notFound()
+  }
+
+  const payload = payloadResult.data
+  const detail: TradeSetupDetail = { ...base, payload }
 
   // Candles pour le chart (RLS gatée 0011). Échec → chart absent, plan lisible.
   const tf = mapTimeframe(payload.timeframe_analysis)
