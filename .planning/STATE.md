@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v2.0
 milestone_name: Plateforme publique
 status: executing
-last_updated: "2026-06-15T23:41:56.793Z"
-last_activity: 2026-06-15 -- Phase 05 execution started
+last_updated: "2026-06-15T23:50:13.444Z"
+last_activity: 2026-06-15
 progress:
   total_phases: 9
   completed_phases: 4
   total_plans: 19
-  completed_plans: 16
-  percent: 84
+  completed_plans: 17
+  percent: 89
 ---
 
 # Project State
@@ -28,11 +28,11 @@ progress:
 ## Current Position
 
 Phase: 05 (track-record-mesur-affich) — EXECUTING
-Plan: 1 of 3
-Status: Executing Phase 05
-Last activity: 2026-06-15 -- Phase 05 execution started
+Plan: 2 of 3
+Status: Ready to execute
+Last activity: 2026-06-16 -- Plan 05-01 COMPLETE (cœur déterministe replay + seuil)
 
-Progress: [██████████] 100%
+Progress: [█████████░] 89%
 
 ## Performance Metrics
 
@@ -50,6 +50,7 @@ Progress: [██████████] 100%
 | Phase 02 P03 | ~18min | 3 tasks | 9 files |
 | Phase 03 P02 | 25min | 4 tasks | 12 files |
 | Phase 03 P03-03 | ~9min | 2 tasks | 10 files |
+| Phase 05 P01 | ~15min | 3 tasks | 6 files |
 
 ## Roadmap v2.0 (9 phases)
 
@@ -175,6 +176,16 @@ Progress: [██████████] 100%
 - **D-04-03-D (Rule 2)** : ajout `messages-parity-payment.test.ts` (garde CI parité récursive payment fr/en/ar + sentinelles sous-clés + no-perf VITR-03), cohérent avec messages-parity-legal.test.ts. 4/4 verts.
 - **Commits 04-03** : d5b38c8 (8 blocs shadcn + form + sonner/react-hook-form/@hookform/resolvers), 1fc7b9e (i18n payment/admin/pricing D-12 + test parité). Vérifs : script flatten plan 53 clés OK, vitest 4/4, `pnpm typecheck` 0 erreur, `lint:i18n` exit 0, root layout.tsx inchangé. **STOP au checkpoint Task 1** (vetting lib QR, blocking-human). PAY-01/04/05/06 + ADMIN-01/02 NON marqués complets.
 
+### Decisions exécution (Plan 05-01)
+
+- **D-05-01-A** : `realized_r` mesuré EXCLUSIVEMENT sur les prix des candles — gagnant `|tp1-entry|/denom`, perdant `-1`, flat `(close-entry)/denom` (long) / `(entry-close)/denom` (short). JAMAIS via `packages/core/scoring` (anti-pattern RESEARCH : le replay mesure le prix réalisé, pas le score de génération). `denom > 0` par construction.
+- **D-05-01-B** : tie-break ambigu D-04 = `distTp <= distSl → hit_tp` (égalité incluse → hit_tp), porté tel quel depuis l'algo figé RESEARCH §Code Examples. Golden-testé (3 sous-branches : TP proche, SL proche, égalité).
+- **D-05-01-C** : aucune candle dans la fenêtre (gap de données, A3) → `flat` realized_r 0 (R neutre).
+- **D-05-01-D** : `vitest.config.ts` include étendu de `apps/web/src/lib/**/*.test.ts` pour couvrir le chemin de test figé par le frontmatter du plan (RED structurel « No test files found » → GREEN, précédent D-02-03-C).
+- **D-05-01-E** : helper `applyThreshold` = union discriminée `{ sufficient:true, winRatePct, n, expectancy, avgR }` | `{ sufficient:false, n }` ; `MIN_SAMPLE=30` (D-09) ; N exposé dans LES DEUX branches (D-12) ; `win_rate` null → winRatePct 0 (jamais NaN). Seuil en couche TS, jamais en DB.
+- **Commits 05-01** : 8498a2c (RED golden tests replayOutcome), 084d75f (GREEN replayOutcome + barrel core), a2f5b19 (helper threshold + test + glob). 17 tests neufs verts (11 replay + 6 threshold), `pnpm typecheck` 0 erreur, 0 package npm ajouté. TRACK-01/TRACK-03 (logique pure) couverts ; job + vue + RLS anon = 05-02/05-03.
+- **D-05-01-DEFER** : 2 tests d'intégration Supabase rouges (`runJob`/`idempotency`, réseau + `.env.test`) hors scope — loggés `deferred-items.md`, aucun fichier du plan touché.
+
 ### Open todos / research flags (v2.0)
 
 - **Phase 4 (research flag) :** TronGrid endpoint `walletsolidity`, parsing logs TRC-20, normalisation hex↔base58 — doc TS peu dense, recherche de phase recommandée.
@@ -192,9 +203,11 @@ Progress: [██████████] 100%
 
 ## Session Continuity
 
-**Last session:** 2026-06-15T18:51:59.470Z
+**Last session:** 2026-06-16T00:48:00.000Z
 
-**Last session:** 2026-06-15 — Plan 04-03 PARTIEL (bloqué checkpoint vetting lib QR B-04-03, human-verify). Couche présentation paiement livrée hors lib QR : Task 2 (d5b38c8) 8 blocs shadcn — 7 via CLI officiel radix-nova (table/textarea/sonner/tabs/alert/alert-dialog/progress) + form.tsx écrit main (react-hook-form 7 + @hookform/resolvers 5, absent registry nova standalone D-02-01-D) ; sonner@2 dep ; existants intacts ; root layout.tsx inchangé (Pitfall 7). Task 3 (1fc7b9e) namespace payment 53 clés ×3 parité RÉCURSIVE stricte (polling.steps.*/errors.*/hash.*/screenshot.*/status.*/expiredGated.*, ICU plural expiryBanner, copy = 04-UI-SPEC) + namespace admin mono-FR + pricing D-12 + test messages-parity-payment.test.ts (4/4). Vérifs : flatten plan 53 clés OK, vitest 4/4, typecheck 0 erreur, lint:i18n exit 0. Rule 1 : i18n-ignore sur faux positif annotation CVA alert.tsx. **STOP au checkpoint Task 1** : lib QR = unique paquet npm vetté (bundle client phase argent), NON auto-approuvable → pnpm add non exécuté. PAY-01/04/05/06 + ADMIN-01/02 NON marqués complets. Stopped at : checkpoint vetting QR B-04-03.
+**Last session:** 2026-06-16 — Plan 05-01 COMPLETE (cœur déterministe pur, zéro I/O). TDD : 8498a2c (RED golden tests replayOutcome) → 084d75f (GREEN replayOutcome pur + barrel core, types Outcome/ReplaySetup/ReplayCandle) ; a2f5b19 (helper applyThreshold seuil N≥30 + test + extension glob vitest apps/web/src/lib/**). replayOutcome : first-touch H1 (D-01/D-03), règle distance D-04 (tie ≤ = hit_tp), flat D-02 au close ≤ valid_until (long ET short), R sur prix candles jamais via scoring. applyThreshold : MIN_SAMPLE=30, N exposé dans les 2 branches (D-12), win_rate null → 0 (pas de NaN). 17 tests neufs verts (11 replay + 6 threshold), typecheck 0 erreur, 0 package npm. TRACK-01/TRACK-03 (logique pure) couverts ; job outcome-tracker + vue pattern_stats + RLS anon = 05-02/05-03. 2 tests d'intégration Supabase rouges hors scope (réseau, deferred-items.md). Stopped at : Plan 05-01 terminé.
+
+**Last session (archive):** 2026-06-15 — Plan 04-03 PARTIEL (bloqué checkpoint vetting lib QR B-04-03, human-verify). Couche présentation paiement livrée hors lib QR : Task 2 (d5b38c8) 8 blocs shadcn — 7 via CLI officiel radix-nova (table/textarea/sonner/tabs/alert/alert-dialog/progress) + form.tsx écrit main (react-hook-form 7 + @hookform/resolvers 5, absent registry nova standalone D-02-01-D) ; sonner@2 dep ; existants intacts ; root layout.tsx inchangé (Pitfall 7). Task 3 (1fc7b9e) namespace payment 53 clés ×3 parité RÉCURSIVE stricte (polling.steps.*/errors.*/hash.*/screenshot.*/status.*/expiredGated.*, ICU plural expiryBanner, copy = 04-UI-SPEC) + namespace admin mono-FR + pricing D-12 + test messages-parity-payment.test.ts (4/4). Vérifs : flatten plan 53 clés OK, vitest 4/4, typecheck 0 erreur, lint:i18n exit 0. Rule 1 : i18n-ignore sur faux positif annotation CVA alert.tsx. **STOP au checkpoint Task 1** : lib QR = unique paquet npm vetté (bundle client phase argent), NON auto-approuvable → pnpm add non exécuté. PAY-01/04/05/06 + ADMIN-01/02 NON marqués complets. Stopped at : checkpoint vetting QR B-04-03.
 
 **Last session (archive):** 2026-06-15 — Plan 04-02 PARTIEL (bloqué checkpoint LIVE apply, owned orchestrateur). Écrit migration 0012_payments.sql (72f49a5) : table payments + RLS producteur-unique (1 insert pending+self / 2 select self+superadmin / 0 update-delete) + UNIQUE(tx_hash) GLOBAL anti-replay + index unique partiel offset D-05 + RPC atomique activate_subscription_for_payment security definer + revoke execute (A8). Écrit repos service_role (eccc956) : payments.ts (reserveOffset montant unique serveur boucle 23505, insertPendingPayment 23505→ReplayError, getByHash, transitionPayment, OFFSET_RESERVATION_MINUTES=60) + subscriptions.ts (activateForPayment via RPC castée D-04-02-C, expireDue, changePlan) + barrel + .env.example (TRONGRID/USDT/TRON vars sans valeurs). Vérifs : multi-critère 5/5, RLS/RPC count, 11 key-links, tsc -b --force vert. **STOP au checkpoint Task 2** : apply_migration LIVE + gen types réservés à l'orchestrateur (jamais db push). PAY-03/04/06 + ADMIN-01/02 NON marqués complets. Stopped at : checkpoint LIVE apply B-04-02.
 

@@ -42,9 +42,9 @@
 - [ ] **PAY-06**: L'offre découverte (3 $/7 j) est utilisable une seule fois par utilisateur puis bascule sur le tarif standard.
 
 ### TRACK — Track record & % mesuré (Wave 3)
-- [ ] **TRACK-01**: Le système rejoue les setups expirés depuis leur snapshot/candles et enregistre le résultat (hit_tp / hit_sl / realized_r) dans `prediction_outcomes`, indépendamment de toute exécution utilisateur.
+- [x] **TRACK-01**: Le système rejoue les setups expirés depuis leur snapshot/candles et enregistre le résultat (hit_tp / hit_sl / realized_r) dans `prediction_outcomes`, indépendamment de toute exécution utilisateur.
 - [ ] **TRACK-02**: Le système calcule le taux de réussite par pattern (backtest) et le track record réel agrégé de la plateforme.
-- [ ] **TRACK-03**: Vitrine et espace membre affichent un % de réussite TOUJOURS mesuré, avec méthode et taille d'échantillon ; « échantillon insuffisant, N trades » tant que N est trop faible.
+- [x] **TRACK-03**: Vitrine et espace membre affichent un % de réussite TOUJOURS mesuré, avec méthode et taille d'échantillon ; « échantillon insuffisant, N trades » tant que N est trop faible.
 
 ### TG — Canal Telegram public (Wave 3)
 - [ ] **TG-01**: Un job publie automatiquement sur le canal Telegram public les résultats journaliers des trades.
@@ -120,9 +120,9 @@
 | PAY-06 | Phase 4 | Pending |
 | ADMIN-01 | Phase 4 | Pending |
 | ADMIN-02 | Phase 4 | Pending |
-| TRACK-01 | Phase 5 | Pending |
+| TRACK-01 | Phase 5 | Complete |
 | TRACK-02 | Phase 5 | Pending |
-| TRACK-03 | Phase 5 | Pending |
+| TRACK-03 | Phase 5 | Complete |
 | TG-01 | Phase 6 | Pending |
 | TG-02 | Phase 6 | Pending |
 | TG-03 | Phase 6 | Pending |
