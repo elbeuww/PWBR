@@ -102,6 +102,7 @@
       "replay": "Ce hash a déjà été utilisé pour un paiement. Chaque transaction ne peut servir qu'une fois.",
       "wrong_recipient": "Cette transaction n'a pas été envoyée à notre adresse de réception. Vérifie l'adresse et soumets un autre hash.",
       "tx_not_found": "Transaction introuvable pour le moment. Si tu viens de payer, patiente quelques minutes puis réessaie.",
+      "expired": "Réservation expirée — choisis à nouveau ton offre pour obtenir un montant à jour, puis soumets ton hash.",
       "legal_gate": "Les paiements en production ne sont pas encore ouverts. Réessaie un peu plus tard.",
       "offset_exhausted": "Trop de paiements en cours en ce moment. Réessaie dans quelques minutes.",
       "not_authenticated": "Ta session a expiré. Reconnecte-toi pour continuer.",

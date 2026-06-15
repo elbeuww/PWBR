@@ -102,6 +102,7 @@
       "replay": "This hash has already been used for a payment. Each transaction can only be used once.",
       "wrong_recipient": "This transaction was not sent to our receiving address. Check the address and submit another hash.",
       "tx_not_found": "Transaction not found yet. If you just paid, wait a few minutes and try again.",
+      "expired": "Reservation expired — pick your plan again to get an up-to-date amount, then submit your hash.",
       "legal_gate": "Production payments are not open yet. Please try again later.",
       "offset_exhausted": "Too many payments in progress right now. Try again in a few minutes.",
       "not_authenticated": "Your session has expired. Sign in again to continue.",

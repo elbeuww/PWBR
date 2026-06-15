@@ -64,6 +64,7 @@ export type PaymentErrorCode =
   | 'offset_exhausted'
   | 'legal_gate'
   | 'replay'
+  | 'expired'
   | 'tx_not_found'
   | 'wrong_token'
   | 'wrong_recipient'
@@ -238,12 +239,18 @@ export async function verifyPayment(paymentId: string, txHash: string): Promise<
   // (4a) ARMER LE UNIQUE D'ABORD — écrire le tx_hash réel sur la ligne pending.
   // La contrainte UNIQUE(tx_hash) globale (0012) lève 23505 si le hash a déjà servi
   // (sur n'importe quel compte) → replay IMMÉDIAT, SANS aucune lecture réseau.
-  const { error: armErr } = await service
+  //
+  // CR-01 : `.select('id')` rend l'arm AUTORITAIRE. Un UPDATE qui matche 0 ligne
+  // n'est PAS une erreur PostgREST ; sans ce contrôle, le flux continuerait avec un
+  // tx_hash JAMAIS écrit (le filet UNIQUE ne se déclenche pas) → fenêtre de
+  // réutilisation du hash entre lignes. On exige donc EXACTEMENT 1 ligne armée.
+  const { data: armed, error: armErr } = await service
     .from('payments')
     .update({ tx_hash: trimmed })
     .eq('id', paymentId)
     .eq('user_id', user.id)
     .eq('status', 'pending')
+    .select('id')
 
   if (armErr) {
     if ((armErr as { code?: string }).code === '23505') {
@@ -251,6 +258,15 @@ export async function verifyPayment(paymentId: string, txHash: string): Promise<
       return { ok: false, status: 'rejected', code: 'replay' }
     }
     return { ok: false, status: 'rejected', code: 'internal' }
+  }
+
+  // 0 ligne armée = le payment n'est plus 'pending' (réservation expirée ou déjà
+  // traité). On NE lit PAS le réseau et on N'active PAS : retour 'expired' (hard-stop).
+  // NB : sur le chemin légitime de re-soumission (tx_not_found), la ligne reste
+  // pending avec le MÊME tx_hash déjà armé ; un re-arm matche cette ligne (1 ligne,
+  // pas de 23505) et le flux continue normalement — on ne casse pas le polling.
+  if (!armed || armed.length === 0) {
+    return { ok: false, status: 'rejected', code: 'expired' }
   }
 
   // (4b) Hash inédit, désormais réservé par ce payment → on peut lire le réseau.
