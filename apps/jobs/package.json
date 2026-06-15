@@ -4,7 +4,8 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dispatch": "tsx src/dispatch.ts"
+    "dispatch": "tsx src/dispatch.ts",
+    "freeze-nile-fixture": "tsx scripts/freeze-nile-fixture.ts"
   },
   "dependencies": {
     "@app/core": "workspace:*",
