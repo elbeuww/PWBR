@@ -310,9 +310,9 @@ export type Database = {
       }
       payments: {
         Row: {
-          amount_atomic: string | null
+          amount_atomic: number | null
           created_at: string
-          expected_amount_atomic: string
+          expected_amount_atomic: number
           id: string
           plan: string
           reject_reason: string | null
@@ -324,9 +324,9 @@ export type Database = {
           verified_at: string | null
         }
         Insert: {
-          amount_atomic?: string | null
+          amount_atomic?: number | null
           created_at?: string
-          expected_amount_atomic: string
+          expected_amount_atomic: number
           id?: string
           plan: string
           reject_reason?: string | null
@@ -338,9 +338,9 @@ export type Database = {
           verified_at?: string | null
         }
         Update: {
-          amount_atomic?: string | null
+          amount_atomic?: number | null
           created_at?: string
-          expected_amount_atomic?: string
+          expected_amount_atomic?: number
           id?: string
           plan?: string
           reject_reason?: string | null
@@ -357,6 +357,38 @@ export type Database = {
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      prediction_outcomes: {
+        Row: {
+          candle_count: number | null
+          outcome: string
+          realized_r: number
+          resolved_at: string
+          setup_id: string
+        }
+        Insert: {
+          candle_count?: number | null
+          outcome: string
+          realized_r: number
+          resolved_at?: string
+          setup_id: string
+        }
+        Update: {
+          candle_count?: number | null
+          outcome?: string
+          realized_r?: number
+          resolved_at?: string
+          setup_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "prediction_outcomes_setup_id_fkey"
+            columns: ["setup_id"]
+            isOneToOne: true
+            referencedRelation: "trade_setups"
             referencedColumns: ["id"]
           },
         ]
@@ -544,6 +576,18 @@ export type Database = {
       }
     }
     Views: {
+      pattern_stats: {
+        Row: {
+          avg_r: number | null
+          bucket: string | null
+          dimension: string | null
+          expectancy: number | null
+          n: number | null
+          period: string | null
+          win_rate: number | null
+        }
+        Relationships: []
+      }
       v_data_freshness: {
         Row: {
           canonical_symbol: string | null
@@ -708,3 +752,68 @@ export const Constants = {
     Enums: {},
   },
 } as const
+
+// ---------------------------------------------------------------------------
+// Alias de convenance (maintenus à la main — réappliquer après chaque
+// régénération `supabase gen types`). Source de vérité : les Tables/Views/Enums
+// générés ci-dessus. Ces alias stabilisent les imports applicatifs.
+// ---------------------------------------------------------------------------
+
+// Enums applicatifs (string-literal unions — pas de pg enum côté DB)
+export type Broker = 'oanda' | 'binance'
+export type AssetClass = 'crypto' | 'forex' | 'metal' | 'energy'
+export type JobRunStatus = 'running' | 'success' | 'error'
+export type Timeframe = 'H1' | 'H4' | 'D'
+export type QuoteHours = '24/7' | 'fx'
+export type CalendarImpact = 'High' | 'Medium' | 'Low'
+export type SnapshotStyle = 'day' | 'swing'
+export type SnapshotKind = 'technical' | 'fundamental' | 'news' | 'combined'
+
+// Phase 1 — profils / instruments / job_runs
+export type ProfileRow = Database['public']['Tables']['profiles']['Row']
+export type ProfileInsert = Database['public']['Tables']['profiles']['Insert']
+export type InstrumentRow = Database['public']['Tables']['instruments']['Row']
+export type InstrumentInsert = Database['public']['Tables']['instruments']['Insert']
+export type JobRunRow = Database['public']['Tables']['job_runs']['Row']
+export type JobRunInsert = Database['public']['Tables']['job_runs']['Insert']
+export type JobRunUpdate = Database['public']['Tables']['job_runs']['Update']
+
+// Phase 2 — ingestion
+export type CandleRow = Database['public']['Tables']['candles']['Row']
+export type CandleInsert = Database['public']['Tables']['candles']['Insert']
+export type NewsRow = Database['public']['Tables']['news']['Row']
+export type NewsInsert = Database['public']['Tables']['news']['Insert']
+export type MacroSeriesRow = Database['public']['Tables']['macro_series']['Row']
+export type MacroSeriesInsert = Database['public']['Tables']['macro_series']['Insert']
+export type EconomicCalendarRow = Database['public']['Tables']['economic_calendar']['Row']
+export type EconomicCalendarInsert = Database['public']['Tables']['economic_calendar']['Insert']
+export type DataFreshnessRow = Database['public']['Views']['v_data_freshness']['Row']
+
+// Phase 3 — moteur déterministe
+export type SnapshotRow = Database['public']['Tables']['snapshots']['Row']
+export type SnapshotInsert = Database['public']['Tables']['snapshots']['Insert']
+export type AssetDriverRow = Database['public']['Tables']['asset_drivers']['Row']
+export type AssetDriverInsert = Database['public']['Tables']['asset_drivers']['Insert']
+
+// Phase 4 — moteur IA vétéran & scoring
+export type TradeDirection = 'long' | 'short'
+export type RiskLevel = 'low' | 'medium' | 'high' | 'extreme'
+export type Confidence = 'low' | 'moderate' | 'high'
+export type SetupStatus = 'active' | 'invalidated' | 'expired'
+export type AnalysisRow = Database['public']['Tables']['analyses']['Row']
+export type AnalysisInsert = Database['public']['Tables']['analyses']['Insert']
+export type TradeSetupRow = Database['public']['Tables']['trade_setups']['Row']
+export type TradeSetupInsert = Database['public']['Tables']['trade_setups']['Insert']
+
+// Phase 4 — paiement USDT & abonnement
+export type UserRole = 'member' | 'affiliate' | 'superadmin'
+export type SubscriptionStatus = 'pending' | 'active' | 'expired' | 'canceled'
+export type SubscriptionPlan = 'discovery' | 'standard'
+export type SubscriptionRow = Database['public']['Tables']['subscriptions']['Row']
+export type SubscriptionInsert = Database['public']['Tables']['subscriptions']['Insert']
+export type ProfileUpdateSafe = Omit<Database['public']['Tables']['profiles']['Update'], 'role'>
+
+// Phase 5 — track record (TRACK-01/02) — issues rejouées + vue agrégée pattern_stats
+export type PredictionOutcomeRow = Database['public']['Tables']['prediction_outcomes']['Row']
+export type PredictionOutcomeInsert = Database['public']['Tables']['prediction_outcomes']['Insert']
+export type PredictionOutcomeUpdate = Database['public']['Tables']['prediction_outcomes']['Update']
