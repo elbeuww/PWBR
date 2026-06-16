@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v2.0
 milestone_name: Plateforme publique
 status: executing
-last_updated: "2026-06-16T00:19:22.990Z"
+last_updated: "2026-06-16T13:36:19.986Z"
 last_activity: 2026-06-16
 progress:
   total_phases: 9
-  completed_phases: 4
+  completed_phases: 5
   total_plans: 19
-  completed_plans: 18
-  percent: 95
+  completed_plans: 19
+  percent: 100
 ---
 
 # Project State
@@ -214,7 +214,7 @@ Progress: [██████████] 95%
 
 ## Session Continuity
 
-**Last session:** 2026-06-16
+**Last session:** 2026-06-16T13:36:19.979Z
 
 **Last session:** 2026-06-16 — Plan 05-02 COMPLETE (pipeline de données track record, TRACK-01/02). Migration 0014 appliquée LIVE via MCP : table prediction_outcomes (PK setup_id, FK trade_setups cascade, RLS authenticated, 0 policy write → service_role bypass) + vue pattern_stats (security_invoker=false, **grant SELECT anon = première lecture publique du projet**, agrégats only). Job outcome-tracker GREEN idempotent 2 niveaux (getResolvedSetupIds + UNIQUE setup_id onConflict ignoreDuplicates), enregistré dispatch, tracé runJob. Repos insertOutcomes/getResolvedSetupIds + getCandlesForReplay (H1 borné anti look-ahead). A1 (invalidated rejoués pleinement) + A2 (expectancy tous / avg_r gagnants) honorés. get_advisors PASS (prediction_outcomes inaccessible anon ; security_definer_view sur pattern_stats = intentionnel). Commits f931623/1584c7c/374a5bb/542a1f7. Déviations : asset_class joint depuis instruments (Rule 1), aliases database.types.ts réappliqués post gen-types (Rule 3). Tests : outcome-tracker 2/2, core replay 11/11, typecheck 0 erreur, 0 npm. Stopped at : Plan 05-02 terminé.
 
