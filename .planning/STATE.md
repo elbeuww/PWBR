@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v2.0
 milestone_name: Plateforme publique
 status: executing
-last_updated: "2026-06-15T23:50:13.444Z"
-last_activity: 2026-06-15
+last_updated: "2026-06-16T00:19:22.990Z"
+last_activity: 2026-06-16
 progress:
   total_phases: 9
   completed_phases: 4
   total_plans: 19
-  completed_plans: 17
-  percent: 89
+  completed_plans: 18
+  percent: 95
 ---
 
 # Project State
@@ -28,11 +28,11 @@ progress:
 ## Current Position
 
 Phase: 05 (track-record-mesur-affich) — EXECUTING
-Plan: 2 of 3
-Status: Ready to execute
-Last activity: 2026-06-16 -- Plan 05-01 COMPLETE (cœur déterministe replay + seuil)
+Plan: 3 of 3 (05-02 COMPLETE, 05-03 reste)
+Status: Ready to execute 05-03
+Last activity: 2026-06-16
 
-Progress: [█████████░] 89%
+Progress: [██████████] 95%
 
 ## Performance Metrics
 
@@ -51,6 +51,7 @@ Progress: [█████████░] 89%
 | Phase 03 P02 | 25min | 4 tasks | 12 files |
 | Phase 03 P03-03 | ~9min | 2 tasks | 10 files |
 | Phase 05 P01 | ~15min | 3 tasks | 6 files |
+| Phase 05 P05-02 | ~30min | 4 tasks | 8 files |
 
 ## Roadmap v2.0 (9 phases)
 
@@ -186,6 +187,16 @@ Progress: [█████████░] 89%
 - **Commits 05-01** : 8498a2c (RED golden tests replayOutcome), 084d75f (GREEN replayOutcome + barrel core), a2f5b19 (helper threshold + test + glob). 17 tests neufs verts (11 replay + 6 threshold), `pnpm typecheck` 0 erreur, 0 package npm ajouté. TRACK-01/TRACK-03 (logique pure) couverts ; job + vue + RLS anon = 05-02/05-03.
 - **D-05-01-DEFER** : 2 tests d'intégration Supabase rouges (`runJob`/`idempotency`, réseau + `.env.test`) hors scope — loggés `deferred-items.md`, aucun fichier du plan touché.
 
+### Decisions exécution (Plan 05-02)
+
+- **D-05-02-A (A1)** : setups `invalidated` rejoués PLEINEMENT par `replayOutcome` (jamais présumés hit_sl) — le replay décide hit_tp/hit_sl/flat. Sélection job = status IN ('expired','invalidated') AND valid_until < now().
+- **D-05-02-B (A2)** : `expectancy` = AVG(realized_r) sur TOUS les trades ; `avg_r` = AVG(realized_r) FILTER WHERE outcome='hit_tp' (R moyen des gagnants). Figé dans la vue `pattern_stats`. N exposé BRUT (D-12), seuil 30 appliqué côté front (threshold.ts 05-01).
+- **D-05-02-C (déviation Rule 1)** : la dimension `asset_class` est jointe depuis `public.instruments` (colonne réelle `i.asset_class`) via JOIN, PAS depuis `trade_setups` (le plan référençait `instrument_class`, inexistant sur trade_setups).
+- **D-05-02-D (apply LIVE)** : migration 0014 appliquée LIVE via MCP `apply_migration` (JAMAIS db push). Table `prediction_outcomes` (PK setup_id, FK trade_setups on delete cascade, RLS authenticated, AUCUNE policy write → service_role bypass) + vue `pattern_stats` (security_invoker=false, **grant SELECT anon = PREMIÈRE lecture publique du projet**, agrégats SEULEMENT).
+- **D-05-02-E (gate sécurité PASS)** : `get_advisors` (security) confirme que `prediction_outcomes` n'est PAS exposé à anon (rls_enabled, authenticated-only select). Le seul nouvel advisor est `security_definer_view` sur `pattern_stats` — INTENTIONNEL (agrège du public via security_invoker=false), NON corrigé. 2 advisors préexistants hors scope (`has_active_subscription`/`is_superadmin`) + WARN leaked-password.
+- **D-05-02-F (déviation Rule 3)** : `generate_typescript_types` écrase tout `database.types.ts` et supprime le bloc d'aliases de convenance maintenus à la main (CandleInsert/TradeSetupInsert/ProfileRow/Timeframe…). Réappliqués à la fin du fichier (source = dist/.d.ts précédent) + ajout PredictionOutcome{Row,Insert,Update}. À refaire après chaque régénération.
+- **Commits 05-02** : f931623 (RED test idempotence + getCandlesForReplay), 1584c7c (migration 0014 + repos + barrel), 374a5bb (GREEN job outcome-tracker + dispatch), 542a1f7 (apply LIVE + regen types + drop temp casts). outcome-tracker test 2/2 vert (2e run = 0 insert), core replay 11/11 non régressé, `pnpm typecheck` 0 erreur, 0 package npm. **TRACK-01/TRACK-02 complets.** Reste 05-03 (page publique consommant pattern_stats en anon + seuil N≥30).
+
 ### Open todos / research flags (v2.0)
 
 - **Phase 4 (research flag) :** TronGrid endpoint `walletsolidity`, parsing logs TRC-20, normalisation hex↔base58 — doc TS peu dense, recherche de phase recommandée.
@@ -203,9 +214,11 @@ Progress: [█████████░] 89%
 
 ## Session Continuity
 
-**Last session:** 2026-06-16T00:48:00.000Z
+**Last session:** 2026-06-16
 
-**Last session:** 2026-06-16 — Plan 05-01 COMPLETE (cœur déterministe pur, zéro I/O). TDD : 8498a2c (RED golden tests replayOutcome) → 084d75f (GREEN replayOutcome pur + barrel core, types Outcome/ReplaySetup/ReplayCandle) ; a2f5b19 (helper applyThreshold seuil N≥30 + test + extension glob vitest apps/web/src/lib/**). replayOutcome : first-touch H1 (D-01/D-03), règle distance D-04 (tie ≤ = hit_tp), flat D-02 au close ≤ valid_until (long ET short), R sur prix candles jamais via scoring. applyThreshold : MIN_SAMPLE=30, N exposé dans les 2 branches (D-12), win_rate null → 0 (pas de NaN). 17 tests neufs verts (11 replay + 6 threshold), typecheck 0 erreur, 0 package npm. TRACK-01/TRACK-03 (logique pure) couverts ; job outcome-tracker + vue pattern_stats + RLS anon = 05-02/05-03. 2 tests d'intégration Supabase rouges hors scope (réseau, deferred-items.md). Stopped at : Plan 05-01 terminé.
+**Last session:** 2026-06-16 — Plan 05-02 COMPLETE (pipeline de données track record, TRACK-01/02). Migration 0014 appliquée LIVE via MCP : table prediction_outcomes (PK setup_id, FK trade_setups cascade, RLS authenticated, 0 policy write → service_role bypass) + vue pattern_stats (security_invoker=false, **grant SELECT anon = première lecture publique du projet**, agrégats only). Job outcome-tracker GREEN idempotent 2 niveaux (getResolvedSetupIds + UNIQUE setup_id onConflict ignoreDuplicates), enregistré dispatch, tracé runJob. Repos insertOutcomes/getResolvedSetupIds + getCandlesForReplay (H1 borné anti look-ahead). A1 (invalidated rejoués pleinement) + A2 (expectancy tous / avg_r gagnants) honorés. get_advisors PASS (prediction_outcomes inaccessible anon ; security_definer_view sur pattern_stats = intentionnel). Commits f931623/1584c7c/374a5bb/542a1f7. Déviations : asset_class joint depuis instruments (Rule 1), aliases database.types.ts réappliqués post gen-types (Rule 3). Tests : outcome-tracker 2/2, core replay 11/11, typecheck 0 erreur, 0 npm. Stopped at : Plan 05-02 terminé.
+
+**Last session (archive):** 2026-06-16 — Plan 05-01 COMPLETE (cœur déterministe pur, zéro I/O). TDD : 8498a2c (RED golden tests replayOutcome) → 084d75f (GREEN replayOutcome pur + barrel core, types Outcome/ReplaySetup/ReplayCandle) ; a2f5b19 (helper applyThreshold seuil N≥30 + test + extension glob vitest apps/web/src/lib/**). replayOutcome : first-touch H1 (D-01/D-03), règle distance D-04 (tie ≤ = hit_tp), flat D-02 au close ≤ valid_until (long ET short), R sur prix candles jamais via scoring. applyThreshold : MIN_SAMPLE=30, N exposé dans les 2 branches (D-12), win_rate null → 0 (pas de NaN). 17 tests neufs verts (11 replay + 6 threshold), typecheck 0 erreur, 0 package npm. TRACK-01/TRACK-03 (logique pure) couverts ; job outcome-tracker + vue pattern_stats + RLS anon = 05-02/05-03. 2 tests d'intégration Supabase rouges hors scope (réseau, deferred-items.md). Stopped at : Plan 05-01 terminé.
 
 **Last session (archive):** 2026-06-15 — Plan 04-03 PARTIEL (bloqué checkpoint vetting lib QR B-04-03, human-verify). Couche présentation paiement livrée hors lib QR : Task 2 (d5b38c8) 8 blocs shadcn — 7 via CLI officiel radix-nova (table/textarea/sonner/tabs/alert/alert-dialog/progress) + form.tsx écrit main (react-hook-form 7 + @hookform/resolvers 5, absent registry nova standalone D-02-01-D) ; sonner@2 dep ; existants intacts ; root layout.tsx inchangé (Pitfall 7). Task 3 (1fc7b9e) namespace payment 53 clés ×3 parité RÉCURSIVE stricte (polling.steps.*/errors.*/hash.*/screenshot.*/status.*/expiredGated.*, ICU plural expiryBanner, copy = 04-UI-SPEC) + namespace admin mono-FR + pricing D-12 + test messages-parity-payment.test.ts (4/4). Vérifs : flatten plan 53 clés OK, vitest 4/4, typecheck 0 erreur, lint:i18n exit 0. Rule 1 : i18n-ignore sur faux positif annotation CVA alert.tsx. **STOP au checkpoint Task 1** : lib QR = unique paquet npm vetté (bundle client phase argent), NON auto-approuvable → pnpm add non exécuté. PAY-01/04/05/06 + ADMIN-01/02 NON marqués complets. Stopped at : checkpoint vetting QR B-04-03.
 
@@ -217,7 +230,9 @@ Progress: [█████████░] 89%
 
 **Last session (archive):** 2026-06-14 — Completed 02-03-PLAN.md (4 commits : 38c1894 tarifs 9$/3$ + paiement-bientot + funnel signup→paiement-bientot, 86e7001 home bénéfice-first + proof slot masqué, 49ac57e RED no-perf-claims, fa8a5d0 GREEN glob vitest). Cœur conversion de la vitrine livré : home VITR-01, tarifs VITR-02 (USDT TRC-20, D-10/D-11/D-12), funnel honnête D-09, garde no-perf-claims VITR-03/D-08. 15 tests verts, tsc/lint:i18n OK, invariant auth P1 intact. **Phase 02 COMPLETE (3/3 plans).** Stopped at : Plan 02-03 terminé.
 
-**Next action:** Phase 04 — Plan 04-03 PARTIEL, **bloqué au checkpoint vetting lib QR B-04-03** (human-verify, blocking-human). Étape humaine requise : vetter la lib QR (npmjs âge/downloads/repo/postinstall + rendu 100% offline + encode l'adresse seule) puis `pnpm --filter web add <qr-lib>` épinglée, OU repli SVG QR maison. Tasks 2+3 (8 blocs shadcn + i18n payment/admin) déjà livrées et committées (d5b38c8, 1fc7b9e). En parallèle : 04-02 bloqué au checkpoint LIVE apply B-04-02 (orchestrateur), 04-01 bloqué au checkpoint réseau TronGrid B-04-01. Ne pas marquer 04-03 complet avant le vetting QR.
+**Next action:** Phase 05 — Plan 05-03 (page track record publique). Consommer la vue `pattern_stats` en lecture anon (premier consommateur public), appliquer le seuil N≥30 via `applyThreshold` (threshold.ts de 05-01), afficher win_rate/expectancy/avg_r/N par dimension D-06 (all_time + 90d) sinon « en construction ». Pipeline de données (table + vue + job idempotent) déjà live et committé (05-02). En suspens Phase 04 : 04-03 vetting lib QR B-04-03, 04-02 LIVE apply B-04-02, 04-01 fixture TronGrid B-04-01.
+
+**Next action (archive):** Phase 04 — Plan 04-03 PARTIEL, **bloqué au checkpoint vetting lib QR B-04-03** (human-verify, blocking-human). Étape humaine requise : vetter la lib QR (npmjs âge/downloads/repo/postinstall + rendu 100% offline + encode l'adresse seule) puis `pnpm --filter web add <qr-lib>` épinglée, OU repli SVG QR maison. Tasks 2+3 (8 blocs shadcn + i18n payment/admin) déjà livrées et committées (d5b38c8, 1fc7b9e). En parallèle : 04-02 bloqué au checkpoint LIVE apply B-04-02 (orchestrateur), 04-01 bloqué au checkpoint réseau TronGrid B-04-01. Ne pas marquer 04-03 complet avant le vetting QR.
 
 **Next action (archive):** Phase 04 — Plan 04-02 PARTIEL, **bloqué au checkpoint LIVE apply B-04-02** (orchestrateur). Étape orchestrateur requise via MCP (après confirmation humaine, JAMAIS db push) : `apply_migration` 0012_payments → `generate_typescript_types` vers database.types.ts (payments + RPC activate_subscription_for_payment) → `list_tables` + `get_advisors security` → re-run `pnpm typecheck`. Le code (migration + repos) est prêt et committé (72f49a5, eccc956) ; il ne reste que l'application live. En parallèle, 04-01 reste bloqué au checkpoint réseau B-04-01 (fixture TronGrid Nile). Ne pas marquer 04-02 complet avant l'apply LIVE + gen types.
 
