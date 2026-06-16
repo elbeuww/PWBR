@@ -21,6 +21,7 @@ import { FilterBar } from '../../../../components/signals/FilterBar'
 import { SignalList } from '../../../../components/signals/SignalList'
 import { SignalsDisclaimerBanner } from '../../../../components/signals/SignalsDisclaimerBanner'
 import { QueryProvider } from '../../../../components/providers/QueryProvider'
+import { TrackRecordBlock } from '@/components/track-record/TrackRecordBlock'
 
 interface SignalsPageProps {
   params: Promise<{ locale: string }>
@@ -70,6 +71,11 @@ export default async function SignalsPage({ params, searchParams }: SignalsPageP
           <SignalList initialData={data} filters={filters} locale={locale} />
         </QueryProvider>
       )}
+
+      {/* Miroir du track record mesuré (D-13) — même source/composant que la vitrine. */}
+      <section className="mt-12 border-t border-border pt-10">
+        <TrackRecordBlock />
+      </section>
     </main>
   )
 }

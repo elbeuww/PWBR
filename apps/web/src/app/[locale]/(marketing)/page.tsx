@@ -4,18 +4,18 @@
  * Bénéfice-first (D-06) : hero → comment ça marche → [proof slot masqué D-08] →
  * aperçu tarifs (D-05). CTA hero → /tarifs (D-07).
  *
- * ⛔ Aucune allégation de performance ni promesse de gain (VITR-03, Pitfall A) :
- * zéro pourcentage, zéro terme de rendement chiffré. Le slot de track record mesuré
- * est CONSTRUIT mais MASQUÉ jusqu'en Phase 5 (D-08) — zéro chiffre rendu.
- * Vert/rouge bannis (D-04). Classes logiques uniquement, navigation localisée.
+ * Track record mesuré : le slot D-08 est ACTIVÉ en Phase 5 (SHOW_PROOF=true). Le
+ * bloc lit la vue pattern_stats via anon-client et n'affiche un % QUE mesuré
+ * (jamais inventé) ; sous N=30 il rend « échantillon insuffisant — N trades ».
+ * Vert/rouge réservés aux résultats mesurés (D-04). Classes logiques, nav localisée.
  */
 import { setRequestLocale, getTranslations } from 'next-intl/server'
 import { Link } from '../../../i18n/navigation'
 import { Button } from '@/components/ui/button'
+import { TrackRecordBlock } from '@/components/track-record/TrackRecordBlock'
 
-// D-08 : la section track record mesuré sera activée en Phase 5.
-// En P2 le slot reste vide — aucun nombre, aucun taux rendu (Pitfall 8).
-const SHOW_PROOF = false
+// D-08 : la section track record mesuré est ACTIVÉE en Phase 5 (TRACK-03).
+const SHOW_PROOF = true
 
 export default async function HomePage({
   params,
@@ -52,8 +52,12 @@ export default async function HomePage({
         </div>
       </section>
 
-      {/* PROOF SLOT — construit mais MASQUÉ jusqu'en Phase 5 (D-08), zéro chiffre */}
-      {SHOW_PROOF && null}
+      {/* PROOF SLOT — track record mesuré, activé en Phase 5 (D-08 / TRACK-03) */}
+      {SHOW_PROOF && (
+        <section className="border-t border-border py-16">
+          <TrackRecordBlock />
+        </section>
+      )}
 
       {/* APERÇU TARIFS — renvoie vers /tarifs (D-05) */}
       <section className="border-t border-border py-16">
