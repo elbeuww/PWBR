@@ -103,7 +103,7 @@ i18n/RTL+rôles avant toute UI publique · RLS signaux avant exposition espace m
 **Plans**: 3 plans (3 vagues)
 - [x] 05-01-PLAN.md — cœur déterministe : replayOutcome pur golden-testé (first-touch H1, distance D-04, flat D-02) + helper seuil N≥30 [TRACK-01, TRACK-03]
 - [x] 05-02-PLAN.md — pipeline data : migration 0014 (prediction_outcomes + vue pattern_stats RLS anon) + repos + job outcome-tracker idempotent + apply LIVE/types/get_advisors [TRACK-01, TRACK-02]
-- [ ] 05-03-PLAN.md — affichage : TrackRecordBlock RSC (anon-client, seuil/N/tooltip/disclaimer) + slot vitrine débloqué + miroir membre + page méthodologie + i18n [TRACK-03]
+- [x] 05-03-PLAN.md — affichage : TrackRecordBlock RSC (anon-client, seuil/N/tooltip/disclaimer) + slot vitrine débloqué + miroir membre + page méthodologie + i18n [TRACK-03]
 **UI hint**: yes
 
 ### Phase 6: Canal Telegram public
