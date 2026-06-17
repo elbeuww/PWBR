@@ -74,7 +74,8 @@ export { upsertNews } from './repositories/news'
 export { upsertMacroSeries } from './repositories/macroSeries'
 export { upsertEconomicCalendar } from './repositories/economicCalendar'
 // Phase 3 — moteur déterministe repositories
-export { upsertSnapshot, getSnapshotByHash } from './repositories/snapshots'
+export { upsertSnapshot, getSnapshotByHash, getLatestSnapshotsByKind } from './repositories/snapshots'
+export type { LatestSnapshotsByKind } from './repositories/snapshots'
 export { getAssetDrivers } from './repositories/assetDrivers'
 // Phase 4 — moteur IA vétéran & scoring repositories
 export { insertAnalysis } from './repositories/analyses'

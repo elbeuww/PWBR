@@ -54,3 +54,51 @@ export async function getSnapshotByHash(
 
   return data ?? null
 }
+
+/** Triplet des derniers snapshots séparés d'un (instrument, style) — un par kind. */
+export interface LatestSnapshotsByKind {
+  technical: SnapshotRow | null
+  fundamental: SnapshotRow | null
+  news: SnapshotRow | null
+}
+
+/** Kinds séparés produits par les 3 engines (assemblés ensuite en 'combined'). */
+const SEPARATE_KINDS = ['technical', 'fundamental', 'news'] as const
+
+/**
+ * Lit le snapshot le PLUS RÉCENT (computed_for_ts DESC) de CHAQUE kind séparé
+ * (technical/fundamental/news) pour un (instrument, style) donné.
+ *
+ * Chaque kind est requêté indépendamment avec `.limit(1).maybeSingle()` :
+ * `.limit(1)` borne explicitement la lecture (anti cap implicite PostgREST 1000,
+ * BUGFIX-CAP1000). Un kind sans aucun snapshot → `null` pour ce kind (jamais un
+ * throw, jamais une ligne fabriquée). Le combine-engine (TROU #2) s'en sert pour
+ * n'assembler que les triplets COMPLETS (cohérence temporelle par instrument×style).
+ */
+export async function getLatestSnapshotsByKind(
+  client: ServiceClient,
+  instrumentId: string,
+  style: string,
+): Promise<LatestSnapshotsByKind> {
+  const [technical, fundamental, news] = await Promise.all(
+    SEPARATE_KINDS.map(async (kind) => {
+      const { data, error } = await client
+        .from('snapshots')
+        .select('*')
+        .eq('instrument_id', instrumentId)
+        .eq('style', style)
+        .eq('kind', kind)
+        .order('computed_for_ts', { ascending: false })
+        .limit(1)
+        .maybeSingle()
+
+      if (error) {
+        throw new Error(`getLatestSnapshotsByKind failed: ${error.message}`)
+      }
+
+      return data ?? null
+    }),
+  )
+
+  return { technical, fundamental, news }
+}
