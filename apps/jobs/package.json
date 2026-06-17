@@ -13,6 +13,7 @@
     "@app/indicators": "workspace:*",
     "@app/supabase": "workspace:*",
     "dotenv": "^16.4.5",
+    "grammy": "1.43.0",
     "luxon": "3.7.2",
     "pino": "10.3.1"
   },
