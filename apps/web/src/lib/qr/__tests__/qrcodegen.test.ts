@@ -64,7 +64,7 @@ function isFinder(m: QrMatrix, ox: number, oy: number): boolean {
     for (let dx = 0; dx < 7; dx++) {
       const ring = Math.max(Math.abs(dx - 3), Math.abs(dy - 3))
       const expectDark = ring !== 2 // anneau de distance 2 = blanc
-      if (m.modules[oy + dy][ox + dx] !== expectDark) return false
+      if (m.modules[oy + dy]![ox + dx] !== expectDark) return false
     }
   }
   return true
@@ -82,7 +82,7 @@ function readDrawnFormatBits(m: QrMatrix): number {
   //   bit  7     -> setFunctionModule(8, 8)         => (8,8)
   //   bit  8     -> setFunctionModule(7, 8)         => col 7, ligne 8
   //   bits 9..14 -> setFunctionModule(14 - i, 8)    => lignes 8, col (14-i)
-  const get = (x: number, y: number, i: number) => (m.modules[y][x] ? 1 : 0) << i
+  const get = (x: number, y: number, i: number) => (m.modules[y]![x] ? 1 : 0) << i
   let v = 0
   for (let i = 0; i <= 5; i++) v |= get(8, i, i)
   v |= get(8, 7, 6)
@@ -117,7 +117,7 @@ function decodeFormatInfo(m: QrMatrix): { ecc: number; mask: number } | null {
   for (const eccFormat of [0, 1, 2, 3]) {
     for (let mask = 0; mask < 8; mask++) {
       if (expectedFormatBits(eccFormat, mask) === drawn) {
-        return { ecc: eccFormatToEnum[eccFormat], mask }
+        return { ecc: eccFormatToEnum[eccFormat]!, mask }
       }
     }
   }
@@ -141,14 +141,14 @@ describe('QR maison — golden + structurel', () => {
   it('STRUCTUREL : timing patterns alternés (ligne/colonne 6)', () => {
     const m = encodeText(GOLDEN_ADDRESS, Ecc.MEDIUM)
     for (let i = 8; i < m.size - 8; i++) {
-      expect(m.modules[6][i]).toBe(i % 2 === 0)
-      expect(m.modules[i][6]).toBe(i % 2 === 0)
+      expect(m.modules[6]![i]).toBe(i % 2 === 0)
+      expect(m.modules[i]![6]).toBe(i % 2 === 0)
     }
   })
 
   it('STRUCTUREL : dark module présent (8, size-8)', () => {
     const m = encodeText(GOLDEN_ADDRESS, Ecc.MEDIUM)
-    expect(m.modules[m.size - 8][8]).toBe(true)
+    expect(m.modules[m.size - 8]![8]).toBe(true)
   })
 
   it('CONFORMITÉ : le format-info décode bien ECC=MEDIUM (preuve lecteur standard)', () => {

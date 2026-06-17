@@ -33,7 +33,9 @@ export function QrCode({ value, ariaLabel, size = 200, ecc, className }: QrCodeP
       width={size}
       height={size}
       viewBox={`0 0 ${viewBox} ${viewBox}`}
-      dir="ltr"
+      // `dir` est un attribut HTML global valide mais absent des typings SVGProps
+      // de React → spread typé pour le conserver sans casser le type (LTR forcé).
+      {...({ dir: 'ltr' } as { dir: string })}
       shapeRendering="crispEdges"
       className={className}
     >

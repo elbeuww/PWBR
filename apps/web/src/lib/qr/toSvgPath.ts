@@ -18,7 +18,7 @@ export function toSvgPath(matrix: QrMatrix, quietZone = QR_QUIET_ZONE): string {
   const parts: string[] = []
   for (let y = 0; y < matrix.size; y++) {
     for (let x = 0; x < matrix.size; x++) {
-      if (matrix.modules[y][x]) {
+      if (matrix.modules[y]![x]) {
         parts.push(`M${x + quietZone},${y + quietZone}h1v1h-1z`)
       }
     }

@@ -88,9 +88,10 @@ function getNumRawDataModules(ver: number): number {
 }
 
 function getNumDataCodewords(ver: number, ecc: Ecc): number {
+  // `!` : ecc∈0..3 et ver∈1..40 sont bornés par construction (tables pleines).
   return (
     Math.floor(getNumRawDataModules(ver) / 8) -
-    ECC_CODEWORDS_PER_BLOCK[ecc][ver] * NUM_ERROR_CORRECTION_BLOCKS[ecc][ver]
+    ECC_CODEWORDS_PER_BLOCK[ecc]![ver]! * NUM_ERROR_CORRECTION_BLOCKS[ecc]![ver]!
   )
 }
 
@@ -102,8 +103,8 @@ function reedSolomonComputeDivisor(degree: number): number[] {
   let root = 1
   for (let i = 0; i < degree; i++) {
     for (let j = 0; j < result.length; j++) {
-      result[j] = reedSolomonMultiply(result[j], root)
-      if (j + 1 < result.length) result[j] ^= result[j + 1]
+      result[j] = reedSolomonMultiply(result[j]!, root)
+      if (j + 1 < result.length) result[j]! ^= result[j + 1]!
     }
     root = reedSolomonMultiply(root, 0x02)
   }
@@ -116,7 +117,7 @@ function reedSolomonComputeRemainder(data: number[], divisor: number[]): number[
     const factor = b ^ (result.shift() as number)
     result.push(0)
     divisor.forEach((coef, i) => {
-      result[i] ^= reedSolomonMultiply(coef, factor)
+      result[i]! ^= reedSolomonMultiply(coef, factor)
     })
   }
   return result
@@ -178,8 +179,9 @@ class QrBuilder {
   }
 
   private setFunctionModule(x: number, y: number, isDark: boolean): void {
-    this.modules[y][x] = isDark
-    this.isFunction[y][x] = true
+    // `!` : (x,y) sont des coordonnées internes bornées 0..size-1 (matrice carrée).
+    this.modules[y]![x] = isDark
+    this.isFunction[y]![x] = true
   }
 
   private drawFunctionPatterns(): void {
@@ -202,7 +204,7 @@ class QrBuilder {
             (i === numAlign - 1 && j === 0)
           )
         ) {
-          this.drawAlignmentPattern(alignPatPos[i], alignPatPos[j])
+          this.drawAlignmentPattern(alignPatPos[i]!, alignPatPos[j]!)
         }
       }
     }
@@ -280,8 +282,9 @@ class QrBuilder {
   private addEccAndInterleave(data: number[]): number[] {
     const ver = this.version
     const ecc = this.ecc
-    const numBlocks = NUM_ERROR_CORRECTION_BLOCKS[ecc][ver]
-    const blockEccLen = ECC_CODEWORDS_PER_BLOCK[ecc][ver]
+    // `!` : ecc∈0..3, ver∈1..40 bornés par construction (tables pleines).
+    const numBlocks = NUM_ERROR_CORRECTION_BLOCKS[ecc]![ver]!
+    const blockEccLen = ECC_CODEWORDS_PER_BLOCK[ecc]![ver]!
     const rawCodewords = Math.floor(getNumRawDataModules(ver) / 8)
     const numShortBlocks = numBlocks - (rawCodewords % numBlocks)
     const shortBlockLen = Math.floor(rawCodewords / numBlocks)
@@ -298,10 +301,11 @@ class QrBuilder {
     }
 
     const result: number[] = []
-    for (let i = 0; i < blocks[0].length; i++) {
+    // `!` : blocks non vide (numBlocks≥1) ; block[i] borné par la boucle.
+    for (let i = 0; i < blocks[0]!.length; i++) {
       blocks.forEach((block, j) => {
         if (i !== shortBlockLen - blockEccLen || j >= numShortBlocks) {
-          result.push(block[i])
+          result.push(block[i]!)
         }
       })
     }
@@ -317,8 +321,8 @@ class QrBuilder {
           const x = right - j
           const upward = ((right + 1) & 2) === 0
           const y = upward ? this.size - 1 - vert : vert
-          if (!this.isFunction[y][x] && i < data.length * 8) {
-            this.modules[y][x] = ((data[i >>> 3] >>> (7 - (i & 7))) & 1) !== 0
+          if (!this.isFunction[y]![x] && i < data.length * 8) {
+            this.modules[y]![x] = ((data[i >>> 3]! >>> (7 - (i & 7))) & 1) !== 0
             i++
           }
         }
@@ -358,7 +362,7 @@ class QrBuilder {
           default:
             throw new Error('mask invalide')
         }
-        if (invert && !this.isFunction[y][x]) this.modules[y][x] = !this.modules[y][x]
+        if (invert && !this.isFunction[y]![x]) this.modules[y]![x] = !this.modules[y]![x]
       }
     }
   }
@@ -388,14 +392,14 @@ class QrBuilder {
       let runX = 0
       const runHistory = new Array<number>(7).fill(0)
       for (let x = 0; x < size; x++) {
-        if (this.modules[y][x] === runColor) {
+        if (this.modules[y]![x] === runColor) {
           runX++
           if (runX === 5) result += PENALTY_N1
           else if (runX > 5) result++
         } else {
           this.finderPenaltyAddHistory(runX, runHistory)
           if (!runColor) result += this.finderPenaltyCountPatterns(runHistory) * PENALTY_N3
-          runColor = this.modules[y][x]
+          runColor = this.modules[y]![x]!
           runX = 1
         }
       }
@@ -408,14 +412,14 @@ class QrBuilder {
       let runY = 0
       const runHistory = new Array<number>(7).fill(0)
       for (let y = 0; y < size; y++) {
-        if (this.modules[y][x] === runColor) {
+        if (this.modules[y]![x] === runColor) {
           runY++
           if (runY === 5) result += PENALTY_N1
           else if (runY > 5) result++
         } else {
           this.finderPenaltyAddHistory(runY, runHistory)
           if (!runColor) result += this.finderPenaltyCountPatterns(runHistory) * PENALTY_N3
-          runColor = this.modules[y][x]
+          runColor = this.modules[y]![x]!
           runY = 1
         }
       }
@@ -425,11 +429,11 @@ class QrBuilder {
     // Blocs 2x2
     for (let y = 0; y < size - 1; y++) {
       for (let x = 0; x < size - 1; x++) {
-        const color = this.modules[y][x]
+        const color = this.modules[y]![x]
         if (
-          color === this.modules[y][x + 1] &&
-          color === this.modules[y + 1][x] &&
-          color === this.modules[y + 1][x + 1]
+          color === this.modules[y]![x + 1] &&
+          color === this.modules[y + 1]![x] &&
+          color === this.modules[y + 1]![x + 1]
         ) {
           result += PENALTY_N2
         }
@@ -445,7 +449,8 @@ class QrBuilder {
   }
 
   private finderPenaltyCountPatterns(runHistory: number[]): number {
-    const n = runHistory[1]
+    // `!` : runHistory a une longueur fixe 7 (alloué tel quel partout).
+    const n = runHistory[1]!
     const core =
       n > 0 &&
       runHistory[2] === n &&
@@ -453,8 +458,8 @@ class QrBuilder {
       runHistory[4] === n &&
       runHistory[5] === n
     return (
-      (core && runHistory[0] >= n * 4 && runHistory[6] >= n ? 1 : 0) +
-      (core && runHistory[6] >= n * 4 && runHistory[0] >= n ? 1 : 0)
+      (core && runHistory[0]! >= n * 4 && runHistory[6]! >= n ? 1 : 0) +
+      (core && runHistory[6]! >= n * 4 && runHistory[0]! >= n ? 1 : 0)
     )
   }
 
@@ -475,7 +480,7 @@ class QrBuilder {
 
   private finderPenaltyAddHistory(currentRunLength: number, runHistory: number[]): void {
     let runLen = currentRunLength
-    if (runHistory[0] === 0) runLen += this.size
+    if (runHistory[0]! === 0) runLen += this.size
     runHistory.pop()
     runHistory.unshift(runLen)
   }
@@ -526,7 +531,8 @@ export function encodeText(text: string, ecc: Ecc = Ecc.MEDIUM): QrMatrix {
 
   const dataCodewords = new Array<number>(bb.length >>> 3).fill(0)
   bb.forEach((bit, i) => {
-    dataCodewords[i >>> 3] |= bit << (7 - (i & 7))
+    // `!` : i>>>3 < dataCodewords.length par construction (taille = bb.length>>>3).
+    dataCodewords[i >>> 3]! |= bit << (7 - (i & 7))
   })
 
   const builder = new QrBuilder(version, ecc)
