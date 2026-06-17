@@ -57,6 +57,13 @@ const STYLE_TF: Record<Style, { htf: 'H4' | 'D'; ltf: 'H1' | 'H4'; set: string }
 const EMA_LONG = 200
 const EMA_MID = 50
 
+/**
+ * Nombre de bougies les plus récentes à charger par (instrument, TF).
+ * Couvre EMA200 + marge confortable pour ATR14, percentiles et structure,
+ * tout en restant SOUS le cap 1000 lignes implicite de PostgREST (BUGFIX-CAP1000).
+ */
+const CANDLE_WARMUP = 500
+
 // ─── Logique pure (D-23, testable hors-ligne) ─────────────────────────────────
 
 /** Tendance d'un TF : close vs EMA200 (ou EMA50 en repli), confirmée par structure. */
@@ -175,8 +182,15 @@ function getServiceClient(): ServiceClient {
 }
 
 /**
- * Lit les bougies clôturées d'un (instrument, timeframe), bougie en cours exclue (D-10).
- * @returns bougies ts ascendant, strictement avant la borne de la dernière clôturée.
+ * Lit les CANDLE_WARMUP bougies clôturées les PLUS RÉCENTES d'un (instrument, timeframe),
+ * bougie en cours exclue (D-10), puis les retourne ré-ordonnées ascendant.
+ *
+ * La requête trie `ts desc` + `.limit(CANDLE_WARMUP)` pour ne charger que les N plus
+ * récentes — sans cette borne, PostgREST plafonne implicitement à 1000 lignes et
+ * renvoie les 1000 plus VIEILLES en ordre ascendant (BUGFIX-CAP1000). Le ré-ordre
+ * ascendant se fait sur une COPIE (immutabilité CLAUDE.md), jamais en mutant `data`.
+ *
+ * @returns bougies ts ascendant, dernière = bougie clôturée la plus récente.
  */
 async function readClosedCandles(
   client: ServiceClient,
@@ -191,11 +205,12 @@ async function readClosedCandles(
     .eq('instrument_id', instrumentId)
     .eq('timeframe', timeframe)
     .lte('ts', cutoff.toISO())
-    .order('ts', { ascending: true })
+    .order('ts', { ascending: false })
+    .limit(CANDLE_WARMUP)
   if (error) {
     throw new Error(`readClosedCandles failed: ${error.message}`)
   }
-  return data ?? []
+  return (data ?? []).slice().reverse()
 }
 
 /** Source de volume selon le broker : Binance = volume réel, OANDA = tick proxy (D-35). */
