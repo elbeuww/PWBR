@@ -30,7 +30,7 @@ progress:
 Phase: 06 (canal-telegram-public) — EXECUTING
 Plan: 2 of 3
 Status: Ready to execute
-Last activity: 2026-06-17 — Quick task 260617-547 (fix cap 1000 technical-engine) + run pipeline moteur (candles/snapshots frais)
+Last activity: 2026-06-17 — Quick task 260617-j1a (combine-engine, TROU #2 résolu — maillon snapshots→persist livré)
 
 Progress: [█████████░] 91%
 
@@ -227,6 +227,7 @@ Progress: [█████████░] 91%
 | # | Description | Date | Commit | Directory |
 |---|-------------|------|--------|-----------|
 | 260617-547 | Fix bug cap 1000 lignes PostgREST dans readClosedCandles (technical-engine) — snapshots techniques gelés sur données périmées | 2026-06-17 | ced206c | [260617-547](./quick/260617-547-corriger-le-bug-du-cap-1000-lignes-dans-/) |
+| 260617-j1a | combine-engine (TROU #2) — assemble snapshots technical/fundamental/news en kind='combined' (latest-par-kind, ancré sur computed_for_ts technical, triplet incomplet→skip), hash réutilisé, upsert idempotent, dispatch | 2026-06-17 | 499d3f5 | [260617-j1a](./quick/260617-j1a-combine-engine/) |
 
 ## Session Continuity
 
