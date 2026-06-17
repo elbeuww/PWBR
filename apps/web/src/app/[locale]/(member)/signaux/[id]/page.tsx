@@ -10,17 +10,19 @@
  * Un signal expiré entre liste et détail, un id inexistant, ou une lecture par un
  * non-abonné → 0 ligne → notFound() (aucune fuite, pas de 403 discriminant).
  *
- * Le chart (lightweight-charts) est client-only → monté via next/dynamic ssr:false
- * (Pitfall 5). Render-fail du chart → le plan résumé (SignalDetail) reste lisible.
+ * Le chart (lightweight-charts) est client-only → monté via CandleChartLazy, un
+ * Client Component qui héberge le next/dynamic ssr:false (Pitfall 5 ; ssr:false
+ * interdit en RSC sous Next 15). Render-fail du chart → le plan résumé
+ * (SignalDetail) reste lisible.
  */
 import { z } from 'zod'
 import { notFound } from 'next/navigation'
-import dynamic from 'next/dynamic'
 import { setRequestLocale, getTranslations } from 'next-intl/server'
 import { Link } from '../../../../../i18n/navigation'
 import { createClient } from '../../../../../lib/supabase/server'
 import { SignalDetail, type TradeSetupDetail } from '../../../../../components/signals/SignalDetail'
 import { SignalsDisclaimerBanner } from '../../../../../components/signals/SignalsDisclaimerBanner'
+import { CandleChartLazy } from '../../../../../components/signals/CandleChartLazy'
 
 /**
  * Schéma Zod du payload §3 affiché (frontière Zod, convention packages/core /
@@ -56,12 +58,6 @@ const SignalPayloadSchema = z.object({
   invalidation: z.string(),
   veteran_note: z.string(),
 })
-
-// Chart client-only : jamais rendu côté serveur (référence window/canvas).
-const CandleChart = dynamic(
-  () => import('../../../../../components/signals/CandleChart').then((m) => m.CandleChart),
-  { ssr: false },
-)
 
 interface SignalDetailPageProps {
   params: Promise<{ locale: string; id: string }>
@@ -148,7 +144,7 @@ export default async function SignalDetailPage({ params }: SignalDetailPageProps
 
       {candles && candles.length > 0 ? (
         <section className="mt-6">
-          <CandleChart
+          <CandleChartLazy
             candles={candles}
             entry={payload.entry.price}
             stopLoss={payload.stop_loss}
