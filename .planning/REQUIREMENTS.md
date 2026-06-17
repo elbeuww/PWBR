@@ -48,7 +48,7 @@
 
 ### TG — Canal Telegram public (Wave 3)
 - [ ] **TG-01**: Un job publie automatiquement sur le canal Telegram public les résultats journaliers des trades.
-- [ ] **TG-02**: Les publications affichent le win rate permanent à jour.
+- [x] **TG-02**: Les publications affichent le win rate permanent à jour.
 - [ ] **TG-03**: Les publications sont idempotentes (aucun double post) et tracées.
 
 ### AFF — Affiliation à paliers (Wave 4)
@@ -124,7 +124,7 @@
 | TRACK-02 | Phase 5 | Complete |
 | TRACK-03 | Phase 5 | Complete |
 | TG-01 | Phase 6 | Pending |
-| TG-02 | Phase 6 | Pending |
+| TG-02 | Phase 6 | Complete |
 | TG-03 | Phase 6 | Pending |
 | AFF-01 | Phase 7 | Pending |
 | AFF-02 | Phase 7 | Pending |

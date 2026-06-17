@@ -115,7 +115,7 @@ i18n/RTL+rôles avant toute UI publique · RLS signaux avant exposition espace m
   2. Chaque publication affiche le win rate permanent à jour (issu du track record mesuré, Phase 5).
   3. Les publications sont idempotentes (aucun double post, contrainte sur `telegram_posts`) et tracées dans `job_runs`.
 **Plans**: 3 plans (3 vagues)
-- [ ] 06-01-PLAN.md — socle partagé : threshold->@app/core + getPatternStats->@app/supabase (graphe propre D-49) + formatMessage pur bilingue FR+AR golden-teste [TG-02, LEGAL-01]
+- [x] 06-01-PLAN.md — socle partagé : threshold->@app/core + getPatternStats->@app/supabase (graphe propre D-49) + formatMessage pur bilingue FR+AR golden-teste [TG-02, LEGAL-01]
 - [ ] 06-02-PLAN.md — migration 0015 telegram_posts (UNIQUE dedupe_key + RLS producteur-unique) + apply LIVE/gen types/alias + repo telegramPosts [TG-03]
 - [ ] 06-03-PLAN.md — grammY 1.43 publication-only + job telegram-publish idempotent (resolved_at, 3 formats D-01) + dispatch + tests mock + envoi reel [TG-01, TG-03]
 **UI hint**: no

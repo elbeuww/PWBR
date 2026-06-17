@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v2.0
 milestone_name: Plateforme publique
 status: executing
-last_updated: "2026-06-17T00:59:53.181Z"
-last_activity: 2026-06-17 -- Phase 06 planning complete
+last_updated: "2026-06-17T01:13:57.235Z"
+last_activity: 2026-06-17
 progress:
   total_phases: 9
   completed_phases: 5
   total_plans: 22
-  completed_plans: 19
-  percent: 86
+  completed_plans: 20
+  percent: 91
 ---
 
 # Project State
@@ -21,18 +21,18 @@ progress:
 ## Project Reference
 
 **Core value:** Produire, pour chaque opportunité, une analyse fiable et explicable — vulgarisée pour un public non technique — avec un % de réussite TOUJOURS mesuré, jamais inventé : c'est le socle de confiance qui fait payer l'abonnement.
-**Current focus:** Phase 05 — track-record-mesur-affich
+**Current focus:** Phase 06 — canal-telegram-public
 **Mode:** interactive (MVP vertical)
 **Granularity:** fine
 
 ## Current Position
 
-Phase: 05 (track-record-mesur-affich) — EXECUTING
-Plan: 3 of 3 (05-02 COMPLETE, 05-03 reste)
+Phase: 06 (canal-telegram-public) — EXECUTING
+Plan: 2 of 3
 Status: Ready to execute
-Last activity: 2026-06-17 -- Phase 06 planning complete
+Last activity: 2026-06-17
 
-Progress: [██████████] 95%
+Progress: [█████████░] 91%
 
 ## Performance Metrics
 
@@ -52,6 +52,7 @@ Progress: [██████████] 95%
 | Phase 03 P03-03 | ~9min | 2 tasks | 10 files |
 | Phase 05 P01 | ~15min | 3 tasks | 6 files |
 | Phase 05 P05-02 | ~30min | 4 tasks | 8 files |
+| Phase 06 P06-01 | ~12min | 3 tasks | 9 files |
 
 ## Roadmap v2.0 (9 phases)
 
@@ -197,6 +198,15 @@ Progress: [██████████] 95%
 - **D-05-02-F (déviation Rule 3)** : `generate_typescript_types` écrase tout `database.types.ts` et supprime le bloc d'aliases de convenance maintenus à la main (CandleInsert/TradeSetupInsert/ProfileRow/Timeframe…). Réappliqués à la fin du fichier (source = dist/.d.ts précédent) + ajout PredictionOutcome{Row,Insert,Update}. À refaire après chaque régénération.
 - **Commits 05-02** : f931623 (RED test idempotence + getCandlesForReplay), 1584c7c (migration 0014 + repos + barrel), 374a5bb (GREEN job outcome-tracker + dispatch), 542a1f7 (apply LIVE + regen types + drop temp casts). outcome-tracker test 2/2 vert (2e run = 0 insert), core replay 11/11 non régressé, `pnpm typecheck` 0 erreur, 0 package npm. **TRACK-01/TRACK-02 complets.** Reste 05-03 (page publique consommant pattern_stats en anon + seuil N≥30).
 
+### Decisions exécution (Plan 06-01)
+
+- **D-06-01-A** : `threshold.ts` (MIN_SAMPLE/applyThreshold + types) déplacé tel quel (contenu IDENTIQUE) en `packages/core/src/track-record/threshold.ts` ; `apps/web/src/lib/track-record/threshold.ts` = re-export mince depuis `@app/core`. Aucun changement de logique → cohérence stricte vitrine ↔ Telegram (D-11). Source unique du seuil pour vitrine P5 ET job Telegram P6.
+- **D-06-01-B** : `getPatternStats` porté en `packages/supabase/src/repositories/patternStats.ts`, typé `SupabaseClient<Database>` générique (anon RSC OU service_role job — la vue grant SELECT anon+authenticated, service_role bypass). SELECT EXACT `'dimension, bucket, period, n, win_rate, avg_r, expectancy'`, jamais de throw. Barrel `@app/supabase` exporte `getPatternStats`/`PatternStatRow` (service-client toujours sous garde D-07). Web re-câblé en re-export mince → jobs n'importera jamais apps/web (D-49).
+- **D-06-01-C** : disclaimer FR+AR en constantes locales dans `format.ts` (copy P2 `disclaimer.footer` identique, sans promesse de gain, LEGAL-01). Le job en `@app/core` ne peut PAS importer les messages next-intl de `apps/web` (cross-app interdit D-49) → la copy est dupliquée volontairement comme constante du formateur pur.
+- **D-06-01-D (Rule 2)** : ajout de l'export barrel `@app/core` pour `formatMessage`/`escapeHtml` + types (non re-listé dans files_modified du plan pour Task 3 mais requis pour que le job P6 importe sans toucher apps/web).
+- **D-06-01-E (formatMessage)** : pur zéro I/O, sortie HTML unique parse_mode ; `escapeHtml` ordre `& < >` sur toute donnée dynamique (T-06-INJ) ; bloc FR LTR + bloc AR RTL (RLM préfixe), ticker/R/% isolés U+2066/U+2069 (T-06-BIDI) ; win rate via `applyThreshold` (TG-02/D-11) ; `FormatTrade` limité à symbol+direction+outcome+realized_r — JAMAIS entry/SL/TP (D-03/T-06-LEAK, grep == 0) ; jour vide D-10 ; cap top-10 par |R| + « +X autres », sortie < 4096 (Pitfall 3).
+- **Commits 06-01** : 9757fdf (Task 1 threshold→core + re-export web + test golden 8), 882915d (Task 2 getPatternStats→@app/supabase + re-câblage web), 28d8800 (Task 3 formatMessage pur bilingue + 11 tests golden). `npx vitest run` 401 tests verts (53 fichiers, dont core threshold 8 + format 11 ; P5 non régressée), `pnpm typecheck` 0 erreur, 0 package npm. **TG-02/LEGAL-01 couverts.** Reste 06-02/06-03 (job d'envoi grammy + planification + threat verify graphe packages).
+
 ### Open todos / research flags (v2.0)
 
 - **Phase 4 (research flag) :** TronGrid endpoint `walletsolidity`, parsing logs TRC-20, normalisation hex↔base58 — doc TS peu dense, recherche de phase recommandée.
@@ -214,9 +224,11 @@ Progress: [██████████] 95%
 
 ## Session Continuity
 
-**Last session:** 2026-06-16T13:36:19.979Z
+**Last session:** 2026-06-17T01:13:57.228Z
 
-**Last session:** 2026-06-16 — Plan 05-02 COMPLETE (pipeline de données track record, TRACK-01/02). Migration 0014 appliquée LIVE via MCP : table prediction_outcomes (PK setup_id, FK trade_setups cascade, RLS authenticated, 0 policy write → service_role bypass) + vue pattern_stats (security_invoker=false, **grant SELECT anon = première lecture publique du projet**, agrégats only). Job outcome-tracker GREEN idempotent 2 niveaux (getResolvedSetupIds + UNIQUE setup_id onConflict ignoreDuplicates), enregistré dispatch, tracé runJob. Repos insertOutcomes/getResolvedSetupIds + getCandlesForReplay (H1 borné anti look-ahead). A1 (invalidated rejoués pleinement) + A2 (expectancy tous / avg_r gagnants) honorés. get_advisors PASS (prediction_outcomes inaccessible anon ; security_definer_view sur pattern_stats = intentionnel). Commits f931623/1584c7c/374a5bb/542a1f7. Déviations : asset_class joint depuis instruments (Rule 1), aliases database.types.ts réappliqués post gen-types (Rule 3). Tests : outcome-tracker 2/2, core replay 11/11, typecheck 0 erreur, 0 npm. Stopped at : Plan 05-02 terminé.
+**Last session:** 2026-06-17 — Plan 06-01 COMPLETE (socle partagé + formateur Telegram bilingue, TG-02/LEGAL-01). Task 1 (9757fdf, TDD) : threshold.ts déplacé tel quel en @app/core (source unique seuil N≥30 vitrine ↔ Telegram, D-11), web re-exporte, test golden 8 vert. Task 2 (882915d) : getPatternStats porté en @app/supabase (client générique anon|service_role, SELECT agrégats exact, jamais de throw), web re-câblé en re-export, suite P5 non régressée — jobs n'importera jamais apps/web (D-49). Task 3 (28d8800, TDD) : formatMessage pur bilingue FR+AR — escapeHtml ordre & < > (T-06-INJ), bloc FR LTR + AR RTL préfixé U+200F, ticker/R/% isolés U+2066/U+2069 (T-06-BIDI), win rate via applyThreshold (TG-02/D-11), disclaimer FR+AR copy P2 chaque sortie (LEGAL-01), FormatTrade sans niveaux entry/SL/TP (D-03/T-06-LEAK grep==0), jour vide D-10, cap top-10 |R| + « +X autres » < 4096 (Pitfall 3), 11 tests golden verts. Déviation Rule 2 : export barrel core formatMessage/escapeHtml. npx vitest run 401 tests verts (53 fichiers), pnpm typecheck 0 erreur, 0 package npm. Stopped at : Plan 06-01 terminé.
+
+**Last session (archive):** 2026-06-16 — Plan 05-02 COMPLETE (pipeline de données track record, TRACK-01/02). Migration 0014 appliquée LIVE via MCP : table prediction_outcomes (PK setup_id, FK trade_setups cascade, RLS authenticated, 0 policy write → service_role bypass) + vue pattern_stats (security_invoker=false, **grant SELECT anon = première lecture publique du projet**, agrégats only). Job outcome-tracker GREEN idempotent 2 niveaux (getResolvedSetupIds + UNIQUE setup_id onConflict ignoreDuplicates), enregistré dispatch, tracé runJob. Repos insertOutcomes/getResolvedSetupIds + getCandlesForReplay (H1 borné anti look-ahead). A1 (invalidated rejoués pleinement) + A2 (expectancy tous / avg_r gagnants) honorés. get_advisors PASS (prediction_outcomes inaccessible anon ; security_definer_view sur pattern_stats = intentionnel). Commits f931623/1584c7c/374a5bb/542a1f7. Déviations : asset_class joint depuis instruments (Rule 1), aliases database.types.ts réappliqués post gen-types (Rule 3). Tests : outcome-tracker 2/2, core replay 11/11, typecheck 0 erreur, 0 npm. Stopped at : Plan 05-02 terminé.
 
 **Last session (archive):** 2026-06-16 — Plan 05-01 COMPLETE (cœur déterministe pur, zéro I/O). TDD : 8498a2c (RED golden tests replayOutcome) → 084d75f (GREEN replayOutcome pur + barrel core, types Outcome/ReplaySetup/ReplayCandle) ; a2f5b19 (helper applyThreshold seuil N≥30 + test + extension glob vitest apps/web/src/lib/**). replayOutcome : first-touch H1 (D-01/D-03), règle distance D-04 (tie ≤ = hit_tp), flat D-02 au close ≤ valid_until (long ET short), R sur prix candles jamais via scoring. applyThreshold : MIN_SAMPLE=30, N exposé dans les 2 branches (D-12), win_rate null → 0 (pas de NaN). 17 tests neufs verts (11 replay + 6 threshold), typecheck 0 erreur, 0 package npm. TRACK-01/TRACK-03 (logique pure) couverts ; job outcome-tracker + vue pattern_stats + RLS anon = 05-02/05-03. 2 tests d'intégration Supabase rouges hors scope (réseau, deferred-items.md). Stopped at : Plan 05-01 terminé.
 
@@ -230,7 +242,9 @@ Progress: [██████████] 95%
 
 **Last session (archive):** 2026-06-14 — Completed 02-03-PLAN.md (4 commits : 38c1894 tarifs 9$/3$ + paiement-bientot + funnel signup→paiement-bientot, 86e7001 home bénéfice-first + proof slot masqué, 49ac57e RED no-perf-claims, fa8a5d0 GREEN glob vitest). Cœur conversion de la vitrine livré : home VITR-01, tarifs VITR-02 (USDT TRC-20, D-10/D-11/D-12), funnel honnête D-09, garde no-perf-claims VITR-03/D-08. 15 tests verts, tsc/lint:i18n OK, invariant auth P1 intact. **Phase 02 COMPLETE (3/3 plans).** Stopped at : Plan 02-03 terminé.
 
-**Next action:** Phase 05 — Plan 05-03 (page track record publique). Consommer la vue `pattern_stats` en lecture anon (premier consommateur public), appliquer le seuil N≥30 via `applyThreshold` (threshold.ts de 05-01), afficher win_rate/expectancy/avg_r/N par dimension D-06 (all_time + 90d) sinon « en construction ». Pipeline de données (table + vue + job idempotent) déjà live et committé (05-02). En suspens Phase 04 : 04-03 vetting lib QR B-04-03, 04-02 LIVE apply B-04-02, 04-01 fixture TronGrid B-04-01.
+**Next action:** Phase 06 — Plan 06-02 (job d'envoi Telegram). Câbler grammy 1.43 + planification sur le socle livré en 06-01 : le job lira `getPatternStats` (@app/supabase, anon|service_role) + clôtures du jour, appellera `formatMessage` (@app/core, pur bilingue FR+AR) et postera sur le canal public (parse_mode HTML). Socle partagé (threshold + getPatternStats + formatMessage) déjà committé et golden-testé (9757fdf/882915d/28d8800). 06-03 = threat verify graphe packages (aucun import apps/web depuis jobs). En suspens Phase 04 : 04-03 vetting lib QR B-04-03, 04-02 LIVE apply B-04-02, 04-01 fixture TronGrid B-04-01.
+
+**Next action (archive):** Phase 05 — Plan 05-03 (page track record publique). Consommer la vue `pattern_stats` en lecture anon (premier consommateur public), appliquer le seuil N≥30 via `applyThreshold` (threshold.ts de 05-01), afficher win_rate/expectancy/avg_r/N par dimension D-06 (all_time + 90d) sinon « en construction ». Pipeline de données (table + vue + job idempotent) déjà live et committé (05-02). En suspens Phase 04 : 04-03 vetting lib QR B-04-03, 04-02 LIVE apply B-04-02, 04-01 fixture TronGrid B-04-01.
 
 **Next action (archive):** Phase 04 — Plan 04-03 PARTIEL, **bloqué au checkpoint vetting lib QR B-04-03** (human-verify, blocking-human). Étape humaine requise : vetter la lib QR (npmjs âge/downloads/repo/postinstall + rendu 100% offline + encode l'adresse seule) puis `pnpm --filter web add <qr-lib>` épinglée, OU repli SVG QR maison. Tasks 2+3 (8 blocs shadcn + i18n payment/admin) déjà livrées et committées (d5b38c8, 1fc7b9e). En parallèle : 04-02 bloqué au checkpoint LIVE apply B-04-02 (orchestrateur), 04-01 bloqué au checkpoint réseau TronGrid B-04-01. Ne pas marquer 04-03 complet avant le vetting QR.
 
