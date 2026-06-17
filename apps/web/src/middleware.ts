@@ -1,5 +1,7 @@
 /**
- * middleware.ts — racine de apps/web (unique middleware)
+ * middleware.ts — DANS src/ (Next.js exige le middleware au même niveau que app/,
+ * donc src/middleware.ts quand un dossier src/ existe ; placé à la racine de
+ * apps/web il n'est PAS détecté → pas de redirect /→/fr, racine en 404).
  *
  * Compose deux responsabilités sur UNE seule response (Pattern 2) :
  *   1. handleI18n(request) → next-intl résout la locale depuis l'URL brute,
@@ -14,8 +16,8 @@
  */
 import createMiddleware from 'next-intl/middleware'
 import { type NextRequest } from 'next/server'
-import { routing } from './src/i18n/routing'
-import { updateSession } from './src/lib/supabase/middleware'
+import { routing } from './i18n/routing'
+import { updateSession } from './lib/supabase/middleware'
 
 const handleI18n = createMiddleware(routing)
 
