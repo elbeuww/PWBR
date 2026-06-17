@@ -4,7 +4,9 @@
  * Fonction PURE, zéro I/O. Produit un unique string HTML (parse_mode: 'HTML')
  * destiné au canal Telegram PUBLIC. Garde-fous de la phase 6 :
  *
- *  - LEGAL-01 : chaque sortie contient le disclaimer FR ET AR (copy P2 identique).
+ *  - LEGAL-01 / D-06 (révisé) : le disclaimer N'EST PLUS émis par message. Il est
+ *    désormais porté par la DESCRIPTION du canal Telegram (persistante, en tête de
+ *    canal, hors-code) ; formatMessage n'injecte plus de disclaimer FR/AR.
  *  - TG-02 / D-11 : le bloc win rate passe par applyThreshold (@app/core) — même
  *    source de vérité que la vitrine ; jamais de % sous N<30.
  *  - D-03 / D-05 (T-06-LEAK) : le type d'entrée FormatTrade ne porte QUE
@@ -32,12 +34,6 @@ const SEP = '────────────'
 
 /** Nombre max de trades détaillés avant résumé « +X autres » (Pitfall 3). */
 const MAX_DETAILED = 10
-
-/** Disclaimer LEGAL-01 — copy P2 identique (jamais de promesse de gain). */
-const DISCLAIMER_FR =
-  '⚠️ Contenu éducatif. Aucune promesse de gain. Ceci ne constitue pas un conseil en investissement.'
-const DISCLAIMER_AR =
-  '⚠️ محتوى تعليمي. لا وعد بأي ربح. هذا ليس نصيحة استثمارية.'
 
 /**
  * Trade minimal affichable (D-03) — JAMAIS de niveau premium (entry/SL/TP).
@@ -166,7 +162,6 @@ export function formatMessage(input: FormatInput): string {
   }
 
   frLines.push(winRateLineFr(winRate))
-  frLines.push(DISCLAIMER_FR)
 
   // ── Bloc AR (RTL) ──────────────────────────────────────────────
   const titleAr =
@@ -194,7 +189,6 @@ export function formatMessage(input: FormatInput): string {
   }
 
   arLines.push(winRateLineAr(winRate))
-  arLines.push(`${RLM}${DISCLAIMER_AR}`)
 
   return [...frLines, '', SEP, '', ...arLines].join('\n')
 }

@@ -1,7 +1,8 @@
 /**
  * Tests golden de formatMessage — formateur Telegram pur bilingue FR+AR.
  *
- * Couvre TG-02 (seuil N≥30), LEGAL-01 (disclaimer FR+AR), D-03/D-05 (jamais de
+ * Couvre TG-02 (seuil N≥30), D-06-REVISED (AUCUN disclaimer par message — LEGAL-01
+ * porté par la DESCRIPTION du canal Telegram, hors-code), D-03/D-05 (jamais de
  * niveaux entrée/SL/TP), D-10 (jour vide), D-11 (cohérence seuil), bidi
  * (isolats U+2066/U+2069/U+200F), escapeHtml (T-06-INJ), cap 4096 (Pitfall 3).
  */
@@ -47,13 +48,28 @@ describe('formatMessage — seuil win rate (TG-02 / D-11)', () => {
   })
 })
 
-describe('formatMessage — disclaimer LEGAL-01', () => {
-  it('toute sortie contient le disclaimer FR ET AR', () => {
+describe('formatMessage — AUCUN disclaimer par message (D-06 révisé)', () => {
+  it('aucune sortie ne contient le disclaimer FR ni AR (porté par la description du canal)', () => {
     const out = formatMessage({ kind: 'recap', winRate: sufficient, trades: [tradeTp] })
-    expect(out).toContain('Contenu éducatif')
-    expect(out).toContain('conseil en investissement')
-    expect(out).toContain('تعليمي')
-    expect(out).toContain('استثمارية')
+    expect(out).not.toContain('Contenu éducatif')
+    expect(out).not.toContain('conseil en investissement')
+    expect(out).not.toContain('تعليمي')
+    expect(out).not.toContain('استثمارية')
+  })
+})
+
+describe('formatMessage — ligne taux de réussite TOUJOURS présente (TG-02 / D-11)', () => {
+  it('N≥30 → ligne taux présente avec « 58% » ET « N=142 »', () => {
+    const out = formatMessage({ kind: 'recap', winRate: sufficient, trades: [tradeTp] })
+    expect(out).toContain('58%')
+    expect(out).toContain('N=142')
+  })
+
+  it('N<30 → ligne taux présente « échantillon insuffisant » + « N=12 » + AUCUN %', () => {
+    const out = formatMessage({ kind: 'recap', winRate: insufficient, trades: [tradeTp] })
+    expect(out).toContain('échantillon insuffisant')
+    expect(out).toContain('N=12')
+    expect(out).not.toContain('%')
   })
 })
 
