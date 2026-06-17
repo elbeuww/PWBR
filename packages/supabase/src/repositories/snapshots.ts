@@ -100,5 +100,8 @@ export async function getLatestSnapshotsByKind(
     }),
   )
 
-  return { technical, fundamental, news }
+  // `?? null` : sous noUncheckedIndexedAccess, la déstructuration du tuple
+  // Promise.all marque chaque élément `| undefined`. Le tableau a toujours 3
+  // éléments (SEPARATE_KINDS, longueur fixe) → normalisation type-only en `null`.
+  return { technical: technical ?? null, fundamental: fundamental ?? null, news: news ?? null }
 }

@@ -90,7 +90,15 @@ export async function fetchActiveSignals(
   return runSetupsQuery(supabase, params)
 }
 
-type SetupsQuery = ReturnType<ReturnType<SupabaseClient<Database>['from']>['select']>
+// Type concret du query-builder trade_setups + SELECT_COLUMNS. Capturé depuis
+// l'expression réelle `from('trade_setups').select(SELECT_COLUMNS)` via
+// `buildBaseSetupsQuery` : le `from()` générique produirait une union sur TOUTES
+// les tables, rendant le paramètre colonne de `.eq` inférable en `never` et
+// cassant `applyInstrumentFilter`. Type-only : sémantique de requête inchangée.
+function buildBaseSetupsQuery(supabase: SupabaseClient<Database>) {
+  return supabase.from('trade_setups').select(SELECT_COLUMNS)
+}
+type SetupsQuery = ReturnType<typeof buildBaseSetupsQuery>
 
 /**
  * Construit et exécute la requête trade_setups (status=active + style/risk + tri),
@@ -102,9 +110,7 @@ async function runSetupsQuery(
   params: SignalsParams,
   applyInstrumentFilter?: (q: SetupsQuery) => SetupsQuery,
 ): Promise<FetchActiveSignalsResult> {
-  let query = supabase
-    .from('trade_setups')
-    .select(SELECT_COLUMNS)
+  let query = buildBaseSetupsQuery(supabase)
     .eq('status', 'active') // D-02 : actifs uniquement
     .limit(100) // D-19 : plafond de sécurité, pas de pagination MVP
 
