@@ -40,6 +40,7 @@ export default defineConfig({
       'apps/**/__tests__/**/*.test.tsx',
       'apps/web/test/**/*.test.ts',
       'apps/web/src/lib/**/*.test.ts',
+      'apps/jobs/src/**/*.test.ts',
     ],
     globals: false,
   },
