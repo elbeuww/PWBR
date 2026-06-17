@@ -87,7 +87,7 @@ export { getPatternStats } from './repositories/patternStats'
 export type { PatternStatRow } from './repositories/patternStats'
 // Phase 6 — canal Telegram (TG-03) — idempotence des publications, écriture service_role
 // (frontière producteur-unique D-05, JAMAIS importé depuis apps/web).
-export { insertPost, getPostedKeys } from './repositories/telegramPosts'
+export { reservePost, releasePost, getPostedKeys } from './repositories/telegramPosts'
 // Phase 4 — paiement USDT & abonnement repositories (service_role)
 export {
   OFFSET_RESERVATION_MINUTES,

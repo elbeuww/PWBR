@@ -7,17 +7,19 @@
  *
  * Décision de cadence (D-01) à chaque run, horloge UTC (luxon) :
  *  - À chaque run : poste les NOTABLES fraîchement résolus (realized_r ≥ 2.0, D-02).
- *  - Au run récap (~21h UTC, RECAP_HOUR_UTC = 21, D-08) : récap quotidien — même un
- *    jour sans trade clos poste « aucun trade » + win rate (D-10), jamais de skip.
+ *  - Au run récap (à/après 21h UTC, now.hour >= RECAP_HOUR_UTC, D-08) : récap quotidien —
+ *    même un jour sans trade clos poste « aucun trade » + win rate (D-10), jamais de skip.
+ *    Le seuil >= (et non ===) rattrape un run de 21h manqué (PC éteint) aux heures suivantes
+ *    du même jour UTC ; l'idempotence (recap:<jour>) garantit un seul récap par jour.
  *  - Le vendredi (weekday === 5, D-09) : post win-rate-seul.
  *
- * Idempotence à 2 niveaux (TG-03, T-06-DUP) :
- *  1. getPostedKeys (sélection bornée applicative) — on n'envoie que les dedupe_key absents.
- *  2. insertPost onConflict 'dedupe_key' ignoreDuplicates (filet DB inviolable).
+ * Idempotence anti double-post (TG-03, T-06-DUP) — RÉSERVER AVANT D'ENVOYER :
+ *  1. getPostedKeys (sélection applicative) — on saute les dedupe_key déjà connus.
+ *  2. reservePost (upsert ignoreDuplicates + select) AVANT le sendMessage : on n'envoie
+ *     QUE si la réservation est gagnée. Un crash entre réservation et envoi laisse la clé
+ *     en base → le run suivant SKIP (post manqué, JAMAIS un doublon public). Si l'envoi
+ *     échoue, releasePost annule la réservation (retry propre, pas de skip silencieux).
  *  Un 2e run consécutif n'envoie aucun message en double (posted=0, sendMessage non rappelé).
- *
- * Ordre send THEN insert (Pitfall 2) : on envoie d'abord, on insère le dedupe_key ensuite.
- * Si l'insert échoue, on logge BRUYAMMENT (pino error) sans masquer — ne jamais swallow.
  *
  * Secrets (T-06-TOKEN) : token/channel_id lus uniquement via getBot/getChannelId
  * (apps/jobs/.env). JAMAIS loggés, JAMAIS dans le Json retourné / job_runs.stats.
@@ -33,7 +35,7 @@ import { DateTime } from 'luxon'
 import { createClient } from '@supabase/supabase-js'
 import { applyThreshold, formatMessage } from '@app/core'
 import type { StatRow, FormatTrade, FormatInput, Outcome } from '@app/core'
-import { getPatternStats, insertPost, getPostedKeys } from '@app/supabase'
+import { getPatternStats, reservePost, releasePost, getPostedKeys } from '@app/supabase'
 import type { Json, Database, TelegramPostInsert } from '@app/supabase'
 import { getBot, getChannelId, sendPost } from '../telegram/bot'
 
@@ -128,10 +130,20 @@ async function loadResolvedTrades(
     }
     const setup = Array.isArray(row.trade_setups) ? row.trade_setups[0] : row.trade_setups
     const inst = Array.isArray(setup?.instruments) ? setup?.instruments[0] : setup?.instruments
+    const symbol = inst?.symbol
+    const direction = setup?.direction
+    // WR-03 fail-fast : ne JAMAIS publier un symbole placeholder ('?') ni une direction
+    // devinée par défaut ('long') sur un canal public de réputation. Un trade incomplet
+    // fait échouer le job BRUYAMMENT (remonté dans job_runs), il n'est pas publié à tort.
+    if (!symbol || !direction) {
+      throw new Error(
+        `telegram-publish: trade ${row.setup_id} missing symbol/direction — refusing to publish incomplete data`,
+      )
+    }
     return {
       setup_id: row.setup_id,
-      symbol: inst?.symbol ?? '?',
-      direction: setup?.direction ?? 'long',
+      symbol,
+      direction,
       outcome: row.outcome,
       realized_r: row.realized_r,
     }
@@ -154,7 +166,9 @@ export async function telegramPublish(injectedNow?: DateTime): Promise<Json> {
   // Bornes & cadence (luxon, UTC).
   const windowStart = now.minus({ hours: WINDOW_HOURS }).toISO() ?? ''
   const isFriday = now.weekday === 5 // luxon : 1=lundi .. 7=dimanche (D-09)
-  const isRecapHour = now.hour === RECAP_HOUR_UTC // D-08
+  // D-08/D-10 : récap dû à/après 21h UTC. `>=` (et non `===`) rattrape un run de 21h
+  // manqué (PC éteint) aux heures suivantes ; recap:<jour> garantit l'unicité quotidienne.
+  const isRecapDue = now.hour >= RECAP_HOUR_UTC
 
   // Données partagées (win rate global + trades clos récents).
   const winRate = await loadGlobalStat(client)
@@ -168,31 +182,50 @@ export async function telegramPublish(injectedNow?: DateTime): Promise<Json> {
   let skippedCount = 0
 
   /**
-   * Envoie un post si sa clé est absente (niveau 1) puis trace (niveau 2).
-   * send THEN insert (Pitfall 2) : insert échoué → log bruyant, jamais masqué.
+   * RÉSERVE la clé (niveau 2) AVANT d'envoyer (anti double-post, T-06-DUP) puis envoie.
+   *
+   * Ordre reserve THEN send (CR-02) : si le process meurt entre la réservation et
+   * l'envoi, la clé existe déjà → le run suivant SKIP (post manqué, JAMAIS un doublon
+   * visible sur le canal public). Si l'envoi échoue, on LIBÈRE la réservation pour
+   * autoriser un retry propre (pas de skip silencieux, D-10) et on surface bruyamment.
    */
   const publish = async (
     dedupeKey: string,
     postType: TelegramPostInsert['post_type'],
     input: FormatInput,
   ): Promise<void> => {
+    // Niveau 1 (applicatif) : clé déjà connue de ce run → rien à faire.
     if (posted.has(dedupeKey)) {
       skippedCount += 1
       return
     }
+    // Niveau 2 (DB, inviolable) : réserver le créneau AVANT tout envoi.
+    const won = await reservePost(client, {
+      dedupe_key: dedupeKey,
+      post_type: postType,
+      // tg_message_id renseigné à null : la réservation précède l'envoi, donc le
+      // message_id n'est pas encore connu. La table ne sert qu'à l'idempotence (P6
+      // publication-only : aucune édition/suppression de post ne le consomme).
+      tg_message_id: null,
+    })
+    if (!won) {
+      // Clé déjà prise (run concurrent ou réservation antérieure) → ne pas réémettre.
+      posted.add(dedupeKey)
+      skippedCount += 1
+      return
+    }
     const html = formatMessage(input)
-    const messageId = await sendPost(bot, channelId, html)
     try {
-      await insertPost(client, {
-        dedupe_key: dedupeKey,
-        post_type: postType,
-        tg_message_id: messageId,
-      })
+      await sendPost(bot, channelId, html)
     } catch (err: unknown) {
-      // Pitfall 2 : message déjà envoyé mais trace échouée — surface bruyamment,
-      // ne jamais swallow (le filet onConflict couvrira le doublon au prochain run).
+      // Envoi échoué après réservation : libérer la clé pour permettre un retry
+      // (sinon le post serait marqué fait mais jamais envoyé). Ne jamais swallow.
       const msg = err instanceof Error ? err.message : String(err)
-      logger.error({ dedupeKey, postType }, `telegram-publish: insertPost failed after send: ${msg}`)
+      logger.error(
+        { dedupeKey, postType },
+        `telegram-publish: sendPost failed after reserve, releasing key: ${msg}`,
+      )
+      await releasePost(client, dedupeKey)
       throw err
     }
     posted.add(dedupeKey)
@@ -211,8 +244,8 @@ export async function telegramPublish(injectedNow?: DateTime): Promise<Json> {
     }
   }
 
-  // 2. RÉCAP quotidien au run récap (~21h UTC) — jour vide → poste quand même (D-10).
-  if (isRecapHour) {
+  // 2. RÉCAP quotidien au run récap (à/après 21h UTC) — jour vide → poste quand même (D-10).
+  if (isRecapDue) {
     const input: FormatInput = {
       kind: 'recap',
       winRate,

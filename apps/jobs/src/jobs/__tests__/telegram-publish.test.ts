@@ -55,6 +55,13 @@ vi.mock('grammy', () => ({
   },
 }))
 
+// ─── Mock p-retry (passe-plat) ──────────────────────────────────────────────────
+// sendPost enveloppe sendMessage dans pRetry({ retries: 3 }) avec backoff exponentiel
+// (~7s). En test on veut un échec immédiat et déterministe : une seule tentative.
+vi.mock('p-retry', () => ({
+  default: (fn: () => Promise<unknown>) => fn(),
+}))
+
 // ─── Mock client service_role (store-backed) ────────────────────────────────────
 
 function makeClient() {
@@ -78,8 +85,17 @@ function makeClient() {
         return { data: [], error: null }
       }
 
+      // Opération courante de la chaîne (select par défaut, upsert/delete sinon) +
+      // lignes réellement insérées par un upsert (pour .select() de reservePost).
+      let op: 'select' | 'upsert' | 'delete' = 'select'
+      let inserted: { dedupe_key: string }[] = []
+
       const builder = {
         select(_cols: string) {
+          // reservePost : upsert(...).select('dedupe_key') → lignes réellement créées.
+          if (op === 'upsert') {
+            return Promise.resolve({ data: inserted, error: null })
+          }
           return builder
         },
         gte(_col: string, iso: string) {
@@ -90,16 +106,33 @@ function makeClient() {
           return Promise.resolve(resolveSelect())
         },
         upsert(rows: PostRow[], _opts: { onConflict: string; ignoreDuplicates: boolean }) {
+          op = 'upsert'
           const existing = new Set(posts.map((p) => p.dedupe_key))
+          inserted = []
           for (const r of rows) {
             if (!existing.has(r.dedupe_key)) {
               posts.push(r)
               existing.add(r.dedupe_key)
+              inserted.push({ dedupe_key: r.dedupe_key })
             }
+          }
+          return builder
+        },
+        delete() {
+          op = 'delete'
+          return builder
+        },
+        eq(col: string, val: string) {
+          // releasePost : delete().eq('dedupe_key', key) → rollback de la réservation.
+          if (op === 'delete' && col === 'dedupe_key') {
+            posts = posts.filter((p) => p.dedupe_key !== val)
           }
           return Promise.resolve({ error: null })
         },
         then(onFulfilled: (v: { data: unknown; error: null }) => unknown) {
+          if (op === 'upsert') {
+            return Promise.resolve({ data: inserted, error: null }).then(onFulfilled)
+          }
           return Promise.resolve(resolveSelect()).then(onFulfilled)
         },
       }
@@ -225,5 +258,62 @@ describe('telegram-publish — publication idempotente (TG-01/02/03)', () => {
     const r = (await telegramPublish(FRIDAY_10H)) as { posted: number }
     expect(r.posted).toBe(1)
     expect(posts.map((p) => p.dedupe_key)).toEqual(['winrate:2026-06-19'])
+  })
+
+  it('CR-02 : envoi échoué après réservation → clé libérée, retry propre (anti double-post)', async () => {
+    outcomes = [notableTrade('su1', 2.5)]
+    // L'envoi échoue après que la clé a été réservée (reserve THEN send).
+    sendMessage.mockRejectedValueOnce(new Error('telegram 500'))
+    await expect(telegramPublish(TUESDAY_10H)).rejects.toThrow('telegram 500')
+    // La réservation a été libérée : aucune trace fantôme → pas de skip silencieux.
+    expect(posts).toEqual([])
+    // Retry : le run suivant réémet et trace normalement (D-10, jamais de skip).
+    sendMessage.mockClear()
+    const r = (await telegramPublish(TUESDAY_10H)) as { posted: number }
+    expect(r.posted).toBe(1)
+    expect(posts.map((p) => p.dedupe_key)).toEqual(['notable:su1'])
+    expect(sendMessage).toHaveBeenCalledTimes(1)
+  })
+
+  it('CR-02 : clé déjà réservée (run concurrent) → sendMessage NON rappelé', async () => {
+    // Simule une réservation antérieure non encore vue par getPostedKeys du run courant :
+    // ici la clé est en base avant le run → reservePost renvoie false → pas de réémission.
+    outcomes = [notableTrade('su1', 2.5)]
+    posts = [{ dedupe_key: 'notable:su1', post_type: 'notable', tg_message_id: null }]
+    const r = (await telegramPublish(TUESDAY_10H)) as { posted: number; skipped: number }
+    expect(r.posted).toBe(0)
+    expect(sendMessage).not.toHaveBeenCalled()
+  })
+
+  it('CR-01 : récap rattrapé après 21h UTC si le run de 21h a été manqué (D-10)', async () => {
+    outcomes = []
+    // Run à 23h UTC — le run de 21h n'a jamais eu lieu (PC éteint). Le récap reste dû.
+    const TUESDAY_23H = DateTime.fromISO('2026-06-16T23:00:00.000Z', { zone: 'UTC' })
+    const r = (await telegramPublish(TUESDAY_23H)) as { posted: number }
+    expect(r.posted).toBe(1)
+    expect(posts.map((p) => p.dedupe_key)).toEqual(['recap:2026-06-16'])
+  })
+
+  it('CR-01 : récap non redupliqué si déjà posté le même jour (idempotent au rattrapage)', async () => {
+    outcomes = []
+    posts = [{ dedupe_key: 'recap:2026-06-16', post_type: 'recap', tg_message_id: 1 }]
+    const TUESDAY_23H = DateTime.fromISO('2026-06-16T23:00:00.000Z', { zone: 'UTC' })
+    const r = (await telegramPublish(TUESDAY_23H)) as { posted: number; skipped: number }
+    expect(r.posted).toBe(0)
+    expect(sendMessage).not.toHaveBeenCalled()
+  })
+
+  it('WR-03 : trade sans symbol/direction → fail-fast (ne publie pas de placeholder)', async () => {
+    outcomes = [
+      {
+        setup_id: 'su1',
+        outcome: 'hit_tp',
+        realized_r: 2.5,
+        resolved_at: '2026-06-16T10:00:00.000Z',
+        trade_setups: null as unknown as OutcomeJoinRow['trade_setups'],
+      },
+    ]
+    await expect(telegramPublish(TUESDAY_10H)).rejects.toThrow(/symbol|direction|incomplete/i)
+    expect(sendMessage).not.toHaveBeenCalled()
   })
 })
