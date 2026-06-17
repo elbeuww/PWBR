@@ -24,6 +24,7 @@ import { calendarIngest } from './jobs/calendar-ingest'
 import { technicalEngine } from './jobs/technical-engine'
 import { fundamentalEngine } from './jobs/fundamental-engine'
 import { newsEngine } from './jobs/news-engine'
+import { combineEngine } from './jobs/combine-engine'
 import { persist } from './jobs/persist'
 import { subscriptionExpiry } from './jobs/subscription-expiry'
 import { outcomeTracker } from './jobs/outcome-tracker'
@@ -43,6 +44,10 @@ const JOB_REGISTRY: Record<string, () => Promise<Json | undefined>> = {
   'technical-engine': technicalEngine,
   'fundamental-engine': fundamentalEngine,
   'news-engine': newsEngine,
+  // COMBINE-ENGINE — maillon TROU #2 : assemble les 3 derniers snapshots séparés
+  // (technical+fundamental+news) par instrument×style en un snapshot kind='combined'
+  // que persist consomme via raw_indicators_ref. À lancer APRÈS les 3 engines, AVANT persist.
+  'combine-engine': combineEngine,
   // PERSIST — frontière de confiance unique (D-43). Appelé après l'ANALYZE avec
   // RUN_ID exporté : `RUN_ID=<session>-<YYYYMMDD>T<HHmm>Z tsx src/dispatch.ts persist`.
   persist,
