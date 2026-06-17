@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v2.0
 milestone_name: Plateforme publique
-status: executing
+status: ready_to_plan
 last_updated: "2026-06-17T01:13:57.235Z"
 last_activity: 2026-06-17
 progress:
   total_phases: 9
-  completed_phases: 5
+  completed_phases: 6
   total_plans: 22
   completed_plans: 20
-  percent: 91
+  percent: 67
 ---
 
 # Project State
@@ -27,10 +27,10 @@ progress:
 
 ## Current Position
 
-Phase: 06 (canal-telegram-public) — EXECUTING
-Plan: 2 of 3
-Status: Ready to execute
-Last activity: 2026-06-17 — Quick task 260617-nsh (déblocage build prod Next 15/Vercel : ssr:false→wrapper Client, build webpack, +~50 erreurs de type purgées — tsc 0 err, 419 tests verts)
+Phase: 06
+Plan: Not started
+Status: Ready to plan
+Last activity: 2026-06-17
 
 Progress: [█████████░] 91%
 
