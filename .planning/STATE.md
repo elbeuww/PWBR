@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v2.0
 milestone_name: Plateforme publique
 status: executing
-last_updated: "2026-06-16T13:36:19.986Z"
-last_activity: 2026-06-16
+last_updated: "2026-06-17T00:59:53.181Z"
+last_activity: 2026-06-17 -- Phase 06 planning complete
 progress:
   total_phases: 9
   completed_phases: 5
-  total_plans: 19
+  total_plans: 22
   completed_plans: 19
-  percent: 100
+  percent: 86
 ---
 
 # Project State
@@ -29,8 +29,8 @@ progress:
 
 Phase: 05 (track-record-mesur-affich) — EXECUTING
 Plan: 3 of 3 (05-02 COMPLETE, 05-03 reste)
-Status: Ready to execute 05-03
-Last activity: 2026-06-16
+Status: Ready to execute
+Last activity: 2026-06-17 -- Phase 06 planning complete
 
 Progress: [██████████] 95%
 
