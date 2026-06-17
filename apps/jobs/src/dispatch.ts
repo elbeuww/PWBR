@@ -27,6 +27,7 @@ import { newsEngine } from './jobs/news-engine'
 import { persist } from './jobs/persist'
 import { subscriptionExpiry } from './jobs/subscription-expiry'
 import { outcomeTracker } from './jobs/outcome-tracker'
+import { telegramPublish } from './jobs/telegram-publish'
 import type { Json } from '@app/supabase'
 
 const logger = pino({ level: 'info' })
@@ -50,6 +51,8 @@ const JOB_REGISTRY: Record<string, () => Promise<Json | undefined>> = {
   'subscription-expiry': subscriptionExpiry,
   // TRACK-01 — replay déterministe des setups expirés. Windows Task Scheduler : run-job.cmd outcome-tracker.
   'outcome-tracker': outcomeTracker,
+  // TG-01/02/03 — publication Telegram horaire (APRÈS outcome-tracker). run-job.cmd telegram-publish.
+  'telegram-publish': telegramPublish,
 }
 
 // ─── Dispatch ────────────────────────────────────────────────────────────────
