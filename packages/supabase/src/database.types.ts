@@ -310,9 +310,13 @@ export type Database = {
       }
       payments: {
         Row: {
-          amount_atomic: number | null
+          // CR-02 / T-04-PREC: colonnes Postgres `bigint`. PostgREST sérialise
+          // bigint en `string` (JSON) car >2^53 dépasse IEEE-754. Le type généré
+          // par défaut (number) est faux pour les gros montants atomiques USDT —
+          // override manuel en `string`. NE PAS regénérer sans ré-appliquer.
+          amount_atomic: string | null
           created_at: string
-          expected_amount_atomic: number
+          expected_amount_atomic: string
           id: string
           plan: string
           reject_reason: string | null
@@ -324,9 +328,10 @@ export type Database = {
           verified_at: string | null
         }
         Insert: {
-          amount_atomic?: number | null
+          // bigint -> string (voir Row ci-dessus).
+          amount_atomic?: string | null
           created_at?: string
-          expected_amount_atomic: number
+          expected_amount_atomic: string
           id?: string
           plan: string
           reject_reason?: string | null
@@ -338,9 +343,10 @@ export type Database = {
           verified_at?: string | null
         }
         Update: {
-          amount_atomic?: number | null
+          // bigint -> string (voir Row ci-dessus).
+          amount_atomic?: string | null
           created_at?: string
-          expected_amount_atomic?: number
+          expected_amount_atomic?: string
           id?: string
           plan?: string
           reject_reason?: string | null
