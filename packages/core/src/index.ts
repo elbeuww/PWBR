@@ -33,6 +33,10 @@ export type {
   ThresholdResult,
 } from './track-record/threshold.js'
 
+// Formateur Telegram pur bilingue FR+AR (Phase 6, TG-02/LEGAL-01/D-03)
+export { formatMessage, escapeHtml } from './telegram/format.js'
+export type { FormatTrade, FormatInput, PostKind } from './telegram/format.js'
+
 // Scoring déterministe §3 (Phase 4, D-42/46/48/50, SCORE-02/03)
 export {
   scoreSetup,
