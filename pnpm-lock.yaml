@@ -78,6 +78,12 @@ importers:
 
   apps/web:
     dependencies:
+      '@app/core':
+        specifier: workspace:*
+        version: link:../../packages/core
+      '@app/data-sources':
+        specifier: workspace:*
+        version: link:../../packages/data-sources
       '@app/supabase':
         specifier: workspace:*
         version: link:../../packages/supabase

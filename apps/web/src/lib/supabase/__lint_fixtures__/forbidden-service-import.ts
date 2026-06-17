@@ -7,6 +7,6 @@
  */
 
 // eslint doit signaler cette ligne (groupe interdit '@app/supabase/service-client')
-import { createServiceRoleClient } from '@app/supabase/service-client'
+import { serviceClient } from '@app/supabase/service-client'
 
-export const fixture = createServiceRoleClient
+export const fixture = serviceClient

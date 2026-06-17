@@ -1,3 +1,4 @@
+/// <reference path="./finnhub.d.ts" />
 /**
  * Client Finnhub — news marché par catégorie (free tier).
  *

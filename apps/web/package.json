@@ -9,6 +9,8 @@
     "start": "next start"
   },
   "dependencies": {
+    "@app/core": "workspace:*",
+    "@app/data-sources": "workspace:*",
     "@app/supabase": "workspace:*",
     "@fontsource/ibm-plex-sans-arabic": "5.2.9",
     "@hookform/resolvers": "5",

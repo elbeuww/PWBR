@@ -81,7 +81,9 @@ export async function changeMemberPlan(formData: FormData): Promise<AdminActionR
     const rawPeriod = formData.get('period')
     const period = rawPeriod ? parsePeriod(rawPeriod) : undefined
 
-    await changePlan(client, { user_id, plan, period })
+    // exactOptionalPropertyTypes : ne passer `period` que s'il est défini
+    // (spread conditionnel), cohérent avec (admin)/file/actions.ts (70b84ee).
+    await changePlan(client, { user_id, plan, ...(period !== undefined ? { period } : {}) })
     revalidatePath('/membres')
     return { ok: true }
   } catch (err) {
