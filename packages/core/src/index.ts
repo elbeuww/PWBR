@@ -24,6 +24,15 @@ export type { Output } from './schemas/output.js'
 export { replayOutcome } from './replay/outcome.js'
 export type { Outcome, ReplaySetup, ReplayCandle } from './replay/outcome.js'
 
+// Seuil d'affichage track record (Phase 5/6, TRACK-03, D-11) — source unique vitrine ↔ Telegram
+export { MIN_SAMPLE, applyThreshold } from './track-record/threshold.js'
+export type {
+  StatRow,
+  SufficientStat,
+  InsufficientStat,
+  ThresholdResult,
+} from './track-record/threshold.js'
+
 // Scoring déterministe §3 (Phase 4, D-42/46/48/50, SCORE-02/03)
 export {
   scoreSetup,
