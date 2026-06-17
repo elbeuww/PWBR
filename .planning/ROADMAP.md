@@ -114,7 +114,11 @@ i18n/RTL+rôles avant toute UI publique · RLS signaux avant exposition espace m
   1. Un job (grammY, publication-only) publie automatiquement sur le canal Telegram public les résultats journaliers des trades.
   2. Chaque publication affiche le win rate permanent à jour (issu du track record mesuré, Phase 5).
   3. Les publications sont idempotentes (aucun double post, contrainte sur `telegram_posts`) et tracées dans `job_runs`.
-**Plans**: TBD
+**Plans**: 3 plans (3 vagues)
+- [ ] 06-01-PLAN.md — socle partagé : threshold->@app/core + getPatternStats->@app/supabase (graphe propre D-49) + formatMessage pur bilingue FR+AR golden-teste [TG-02, LEGAL-01]
+- [ ] 06-02-PLAN.md — migration 0015 telegram_posts (UNIQUE dedupe_key + RLS producteur-unique) + apply LIVE/gen types/alias + repo telegramPosts [TG-03]
+- [ ] 06-03-PLAN.md — grammY 1.43 publication-only + job telegram-publish idempotent (resolved_at, 3 formats D-01) + dispatch + tests mock + envoi reel [TG-01, TG-03]
+**UI hint**: no
 
 ### Phase 7: Affiliation à paliers
 **Goal**: Activer l'acquisition par influenceurs avec une affiliation idempotente, sans fraude ni fuite de PII, calculée uniquement sur les abonnés actifs.
@@ -157,7 +161,7 @@ i18n/RTL+rôles avant toute UI publique · RLS signaux avant exposition espace m
 | 3. Espace membre signaux | 0/3 | Planned | - |
 | 4. Paiement USDT (encaissement) | 0/6 | Planned | - |
 | 5. Track record & % mesuré | 0/3 | Planned | - |
-| 6. Telegram public | 0/? | Not started | - |
+| 6. Telegram public | 0/3 | Planned | - |
 | 7. Affiliation à paliers | 0/? | Not started | - |
 | 8. Superadmin consolidé | 0/? | Not started | - |
 | 9. CMS cours & articles | 0/? | Not started | - |
