@@ -81,6 +81,10 @@ export { insertOutcomes, getResolvedSetupIds } from './repositories/predictionOu
 // Phase 5/6 — track record (TRACK-03) — lecture agrégats partagée web + job Telegram (D-49)
 export { getPatternStats } from './repositories/patternStats'
 export type { PatternStatRow } from './repositories/patternStats'
+// Phase 6 — canal Telegram (TG-03) — idempotence des publications, écriture service_role
+// (frontière producteur-unique D-05, JAMAIS importé depuis apps/web).
+// L'export type { TelegramPostRow, TelegramPostInsert, TelegramPostUpdate } est ajouté en Task 2 (après gen types).
+export { insertPost, getPostedKeys } from './repositories/telegramPosts'
 // Phase 4 — paiement USDT & abonnement repositories (service_role)
 export {
   OFFSET_RESERVATION_MINUTES,
