@@ -4,7 +4,13 @@
 > exige des secrets hors-code (bot + canal Telegram) que Claude ne peut pas créer.
 > Cet item est l'équivalent de l'UAT navigateur différé de la Phase 5.
 
-**Status:** ⏳ en attente · **Bloque:** `phase.complete` de la Phase 6 · **Date créée:** 2026-06-17
+**Status:** ✅ validé (Borhane, 2026-06-18 « c'est parfait ») · **Date créée:** 2026-06-17
+
+### Résultat
+- Envoi réel OK : notable ETHUSDT +2.03R posté (`job_runs` success, token absent des stats).
+- Idempotence live OK : 2e run `posted=0, skipped=1` (aucun doublon).
+- Rendu validé : FR haut / AR RTL bas, bidi tickers OK, taux de réussite N=2 « échantillon insuffisant » (aucun %).
+- **Évolution produit** : disclaimer retiré des messages (D-06 révisée, quick 260617-sy5) → porté par la DESCRIPTION du canal (posée via API). Photo de profil + description posées. LEGAL-01 toujours satisfait.
 
 ---
 
