@@ -57,6 +57,10 @@ export type {
   PredictionOutcomeRow,
   PredictionOutcomeInsert,
   PredictionOutcomeUpdate,
+  // Phase 6 — canal Telegram public (TG-03)
+  TelegramPostRow,
+  TelegramPostInsert,
+  TelegramPostUpdate,
 } from './database.types'
 
 // Repositories
@@ -83,7 +87,6 @@ export { getPatternStats } from './repositories/patternStats'
 export type { PatternStatRow } from './repositories/patternStats'
 // Phase 6 — canal Telegram (TG-03) — idempotence des publications, écriture service_role
 // (frontière producteur-unique D-05, JAMAIS importé depuis apps/web).
-// L'export type { TelegramPostRow, TelegramPostInsert, TelegramPostUpdate } est ajouté en Task 2 (après gen types).
 export { insertPost, getPostedKeys } from './repositories/telegramPosts'
 // Phase 4 — paiement USDT & abonnement repositories (service_role)
 export {

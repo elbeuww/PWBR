@@ -12,19 +12,9 @@
  */
 
 import type { SupabaseClient } from '@supabase/supabase-js'
-import type { Database } from '../database.types'
+import type { Database, TelegramPostInsert } from '../database.types'
 
 type ServiceClient = SupabaseClient<Database>
-
-// TODO(Task 2) : remplacé après gen types — `TelegramPostInsert` sera régénéré dans
-// database.types.ts puis ré-exporté depuis l'index (alias maison, Pitfall 6 / D-05-02-F).
-// Type provisoire minimal aligné sur la DDL 0015 (id/posted_at = defaults DB → optionnels).
-type TelegramPostInsert = {
-  dedupe_key: string
-  post_type: 'recap' | 'notable' | 'winrate'
-  tg_message_id?: number | null
-  run_id?: string | null
-}
 
 /**
  * Insère une publication. Idempotent : onConflict 'dedupe_key' ignoreDuplicates.
@@ -36,8 +26,7 @@ export async function insertPost(
 ): Promise<void> {
   const { error } = await client
     .from('telegram_posts')
-    // Cast provisoire retiré en Task 2 une fois le type régénéré présent dans Database.
-    .upsert([row] as never, { onConflict: 'dedupe_key', ignoreDuplicates: true })
+    .upsert([row], { onConflict: 'dedupe_key', ignoreDuplicates: true })
 
   if (error) {
     throw new Error(`insertPost failed: ${error.message}`)

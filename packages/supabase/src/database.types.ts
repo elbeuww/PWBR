@@ -496,6 +496,41 @@ export type Database = {
           },
         ]
       }
+      telegram_posts: {
+        Row: {
+          dedupe_key: string
+          id: string
+          post_type: string
+          posted_at: string
+          run_id: string | null
+          tg_message_id: number | null
+        }
+        Insert: {
+          dedupe_key: string
+          id?: string
+          post_type: string
+          posted_at?: string
+          run_id?: string | null
+          tg_message_id?: number | null
+        }
+        Update: {
+          dedupe_key?: string
+          id?: string
+          post_type?: string
+          posted_at?: string
+          run_id?: string | null
+          tg_message_id?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "telegram_posts_run_id_fkey"
+            columns: ["run_id"]
+            isOneToOne: false
+            referencedRelation: "job_runs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       trade_setups: {
         Row: {
           analysis_id: string
@@ -817,3 +852,8 @@ export type ProfileUpdateSafe = Omit<Database['public']['Tables']['profiles']['U
 export type PredictionOutcomeRow = Database['public']['Tables']['prediction_outcomes']['Row']
 export type PredictionOutcomeInsert = Database['public']['Tables']['prediction_outcomes']['Insert']
 export type PredictionOutcomeUpdate = Database['public']['Tables']['prediction_outcomes']['Update']
+
+// Phase 6 — canal Telegram public (TG-03) — idempotence des publications
+export type TelegramPostRow = Database['public']['Tables']['telegram_posts']['Row']
+export type TelegramPostInsert = Database['public']['Tables']['telegram_posts']['Insert']
+export type TelegramPostUpdate = Database['public']['Tables']['telegram_posts']['Update']
