@@ -78,6 +78,9 @@ export { insertTradeSetups, expirePriorSetups } from './repositories/tradeSetups
 export type { ImmutabilityKey } from './repositories/tradeSetups'
 // Phase 5 — track record (TRACK-01) — écriture service_role idempotente prediction_outcomes
 export { insertOutcomes, getResolvedSetupIds } from './repositories/predictionOutcomes'
+// Phase 5/6 — track record (TRACK-03) — lecture agrégats partagée web + job Telegram (D-49)
+export { getPatternStats } from './repositories/patternStats'
+export type { PatternStatRow } from './repositories/patternStats'
 // Phase 4 — paiement USDT & abonnement repositories (service_role)
 export {
   OFFSET_RESERVATION_MINUTES,
