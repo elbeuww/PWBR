@@ -68,6 +68,10 @@ export interface ReplayCandleRow {
  * ts croissant (anti look-ahead — l'appelant borne à valid_until). Modèle getLastCandleTs.
  *
  * Filtre timeframe='H1' (D-03) ; ordre `ts asc` requis par replayOutcome (@app/core).
+ *
+ * Sûreté cap 1000 : la fenêtre [from, to] est bornée par valid_until (durée de vie
+ * d'un setup) → bien moins de 1000 bougies H1 → le plafond implicite PostgREST n'est
+ * jamais atteint (cf. bug fix readClosedCandles, BUGFIX-CAP1000). Pas de .limit() requis.
  */
 export async function getCandlesForReplay(
   client: ServiceClient,
