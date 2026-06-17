@@ -30,7 +30,7 @@ progress:
 Phase: 06 (canal-telegram-public) — EXECUTING
 Plan: 2 of 3
 Status: Ready to execute
-Last activity: 2026-06-17 — Quick task 260617-j1a (combine-engine, TROU #2 résolu — maillon snapshots→persist livré)
+Last activity: 2026-06-17 — Quick task 260617-nsh (déblocage build prod Next 15/Vercel : ssr:false→wrapper Client, build webpack, +~50 erreurs de type purgées — tsc 0 err, 419 tests verts)
 
 Progress: [█████████░] 91%
 
@@ -228,6 +228,7 @@ Progress: [█████████░] 91%
 |---|-------------|------|--------|-----------|
 | 260617-547 | Fix bug cap 1000 lignes PostgREST dans readClosedCandles (technical-engine) — snapshots techniques gelés sur données périmées | 2026-06-17 | ced206c | [260617-547](./quick/260617-547-corriger-le-bug-du-cap-1000-lignes-dans-/) |
 | 260617-j1a | combine-engine (TROU #2) — assemble snapshots technical/fundamental/news en kind='combined' (latest-par-kind, ancré sur computed_for_ts technical, triplet incomplet→skip), hash réutilisé, upsert idempotent, dispatch | 2026-06-17 | 499d3f5 | [260617-j1a](./quick/260617-j1a-combine-engine/) |
+| 260617-nsh | Déblocage build prod Next 15/Vercel (apps/web) : dynamic(ssr:false)→wrapper Client, build webpack + résolution imports .js des packages TS-source, @app/data-sources dans transpilePackages, +~50 erreurs de type purgées (frontière argent bigint number→string type-only, lib QR guards, exactOptionalPropertyTypes) — tsc 0 err, next build webpack OK (44/44 pages), 419 tests verts, security-review RAS | 2026-06-17 | c6868d9 | [260617-nsh](./quick/260617-nsh-fix-web-prod-build/) |
 
 ## Session Continuity
 
