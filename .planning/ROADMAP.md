@@ -117,7 +117,7 @@ i18n/RTL+rôles avant toute UI publique · RLS signaux avant exposition espace m
 **Plans**: 3 plans (3 vagues)
 - [x] 06-01-PLAN.md — socle partagé : threshold->@app/core + getPatternStats->@app/supabase (graphe propre D-49) + formatMessage pur bilingue FR+AR golden-teste [TG-02, LEGAL-01]
 - [x] 06-02-PLAN.md — migration 0015 telegram_posts (UNIQUE dedupe_key + RLS producteur-unique) + apply LIVE/gen types/alias + repo telegramPosts [TG-03]
-- [ ] 06-03-PLAN.md — grammY 1.43 publication-only + job telegram-publish idempotent (resolved_at, 3 formats D-01) + dispatch + tests mock + envoi reel [TG-01, TG-03]
+- [x] 06-03-PLAN.md — grammY 1.43 publication-only + job telegram-publish idempotent (resolved_at, 3 formats D-01) + dispatch + tests mock + envoi reel [TG-01, TG-03]
 **UI hint**: no
 
 ### Phase 7: Affiliation à paliers
