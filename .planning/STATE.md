@@ -30,7 +30,7 @@ progress:
 Phase: 06 (canal-telegram-public) — EXECUTING
 Plan: 2 of 3
 Status: Ready to execute
-Last activity: 2026-06-17
+Last activity: 2026-06-17 — Quick task 260617-547 (fix cap 1000 technical-engine) + run pipeline moteur (candles/snapshots frais)
 
 Progress: [█████████░] 91%
 
@@ -221,6 +221,12 @@ Progress: [█████████░] 91%
 
 - **B-04-02 (checkpoint LIVE apply, owned orchestrateur)** : Task 2 de 04-02 non franchie. La migration `supabase/migrations/0012_payments.sql` existe (72f49a5) mais n'est PAS dans la base live. À exécuter par l'orchestrateur via MCP (PAS `supabase db push`) après confirmation humaine : (1) `apply_migration` name `0012_payments` ; (2) `generate_typescript_types` → `packages/supabase/src/database.types.ts` (ajouter `payments` Row/Insert/Update + fonction `activate_subscription_for_payment` dans `Functions`) ; (3) `list_tables` (confirmer payments + UNIQUE tx_hash + RLS + RPC) ; (4) `get_advisors` security (WARN security-definer RPC = EXPECTED, non bloquant) ; (5) re-run `pnpm typecheck`. Les repos compilent contre les types actuels mais ne sont pleinement type-safe qu'après régénération. Aucun stub de type fabriqué (interdit). Resume-signal : `applied` + sortie list_tables/get_advisors.
 - **B-04-01 (checkpoint réseau, bloque Plan 04 aval)** : Task 1 de 04-01 non franchie. Aucune clé TronGrid provisionnée (pas de `apps/web/.env`, aucune entrée `TRON-PRO-API-KEY`/`TRON_*` dans les `.env.example`) et accès réseau TronGrid Nile indisponible. À fournir par ops (hors-code) : (1) clé TronGrid tier gratuit, (2) une vraie TX USDT-test Nile confirmée, (3) coller la réponse JSON brute dans `packages/data-sources/src/trongrid/__fixtures__/nile-trc20-transfer.json`, (4) confirmer A1-A7 dans `GOLDEN.md` (champs API, `only_confirmed`/`contract_address`, header, `decimals===6`, contrat USDT **Nile**, seuil de confirmations). Aucune fixture/golden API fabriquée (interdit). Resume-signal : `approved` + fixture collée.
+
+### Quick Tasks Completed
+
+| # | Description | Date | Commit | Directory |
+|---|-------------|------|--------|-----------|
+| 260617-547 | Fix bug cap 1000 lignes PostgREST dans readClosedCandles (technical-engine) — snapshots techniques gelés sur données périmées | 2026-06-17 | ced206c | [260617-547](./quick/260617-547-corriger-le-bug-du-cap-1000-lignes-dans-/) |
 
 ## Session Continuity
 
