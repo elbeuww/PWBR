@@ -92,9 +92,13 @@ export async function adjustPayment(formData: FormData): Promise<QueueActionResu
     if (!user_id) throw new Error('user_id requis')
     const plan = parsePlan(formData.get('plan'))
     const rawPeriod = formData.get('period')
+    // `period` est optionnel (ChangePlanInput.period?: string). Sous
+    // exactOptionalPropertyTypes, passer `period: undefined` n'est pas assignable
+    // à une prop optionnelle → on ne l'inclut QUE si fournie (runtime identique :
+    // sans period, changePlan ne touche que `plan`).
     const period = rawPeriod ? parsePeriod(rawPeriod) : undefined
 
-    await changePlan(client, { user_id, plan, period })
+    await changePlan(client, period ? { user_id, plan, period } : { user_id, plan })
     revalidatePath('/file')
     return { ok: true }
   } catch (err) {
