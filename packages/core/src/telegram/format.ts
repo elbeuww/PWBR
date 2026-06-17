@@ -156,7 +156,7 @@ export function formatMessage(input: FormatInput): string {
     } else {
       for (const tr of shown) {
         frLines.push(
-          `• ${escapeHtml(tr.symbol)} (${tr.direction}) — ${outcomeFr(tr.outcome)} ${formatR(tr.realized_r)}`,
+          `• ${escapeHtml(tr.symbol)} (${escapeHtml(tr.direction)}) — ${outcomeFr(tr.outcome)} ${formatR(tr.realized_r)}`,
         )
       }
       if (rest > 0) {
