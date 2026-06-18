@@ -130,7 +130,7 @@ i18n/RTL+rôles avant toute UI publique · RLS signaux avant exposition espace m
   3. Les commissions récurrentes (palier max 20 %) sont calculées sur les abonnés ACTIFS sur la période uniquement, de façon idempotente (`UNIQUE(affiliate_id, referral_id, period)`, re-run = même total) ; auto-parrainage et abonnés expirés ne génèrent aucune commission.
   4. Le superadmin marque les commissions payées (payout manuel en crypto) et l'état se reflète dans le dashboard affilié.
 **Plans**: 6 plans
-- [ ] 07-01-PLAN.md — migration 0016 (5 tables + RLS + RPC commission/payout + vue no-PII) + apply LIVE + types
+- [x] 07-01-PLAN.md — migration 0016 (5 tables + RLS + RPC commission/payout + vue no-PII) + apply LIVE + types
 - [ ] 07-02-PLAN.md — grille de paliers + commission BigInt en logique pure golden-testée (@app/core)
 - [ ] 07-03-PLAN.md — repos service_role (attribution, RPC wrappers, candidatures) + job mensuel idempotent
 - [ ] 07-04-PLAN.md — capture ?ref (middleware cookie 30j) + attribution figée au signup + E2E
