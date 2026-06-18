@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v2.0
 milestone_name: Plateforme publique
 status: executing
-last_updated: "2026-06-18T01:28:50.376Z"
+last_updated: "2026-06-18T01:38:41.870Z"
 last_activity: 2026-06-18
 progress:
   total_phases: 9
   completed_phases: 6
   total_plans: 28
-  completed_plans: 25
-  percent: 89
+  completed_plans: 26
+  percent: 93
 ---
 
 # Project State
@@ -28,11 +28,11 @@ progress:
 ## Current Position
 
 Phase: 07 (affiliation-paliers) — EXECUTING
-Plan: 3 of 6
+Plan: 4 of 6
 Status: Ready to execute
 Last activity: 2026-06-18
 
-Progress: [█████████░] 89%
+Progress: [█████████░] 93%
 
 ## Performance Metrics
 
@@ -54,6 +54,7 @@ Progress: [█████████░] 89%
 | Phase 05 P05-02 | ~30min | 4 tasks | 8 files |
 | Phase 06 P06-01 | ~12min | 3 tasks | 9 files |
 | Phase 07 P07-03 | ~12min | 2 tasks | 9 files |
+| Phase 07 P07-04 | ~10min | 2 tasks | 6 files |
 
 ## Roadmap v2.0 (9 phases)
 
@@ -223,6 +224,13 @@ Progress: [█████████░] 89%
 - **D-07-03-D (job luxon UTC, T-07-TZ)** : période = `DateTime.utc().toFormat('yyyy-MM')` (`grep -c "new Date(" affiliate-commission.ts == 0`), `argv[3]` validé `^\d{4}-\d{2}$` pour re-calcul. Idempotence portée par le RPC (UNIQUE + on conflict do update where status='due') → re-run du même mois = même total, jamais d'écrasement d'un payé.
 - **Commits 07-03** : 26ce2f4 (Task 1 : 4 repos service_role + barrel + 8 tests verts + affiliate-rls.test.ts isolation cross-user), c023314 (Task 2 : job affiliate-commission idempotent luxon UTC + dispatch). `npx vitest run` 457 verts | 4 skip (RLS réseau), `pnpm typecheck` 0 erreur, 0 package npm. D-49 respecté (aucun import apps/web). **AFF-01/02/04/05 complets** (AFF-03 déjà 07-02). affiliate-rls.test.ts (AFF-02) authoré mais GREEN différé réseau (deferred-items.md).
 
+### Decisions exécution (Plan 07-04)
+
+- **D-07-04-A (capture ?ref, Pitfall 2)** : `captureRef(request, response)` inséré comme 3ᵉ étape du middleware composé en MUTANT la response next-intl (jamais `NextResponse.next()` recréée — même invariant que `updateSession`, D-01-03-B). Ordre verrouillé **locale → ref → session** (D-09). Regex `^[A-Z0-9]{3,20}$` validée AVANT pose (anti-injection T-07-REFINJ) ; cookie `aff_ref` httpOnly+secure+sameSite=lax (T-07-COOKIE/A1), `maxAge` 30j (D-09), last-touch (D-10, écrase toujours). 8 tests vitest verts.
+- **D-07-04-B (attribution figée au signup, D-11)** : le trigger DB `handle_new_user` (`search_path=''`) ne voit pas le cookie HTTP → l'écriture `referrals` se fait dans `signUp` APRÈS `auth.signUp` réussi, via `attributeReferral(createAdminServiceClient(), …)` (service_role local server-only ; la RLS D-07 interdit l'écriture front). Cookie consommé (`delete('aff_ref')`) une fois. `redirect /paiement-bientot` (D-02-03-B), `signIn`/`signOut`/`toSafeErrorKey` intacts.
+- **D-07-04-C (best-effort ABSOLU, T-07-ATTR-CRASH/A2)** : `attributeReferral` enveloppé dans `try/catch` ; échec loggé `console.error` serveur (jamais `console.log`), jamais propagé. Code inconnu / self-ref (D-12, no-op repo) / 23505 idempotent / erreur DB → l'inscription RÉUSSIT toujours et redirige `/paiement-bientot`. E2E `affiliation-attribution.spec.ts` authoré (3 tests, `--list` OK) ; GREEN = human-verify (préconditions deferred-items.md, D-01-04-C). Aucune fuite service_role client (lue via `process.env`, sans `NEXT_PUBLIC_`).
+- **Commits 07-04** : f53302e (RED captureRef test), 0169370 (GREEN captureRef + insertion middleware), f066d77 (signUp attribution best-effort + E2E authoré). `npx vitest run` 465 verts | 4 skip, `pnpm typecheck` 0 erreur, `lint:i18n` exit 0, 0 package npm. **AFF-01 bout en bout couvert** (capture ?ref → attribution au signup).
+
 ### Open todos / research flags (v2.0)
 
 - **Phase 4 (research flag) :** TronGrid endpoint `walletsolidity`, parsing logs TRC-20, normalisation hex↔base58 — doc TS peu dense, recherche de phase recommandée.
@@ -249,7 +257,7 @@ Progress: [█████████░] 89%
 
 ## Session Continuity
 
-**Last session:** 2026-06-18T02:35:00.000Z — Plan 07-03 COMPLETE (couche service_role affiliation + job mensuel + isolation RLS, AFF-01/02/04/05). Task 1 (26ce2f4) : `affiliates.ts` (attributeReferral best-effort — code inconnu/self-ref no-op, 23505 idempotent D-11 ; promoteAffiliate upsert + role ; createCode + CodeTakenError), `referrals.ts` (countReferrals D-02), `commissions.ts` (wrappers MINCES `compute_affiliate_commissions`/`mark_commission_paid`, ZÉRO calcul JS T-07-FLOAT, amount_atomic string CR-02), `affiliateApplications.ts` (listPending/transition miroir transitionPayment), barrel @app/supabase Phase 7. `affiliates.test.ts` 8 verts (attribution + forme RPC). `affiliate-rls.test.ts` (AFF-02) : seed A/B service_role, lecture anon-client scopée A → 0 ligne de B sur commissions/referrals/affiliate_dashboard, superadmin voit tout ; describe.skipIf(!HAS_ENV) → SKIP sans réseau (aucun GREEN fabriqué, D-05-01-DEFER). Task 2 (c023314) : `affiliate-commission.ts` miroir outcome-tracker (getServiceClient lazy, période luxon UTC yyyy-MM ou argv[3] validé, computeCommissions, Promise<Json>), enregistré dispatch JOB_REGISTRY. `npx vitest run` 457 verts | 4 skip, `pnpm typecheck` 0 erreur, 0 package npm, D-49 OK (aucun import apps/web). Ops : ajouter tâche Windows Task Scheduler mensuelle `run-job.cmd affiliate-commission`. Stopped at : Plan 07-03 terminé.
+**Last session:** 2026-06-18T01:37:52.838Z
 
 **Last session (archive):** 2026-06-18T02:30:00.000Z — Plan 07-02 COMPLETE (grille de paliers + commission BigInt en logique pure @app/core, AFF-03). TDD : 4a06c4c (RED — 28 golden tests, module `../tiers.js` absent) → cd27a0c (GREEN — `tiers.ts` pur + barrel). `affiliateRateBps(signups)` miroir bit-à-bit du `case` SQL `affiliate_rate_bps` (0016 LIVE) : 17 bornes verrouillées (0/1/99/100/500/501/600/1000/1001/5000/5001/10000/10001/25000/25001/50000/50001), seuil plafond gardé à `>= 50000` pour matcher le SQL (D-07-02-A). `computeCommissionAtomic(base, bps) = (base * BigInt(bps)) / 10000n` floor BigInt zéro float (T-07-FLOAT, D-07-02-B), exact > 2⁵³. `TIERS` (8 paliers) + type `Tier` exportés du barrel. Pureté : zéro I/O (grep imports Supabase/fs/http/fetch == 0), `grep -c "Number(" == 0`. `npx vitest run packages/core` 144/144 verts (28 neufs), `pnpm typecheck` 0 erreur, 0 package npm. Source unique grille + commission réutilisable par le dashboard affiliation. Stopped at : Plan 07-02 terminé.
 
