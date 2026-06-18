@@ -386,7 +386,7 @@ Normalisation côté insertion (superadmin) : `code.toUpperCase().trim()`. La vi
 **What:** Le dashboard ne rend QUE des compteurs/sommes. Zéro ligne par filleul. Deux options d'implémentation (cf. §Open Q2) :
 - **Option A (recommandée) — vue d'agrégat `security_invoker=true`** : la vue hérite de la RLS de l'appelant ⇒ un affilié ne voit que SES agrégats. La vue ne SELECT que des `count()`/`sum()` groupés par `affiliate_id`, jamais d'`user_id` de filleul.
 - **Option B — RPC `security definer` filtrée sur `auth.uid()`** : retourne un objet d'agrégats pour l'affilié courant uniquement.
-**Isolation prouvée (test obligatoire)** : un affilié A authentifié ne doit JAMAIS lire les agrégats de B (cross-user → 0 ligne / accès refusé). Miroir des tests RLS `gating-rls.test.ts` (P1) et isolation `subscriptions` cross-user.
+**Isolation prouvée (test obligatoire)** : un affilié A authentifié ne doit JAMAIS lire les agrégats de B (cross-user → 0 ligne / accès refusé). Miroir des tests RLS `gating-rls.test.ts` (P1) et isolation `subscriptions` cross-user. Test dédié : `packages/supabase/src/repositories/__tests__/affiliate-rls.test.ts` (planifié en 07-03, anon-client cross-user) couvre AFF-02 « isolation RLS prouvée ».
 **No-PII checker** : le checker/auditeur DOIT échouer si une surface affilié rend une boucle/table sur des referrals individuels (UI-SPEC §Tier Grid).
 
 ### Pattern 7 : Payout (D-15, AFF-04) — file `(admin)` service_role
@@ -482,7 +482,7 @@ export async function payCommission(formData: FormData) {
 ### Pitfall 6 : Isolation RLS dashboard contournée (no-PII faux)
 **What goes wrong:** Un affilié lit les données d'un autre, ou une PII de filleul fuit via une jointure.
 **Why it happens:** Vue `security_invoker=false` (vue le voit tout), ou requête RSC en service_role (bypass RLS) qui oublie un filtre.
-**How to avoid:** Dashboard en **anon/auth-client** (PAS service_role) + vue `security_invoker=true` OU RPC `security definer` filtrée `auth.uid()`. La vue ne SELECT que des agrégats. Test cross-user obligatoire (miroir gating-rls). `get_advisors security` au gate de phase.
+**How to avoid:** Dashboard en **anon/auth-client** (PAS service_role) + vue `security_invoker=true` OU RPC `security definer` filtrée `auth.uid()`. La vue ne SELECT que des agrégats. Test cross-user obligatoire (miroir gating-rls) → `affiliate-rls.test.ts` planifié en 07-03 (`packages/supabase/src/repositories/__tests__/affiliate-rls.test.ts`, anon-client : affilié A ne lit jamais les données de B). `get_advisors security` au gate de phase.
 **Warning signs:** Le dashboard affiche un `user_id` ou une date d'inscription individuelle ; un affilié voit des chiffres non nuls pour un autre.
 
 ## Code Examples
@@ -527,7 +527,7 @@ export async function attributeReferral(
 }
 ```
 
-### Vue d'agrégat dashboard (no-PII, security_invoker)
+### Vue d'agrégat dashboard (no-PII, security_invoker, revenu cumul + mois courant D-14)
 ```sql
 -- 0016 (extrait) : agrégats par affilié, RLS héritée de l'appelant (no-PII D-13)
 create view public.affiliate_dashboard with (security_invoker = true) as
@@ -537,15 +537,20 @@ select
   count(distinct s.user_id) filter (
     where s.status='active' and s.current_period_end > now()
   )                                                       as active_referrals,     -- D-14 abonnés actifs
+  -- D-14 : revenus générés (revenu brut des filleuls) décomposés cumul vs mois courant
+  coalesce(sum(p.amount_atomic), 0)::text                                                       as revenue_total_atomic,
+  coalesce(sum(p.amount_atomic) filter (where to_char(p.verified_at,'YYYY-MM') = to_char(now() at time zone 'utc','YYYY-MM')), 0)::text as revenue_current_month_atomic,
   coalesce(sum(c.amount_atomic) filter (where c.status='due'),  0)::text as commissions_due_atomic,
-  coalesce(sum(c.amount_atomic) filter (where c.status='payée'),0)::text as commissions_paid_atomic
+  coalesce(sum(c.amount_atomic) filter (where c.status='paid'), 0)::text as commissions_paid_atomic
 from public.affiliates a
 left join public.referrals r     on r.affiliate_id = a.id
 left join public.subscriptions s on s.user_id = r.user_id
+left join public.payments p      on p.user_id = r.user_id and p.status = 'verified'
 left join public.commissions c   on c.affiliate_id = a.id
 where a.user_id = auth.uid()        -- isolation (la RLS sous-jacente la renforce)
 group by a.id;
 -- ::text sur les bigint sommés → PostgREST string (CR-02), JAMAIS Number côté JS.
+-- revenue_total_atomic = revenu brut cumulé des filleuls ; revenue_current_month_atomic = mois courant (D-14).
 ```
 *(Le taux/palier courant se dérive de `total_signups` via `affiliate_rate_bps` — exposable en colonne calculée ou côté RSC.)*
 
@@ -557,8 +562,6 @@ group by a.id;
 | `to_char` pour borner un mois | bornes `timestamptz` UTC `[date_trunc, +1 month)` | recommandation P7 | Idempotence robuste au TZ (Pitfall 4). |
 | Float pour montants | BigInt atomique ×10⁶ string | P4 | Déterminisme financier (hérité, à respecter). |
 
-**Deprecated/outdated:** rien de spécifique à P7. Tous les patterns sont courants dans le dépôt (dernière migration 0015, juin 2026).
-
 ## Assumptions Log
 
 | # | Claim | Section | Risk if Wrong |
@@ -567,29 +570,33 @@ group by a.id;
 | A2 | L'attribution doit être best-effort (un code invalide ne bloque jamais le signup) | Pattern 2 | Si l'attribution devait être bloquante (rare), le flux changerait — mais bloquer un signup sur une erreur d'affiliation est un anti-pattern produit. |
 | A3 | Longueur du code vanity = 3–20 caractères `[A-Z0-9]` | Pattern 5 / D-06 | Borne exacte = discrétion ; trop court = collisions, trop long = non mémorisable. À confirmer fondateur. |
 | A4 | Un `referral` est unique par `user_id` (un filleul n'appartient qu'à un affilié, last-touch figé au signup) | Pattern 2 / D-11 | Si un user pouvait être ré-attribué après signup, le modèle changerait — mais D-11 fige l'attribution à l'inscription. |
-| A5 | L'arrondi de `amount_atomic × rate_bps / 10000` se fait par troncature entière Postgres | Pattern 4 | Arrondi (floor vs round) affecte des micro-unités ; impact financier négligeable mais à figer (déterminisme). §Open Q3. |
-| A6 | La candidature `affiliate_applications` est insérée par l'utilisateur authentifié (RLS insert self) OU via service_role | Pattern 6 / D-08 | Si le formulaire est public (non authentifié), l'insertion doit passer par une server action service_role (pas de RLS authenticated). §Open Q1. |
-| A7 | `commissions.status` utilise les valeurs `'due'`/`'payée'` (UI-SPEC) | Pattern 4/7 | Cohérence avec les badges UI ; le planner doit figer l'enum exact (text + check, miroir 0012). Éviter un accent dans une valeur SQL → préférer `'due'`/`'paid'` en DB et traduire au front. |
+| A5 | L'arrondi de `amount_atomic × rate_bps / 10000` se fait par troncature entière Postgres (`floor`) — **tranché Q3** | Pattern 4 | Arrondi (floor vs round) affecte des micro-unités ; impact financier négligeable, figé en test golden 07-02. §Open Q3 RESOLVED. |
+| A6 | La candidature `affiliate_applications` est insérée via service_role (server action) — **tranché Q1** | Pattern 6 / D-08 | Insert via service_role en 07-06 ; aucune policy insert front (07-01). §Open Q1 RESOLVED. |
+| A7 | `commissions.status` utilise les valeurs `'due'`/`'paid'` (sans accent en DB) — **tranché Q4** | Pattern 4/7 | Valeurs SQL sans accent (07-01) ; traduction `'paid' → « payée »` au front via i18n (07-06). §Open Q4 RESOLVED. |
 
-## Open Questions
+## Open Questions (RESOLVED)
 
-1. **Le formulaire de candidature est-il accessible non authentifié ?**
-   - What we know: UI-SPEC dit « page publique gated derrière le lien programme », audience « visiteur/membre candidat ».
-   - What's unclear: un visiteur non connecté peut-il candidater (alors aucune RLS authenticated ne couvre l'insert) ?
-   - Recommendation: insérer `affiliate_applications` via une **server action service_role** (pas de policy insert front), qui capture les champs + l'email saisi. Évite d'exiger un compte pour candidater et garde la frontière producteur-unique. (Si réservé aux membres connectés : RLS insert `user_id = auth.uid()` possible.)
+> Les 4 questions de discrétion ont été tranchées au planning. Chaque résolution indique le plan qui implémente la décision.
 
-2. **Dashboard : vue `security_invoker=true` ou RPC `security definer` filtré `auth.uid()` ?**
-   - What we know: les deux isolent. `pattern_stats` (0014) était `security_invoker=false` (lecture publique) — cas inverse.
-   - What's unclear: lequel donne la meilleure ergonomie react-query + le test d'isolation le plus simple.
-   - Recommendation: **vue `security_invoker=true`** (plus simple à requêter via PostgREST `.select()`, RLS héritée automatiquement, isolation prouvable par test cross-user). RPC si des agrégats multi-tables deviennent trop lourds pour une vue.
+1. **Le formulaire de candidature est-il accessible non authentifié ?** → **RÉSOLU : insert via server action service_role** (pas de policy insert front).
+   - **Décision :** la candidature `affiliate_applications(status='pending')` est insérée via `createAdminServiceClient()` dans une server action ; aucune policy insert authenticated. Un visiteur peut candidater sans compte ; la frontière producteur-unique est préservée.
+   - **Tranché par :** `07-06-PLAN.md` Task 1 (`submitApplication` → insert service_role) ET `07-01-PLAN.md` Task 1 (RLS `affiliate_applications` : SELECT superadmin uniquement, AUCUNE policy insert front).
+   - Rationale d'origine: éviter d'exiger un compte pour candidater + garder la frontière producteur-unique.
 
-3. **Arrondi de la commission (troncature vs arrondi au plus proche) ?**
-   - What we know: `amount_atomic × rate_bps / 10000` en entier ⇒ Postgres tronque.
-   - What's unclear: le fondateur veut-il `floor` (par défaut) ou `round` ?
-   - Recommendation: `floor` (troncature) = déterministe et conservateur (jamais sur-payer). Documenter et figer en test golden. Impact = sous-unités USDT (négligeable), mais doit être stable entre re-runs.
+2. **Dashboard : vue `security_invoker=true` ou RPC `security definer` filtré `auth.uid()` ?** → **RÉSOLU : vue `security_invoker=true`**.
+   - **Décision :** vue `public.affiliate_dashboard with (security_invoker = true)`, agrégats seuls, RLS héritée de l'appelant, lue en anon/auth-client. Isolation prouvable par test cross-user (`affiliate-rls.test.ts`, 07-03).
+   - **Tranché par :** `07-01-PLAN.md` Task 1 (création de la vue `security_invoker=true`) ; consommée en lecture auth-client par `07-06-PLAN.md` Task 2.
+   - Rationale d'origine: plus simple à requêter via PostgREST `.select()` + isolation prouvable.
 
-4. **`commissions.status` : valeur SQL accentuée `'payée'` ou `'paid'` ?**
-   - Recommendation: stocker `'paid'`/`'due'` en DB (check constraint sans accent, évite les surprises d'encodage), traduire `'paid' → « payée »` au front via i18n. Le planner tranche.
+3. **Arrondi de la commission (troncature vs arrondi au plus proche) ?** → **RÉSOLU : `floor` (troncature entière Postgres)**.
+   - **Décision :** `(Σ amount_atomic × rate_bps) / 10000` en division entière Postgres = troncature `floor`. Déterministe et conservateur (jamais sur-payer). Figé en test golden.
+   - **Tranché par :** `07-01-PLAN.md` Task 1 (RPC `compute_affiliate_commissions`, division entière `/ 10000`) ET `07-02` (grille `affiliateRateBps` portée en core, golden values).
+   - Rationale d'origine: stable entre re-runs, impact sous-unités USDT négligeable.
+
+4. **`commissions.status` : valeur SQL accentuée `'payée'` ou `'paid'` ?** → **RÉSOLU : `'due'` / `'paid'` (sans accent) en DB**.
+   - **Décision :** `check (status in ('due','paid'))` sans accent ; traduction `'paid' → « payée »` au front via i18n. Évite les surprises d'encodage.
+   - **Tranché par :** `07-01-PLAN.md` Task 1 (table `commissions` + check constraint + acceptance `grep -c "'payée'" == 0`) ; rendu i18n côté `07-06`.
+   - Rationale d'origine: pas d'accent dans une valeur SQL.
 
 ## Environment Availability
 
@@ -619,10 +626,10 @@ group by a.id;
 |--------|----------|-----------|-------------------|-------------|
 | AFF-01 | `captureRef` pose cookie sur `?ref`, ignore invalide, last-touch | unit | `npx vitest run apps/web/src/lib/affiliate/__tests__/captureRef.test.ts` | ❌ Wave 0 |
 | AFF-01 | `attributeReferral` : code inconnu→no-op, self-ref→skip, 23505→idempotent | unit | `npx vitest run packages/supabase/src/repositories/__tests__/affiliates.test.ts` | ❌ Wave 0 |
-| AFF-01 | E2E : arriver `?ref=X` → signup → ligne `referrals` créée | e2e | `npx playwright test affiliation-attribution.spec.ts` | ❌ Wave 0 (human-verify : dev server + .env) |
+| AFF-01 | E2E : arriver `?ref=X` → signup → ligne `referrals` créée | e2e | `npx playwright test affiliation-attribution.spec.ts` | ❌ Wave 0 (human-verify : dev server :3000 + `affiliate_codes` pré-populé + .env) |
 | AFF-03 | Grille : 600 inscrits → palier 3 (14 %) ; bornes de paliers | unit | `npx vitest run packages/core/src/affiliate/__tests__/tiers.test.ts` (si grille portée en core) | ❌ Wave 0 |
 | AFF-03/05 | Job idempotent : re-run = même total ; expiré→0 ; self-ref→0 | integration | `npx vitest run apps/jobs/src/jobs/__tests__/affiliate-commission.test.ts` | ❌ Wave 0 (réseau Supabase → possible human-verify) |
-| AFF-02 | Isolation RLS : affilié A ne lit pas les agrégats de B | integration | `npx vitest run packages/supabase/src/repositories/__tests__/affiliate-rls.test.ts` (anon-client cross-user) | ❌ Wave 0 |
+| AFF-02 | Isolation RLS : affilié A ne lit pas les agrégats de B | integration | `npx vitest run packages/supabase/src/repositories/__tests__/affiliate-rls.test.ts` (anon-client cross-user) | ❌ Wave 0 (planifié 07-03) |
 | AFF-04 | `markCommissionPaid` : insert payouts + commission due→paid atomique | integration | idem affiliate repo tests | ❌ Wave 0 |
 | AFF-02 | i18n parité `affiliate` fr/en/ar (clés strictes) | unit | `npx vitest run apps/web/.../messages-parity-affiliate.test.ts` | ❌ Wave 0 (miroir messages-parity-payment.test.ts) |
 
@@ -637,7 +644,7 @@ group by a.id;
 - [ ] `packages/core/src/affiliate/__tests__/tiers.test.ts` — couvre AFF-03 (grille pure, si portée en core)
 - [ ] `apps/jobs/src/jobs/__tests__/affiliate-commission.test.ts` — couvre AFF-03/05 (idempotence)
 - [ ] `messages-parity-affiliate.test.ts` — parité i18n (miroir `messages-parity-payment.test.ts`)
-- [ ] Tests RLS cross-user anon-client (miroir `gating-rls.test.ts`) — couvre AFF-02 isolation
+- [ ] `packages/supabase/src/repositories/__tests__/affiliate-rls.test.ts` — tests RLS cross-user anon-client (miroir `gating-rls.test.ts`) — couvre AFF-02 isolation (planifié 07-03)
 - Framework déjà installé — aucun install requis.
 
 ## Security Domain
@@ -701,7 +708,7 @@ group by a.id;
 - Standard stack: HIGH — zéro paquet nouveau, versions lues dans les `package.json` réels.
 - Architecture: HIGH — chaque pattern lu dans le code livré (migrations 0008–0015, middleware, actions, jobs, repos).
 - Pitfalls: HIGH — dérivés directement des conventions du dépôt (override types, régénération, RLS, TZ).
-- Zones neuves (captureRef + attribution server-action + RPC commission): MEDIUM-HIGH — l'approche est dérivée des patterns existants mais n'a pas encore d'implémentation de référence dans CE dépôt (d'où §Open Questions sur 4 points de discrétion).
+- Zones neuves (captureRef + attribution server-action + RPC commission): MEDIUM-HIGH — l'approche est dérivée des patterns existants mais n'a pas encore d'implémentation de référence dans CE dépôt (les 4 §Open Questions de discrétion sont désormais tranchées au planning, cf. §Open Questions (RESOLVED)).
 
 **Research date:** 2026-06-18
 **Valid until:** 2026-07-18 (30 j — stack verrouillée, stable ; revérifier si une migration intercalaire change le numéro 0016 ou si P4 débloque les checkpoints LIVE en attente)
