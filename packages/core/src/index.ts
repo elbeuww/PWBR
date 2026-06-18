@@ -37,6 +37,11 @@ export type {
 export { formatMessage, escapeHtml } from './telegram/format.js'
 export type { FormatTrade, FormatInput, PostKind } from './telegram/format.js'
 
+// Grille de paliers d'affiliation + commission BigInt (Phase 7, AFF-03, D-01/D-02)
+// Source unique pure, miroir bit-à-bit du SQL affiliate_rate_bps (0016)
+export { TIERS, affiliateRateBps, computeCommissionAtomic } from './affiliate/tiers.js'
+export type { Tier } from './affiliate/tiers.js'
+
 // Scoring déterministe §3 (Phase 4, D-42/46/48/50, SCORE-02/03)
 export {
   scoreSetup,
