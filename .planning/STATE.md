@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v2.0
 milestone_name: Plateforme publique
 status: executing
-last_updated: "2026-06-18T01:19:53.756Z"
+last_updated: "2026-06-18T01:28:50.376Z"
 last_activity: 2026-06-18
 progress:
   total_phases: 9
   completed_phases: 6
   total_plans: 28
-  completed_plans: 24
-  percent: 86
+  completed_plans: 25
+  percent: 89
 ---
 
 # Project State
@@ -28,11 +28,11 @@ progress:
 ## Current Position
 
 Phase: 07 (affiliation-paliers) — EXECUTING
-Plan: 2 of 6
+Plan: 3 of 6
 Status: Ready to execute
 Last activity: 2026-06-18
 
-Progress: [█████████░] 86%
+Progress: [█████████░] 89%
 
 ## Performance Metrics
 
@@ -53,6 +53,7 @@ Progress: [█████████░] 86%
 | Phase 05 P01 | ~15min | 3 tasks | 6 files |
 | Phase 05 P05-02 | ~30min | 4 tasks | 8 files |
 | Phase 06 P06-01 | ~12min | 3 tasks | 9 files |
+| Phase 07 P07-03 | ~12min | 2 tasks | 9 files |
 
 ## Roadmap v2.0 (9 phases)
 
@@ -214,6 +215,14 @@ Progress: [█████████░] 86%
 - **D-07-02-C (pureté + chemin)** : `tiers.ts` zéro I/O (aucun import Supabase/fs/http/fetch/server-only), exporté via barrel `@app/core` (miroir threshold/replayOutcome). Tests au chemin imposé `affiliate/__tests__/tiers.test.ts` (sous-dossier `__tests__/`, divergent du pattern `*.test.ts` côté-module mais couvert par le glob `packages/**/*.test.ts`).
 - **Commits 07-02** : 4a06c4c (RED 28 golden tests : 17 bornes signups→bps + invariants TIERS + 7 cas commission floor), cd27a0c (GREEN tiers.ts + barrel). `npx vitest run packages/core` 144/144 verts, `pnpm typecheck` 0 erreur, 0 package npm (T-07-SC accept). **AFF-03 (logique pure) couvert.** Source unique grille + commission réutilisable par le dashboard affiliation (07 aval).
 
+### Decisions exécution (Plan 07-03)
+
+- **D-07-03-A (RPC wrappers, zéro calcul JS, T-07-FLOAT)** : `commissions.ts` ne fait qu'invoquer les RPC LIVE `compute_affiliate_commissions` / `mark_commission_paid` — aucun INSERT/SELECT de calcul. `grep -c "Number(" commissions.ts == 0` (commentaires reformulés). Toute l'idempotence (T-07-DOUBLEPAY) et le financier restent en DB.
+- **D-07-03-B (CR-02 sur mark_commission_paid)** : la signature générée type `p_amount_atomic: number`, mais la colonne DB est bigint > 2⁵³ → on transmet une **string** (PostgREST caste sans perte) via cast d'argument volontaire (`as unknown as ...Args`), jamais `Number()`. Précédent D-04-02-C.
+- **D-07-03-C (attribution best-effort, T-07-ATTR-CRASH)** : `attributeReferral` capture 23505 sur `referrals(user_id)` → idempotent (last-touch joué au cookie, D-11) ; code inconnu/self-ref (D-12) → no-op sans throw → ne casse jamais le signup. Squelette RESEARCH §Code Examples honoré (lookup `affiliate_codes.select('affiliate_id, affiliates!inner(user_id)')`).
+- **D-07-03-D (job luxon UTC, T-07-TZ)** : période = `DateTime.utc().toFormat('yyyy-MM')` (`grep -c "new Date(" affiliate-commission.ts == 0`), `argv[3]` validé `^\d{4}-\d{2}$` pour re-calcul. Idempotence portée par le RPC (UNIQUE + on conflict do update where status='due') → re-run du même mois = même total, jamais d'écrasement d'un payé.
+- **Commits 07-03** : 26ce2f4 (Task 1 : 4 repos service_role + barrel + 8 tests verts + affiliate-rls.test.ts isolation cross-user), c023314 (Task 2 : job affiliate-commission idempotent luxon UTC + dispatch). `npx vitest run` 457 verts | 4 skip (RLS réseau), `pnpm typecheck` 0 erreur, 0 package npm. D-49 respecté (aucun import apps/web). **AFF-01/02/04/05 complets** (AFF-03 déjà 07-02). affiliate-rls.test.ts (AFF-02) authoré mais GREEN différé réseau (deferred-items.md).
+
 ### Open todos / research flags (v2.0)
 
 - **Phase 4 (research flag) :** TronGrid endpoint `walletsolidity`, parsing logs TRC-20, normalisation hex↔base58 — doc TS peu dense, recherche de phase recommandée.
@@ -240,7 +249,9 @@ Progress: [█████████░] 86%
 
 ## Session Continuity
 
-**Last session:** 2026-06-18T02:30:00.000Z — Plan 07-02 COMPLETE (grille de paliers + commission BigInt en logique pure @app/core, AFF-03). TDD : 4a06c4c (RED — 28 golden tests, module `../tiers.js` absent) → cd27a0c (GREEN — `tiers.ts` pur + barrel). `affiliateRateBps(signups)` miroir bit-à-bit du `case` SQL `affiliate_rate_bps` (0016 LIVE) : 17 bornes verrouillées (0/1/99/100/500/501/600/1000/1001/5000/5001/10000/10001/25000/25001/50000/50001), seuil plafond gardé à `>= 50000` pour matcher le SQL (D-07-02-A). `computeCommissionAtomic(base, bps) = (base * BigInt(bps)) / 10000n` floor BigInt zéro float (T-07-FLOAT, D-07-02-B), exact > 2⁵³. `TIERS` (8 paliers) + type `Tier` exportés du barrel. Pureté : zéro I/O (grep imports Supabase/fs/http/fetch == 0), `grep -c "Number(" == 0`. `npx vitest run packages/core` 144/144 verts (28 neufs), `pnpm typecheck` 0 erreur, 0 package npm. Source unique grille + commission réutilisable par le dashboard affiliation. Stopped at : Plan 07-02 terminé.
+**Last session:** 2026-06-18T02:35:00.000Z — Plan 07-03 COMPLETE (couche service_role affiliation + job mensuel + isolation RLS, AFF-01/02/04/05). Task 1 (26ce2f4) : `affiliates.ts` (attributeReferral best-effort — code inconnu/self-ref no-op, 23505 idempotent D-11 ; promoteAffiliate upsert + role ; createCode + CodeTakenError), `referrals.ts` (countReferrals D-02), `commissions.ts` (wrappers MINCES `compute_affiliate_commissions`/`mark_commission_paid`, ZÉRO calcul JS T-07-FLOAT, amount_atomic string CR-02), `affiliateApplications.ts` (listPending/transition miroir transitionPayment), barrel @app/supabase Phase 7. `affiliates.test.ts` 8 verts (attribution + forme RPC). `affiliate-rls.test.ts` (AFF-02) : seed A/B service_role, lecture anon-client scopée A → 0 ligne de B sur commissions/referrals/affiliate_dashboard, superadmin voit tout ; describe.skipIf(!HAS_ENV) → SKIP sans réseau (aucun GREEN fabriqué, D-05-01-DEFER). Task 2 (c023314) : `affiliate-commission.ts` miroir outcome-tracker (getServiceClient lazy, période luxon UTC yyyy-MM ou argv[3] validé, computeCommissions, Promise<Json>), enregistré dispatch JOB_REGISTRY. `npx vitest run` 457 verts | 4 skip, `pnpm typecheck` 0 erreur, 0 package npm, D-49 OK (aucun import apps/web). Ops : ajouter tâche Windows Task Scheduler mensuelle `run-job.cmd affiliate-commission`. Stopped at : Plan 07-03 terminé.
+
+**Last session (archive):** 2026-06-18T02:30:00.000Z — Plan 07-02 COMPLETE (grille de paliers + commission BigInt en logique pure @app/core, AFF-03). TDD : 4a06c4c (RED — 28 golden tests, module `../tiers.js` absent) → cd27a0c (GREEN — `tiers.ts` pur + barrel). `affiliateRateBps(signups)` miroir bit-à-bit du `case` SQL `affiliate_rate_bps` (0016 LIVE) : 17 bornes verrouillées (0/1/99/100/500/501/600/1000/1001/5000/5001/10000/10001/25000/25001/50000/50001), seuil plafond gardé à `>= 50000` pour matcher le SQL (D-07-02-A). `computeCommissionAtomic(base, bps) = (base * BigInt(bps)) / 10000n` floor BigInt zéro float (T-07-FLOAT, D-07-02-B), exact > 2⁵³. `TIERS` (8 paliers) + type `Tier` exportés du barrel. Pureté : zéro I/O (grep imports Supabase/fs/http/fetch == 0), `grep -c "Number(" == 0`. `npx vitest run packages/core` 144/144 verts (28 neufs), `pnpm typecheck` 0 erreur, 0 package npm. Source unique grille + commission réutilisable par le dashboard affiliation. Stopped at : Plan 07-02 terminé.
 
 **Last session (archive):** 2026-06-17 — Plan 06-01 COMPLETE (socle partagé + formateur Telegram bilingue, TG-02/LEGAL-01). Task 1 (9757fdf, TDD) : threshold.ts déplacé tel quel en @app/core (source unique seuil N≥30 vitrine ↔ Telegram, D-11), web re-exporte, test golden 8 vert. Task 2 (882915d) : getPatternStats porté en @app/supabase (client générique anon|service_role, SELECT agrégats exact, jamais de throw), web re-câblé en re-export, suite P5 non régressée — jobs n'importera jamais apps/web (D-49). Task 3 (28d8800, TDD) : formatMessage pur bilingue FR+AR — escapeHtml ordre & < > (T-06-INJ), bloc FR LTR + AR RTL préfixé U+200F, ticker/R/% isolés U+2066/U+2069 (T-06-BIDI), win rate via applyThreshold (TG-02/D-11), disclaimer FR+AR copy P2 chaque sortie (LEGAL-01), FormatTrade sans niveaux entry/SL/TP (D-03/T-06-LEAK grep==0), jour vide D-10, cap top-10 |R| + « +X autres » < 4096 (Pitfall 3), 11 tests golden verts. Déviation Rule 2 : export barrel core formatMessage/escapeHtml. npx vitest run 401 tests verts (53 fichiers), pnpm typecheck 0 erreur, 0 package npm. Stopped at : Plan 06-01 terminé.
 
@@ -258,7 +269,7 @@ Progress: [█████████░] 86%
 
 **Last session (archive):** 2026-06-14 — Completed 02-03-PLAN.md (4 commits : 38c1894 tarifs 9$/3$ + paiement-bientot + funnel signup→paiement-bientot, 86e7001 home bénéfice-first + proof slot masqué, 49ac57e RED no-perf-claims, fa8a5d0 GREEN glob vitest). Cœur conversion de la vitrine livré : home VITR-01, tarifs VITR-02 (USDT TRC-20, D-10/D-11/D-12), funnel honnête D-09, garde no-perf-claims VITR-03/D-08. 15 tests verts, tsc/lint:i18n OK, invariant auth P1 intact. **Phase 02 COMPLETE (3/3 plans).** Stopped at : Plan 02-03 terminé.
 
-**Next action:** Phase 07 — plan suivant de l'affiliation (07-03+). La grille pure (`affiliateRateBps`/`computeCommissionAtomic`/`TIERS`) et le socle DB (0016, RPC `compute_affiliate_commissions`/`mark_commission_paid`, vue `affiliate_dashboard`) sont LIVE et golden-testés ; les couches aval (calcul orchestré côté job, attribution `referrals`, dashboard affiliation, candidature) consomment ces objets. Le palier (taux bps) est dérivé du NOMBRE D'INSCRITS via le code (D-02). En suspens Phase 04 : 04-03 vetting lib QR B-04-03, 04-02 LIVE apply B-04-02, 04-01 fixture TronGrid B-04-01. Phase 06 : 06-02 (job grammy) / 06-03 (threat verify graphe packages) restent à faire.
+**Next action:** Phase 07 — Plan 07-04 (signUp étendu : lecture cookie aff_ref + `attributeReferral` best-effort + delete cookie). Le repo `attributeReferral(client, {affiliate_code, referral_user_id})` est livré (26ce2f4, @app/supabase) et best-effort (ne casse jamais le signup) ; 07-04 le câble dans l'action serveur (try/catch, redirige paiement-bientot même si l'attribution échoue). Puis 07-05 (back-office : promoteAffiliate/createCode/listPending/transition/markCommissionPaid + CODE_TAKEN) et 07-06 (candidature). Le job mensuel `affiliate-commission` est enregistré au dispatch (run-job.cmd affiliate-commission, mensuel UTC). affiliate-rls.test.ts (AFF-02) reste à passer GREEN une fois `.env.test` + 2 users seedés disponibles (deferred-items.md). En suspens Phase 04 : 04-03 vetting lib QR B-04-03, 04-02 LIVE apply B-04-02, 04-01 fixture TronGrid B-04-01. Phase 06 : 06-02 (job grammy) / 06-03 (threat verify graphe packages).
 
 **Next action (archive):** Phase 06 — Plan 06-02 (job d'envoi Telegram). Câbler grammy 1.43 + planification sur le socle livré en 06-01 : le job lira `getPatternStats` (@app/supabase, anon|service_role) + clôtures du jour, appellera `formatMessage` (@app/core, pur bilingue FR+AR) et postera sur le canal public (parse_mode HTML). Socle partagé (threshold + getPatternStats + formatMessage) déjà committé et golden-testé (9757fdf/882915d/28d8800). 06-03 = threat verify graphe packages (aucun import apps/web depuis jobs). En suspens Phase 04 : 04-03 vetting lib QR B-04-03, 04-02 LIVE apply B-04-02, 04-01 fixture TronGrid B-04-01.
 
