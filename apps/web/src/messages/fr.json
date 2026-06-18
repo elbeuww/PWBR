@@ -190,6 +190,64 @@
       "confirm": "Appliquer",
       "cancel": "Annuler"
     },
+    "affiliateQueue": {
+      "title": "Candidatures d'affiliés",
+      "colEmail": "Email",
+      "colSocial": "Réseaux sociaux",
+      "colTelegram": "Telegram",
+      "colFacebook": "Facebook",
+      "colSubscribers": "Abonnés",
+      "colInteractions": "Interactions",
+      "colStatus": "Statut",
+      "badgePending": "En attente",
+      "actionApprove": "Approuver",
+      "actionReject": "Rejeter",
+      "emptyHeading": "Aucune candidature en attente",
+      "emptyBody": "Les nouvelles candidatures d'affiliés apparaîtront ici pour revue.",
+      "approveDialog": {
+        "title": "Approuver la candidature",
+        "codeLabel": "Code d'affiliation",
+        "codePlaceholder": "Ex : MERA2026",
+        "codeHint": "A-Z et 0-9, de 3 à 20 caractères.",
+        "confirm": "Approuver et créer le code",
+        "cancel": "Annuler"
+      },
+      "rejectDialog": {
+        "title": "Rejeter la candidature",
+        "motifLabel": "Motif du rejet",
+        "motifPlaceholder": "Explique brièvement la raison du rejet",
+        "confirm": "Confirmer le rejet",
+        "cancel": "Annuler"
+      },
+      "errors": {
+        "codeTaken": "Ce code est déjà utilisé. Choisissez-en un autre (A-Z, 0-9)."
+      }
+    },
+    "payouts": {
+      "title": "Commissions à payer",
+      "colAffiliate": "Affilié",
+      "colPeriod": "Période",
+      "colBase": "Base",
+      "colAmount": "Montant dû",
+      "colStatus": "Statut",
+      "colTxHash": "Transaction",
+      "badgeDue": "À payer",
+      "badgePaid": "Payée",
+      "viewOnTronscan": "Voir sur TronScan",
+      "actionPay": "Marquer comme payé",
+      "emptyHeading": "Aucune commission à payer",
+      "emptyBody": "Aucune commission à payer pour le moment.",
+      "payDialog": {
+        "title": "Marquer la commission comme payée",
+        "txHashLabel": "Hash de transaction (tx_hash)",
+        "txHashPlaceholder": "Hash TronScan de la transaction",
+        "amountLabel": "Montant payé (USDT)",
+        "amountPlaceholder": "Ex : 12.50",
+        "dateLabel": "Date du paiement",
+        "confirm": "Marquer comme payé",
+        "cancel": "Annuler"
+      }
+    },
     "actionSuccess": "Action effectuée",
     "actionError": "Échec de l'action. Réessaie."
   },
