@@ -24,10 +24,18 @@ type ServiceClient = SupabaseClient<Database>
  * `period` ('YYYY-MM' UTC). Wrapper mince : tout le calcul est dans le RPC.
  * Retourne le jsonb du RPC (`{ period, rows }`).
  */
+/** Format période = mois calendaire UTC strict 'YYYY-MM' (01-12). Validé AVANT le RPC (M-04). */
+const PERIOD_PATTERN = /^\d{4}-(0[1-9]|1[0-2])$/
+
 export async function computeCommissions(
   client: ServiceClient,
   period: string,
 ): Promise<Database['public']['Functions']['compute_affiliate_commissions']['Returns']> {
+  // Garde frontière (M-04) : rejette un mois hors 01-12 AVANT d'invoquer le RPC.
+  if (!PERIOD_PATTERN.test(period)) {
+    throw new Error(`computeCommissions: période invalide (attendu YYYY-MM, reçu "${period}")`)
+  }
+
   const { data, error } = await client.rpc('compute_affiliate_commissions', {
     p_period: period,
   })

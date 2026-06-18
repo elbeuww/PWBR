@@ -41,6 +41,10 @@ export interface TransitionApplicationExtra {
 /**
  * Transition de statut d'une candidature (pending → approved | rejected). Status-only,
  * jamais delete (miroir transitionPayment). reject_reason posé sur un rejet.
+ *
+ * Garde de statut (M-01, miroir anti-double-payout de mark_commission_paid) : l'UPDATE
+ * filtre `status='pending'` → impossible de re-traiter une candidature déjà approved/rejected.
+ * Si 0 ligne touchée (candidature inexistante OU déjà traitée), on lève explicitement.
  */
 export async function transitionApplication(
   client: ServiceClient,
@@ -53,12 +57,17 @@ export async function transitionApplication(
     patch.reject_reason = extra.reject_reason
   }
 
-  const { error } = await client
+  const { count, error } = await client
     .from('affiliate_applications')
-    .update(patch)
+    .update(patch, { count: 'exact' })
     .eq('id', id)
+    .eq('status', 'pending')
 
   if (error) {
     throw new Error(`transitionApplication failed: ${error.message}`)
+  }
+  if ((count ?? 0) === 0) {
+    // Candidature inexistante ou déjà traitée (garde anti-rejeu de transition).
+    throw new Error('transitionApplication: candidature inexistante ou déjà traitée')
   }
 }

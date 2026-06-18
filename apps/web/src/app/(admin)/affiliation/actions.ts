@@ -40,9 +40,17 @@ async function guard() {
   return createAdminServiceClient()
 }
 
+/**
+ * Mappe une erreur serveur vers une clé i18n OPAQUE (M-05). Ne JAMAIS propager `err.message`
+ * brut au client (fuite d'implémentation DB). Détail loggé serveur ; clé générique sinon.
+ */
 function fail(err: unknown): QueueActionResult {
   if (err instanceof CodeTakenError) return { ok: false, error: CODE_TAKEN }
-  return { ok: false, error: err instanceof Error ? err.message : 'unknown' }
+  // Sentinelle métier connue : aucun compte ne correspond à l'email de candidature.
+  if (err instanceof Error && err.message === NO_ACCOUNT) return { ok: false, error: NO_ACCOUNT }
+  // Tout le reste : détail loggé serveur, clé générique opaque renvoyée au client.
+  console.error('[affiliation/actions] échec action back-office :', err)
+  return { ok: false, error: 'action_failed' }
 }
 
 /** Normalise + valide le code vanity (D-06). Lève si hors borne A-Z0-9 {3,20}. */
@@ -62,15 +70,25 @@ export async function approveApplication(formData: FormData): Promise<QueueActio
   try {
     const client = await guard()
     const application_id = String(formData.get('application_id') ?? '')
-    const applicant_email = String(formData.get('applicant_email') ?? '')
-      .trim()
-      .toLowerCase()
-    if (!application_id || !applicant_email) {
-      throw new Error('application_id et applicant_email requis')
+    if (!application_id) {
+      throw new Error('application_id requis')
     }
     const code = parseVanityCode(formData.get('code'))
 
-    // Résout l'email de candidature → user_id existant (le compte doit exister, D-07).
+    // M-02 — moindre confiance : l'email à promouvoir vient de la LIGNE de candidature
+    // (service_role, status='pending'), JAMAIS du formData client. Un POST forgé ne peut
+    // donc plus promouvoir un email arbitraire ni re-traiter une candidature déjà traitée.
+    const { data: application, error: appError } = await client
+      .from('affiliate_applications')
+      .select('applicant_email')
+      .eq('id', application_id)
+      .eq('status', 'pending')
+      .maybeSingle()
+    if (appError) throw new Error(`lookup candidature: ${appError.message}`)
+    if (!application) throw new Error(NO_ACCOUNT)
+    const applicant_email = application.applicant_email.trim().toLowerCase()
+
+    // Résout l'email de candidature (source DB) → user_id existant (le compte doit exister, D-07).
     const { data: profile, error: lookupError } = await client
       .from('profiles')
       .select('id')

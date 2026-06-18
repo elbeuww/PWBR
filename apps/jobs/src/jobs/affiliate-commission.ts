@@ -51,9 +51,11 @@ export async function affiliateCommission(): Promise<Json> {
 
   // Période = mois calendaire UTC (luxon, T-07-TZ / Pitfall 4) — jamais d'horloge JS locale.
   // Argument optionnel (re-calcul d'un mois passé) : validé sur le format 'yyyy-MM'.
+  // Format strict 'yyyy-MM' avec mois 01-12 (M-04) — un argument hors borne est ignoré
+  // au profit du mois courant (computeCommissions re-valide aussi côté frontière repo).
   const argPeriod = process.argv[3]
   const period =
-    argPeriod && /^\d{4}-\d{2}$/.test(argPeriod)
+    argPeriod && /^\d{4}-(0[1-9]|1[0-2])$/.test(argPeriod)
       ? argPeriod
       : DateTime.utc().toFormat('yyyy-MM')
 
