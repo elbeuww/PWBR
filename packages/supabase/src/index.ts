@@ -116,3 +116,27 @@ export type {
   ActivateForPaymentInput,
   ChangePlanInput,
 } from './repositories/subscriptions'
+// Phase 7 — affiliation (service_role, frontière producteur-unique D-07/D-11,
+// JAMAIS importé depuis apps/web). Calcul financier en DB (RPC) — repos = wrappers.
+export {
+  CodeTakenError,
+  attributeReferral,
+  promoteAffiliate,
+  createCode,
+} from './repositories/affiliates'
+export type {
+  AttributeReferralInput,
+  PromoteAffiliateInput,
+  CreateCodeInput,
+} from './repositories/affiliates'
+export { countReferrals } from './repositories/referrals'
+export {
+  computeCommissions,
+  markCommissionPaid,
+} from './repositories/commissions'
+export type { MarkCommissionPaidInput } from './repositories/commissions'
+export {
+  listPendingApplications,
+  transitionApplication,
+} from './repositories/affiliateApplications'
+export type { TransitionApplicationExtra } from './repositories/affiliateApplications'
