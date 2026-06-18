@@ -9,8 +9,8 @@ progress:
   total_phases: 9
   completed_phases: 6
   total_plans: 28
-  completed_plans: 26
-  percent: 93
+  completed_plans: 27
+  percent: 96
 ---
 
 # Project State
@@ -28,11 +28,11 @@ progress:
 ## Current Position
 
 Phase: 07 (affiliation-paliers) — EXECUTING
-Plan: 4 of 6
+Plan: 5 of 6
 Status: Ready to execute
 Last activity: 2026-06-18
 
-Progress: [█████████░] 93%
+Progress: [█████████▓] 96%
 
 ## Performance Metrics
 
@@ -55,6 +55,7 @@ Progress: [█████████░] 93%
 | Phase 06 P06-01 | ~12min | 3 tasks | 9 files |
 | Phase 07 P07-03 | ~12min | 2 tasks | 9 files |
 | Phase 07 P07-04 | ~10min | 2 tasks | 6 files |
+| Phase 07 P07-05 | ~20min | 2 tasks | 7 files |
 
 ## Roadmap v2.0 (9 phases)
 
@@ -231,6 +232,13 @@ Progress: [█████████░] 93%
 - **D-07-04-C (best-effort ABSOLU, T-07-ATTR-CRASH/A2)** : `attributeReferral` enveloppé dans `try/catch` ; échec loggé `console.error` serveur (jamais `console.log`), jamais propagé. Code inconnu / self-ref (D-12, no-op repo) / 23505 idempotent / erreur DB → l'inscription RÉUSSIT toujours et redirige `/paiement-bientot`. E2E `affiliation-attribution.spec.ts` authoré (3 tests, `--list` OK) ; GREEN = human-verify (préconditions deferred-items.md, D-01-04-C). Aucune fuite service_role client (lue via `process.env`, sans `NEXT_PUBLIC_`).
 - **Commits 07-04** : f53302e (RED captureRef test), 0169370 (GREEN captureRef + insertion middleware), f066d77 (signUp attribution best-effort + E2E authoré). `npx vitest run` 465 verts | 4 skip, `pnpm typecheck` 0 erreur, `lint:i18n` exit 0, 0 package npm. **AFF-01 bout en bout couvert** (capture ?ref → attribution au signup).
 
+### Decisions exécution (Plan 07-05)
+
+- **D-07-05-A (back-office mono-FR, miroir (admin)/file)** : 2 surfaces superadmin créées hors `[locale]` — `(admin)/affiliation` (revue candidatures) + `(admin)/affiliation/payouts`. 404 non-superadmin via layout `(admin)` (`requireRole('superadmin')` → notFound) ET re-validation `requireRole` en tête de CHAQUE server action (endpoint POST direct, T-07-ADMIN-WRITE). i18n `admin.affiliateQueue.*` + `admin.payouts.*` mono-FR (en/ar non touchés, invariant D-04-03-B ; tests parité par-namespace → admin FR-only ne casse rien). Badges ambre pending/due, neutre approved/paid (jamais vert/rouge D-04, grep green-/red- == 0).
+- **D-07-05-B (approbation : résolution email→user_id)** : `affiliate_applications` ne stocke que `applicant_email` (pas de user_id) ; `promoteAffiliate` exige un user_id. `approveApplication` résout l'email → `profiles.id` (ilike) via service_role ; compte inexistant → erreur `NO_ACCOUNT` (le candidat doit déjà avoir un compte, cohérent D-07 pas de self-serve). Puis `promoteAffiliate` (rôle affiliate + affiliates idempotent) + `createCode` (code vanity validé `^[A-Z0-9]{3,20}$` AVANT écriture, CodeTakenError → toast i18n `affiliateQueue.errors.codeTaken`) + `transitionApplication('approved')`. Rejet = `transitionApplication('rejected', {reject_reason})` motif requis (T-07-DESTRUCT).
+- **D-07-05-C (payout : vue due+paid, RPC atomique)** : `payCommission` re-valide `requireRole('superadmin')` puis `markCommissionPaid(service_role, {commission_id, tx_hash, amount_atomic})` — RPC `mark_commission_paid` atomique (commission due→paid + insert payouts), anti double-payout porté par la DB. Montant saisi lisible (USDT) → `toAtomic` côté client → **string** atomique côté serveur (CR-02, borne `^[0-9]+$`, jamais Number). La vue affiche due ET paid (déviation Rule 2 vs `loadDue` du plan) pour porter le lien tx_hash → TronScan `target="_blank" rel="noopener noreferrer"` (T-07-EXTLINK) sur les payés ; action « Marquer payé » seulement sur les due. Date de paiement saisie obligatoire UI (D-15) mais horodatage réel = DB (`payouts.paid_at default now()`, le RPC ne prend pas paid_at).
+- **Commits 07-05** : 6cfa967 (Task 1 : file de revue page+actions+ApplicationRowActions+i18n), 6fa809b (Task 2 : payouts page+actions+PayoutRowAction). `pnpm typecheck` 0 erreur, `lint:i18n` exit 0, `npx vitest run` 465 verts | 4 skip (non régressé), 0 package npm (T-07-SC accept). **AFF-01 (pose code vanity par superadmin, D-07) + AFF-04 (payout tracé tx_hash, D-15) couverts back-office.** Reste 07-06 (surface 1 candidature `[locale]` trilingue + surface 3 dashboard affilié no-PII).
+
 ### Open todos / research flags (v2.0)
 
 - **Phase 4 (research flag) :** TronGrid endpoint `walletsolidity`, parsing logs TRC-20, normalisation hex↔base58 — doc TS peu dense, recherche de phase recommandée.
@@ -257,7 +265,7 @@ Progress: [█████████░] 93%
 
 ## Session Continuity
 
-**Last session:** 2026-06-18T01:37:52.838Z
+**Last session:** 2026-06-18 — Plan 07-05 COMPLETE (back-office affilié : revue candidatures + payout, AFF-01/AFF-04). 2 surfaces superadmin mono-FR hors `[locale]`, miroir exact (admin)/file. Task 1 (6cfa967) : `(admin)/affiliation` RSC `listPendingApplications` via service_role + `ApplicationRowActions` client (approuver → dialog code vanity borné A-Z0-9 {3,20} → résolution email→user_id + promoteAffiliate + createCode CODE_TAKEN + transition approved ; rejeter → alert-dialog motif requis) + i18n `admin.affiliateQueue.*` (D-07-05-A/B). Task 2 (6fa809b) : `(admin)/affiliation/payouts` RSC commissions due+paid via service_role (badge ambre due / neutre paid, lien tx_hash TronScan rel=noopener) + `PayoutRowAction` alert-dialog tx_hash+montant+date (D-15) → `payCommission` requireRole + `markCommissionPaid` RPC atomique anti double-payout, montant `toAtomic` côté client → string atomique (CR-02) + i18n `admin.payouts.*` (D-07-05-C). Défense en profondeur : 404 non-superadmin (layout + requireRole re-validé chaque action), 0 écriture front (service_role only), entrées validées serveur (code `^[A-Z0-9]{3,20}$`, amount `^[0-9]+$`, motif non vide). Déviation Rule 2 : vue payout étend due→due+paid pour porter le lien TronScan. `pnpm typecheck` 0, `lint:i18n` exit 0, vitest 465 verts | 4 skip (non régressé), 0 npm. Stopped at : Plan 07-05 terminé.
 
 **Last session (archive):** 2026-06-18T02:30:00.000Z — Plan 07-02 COMPLETE (grille de paliers + commission BigInt en logique pure @app/core, AFF-03). TDD : 4a06c4c (RED — 28 golden tests, module `../tiers.js` absent) → cd27a0c (GREEN — `tiers.ts` pur + barrel). `affiliateRateBps(signups)` miroir bit-à-bit du `case` SQL `affiliate_rate_bps` (0016 LIVE) : 17 bornes verrouillées (0/1/99/100/500/501/600/1000/1001/5000/5001/10000/10001/25000/25001/50000/50001), seuil plafond gardé à `>= 50000` pour matcher le SQL (D-07-02-A). `computeCommissionAtomic(base, bps) = (base * BigInt(bps)) / 10000n` floor BigInt zéro float (T-07-FLOAT, D-07-02-B), exact > 2⁵³. `TIERS` (8 paliers) + type `Tier` exportés du barrel. Pureté : zéro I/O (grep imports Supabase/fs/http/fetch == 0), `grep -c "Number(" == 0`. `npx vitest run packages/core` 144/144 verts (28 neufs), `pnpm typecheck` 0 erreur, 0 package npm. Source unique grille + commission réutilisable par le dashboard affiliation. Stopped at : Plan 07-02 terminé.
 
@@ -277,7 +285,9 @@ Progress: [█████████░] 93%
 
 **Last session (archive):** 2026-06-14 — Completed 02-03-PLAN.md (4 commits : 38c1894 tarifs 9$/3$ + paiement-bientot + funnel signup→paiement-bientot, 86e7001 home bénéfice-first + proof slot masqué, 49ac57e RED no-perf-claims, fa8a5d0 GREEN glob vitest). Cœur conversion de la vitrine livré : home VITR-01, tarifs VITR-02 (USDT TRC-20, D-10/D-11/D-12), funnel honnête D-09, garde no-perf-claims VITR-03/D-08. 15 tests verts, tsc/lint:i18n OK, invariant auth P1 intact. **Phase 02 COMPLETE (3/3 plans).** Stopped at : Plan 02-03 terminé.
 
-**Next action:** Phase 07 — Plan 07-04 (signUp étendu : lecture cookie aff_ref + `attributeReferral` best-effort + delete cookie). Le repo `attributeReferral(client, {affiliate_code, referral_user_id})` est livré (26ce2f4, @app/supabase) et best-effort (ne casse jamais le signup) ; 07-04 le câble dans l'action serveur (try/catch, redirige paiement-bientot même si l'attribution échoue). Puis 07-05 (back-office : promoteAffiliate/createCode/listPending/transition/markCommissionPaid + CODE_TAKEN) et 07-06 (candidature). Le job mensuel `affiliate-commission` est enregistré au dispatch (run-job.cmd affiliate-commission, mensuel UTC). affiliate-rls.test.ts (AFF-02) reste à passer GREEN une fois `.env.test` + 2 users seedés disponibles (deferred-items.md). En suspens Phase 04 : 04-03 vetting lib QR B-04-03, 04-02 LIVE apply B-04-02, 04-01 fixture TronGrid B-04-01. Phase 06 : 06-02 (job grammy) / 06-03 (threat verify graphe packages).
+**Next action:** Phase 07 — Plan 07-06 (surfaces `[locale]` trilingues restantes). Surface 1 = formulaire de candidature `[locale]/affiliation` (form react-hook-form + zod, namespace i18n `affiliate.application.*` à parité STRICTE fr/en/ar + RTL, insert via service_role D-08, toast sonner). Surface 3 = dashboard affilié no-PII `[locale]/(affiliate)/dashboard` (rôle affiliate, vue `affiliate_dashboard` security_invoker en lecture RLS seule via @tanstack/react-query, grille 8 paliers + progression, namespaces `affiliate.dashboard.*`/`affiliate.tiers.*`, zéro ligne par filleul D-13). Back-office (surfaces 2 & 4) déjà livré en 07-05 (6cfa967, 6fa809b). Le job mensuel `affiliate-commission` est enregistré au dispatch. affiliate-rls.test.ts (AFF-02) reste à passer GREEN une fois `.env.test` + 2 users seedés disponibles (deferred-items.md). En suspens Phase 04 : 04-03 vetting lib QR B-04-03, 04-02 LIVE apply B-04-02, 04-01 fixture TronGrid B-04-01. Phase 06 : 06-02 (job grammy) / 06-03 (threat verify graphe packages).
+
+**Next action (archive):** Phase 07 — Plan 07-04 (signUp étendu : lecture cookie aff_ref + `attributeReferral` best-effort + delete cookie). Le repo `attributeReferral(client, {affiliate_code, referral_user_id})` est livré (26ce2f4, @app/supabase) et best-effort (ne casse jamais le signup) ; 07-04 le câble dans l'action serveur (try/catch, redirige paiement-bientot même si l'attribution échoue). Puis 07-05 (back-office) et 07-06 (candidature).
 
 **Next action (archive):** Phase 06 — Plan 06-02 (job d'envoi Telegram). Câbler grammy 1.43 + planification sur le socle livré en 06-01 : le job lira `getPatternStats` (@app/supabase, anon|service_role) + clôtures du jour, appellera `formatMessage` (@app/core, pur bilingue FR+AR) et postera sur le canal public (parse_mode HTML). Socle partagé (threshold + getPatternStats + formatMessage) déjà committé et golden-testé (9757fdf/882915d/28d8800). 06-03 = threat verify graphe packages (aucun import apps/web depuis jobs). En suspens Phase 04 : 04-03 vetting lib QR B-04-03, 04-02 LIVE apply B-04-02, 04-01 fixture TronGrid B-04-01.
 

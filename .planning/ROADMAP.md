@@ -134,7 +134,7 @@ i18n/RTL+rôles avant toute UI publique · RLS signaux avant exposition espace m
 - [x] 07-02-PLAN.md — grille de paliers + commission BigInt en logique pure golden-testée (@app/core)
 - [x] 07-03-PLAN.md — repos service_role (attribution, RPC wrappers, candidatures) + job mensuel idempotent
 - [x] 07-04-PLAN.md — capture ?ref (middleware cookie 30j) + attribution figée au signup + E2E
-- [ ] 07-05-PLAN.md — back-office (admin) : file de revue candidatures + vue payout
+- [x] 07-05-PLAN.md — back-office (admin) : file de revue candidatures + vue payout
 - [ ] 07-06-PLAN.md — surfaces membre : candidature + dashboard affilié no-PII + namespace i18n affiliate
 **UI hint**: yes
 
