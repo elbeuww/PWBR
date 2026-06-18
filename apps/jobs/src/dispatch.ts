@@ -29,6 +29,7 @@ import { persist } from './jobs/persist'
 import { subscriptionExpiry } from './jobs/subscription-expiry'
 import { outcomeTracker } from './jobs/outcome-tracker'
 import { telegramPublish } from './jobs/telegram-publish'
+import { affiliateCommission } from './jobs/affiliate-commission'
 import type { Json } from '@app/supabase'
 
 const logger = pino({ level: 'info' })
@@ -58,6 +59,9 @@ const JOB_REGISTRY: Record<string, () => Promise<Json | undefined>> = {
   'outcome-tracker': outcomeTracker,
   // TG-01/02/03 — publication Telegram horaire (APRÈS outcome-tracker). run-job.cmd telegram-publish.
   'telegram-publish': telegramPublish,
+  // AFF-03 — calcul mensuel idempotent des commissions (mois UTC courant via luxon).
+  // Windows Task Scheduler mensuel : run-job.cmd affiliate-commission.
+  'affiliate-commission': affiliateCommission,
 }
 
 // ─── Dispatch ────────────────────────────────────────────────────────────────
