@@ -237,6 +237,7 @@ create function public.affiliate_rate_bps(p_signups int)
   returns int
   language sql
   immutable
+  set search_path = public  -- D-V2-05 : search_path figé sur toutes les fonctions (advisor function_search_path_mutable)
 as $$
   select case
     when p_signups >= 50000 then 2000  -- 20.00 %

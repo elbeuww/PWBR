@@ -615,8 +615,236 @@ export type Database = {
           },
         ]
       }
+      affiliates: {
+        Row: {
+          created_at: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "affiliates_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      affiliate_codes: {
+        Row: {
+          affiliate_id: string
+          code: string
+          created_at: string
+        }
+        Insert: {
+          affiliate_id: string
+          code: string
+          created_at?: string
+        }
+        Update: {
+          affiliate_id?: string
+          code?: string
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "affiliate_codes_affiliate_id_fkey"
+            columns: ["affiliate_id"]
+            isOneToOne: false
+            referencedRelation: "affiliates"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      affiliate_applications: {
+        Row: {
+          applicant_email: string
+          created_at: string
+          facebook: string | null
+          id: string
+          interactions: string | null
+          reject_reason: string | null
+          social_links: string | null
+          status: string
+          subscriber_count: number | null
+          telegram: string | null
+        }
+        Insert: {
+          applicant_email: string
+          created_at?: string
+          facebook?: string | null
+          id?: string
+          interactions?: string | null
+          reject_reason?: string | null
+          social_links?: string | null
+          status?: string
+          subscriber_count?: number | null
+          telegram?: string | null
+        }
+        Update: {
+          applicant_email?: string
+          created_at?: string
+          facebook?: string | null
+          id?: string
+          interactions?: string | null
+          reject_reason?: string | null
+          social_links?: string | null
+          status?: string
+          subscriber_count?: number | null
+          telegram?: string | null
+        }
+        Relationships: []
+      }
+      referrals: {
+        Row: {
+          affiliate_id: string
+          attributed_at: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          affiliate_id: string
+          attributed_at?: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          affiliate_id?: string
+          attributed_at?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "referrals_affiliate_id_fkey"
+            columns: ["affiliate_id"]
+            isOneToOne: false
+            referencedRelation: "affiliates"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "referrals_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      commissions: {
+        Row: {
+          // CR-02 / T-07: bigint Postgres -> string (PostgREST). NE PAS regénérer sans ré-appliquer.
+          affiliate_id: string
+          amount_atomic: string
+          base_atomic: string
+          created_at: string
+          id: string
+          period: string
+          rate_bps: number
+          referral_id: string | null
+          status: string
+        }
+        Insert: {
+          // bigint -> string (voir Row).
+          affiliate_id: string
+          amount_atomic?: string
+          base_atomic?: string
+          created_at?: string
+          id?: string
+          period: string
+          rate_bps: number
+          referral_id?: string | null
+          status?: string
+        }
+        Update: {
+          // bigint -> string (voir Row).
+          affiliate_id?: string
+          amount_atomic?: string
+          base_atomic?: string
+          created_at?: string
+          id?: string
+          period?: string
+          rate_bps?: number
+          referral_id?: string | null
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "commissions_affiliate_id_fkey"
+            columns: ["affiliate_id"]
+            isOneToOne: false
+            referencedRelation: "affiliates"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "commissions_referral_id_fkey"
+            columns: ["referral_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      payouts: {
+        Row: {
+          // CR-02 / T-07: bigint Postgres -> string (PostgREST). NE PAS regénérer sans ré-appliquer.
+          amount_atomic: string
+          commission_id: string
+          id: string
+          paid_at: string
+          tx_hash: string
+        }
+        Insert: {
+          // bigint -> string (voir Row).
+          amount_atomic: string
+          commission_id: string
+          id?: string
+          paid_at?: string
+          tx_hash: string
+        }
+        Update: {
+          // bigint -> string (voir Row).
+          amount_atomic?: string
+          commission_id?: string
+          id?: string
+          paid_at?: string
+          tx_hash?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payouts_commission_id_fkey"
+            columns: ["commission_id"]
+            isOneToOne: false
+            referencedRelation: "commissions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
+      affiliate_dashboard: {
+        Row: {
+          active_referrals: number | null
+          affiliate_id: string | null
+          commissions_due_atomic: string | null
+          commissions_paid_atomic: string | null
+          revenue_current_month_atomic: string | null
+          revenue_total_atomic: string | null
+          total_signups: number | null
+        }
+        Relationships: []
+      }
       pattern_stats: {
         Row: {
           avg_r: number | null
@@ -650,6 +878,22 @@ export type Database = {
       }
     }
     Functions: {
+      affiliate_rate_bps: {
+        Args: { p_signups: number }
+        Returns: number
+      }
+      compute_affiliate_commissions: {
+        Args: { p_period: string }
+        Returns: Json
+      }
+      mark_commission_paid: {
+        Args: {
+          p_amount_atomic: number
+          p_commission_id: string
+          p_tx_hash: string
+        }
+        Returns: undefined
+      }
       activate_subscription_for_payment: {
         Args: {
           p_payment_id: string
@@ -863,3 +1107,23 @@ export type PredictionOutcomeUpdate = Database['public']['Tables']['prediction_o
 export type TelegramPostRow = Database['public']['Tables']['telegram_posts']['Row']
 export type TelegramPostInsert = Database['public']['Tables']['telegram_posts']['Insert']
 export type TelegramPostUpdate = Database['public']['Tables']['telegram_posts']['Update']
+
+// Phase 7 — affiliation à paliers (AFF-01..05, migration 0016) — alias maison.
+// *_atomic typés string (CR-02 : bigint Postgres -> string PostgREST).
+export type AffiliateStatus = 'pending' | 'approved' | 'rejected'
+export type CommissionStatus = 'due' | 'paid'
+export type AffiliateRow = Database['public']['Tables']['affiliates']['Row']
+export type AffiliateInsert = Database['public']['Tables']['affiliates']['Insert']
+export type AffiliateCodeRow = Database['public']['Tables']['affiliate_codes']['Row']
+export type AffiliateCodeInsert = Database['public']['Tables']['affiliate_codes']['Insert']
+export type AffiliateApplicationRow = Database['public']['Tables']['affiliate_applications']['Row']
+export type AffiliateApplicationInsert = Database['public']['Tables']['affiliate_applications']['Insert']
+export type AffiliateApplicationUpdate = Database['public']['Tables']['affiliate_applications']['Update']
+export type ReferralRow = Database['public']['Tables']['referrals']['Row']
+export type ReferralInsert = Database['public']['Tables']['referrals']['Insert']
+export type CommissionRow = Database['public']['Tables']['commissions']['Row']
+export type CommissionInsert = Database['public']['Tables']['commissions']['Insert']
+export type CommissionUpdate = Database['public']['Tables']['commissions']['Update']
+export type PayoutRow = Database['public']['Tables']['payouts']['Row']
+export type PayoutInsert = Database['public']['Tables']['payouts']['Insert']
+export type AffiliateDashboardRow = Database['public']['Views']['affiliate_dashboard']['Row']
