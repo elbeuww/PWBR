@@ -18,6 +18,7 @@ import createMiddleware from 'next-intl/middleware'
 import { type NextRequest } from 'next/server'
 import { routing } from './i18n/routing'
 import { updateSession } from './lib/supabase/middleware'
+import { captureRef } from './lib/affiliate/captureRef'
 
 const handleI18n = createMiddleware(routing)
 
@@ -26,7 +27,10 @@ export async function middleware(request: NextRequest) {
   const response = handleI18n(request)
   // Header consommé par le gate RSC pour le returnTo (D-08).
   response.headers.set('x-pathname', request.nextUrl.pathname)
-  // 2. Session ensuite : MUTE la response next-intl (ne la recrée pas).
+  // 2. Ref : capture ?ref → cookie aff_ref (30j, last-touch) en MUTANT la même
+  //    response (D-09/D-10). Ordre verrouillé locale → ref → session.
+  captureRef(request, response)
+  // 3. Session ensuite : MUTE la response next-intl (ne la recrée pas).
   return await updateSession(request, response)
 }
 
