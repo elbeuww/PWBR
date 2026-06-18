@@ -54,7 +54,7 @@
 ### AFF — Affiliation à paliers (Wave 4)
 - [ ] **AFF-01**: Un affilié dispose d'un code promo ; un visiteur arrivant avec `?ref=` est attribué à cet affilié à l'inscription.
 - [ ] **AFF-02**: Un affilié voit son dashboard : abonnés actifs ramenés, revenus générés, commissions dues/payées — sans PII des filleuls.
-- [ ] **AFF-03**: Le système calcule les commissions récurrentes (palier max 20 %) sur les abonnés ACTIFS uniquement, de façon idempotente par période.
+- [x] **AFF-03**: Le système calcule les commissions récurrentes (palier max 20 %) sur les abonnés ACTIFS uniquement, de façon idempotente par période.
 - [ ] **AFF-04**: Le superadmin marque les commissions payées (payout manuel en crypto) ; l'état se reflète dans le dashboard affilié.
 - [ ] **AFF-05**: L'auto-parrainage et les abonnés expirés ne génèrent aucune commission.
 
@@ -128,7 +128,7 @@
 | TG-03 | Phase 6 | Pending |
 | AFF-01 | Phase 7 | Pending |
 | AFF-02 | Phase 7 | Pending |
-| AFF-03 | Phase 7 | Pending |
+| AFF-03 | Phase 7 | Complete |
 | AFF-04 | Phase 7 | Pending |
 | AFF-05 | Phase 7 | Pending |
 | ADMIN-03 | Phase 8 | Pending |
