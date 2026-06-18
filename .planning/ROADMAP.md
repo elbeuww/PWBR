@@ -129,7 +129,13 @@ i18n/RTL+rôles avant toute UI publique · RLS signaux avant exposition espace m
   2. Un affilié voit son dashboard (abonnés actifs ramenés, revenus générés, commissions dues/payées) sans aucune PII des filleuls ; un affilié ne voit jamais les referrals d'un autre (isolation RLS prouvée).
   3. Les commissions récurrentes (palier max 20 %) sont calculées sur les abonnés ACTIFS sur la période uniquement, de façon idempotente (`UNIQUE(affiliate_id, referral_id, period)`, re-run = même total) ; auto-parrainage et abonnés expirés ne génèrent aucune commission.
   4. Le superadmin marque les commissions payées (payout manuel en crypto) et l'état se reflète dans le dashboard affilié.
-**Plans**: TBD
+**Plans**: 6 plans
+- [ ] 07-01-PLAN.md — migration 0016 (5 tables + RLS + RPC commission/payout + vue no-PII) + apply LIVE + types
+- [ ] 07-02-PLAN.md — grille de paliers + commission BigInt en logique pure golden-testée (@app/core)
+- [ ] 07-03-PLAN.md — repos service_role (attribution, RPC wrappers, candidatures) + job mensuel idempotent
+- [ ] 07-04-PLAN.md — capture ?ref (middleware cookie 30j) + attribution figée au signup + E2E
+- [ ] 07-05-PLAN.md — back-office (admin) : file de revue candidatures + vue payout
+- [ ] 07-06-PLAN.md — surfaces membre : candidature + dashboard affilié no-PII + namespace i18n affiliate
 **UI hint**: yes
 
 ### Phase 8: Superadmin consolidé (signaux, santé, affiliés)
