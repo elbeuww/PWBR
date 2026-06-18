@@ -3,7 +3,7 @@ gsd_state_version: 1.0
 milestone: v2.0
 milestone_name: Plateforme publique
 status: planning
-last_updated: "2026-06-17T23:57:57.764Z"
+last_updated: "2026-06-18T00:05:00.550Z"
 last_activity: 2026-06-17
 progress:
   total_phases: 9
@@ -233,7 +233,7 @@ Progress: [█████████░] 91%
 
 ## Session Continuity
 
-**Last session:** 2026-06-17T23:57:57.757Z
+**Last session:** 2026-06-18T00:05:00.542Z
 
 **Last session:** 2026-06-17 — Plan 06-01 COMPLETE (socle partagé + formateur Telegram bilingue, TG-02/LEGAL-01). Task 1 (9757fdf, TDD) : threshold.ts déplacé tel quel en @app/core (source unique seuil N≥30 vitrine ↔ Telegram, D-11), web re-exporte, test golden 8 vert. Task 2 (882915d) : getPatternStats porté en @app/supabase (client générique anon|service_role, SELECT agrégats exact, jamais de throw), web re-câblé en re-export, suite P5 non régressée — jobs n'importera jamais apps/web (D-49). Task 3 (28d8800, TDD) : formatMessage pur bilingue FR+AR — escapeHtml ordre & < > (T-06-INJ), bloc FR LTR + AR RTL préfixé U+200F, ticker/R/% isolés U+2066/U+2069 (T-06-BIDI), win rate via applyThreshold (TG-02/D-11), disclaimer FR+AR copy P2 chaque sortie (LEGAL-01), FormatTrade sans niveaux entry/SL/TP (D-03/T-06-LEAK grep==0), jour vide D-10, cap top-10 |R| + « +X autres » < 4096 (Pitfall 3), 11 tests golden verts. Déviation Rule 2 : export barrel core formatMessage/escapeHtml. npx vitest run 401 tests verts (53 fichiers), pnpm typecheck 0 erreur, 0 package npm. Stopped at : Plan 06-01 terminé.
 
