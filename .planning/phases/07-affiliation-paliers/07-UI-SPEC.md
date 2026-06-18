@@ -1,10 +1,11 @@
 ---
 phase: 7
 slug: affiliation-paliers
-status: draft
+status: approved
 shadcn_initialized: true
 preset: "shadcn (Tailwind v4 CSS-first, radix-nova registry) — héritée Phase 2 (D-02-01)"
 created: 2026-06-18
+reviewed_at: 2026-06-18
 ---
 
 # Phase 7 — UI Design Contract
