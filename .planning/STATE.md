@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v2.0
 milestone_name: Plateforme publique
 status: executing
-last_updated: "2026-06-18T01:38:41.870Z"
+last_updated: "2026-06-18T01:59:17.573Z"
 last_activity: 2026-06-18
 progress:
   total_phases: 9
-  completed_phases: 6
+  completed_phases: 7
   total_plans: 28
-  completed_plans: 27
-  percent: 96
+  completed_plans: 28
+  percent: 100
 ---
 
 # Project State
@@ -28,11 +28,11 @@ progress:
 ## Current Position
 
 Phase: 07 (affiliation-paliers) — EXECUTING
-Plan: 5 of 6
+Plan: 6 of 6
 Status: Ready to execute
 Last activity: 2026-06-18
 
-Progress: [█████████▓] 96%
+Progress: [██████████] 100%
 
 ## Performance Metrics
 
@@ -265,7 +265,7 @@ Progress: [█████████▓] 96%
 
 ## Session Continuity
 
-**Last session:** 2026-06-18 — Plan 07-05 COMPLETE (back-office affilié : revue candidatures + payout, AFF-01/AFF-04). 2 surfaces superadmin mono-FR hors `[locale]`, miroir exact (admin)/file. Task 1 (6cfa967) : `(admin)/affiliation` RSC `listPendingApplications` via service_role + `ApplicationRowActions` client (approuver → dialog code vanity borné A-Z0-9 {3,20} → résolution email→user_id + promoteAffiliate + createCode CODE_TAKEN + transition approved ; rejeter → alert-dialog motif requis) + i18n `admin.affiliateQueue.*` (D-07-05-A/B). Task 2 (6fa809b) : `(admin)/affiliation/payouts` RSC commissions due+paid via service_role (badge ambre due / neutre paid, lien tx_hash TronScan rel=noopener) + `PayoutRowAction` alert-dialog tx_hash+montant+date (D-15) → `payCommission` requireRole + `markCommissionPaid` RPC atomique anti double-payout, montant `toAtomic` côté client → string atomique (CR-02) + i18n `admin.payouts.*` (D-07-05-C). Défense en profondeur : 404 non-superadmin (layout + requireRole re-validé chaque action), 0 écriture front (service_role only), entrées validées serveur (code `^[A-Z0-9]{3,20}$`, amount `^[0-9]+$`, motif non vide). Déviation Rule 2 : vue payout étend due→due+paid pour porter le lien TronScan. `pnpm typecheck` 0, `lint:i18n` exit 0, vitest 465 verts | 4 skip (non régressé), 0 npm. Stopped at : Plan 07-05 terminé.
+**Last session:** 2026-06-18T01:59:17.565Z
 
 **Last session (archive):** 2026-06-18T02:30:00.000Z — Plan 07-02 COMPLETE (grille de paliers + commission BigInt en logique pure @app/core, AFF-03). TDD : 4a06c4c (RED — 28 golden tests, module `../tiers.js` absent) → cd27a0c (GREEN — `tiers.ts` pur + barrel). `affiliateRateBps(signups)` miroir bit-à-bit du `case` SQL `affiliate_rate_bps` (0016 LIVE) : 17 bornes verrouillées (0/1/99/100/500/501/600/1000/1001/5000/5001/10000/10001/25000/25001/50000/50001), seuil plafond gardé à `>= 50000` pour matcher le SQL (D-07-02-A). `computeCommissionAtomic(base, bps) = (base * BigInt(bps)) / 10000n` floor BigInt zéro float (T-07-FLOAT, D-07-02-B), exact > 2⁵³. `TIERS` (8 paliers) + type `Tier` exportés du barrel. Pureté : zéro I/O (grep imports Supabase/fs/http/fetch == 0), `grep -c "Number(" == 0`. `npx vitest run packages/core` 144/144 verts (28 neufs), `pnpm typecheck` 0 erreur, 0 package npm. Source unique grille + commission réutilisable par le dashboard affiliation. Stopped at : Plan 07-02 terminé.
 
