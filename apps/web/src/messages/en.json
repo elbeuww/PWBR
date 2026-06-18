@@ -326,6 +326,35 @@
         "invalid": "Incomplete form. Check the fields and try again.",
         "submitFailed": "Failed to submit the application. Check your connection and try again."
       }
+    },
+    "dashboard": {
+      "title": "Affiliate area",
+      "subtitle": "Your aggregated statistics. No personal data about your referrals is shown.",
+      "tierLabel": "Current tier",
+      "rateLabel": "Current rate",
+      "signupsLabel": "Sign-ups via code",
+      "signupsHint": "The number of sign-ups determines your tier and rate.",
+      "activeReferralsLabel": "Active referred subscribers",
+      "activeReferralsHint": "Audience determines the rate; the amount follows the money actually collected.",
+      "revenueLabel": "Revenue generated",
+      "revenueTotal": "All-time",
+      "revenueCurrentMonth": "Current month",
+      "commissionsDueLabel": "Commissions due",
+      "commissionsPaidLabel": "Commissions paid",
+      "progressTitle": "Progression",
+      "progressToNext": "{remaining} sign-ups until tier {nextTier} ({nextRate}%).",
+      "maxTierReached": "Maximum tier reached.",
+      "emptyHeading": "No referrals yet",
+      "emptyBody": "Share your affiliate code to start referring. Your statistics will appear here from the first sign-up.",
+      "loadError": "Unable to load your statistics. Try again in a moment."
+    },
+    "tiers": {
+      "gridTitle": "Tier grid",
+      "colTier": "Tier",
+      "colSignups": "Sign-ups via code",
+      "colRate": "Rate",
+      "tierName": "Tier {tier}",
+      "current": "Current"
     }
   }
 }

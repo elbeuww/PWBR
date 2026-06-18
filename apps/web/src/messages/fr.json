@@ -447,6 +447,35 @@
         "invalid": "Formulaire incomplet. Vérifiez les champs et réessayez.",
         "submitFailed": "Échec de l'envoi de la candidature. Vérifiez votre connexion et réessayez."
       }
+    },
+    "dashboard": {
+      "title": "Espace affilié",
+      "subtitle": "Vos statistiques agrégées. Aucune donnée personnelle de vos filleuls n'est affichée.",
+      "tierLabel": "Palier actuel",
+      "rateLabel": "Taux actuel",
+      "signupsLabel": "Inscrits via le code",
+      "signupsHint": "Le nombre d'inscrits détermine votre palier et votre taux.",
+      "activeReferralsLabel": "Abonnés actifs ramenés",
+      "activeReferralsHint": "L'audience détermine le taux ; le montant suit l'argent réellement encaissé.",
+      "revenueLabel": "Revenus générés",
+      "revenueTotal": "Cumul",
+      "revenueCurrentMonth": "Mois courant",
+      "commissionsDueLabel": "Commissions dues",
+      "commissionsPaidLabel": "Commissions payées",
+      "progressTitle": "Progression",
+      "progressToNext": "{remaining} inscrits avant le palier {nextTier} ({nextRate}%).",
+      "maxTierReached": "Palier maximum atteint.",
+      "emptyHeading": "Pas encore de filleuls",
+      "emptyBody": "Partagez votre code d'affiliation pour commencer à parrainer. Vos statistiques s'afficheront ici dès la première inscription.",
+      "loadError": "Impossible de charger vos statistiques. Réessayez dans un instant."
+    },
+    "tiers": {
+      "gridTitle": "Grille des paliers",
+      "colTier": "Palier",
+      "colSignups": "Inscrits via le code",
+      "colRate": "Taux",
+      "tierName": "Palier {tier}",
+      "current": "Actuel"
     }
   }
 }

@@ -326,6 +326,35 @@
         "invalid": "النموذج غير مكتمل. تحقق من الحقول وحاول مرة أخرى.",
         "submitFailed": "فشل إرسال الطلب. تحقق من اتصالك وحاول مرة أخرى."
       }
+    },
+    "dashboard": {
+      "title": "مساحة الشريك",
+      "subtitle": "إحصاءاتك الإجمالية. لا تُعرض أي بيانات شخصية عن المُحالين منك.",
+      "tierLabel": "المستوى الحالي",
+      "rateLabel": "النسبة الحالية",
+      "signupsLabel": "المسجّلون عبر الرمز",
+      "signupsHint": "عدد المسجّلين يحدد مستواك ونسبتك.",
+      "activeReferralsLabel": "المشتركون النشطون المُحالون",
+      "activeReferralsHint": "الجمهور يحدد النسبة؛ والمبلغ يتبع المال المُحصَّل فعليًا.",
+      "revenueLabel": "الإيرادات المُولَّدة",
+      "revenueTotal": "الإجمالي",
+      "revenueCurrentMonth": "الشهر الحالي",
+      "commissionsDueLabel": "العمولات المستحقة",
+      "commissionsPaidLabel": "العمولات المدفوعة",
+      "progressTitle": "التقدّم",
+      "progressToNext": "{remaining} مسجّلًا قبل المستوى {nextTier} ({nextRate}%).",
+      "maxTierReached": "تم بلوغ المستوى الأقصى.",
+      "emptyHeading": "لا يوجد مُحالون بعد",
+      "emptyBody": "شارك رمز الشراكة الخاص بك لبدء الإحالة. ستظهر إحصاءاتك هنا منذ أول تسجيل.",
+      "loadError": "تعذّر تحميل إحصاءاتك. حاول مرة أخرى بعد لحظات."
+    },
+    "tiers": {
+      "gridTitle": "جدول المستويات",
+      "colTier": "المستوى",
+      "colSignups": "المسجّلون عبر الرمز",
+      "colRate": "النسبة",
+      "tierName": "المستوى {tier}",
+      "current": "الحالي"
     }
   }
 }
