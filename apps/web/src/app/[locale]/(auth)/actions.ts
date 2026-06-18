@@ -12,10 +12,13 @@
  * La gestion fine des erreurs (feedback UI) est prévue en Phase 5 (design).
  */
 import { getLocale } from 'next-intl/server'
+import { cookies } from 'next/headers'
 import { redirect as nextRedirect } from 'next/navigation'
 import { redirect } from '../../../i18n/navigation'
 import { createClient } from '../../../lib/supabase/server'
+import { createAdminServiceClient } from '../../../lib/supabase/admin-service'
 import { safeReturnTo } from '../../../lib/auth/gate'
+import { attributeReferral } from '@app/supabase'
 
 /**
  * Mappe un message d'erreur Supabase brut vers une clé i18n opaque (CR-03) —
@@ -41,11 +44,33 @@ export async function signUp(formData: FormData): Promise<void> {
     redirect({ href: { pathname: '/signup', query: { error: 'missing-fields' } }, locale })
   }
 
-  const { error } = await supabase.auth.signUp({ email, password })
+  const { data, error } = await supabase.auth.signUp({ email, password })
 
   if (error) {
     redirect({ href: { pathname: '/signup', query: { error: toSafeErrorKey(error.message) } }, locale })
   }
+
+  // D-11 : attribution figée à l'inscription (le trigger DB ne voit pas le cookie HTTP).
+  // Best-effort ABSOLU (T-07-ATTR-CRASH, A2) : code inconnu / self-ref / déjà attribué /
+  // erreur DB → l'inscription RÉUSSIT quand même. L'attribution ne bloque JAMAIS le signup.
+  // service_role local (la RLS interdit toute écriture front sur referrals — D-07).
+  const cookieStore = await cookies()
+  const refCode = cookieStore.get('aff_ref')?.value
+  if (refCode && data.user) {
+    try {
+      await attributeReferral(createAdminServiceClient(), {
+        affiliate_code: refCode,
+        referral_user_id: data.user.id,
+      })
+    } catch (attributionError: unknown) {
+      // Loggé serveur, jamais propagé : l'attribution est best-effort (A2).
+      const message =
+        attributionError instanceof Error ? attributionError.message : 'unknown error'
+      console.error(`[signUp] attribution best-effort échouée (signup OK) : ${message}`)
+    }
+  }
+  // Cookie consommé une fois (last-touch déjà figé au moment du signup).
+  cookieStore.delete('aff_ref')
 
   // Session déjà active (D-02 : pas de confirmation). D-09 : le funnel d'abonnement
   // s'arrête sur l'écran honnête « paiement bientôt » (pas de flux de paiement en P2).
