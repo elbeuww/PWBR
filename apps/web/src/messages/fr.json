@@ -422,5 +422,31 @@
     "colName": "Nom",
     "colBroker": "Broker",
     "colClass": "Classe"
+  },
+  "affiliate": {
+    "application": {
+      "title": "Devenir affilié",
+      "intro": "Présentez votre audience pour rejoindre le programme. Chaque candidature est revue manuellement par notre équipe.",
+      "emailLabel": "Adresse e-mail",
+      "socialLinksLabel": "Réseaux sociaux",
+      "socialLinksHelp": "Liens vers vos profils (Instagram, X, YouTube, TikTok…).",
+      "telegramLabel": "Canal Telegram",
+      "facebookLabel": "Page Facebook",
+      "subscriberCountLabel": "Nombre d'abonnés",
+      "interactionsLabel": "Niveau d'interactions",
+      "interactionsHelp": "Décrivez l'engagement de votre audience (commentaires, partages, fréquence).",
+      "submit": "Envoyer ma candidature",
+      "submitting": "Envoi en cours…",
+      "success": "Candidature reçue. Notre équipe la revoit prochainement.",
+      "receivedHeading": "Candidature reçue",
+      "receivedBody": "Merci. Votre candidature est en file de revue. Vous serez recontacté après vérification.",
+      "errors": {
+        "email": "Adresse e-mail invalide.",
+        "subscriberCount": "Indiquez un nombre entier d'abonnés (zéro ou plus).",
+        "channel": "Renseignez au moins un canal d'audience (réseau social, Telegram ou Facebook).",
+        "invalid": "Formulaire incomplet. Vérifiez les champs et réessayez.",
+        "submitFailed": "Échec de l'envoi de la candidature. Vérifiez votre connexion et réessayez."
+      }
+    }
   }
 }

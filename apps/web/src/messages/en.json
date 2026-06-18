@@ -301,5 +301,31 @@
     "colName": "Name",
     "colBroker": "Broker",
     "colClass": "Class"
+  },
+  "affiliate": {
+    "application": {
+      "title": "Become an affiliate",
+      "intro": "Tell us about your audience to join the program. Every application is manually reviewed by our team.",
+      "emailLabel": "Email address",
+      "socialLinksLabel": "Social networks",
+      "socialLinksHelp": "Links to your profiles (Instagram, X, YouTube, TikTok…).",
+      "telegramLabel": "Telegram channel",
+      "facebookLabel": "Facebook page",
+      "subscriberCountLabel": "Subscriber count",
+      "interactionsLabel": "Engagement level",
+      "interactionsHelp": "Describe your audience engagement (comments, shares, frequency).",
+      "submit": "Submit my application",
+      "submitting": "Submitting…",
+      "success": "Application received. Our team will review it shortly.",
+      "receivedHeading": "Application received",
+      "receivedBody": "Thank you. Your application is in the review queue. We will get back to you after verification.",
+      "errors": {
+        "email": "Invalid email address.",
+        "subscriberCount": "Enter a whole number of subscribers (zero or more).",
+        "channel": "Provide at least one audience channel (social network, Telegram or Facebook).",
+        "invalid": "Incomplete form. Check the fields and try again.",
+        "submitFailed": "Failed to submit the application. Check your connection and try again."
+      }
+    }
   }
 }
