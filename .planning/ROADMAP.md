@@ -157,8 +157,8 @@ i18n/RTL+rôles avant toute UI publique · RLS signaux avant exposition espace m
 **Depends on**: Phase 1 (locale/RTL), Phase 2 (vitrine)
 **Requirements**: CMS-01, CMS-02
 **Success Criteria** (what must be TRUE):
-  1. Un visiteur lit des articles/cours gratuits vulgarisés sur la vitrine, dans sa langue (contenu DB par `(slug, locale)`, rendu MDX RSC).
-  2. Le superadmin crée, édite et publie des articles.
+  1. Un visiteur lit des articles/cours gratuits vulgarisés sur la vitrine, dans sa langue (clé `(slug, locale)`, **fichiers MDX versionnés** rendus RSC).
+  2. Le contenu (articles + cours) est rédigé et publié de façon autonome via fichiers MDX (commit → deploy) — **pas de CMS éditeur** (CMS-02 révisé 2026-06-19, D-01).
 **Plans**: TBD
 **UI hint**: yes
 

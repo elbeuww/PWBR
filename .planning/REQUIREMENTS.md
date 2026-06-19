@@ -66,7 +66,7 @@
 
 ### CMS — Cours & articles vulgarisés (Wave 4)
 - [ ] **CMS-01**: Un visiteur lit des articles/cours gratuits vulgarisés sur la vitrine, dans sa langue.
-- [ ] **CMS-02**: Le superadmin crée / édite / publie des articles (MDX rendu RSC).
+- [ ] **CMS-02** _(révisé 2026-06-19, D-01)_ : Le contenu (articles + cours) est rédigé par l'agent et publié de façon autonome via des fichiers MDX versionnés (commit → deploy), rendu RSC. **Pas d'UI d'édition superadmin** (CMS éditeur retiré).
 
 ### LEGAL — Conformité & disclaimers (Wave 2, gate de lancement)
 - [x] **LEGAL-01**: Des disclaimers « contenu éducatif, pas un conseil en investissement, aucune promesse de gain » sont présents sur la vitrine, l'espace membre et les posts Telegram.
