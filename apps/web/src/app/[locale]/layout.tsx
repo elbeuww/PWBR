@@ -12,9 +12,10 @@
  * Source : 01-RESEARCH.md §Pattern 1 ; 02-RESEARCH.md §Pattern 1 ; D-02/D-03/D-10 ; UI-SPEC §Shell
  */
 import { NextIntlClientProvider, hasLocale } from 'next-intl'
-import { setRequestLocale, getMessages } from 'next-intl/server'
+import { setRequestLocale, getMessages, getTranslations } from 'next-intl/server'
 import { notFound } from 'next/navigation'
 import { routing } from '../../i18n/routing'
+import { Link } from '../../i18n/navigation'
 import { LanguageSwitcher } from '../../components/LanguageSwitcher'
 import { ThemeProvider } from '../../components/ThemeProvider'
 import { ThemeToggle } from '../../components/ThemeToggle'
@@ -39,6 +40,8 @@ export default async function LocaleLayout({
   }
   setRequestLocale(locale)
   const messages = await getMessages()
+  // D-08c : entrée funnel permanente vers l'Académie (libellé i18n, nav localisée).
+  const tAcademy = await getTranslations('academy')
 
   return (
     <html
@@ -51,6 +54,13 @@ export default async function LocaleLayout({
           <NextIntlClientProvider messages={messages}>
             <header className="flex h-14 items-center justify-between bg-secondary px-4 md:px-6">
               <span className="font-semibold">Vétéran Trading</span> {/* i18n-ignore: marque */}
+              {/* D-08c : entrée funnel Académie — Link localisé (préserve la locale), libellé i18n. */}
+              <Link
+                href="/academie"
+                className="ms-6 text-sm font-medium text-foreground hover:text-primary"
+              >
+                {tAcademy('navAcademy')}
+              </Link>
               <div className="ms-auto flex items-center gap-2">
                 <ThemeToggle />
                 <LanguageSwitcher />

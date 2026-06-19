@@ -25,6 +25,13 @@ vi.mock('next-intl', () => ({
   useTranslations: () => (key: string) => key,
 }))
 
+// i18n/navigation : Link localisé mocké en <a> (évite de résoudre next/navigation
+// côté next-intl createNavigation sous le runner ; on teste le rendu, pas le routage).
+vi.mock('../../../i18n/navigation', () => ({
+  Link: ({ href, children, ...rest }: { href: string; children?: unknown }) =>
+    createElement('a', { href, ...rest }, children as never),
+}))
+
 const VETERAN_NOTE =
   'Setup propre sur cassure de structure H4 ; je laisse courir vers le TP2 si le momentum tient.'
 const TECH_REASON = 'BOS haussier confirmé sur H4 avec retest de la zone de demande.'

@@ -16,6 +16,7 @@
  */
 import { useTranslations } from 'next-intl'
 import { Collapsible as CollapsiblePrimitive } from 'radix-ui'
+import { Link } from '../../i18n/navigation'
 import { formatPrice } from '../../lib/signals/format'
 import { ContributingFactors } from './ContributingFactors'
 
@@ -59,6 +60,7 @@ function capitalize(s: string): string {
 export function SignalDetail({ setup, locale }: SignalDetailProps) {
   const t = useTranslations('signalDetail')
   const tSignals = useTranslations('signals')
+  const tAcademy = useTranslations('academy')
   const p = setup.payload
   const precision = setup.instruments.precision
   const isLong = p.direction === 'long'
@@ -136,6 +138,16 @@ export function SignalDetail({ setup, locale }: SignalDetailProps) {
             </dd>
           </div>
         </dl>
+
+        {/* D-08b : lien funnel contextuel vers le cours « prendre en main MT5 ». */}
+        <p className="mt-4 text-sm">
+          <Link
+            href="/academie/prendre-en-main-mt5"
+            className="font-medium text-primary hover:underline"
+          >
+            {tAcademy('signalExecLink')}
+          </Link>
+        </p>
       </section>
 
       {/* NIVEAU 2 — Analyse approfondie : repliée par défaut, contenu VERBATIM. */}

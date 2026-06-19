@@ -25,6 +25,8 @@ export default async function HomePage({
   const { locale } = await params
   setRequestLocale(locale)
   const t = await getTranslations('home')
+  // D-08a : bloc funnel « Apprenez les bases » → /academie (libellé i18n academy.*).
+  const tAcademy = await getTranslations('academy')
 
   return (
     <main className="mx-auto max-w-screen-xl px-4 text-start md:px-6 lg:px-8">
@@ -58,6 +60,17 @@ export default async function HomePage({
           <TrackRecordBlock />
         </section>
       )}
+
+      {/* APPRENEZ LES BASES — funnel Académie (D-08a) → /academie, lien localisé i18n. */}
+      <section className="border-t border-border py-16">
+        <h2 className="text-2xl font-semibold">{tAcademy('navAcademy')}</h2>
+        <p className="mt-4 max-w-2xl text-muted-foreground">{tAcademy('subtitle')}</p>
+        <div className="mt-6">
+          <Button asChild variant="outline">
+            <Link href="/academie">{tAcademy('learnBasicsCta')}</Link>
+          </Button>
+        </div>
+      </section>
 
       {/* APERÇU TARIFS — renvoie vers /tarifs (D-05) */}
       <section className="border-t border-border py-16">
