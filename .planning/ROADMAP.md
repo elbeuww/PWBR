@@ -23,7 +23,7 @@ i18n/RTL+rôles avant toute UI publique · RLS signaux avant exposition espace m
 - [ ] **Phase 6: Canal Telegram public** - Publication idempotente des résultats journaliers + win rate permanent
 - [ ] **Phase 7: Affiliation à paliers** - Codes promo, capture `?ref`, dashboard affilié sans PII, commissions idempotentes max 20 % sur abonnés actifs
 - [x] **Phase 8: Superadmin consolidé (signaux, santé, affiliés)** - Vue signaux publiés + santé jobs/données + gestion des affiliés et payouts manuels
-- [ ] **Phase 9: CMS cours & articles vulgarisés** - Articles MDX trilingues créés/édités/publiés par le superadmin, lus sur la vitrine
+- [ ] **Phase 9: CMS cours & articles vulgarisés** - Articles/cours MDX trilingues rédigés par l'agent, publiés en autonomie (commit → deploy), lus sur la vitrine
 
 ## Phase Details
 
@@ -153,13 +153,18 @@ i18n/RTL+rôles avant toute UI publique · RLS signaux avant exposition espace m
 **UI hint**: yes
 
 ### Phase 9: CMS cours & articles vulgarisés
-**Goal**: Construire le contenu éducatif gratuit (de la base) qui nourrit le funnel et la crédibilité, géré par le superadmin et lu sur la vitrine.
+**Goal**: Construire l'Académie — le contenu éducatif gratuit (articles + cours vulgarisés) qui nourrit le funnel et la crédibilité, rédigé par l'agent et publié en autonomie via fichiers MDX versionnés, lu sur la vitrine dans les 3 langues (D-01 : pas d'UI superadmin).
 **Depends on**: Phase 1 (locale/RTL), Phase 2 (vitrine)
 **Requirements**: CMS-01, CMS-02
 **Success Criteria** (what must be TRUE):
   1. Un visiteur lit des articles/cours gratuits vulgarisés sur la vitrine, dans sa langue (clé `(slug, locale)`, **fichiers MDX versionnés** rendus RSC).
   2. Le contenu (articles + cours) est rédigé et publié de façon autonome via fichiers MDX (commit → deploy) — **pas de CMS éditeur** (CMS-02 révisé 2026-06-19, D-01).
-**Plans**: TBD
+**Plans**: 5 plans (4 vagues)
+- [ ] 09-01-PLAN.md — socle pur : frontmatter Zod + searchParams whitelist + reading-time + toc + install deps MDX [CMS-01]
+- [ ] 09-02-PLAN.md — couche fichiers : content.ts (fs/gray-matter, résolution+fallback D-14, anti path-traversal) + course-model + fixtures MDX de preuve [CMS-01, CMS-02]
+- [ ] 09-03-PLAN.md — présentation : composants pédago + mapping MDX + ContentCard + FilterBar + FallbackBanner [CMS-01]
+- [ ] 09-04-PLAN.md — routes RSC (index/article/cours/leçon via compileMDX) + sitemap hreflang + namespace i18n academy [CMS-01, CMS-02]
+- [ ] 09-05-PLAN.md — wiring funnel D-08 (nav/home/signal) + E2E + vérif rendu Vercel preview [CMS-01, LEGAL-01]
 **UI hint**: yes
 
 ## Progress
@@ -174,7 +179,7 @@ i18n/RTL+rôles avant toute UI publique · RLS signaux avant exposition espace m
 | 6. Telegram public | 0/3 | Planned | - |
 | 7. Affiliation à paliers | 0/? | Not started | - |
 | 8. Superadmin consolidé | 4/4 | Complete | 2026-06-19 |
-| 9. CMS cours & articles | 0/? | Not started | - |
+| 9. CMS cours & articles | 0/5 | Planned | - |
 
 ## Coverage Map
 
