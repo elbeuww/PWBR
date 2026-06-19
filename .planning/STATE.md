@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v2.0
 milestone_name: milestone
 status: executing
-last_updated: "2026-06-19T03:30:01.720Z"
+last_updated: "2026-06-19T03:35:08.703Z"
 last_activity: 2026-06-19
 progress:
   total_phases: 9
   completed_phases: 7
   total_plans: 32
-  completed_plans: 30
-  percent: 94
+  completed_plans: 31
+  percent: 97
 ---
 
 # Project State
@@ -28,11 +28,11 @@ progress:
 ## Current Position
 
 Phase: 08 (superadmin-consolid-signaux-sant-affili-s) — EXECUTING
-Plan: 3 of 4
+Plan: 4 of 4
 Status: Ready to execute
 Last activity: 2026-06-19
 
-Progress: [█████████░] 94%
+Progress: [██████████] 97%
 
 ## Performance Metrics
 
@@ -58,6 +58,7 @@ Progress: [█████████░] 94%
 | Phase 07 P07-05 | ~20min | 2 tasks | 7 files |
 | Phase 08 P01 | ~12min | 2 tasks | 9 files |
 | Phase 08 P02 | ~10 min | 2 tasks | 2 files |
+| Phase 08 P03 | ~15 min | 2 tasks | 2 files |
 
 ## Roadmap v2.0 (9 phases)
 
@@ -275,7 +276,7 @@ Progress: [█████████░] 94%
 
 ## Session Continuity
 
-**Last session:** 2026-06-19T03:24:43.078Z
+**Last session:** 2026-06-19T03:35:02.041Z
 
 **Last session (archive):** 2026-06-18T02:30:00.000Z — Plan 07-02 COMPLETE (grille de paliers + commission BigInt en logique pure @app/core, AFF-03). TDD : 4a06c4c (RED — 28 golden tests, module `../tiers.js` absent) → cd27a0c (GREEN — `tiers.ts` pur + barrel). `affiliateRateBps(signups)` miroir bit-à-bit du `case` SQL `affiliate_rate_bps` (0016 LIVE) : 17 bornes verrouillées (0/1/99/100/500/501/600/1000/1001/5000/5001/10000/10001/25000/25001/50000/50001), seuil plafond gardé à `>= 50000` pour matcher le SQL (D-07-02-A). `computeCommissionAtomic(base, bps) = (base * BigInt(bps)) / 10000n` floor BigInt zéro float (T-07-FLOAT, D-07-02-B), exact > 2⁵³. `TIERS` (8 paliers) + type `Tier` exportés du barrel. Pureté : zéro I/O (grep imports Supabase/fs/http/fetch == 0), `grep -c "Number(" == 0`. `npx vitest run packages/core` 144/144 verts (28 neufs), `pnpm typecheck` 0 erreur, 0 package npm. Source unique grille + commission réutilisable par le dashboard affiliation. Stopped at : Plan 07-02 terminé.
 
