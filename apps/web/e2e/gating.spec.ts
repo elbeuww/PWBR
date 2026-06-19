@@ -12,6 +12,9 @@
  *    requireActiveSub → /tarifs.
  *  - ACCESS-03 / D-09 : non-superadmin (et non-auth) sur (admin) → 404 (discrétion,
  *    jamais 403 — threat T-01-08).
+ *  - ACCESS-03b / T-04-ADMIN-ELEV (Plan 08-04) : les nouvelles routes admin Phase 8
+ *    (/admin/signaux, /admin/signaux/[id], /admin/sante) → 404 pour non-auth ET
+ *    authentifié-non-superadmin. L'existence du back-office ne fuit jamais (jamais 200/redirect/403).
  *  - T-01-07 (open redirect) : returnTo `//evil.com` ne provoque PAS de redirection
  *    hors origine après connexion (validation same-origin de gate.ts safeReturnTo).
  *
@@ -82,6 +85,51 @@ test.describe('ACCESS-03 / D-09 : (admin) → 404 (discrétion, jamais 403)', ()
 
     const response = await page.goto(ADMIN_SURFACE)
     // notFound() du gate → 404, JAMAIS 403 (l'existence du back-office ne fuit pas).
+    expect(response?.status()).toBe(404)
+  })
+})
+
+// Nouvelles routes admin Phase 8 (Plans 08-02 signaux + détail, 08-03 santé). `/admin` est déjà
+// couvert par ACCESS-03 — ne PAS le dupliquer ici. La garde réelle = layout (admin)
+// requireRole('superadmin') → notFound() ; cet E2E prouve qu'elle couvre aussi les nouvelles routes.
+// Tests déroulés (un test() par route × par état d'auth) pour que chaque chemin et chaque assertion
+// .toBe(404) apparaisse littéralement dans le spec.
+test.describe('ACCESS-03b / T-04-ADMIN-ELEV : nouvelles routes admin Phase 8 → 404', () => {
+  // --- /admin/signaux (liste) ---
+  test('visiteur non auth sur /admin/signaux reçoit un 404', async ({ page }) => {
+    const response = await page.goto('/admin/signaux')
+    expect(response?.status()).toBe(404)
+  })
+
+  test('auth NON superadmin sur /admin/signaux reçoit un 404', async ({ page }) => {
+    await signUp(page, uniqueEmail('nonadmin-signaux'))
+    const response = await page.goto('/admin/signaux')
+    expect(response?.status()).toBe(404)
+  })
+
+  // --- /admin/signaux/[id] (détail) — id concret quelconque : la garde déclenche AVANT toute
+  // lecture de données, un id inexistant exerce le segment de route sans dépendre d'un signal réel.
+  test('visiteur non auth sur /admin/signaux/[id] reçoit un 404', async ({ page }) => {
+    const response = await page.goto('/admin/signaux/00000000-0000-0000-0000-000000000000')
+    expect(response?.status()).toBe(404)
+  })
+
+  test('auth NON superadmin sur /admin/signaux/[id] reçoit un 404', async ({ page }) => {
+    await signUp(page, uniqueEmail('nonadmin-signaux-detail'))
+    const response = await page.goto('/admin/signaux/00000000-0000-0000-0000-000000000000')
+    expect(response?.status()).toBe(404)
+  })
+
+  // --- /admin/sante (santé des données) ---
+  test('visiteur non auth sur /admin/sante reçoit un 404', async ({ page }) => {
+    const response = await page.goto('/admin/sante')
+    expect(response?.status()).toBe(404)
+  })
+
+  test('auth NON superadmin sur /admin/sante reçoit un 404', async ({ page }) => {
+    await signUp(page, uniqueEmail('nonadmin-sante'))
+    const response = await page.goto('/admin/sante')
+    // notFound() du gate → 404, JAMAIS 200/redirect/403 (l'existence du back-office ne fuit pas).
     expect(response?.status()).toBe(404)
   })
 })
