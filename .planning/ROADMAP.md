@@ -22,7 +22,7 @@ i18n/RTL+rôles avant toute UI publique · RLS signaux avant exposition espace m
 - [ ] **Phase 5: Track record mesuré & % affiché** - Rejeu des setups expirés → `prediction_outcomes`/`pattern_stats` → % TOUJOURS mesuré (jamais inventé)
 - [ ] **Phase 6: Canal Telegram public** - Publication idempotente des résultats journaliers + win rate permanent
 - [ ] **Phase 7: Affiliation à paliers** - Codes promo, capture `?ref`, dashboard affilié sans PII, commissions idempotentes max 20 % sur abonnés actifs
-- [ ] **Phase 8: Superadmin consolidé (signaux, santé, affiliés)** - Vue signaux publiés + santé jobs/données + gestion des affiliés et payouts manuels
+- [x] **Phase 8: Superadmin consolidé (signaux, santé, affiliés)** - Vue signaux publiés + santé jobs/données + gestion des affiliés et payouts manuels
 - [ ] **Phase 9: CMS cours & articles vulgarisés** - Articles MDX trilingues créés/édités/publiés par le superadmin, lus sur la vitrine
 
 ## Phase Details
@@ -173,7 +173,7 @@ i18n/RTL+rôles avant toute UI publique · RLS signaux avant exposition espace m
 | 5. Track record & % mesuré | 0/3 | Planned | - |
 | 6. Telegram public | 0/3 | Planned | - |
 | 7. Affiliation à paliers | 0/? | Not started | - |
-| 8. Superadmin consolidé | 0/4 | Planned | - |
+| 8. Superadmin consolidé | 4/4 | Complete | 2026-06-19 |
 | 9. CMS cours & articles | 0/? | Not started | - |
 
 ## Coverage Map

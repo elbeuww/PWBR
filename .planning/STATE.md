@@ -2,8 +2,8 @@
 gsd_state_version: 1.0
 milestone: v2.0
 milestone_name: milestone
-status: verifying
-last_updated: "2026-06-19T03:48:01.803Z"
+status: ready
+last_updated: "2026-06-19T15:30:00.000Z"
 last_activity: 2026-06-19
 progress:
   total_phases: 9
@@ -21,15 +21,15 @@ progress:
 ## Project Reference
 
 **Core value:** Produire, pour chaque opportunité, une analyse fiable et explicable — vulgarisée pour un public non technique — avec un % de réussite TOUJOURS mesuré, jamais inventé : c'est le socle de confiance qui fait payer l'abonnement.
-**Current focus:** Phase 08 — superadmin-consolid-signaux-sant-affili-s
+**Current focus:** Phase 09 — CMS cours & articles (dernière phase v2.0)
 **Mode:** interactive (MVP vertical)
 **Granularity:** fine
 
 ## Current Position
 
-Phase: 08 (superadmin-consolid-signaux-sant-affili-s) — EXECUTING
-Plan: 4 of 4
-Status: Phase complete — ready for verification
+Phase: 08 (superadmin-consolid-signaux-sant-affili-s) — COMPLETE (2026-06-19)
+Plan: 4 of 4 — verified (human_needed, approuvé Borhane) + secured (21/21) + 3 bugs runtime corrigés via /gsd-debug
+Status: Phase 8 complete. Dette : vérif runtime 404/200 en env propre (Vercel/CI). Prochaine = Phase 9 (CMS).
 Last activity: 2026-06-19
 
 Progress: [██████████] 100%
