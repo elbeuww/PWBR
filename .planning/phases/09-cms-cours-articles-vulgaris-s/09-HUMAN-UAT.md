@@ -8,7 +8,11 @@ updated: 2026-06-19
 
 ## Current Test
 
-[awaiting human testing — Vercel preview]
+number: 1
+name: Déploiement preview + E2E réel
+expected: |
+  Brancher l'URL preview Vercel → `PLAYWRIGHT_BASE_URL=<url> pnpm --filter web exec playwright test e2e/academie.spec.ts` → les tests passent (ou écarts documentés).
+awaiting: user response
 
 > Le rendu MDX réel (compileMDX, composants pédago, RTL arabe, fallback) n'est PAS
 > vérifiable localement : le `!` du chemin projet casse `next build`/webpack et `dev`
