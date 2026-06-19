@@ -145,7 +145,11 @@ i18n/RTL+rôles avant toute UI publique · RLS signaux avant exposition espace m
 **Success Criteria** (what must be TRUE):
   1. Le superadmin voit les affiliés et leurs performances et gère les payouts de commissions.
   2. Le superadmin voit les signaux publiés et la santé des jobs/données (`job_runs`, `v_data_freshness`, flag `stale`).
-**Plans**: TBD
+**Plans**: 4 plans (2 vagues)
+- [ ] 08-01-PLAN.md — socle : libs pures admin (signals/freshness/jobs) + tests + shell sidebar + copy FR [ADMIN-03, ADMIN-04]
+- [ ] 08-02-PLAN.md — Signaux : liste trade_setups × telegram_posts + filtres + détail admin read-only [ADMIN-04]
+- [ ] 08-03-PLAN.md — Santé : feux fraîcheur candles/news/macro + table job_runs + dashboard KPI [ADMIN-04]
+- [ ] 08-04-PLAN.md — Affiliés : perfs agrégées tables de base + wiring payouts existant [ADMIN-03]
 **UI hint**: yes
 
 ### Phase 9: CMS cours & articles vulgarisés
@@ -169,7 +173,7 @@ i18n/RTL+rôles avant toute UI publique · RLS signaux avant exposition espace m
 | 5. Track record & % mesuré | 0/3 | Planned | - |
 | 6. Telegram public | 0/3 | Planned | - |
 | 7. Affiliation à paliers | 0/? | Not started | - |
-| 8. Superadmin consolidé | 0/? | Not started | - |
+| 8. Superadmin consolidé | 0/4 | Planned | - |
 | 9. CMS cours & articles | 0/? | Not started | - |
 
 ## Coverage Map
