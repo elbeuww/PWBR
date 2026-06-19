@@ -65,7 +65,7 @@
 - [x] **ADMIN-04**: Le superadmin voit les signaux publiés et la santé des jobs/données (`job_runs`, freshness).
 
 ### CMS — Cours & articles vulgarisés (Wave 4)
-- [ ] **CMS-01**: Un visiteur lit des articles/cours gratuits vulgarisés sur la vitrine, dans sa langue.
+- [x] **CMS-01**: Un visiteur lit des articles/cours gratuits vulgarisés sur la vitrine, dans sa langue.
 - [ ] **CMS-02** _(révisé 2026-06-19, D-01)_ : Le contenu (articles + cours) est rédigé par l'agent et publié de façon autonome via des fichiers MDX versionnés (commit → deploy), rendu RSC. **Pas d'UI d'édition superadmin** (CMS éditeur retiré).
 
 ### LEGAL — Conformité & disclaimers (Wave 2, gate de lancement)
@@ -133,5 +133,5 @@
 | AFF-05 | Phase 7 | Complete |
 | ADMIN-03 | Phase 8 | Complete |
 | ADMIN-04 | Phase 8 | Complete |
-| CMS-01 | Phase 9 | Pending |
+| CMS-01 | Phase 9 | Complete |
 | CMS-02 | Phase 9 | Pending |
