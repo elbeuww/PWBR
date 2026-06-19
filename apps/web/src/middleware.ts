@@ -41,6 +41,6 @@ export const config = {
      * Appliquer le middleware à toutes les routes UI (next-intl recommande
      * son propre matcher incluant l'exclusion de `api`).
      */
-    '/((?!api|_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
+    '/((?!admin|api|_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
   ],
 }
