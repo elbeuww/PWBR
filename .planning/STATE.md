@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v2.0
 milestone_name: milestone
-status: completed
-last_updated: "2026-06-19T03:12:30.946Z"
-last_activity: 2026-06-18 -- Phase 07 marked complete
+status: executing
+last_updated: "2026-06-19T03:24:50.590Z"
+last_activity: 2026-06-19
 progress:
   total_phases: 9
   completed_phases: 7
   total_plans: 32
-  completed_plans: 28
-  percent: 88
+  completed_plans: 29
+  percent: 91
 ---
 
 # Project State
@@ -21,18 +21,18 @@ progress:
 ## Project Reference
 
 **Core value:** Produire, pour chaque opportunité, une analyse fiable et explicable — vulgarisée pour un public non technique — avec un % de réussite TOUJOURS mesuré, jamais inventé : c'est le socle de confiance qui fait payer l'abonnement.
-**Current focus:** Phase 07 — affiliation-paliers
+**Current focus:** Phase 08 — superadmin-consolid-signaux-sant-affili-s
 **Mode:** interactive (MVP vertical)
 **Granularity:** fine
 
 ## Current Position
 
-Phase: 07 — COMPLETE
-Plan: 6 of 6
-Status: Phase 07 complete
-Last activity: 2026-06-18 -- Phase 07 marked complete
+Phase: 08 (superadmin-consolid-signaux-sant-affili-s) — EXECUTING
+Plan: 2 of 4
+Status: Ready to execute
+Last activity: 2026-06-19
 
-Progress: [██████████] 100%
+Progress: [█████████░] 91%
 
 ## Performance Metrics
 
@@ -56,6 +56,7 @@ Progress: [██████████] 100%
 | Phase 07 P07-03 | ~12min | 2 tasks | 9 files |
 | Phase 07 P07-04 | ~10min | 2 tasks | 6 files |
 | Phase 07 P07-05 | ~20min | 2 tasks | 7 files |
+| Phase 08 P01 | ~12min | 2 tasks | 9 files |
 
 ## Roadmap v2.0 (9 phases)
 
@@ -239,6 +240,14 @@ Progress: [██████████] 100%
 - **D-07-05-C (payout : vue due+paid, RPC atomique)** : `payCommission` re-valide `requireRole('superadmin')` puis `markCommissionPaid(service_role, {commission_id, tx_hash, amount_atomic})` — RPC `mark_commission_paid` atomique (commission due→paid + insert payouts), anti double-payout porté par la DB. Montant saisi lisible (USDT) → `toAtomic` côté client → **string** atomique côté serveur (CR-02, borne `^[0-9]+$`, jamais Number). La vue affiche due ET paid (déviation Rule 2 vs `loadDue` du plan) pour porter le lien tx_hash → TronScan `target="_blank" rel="noopener noreferrer"` (T-07-EXTLINK) sur les payés ; action « Marquer payé » seulement sur les due. Date de paiement saisie obligatoire UI (D-15) mais horodatage réel = DB (`payouts.paid_at default now()`, le RPC ne prend pas paid_at).
 - **Commits 07-05** : 6cfa967 (Task 1 : file de revue page+actions+ApplicationRowActions+i18n), 6fa809b (Task 2 : payouts page+actions+PayoutRowAction). `pnpm typecheck` 0 erreur, `lint:i18n` exit 0, `npx vitest run` 465 verts | 4 skip (non régressé), 0 package npm (T-07-SC accept). **AFF-01 (pose code vanity par superadmin, D-07) + AFF-04 (payout tracé tx_hash, D-15) couverts back-office.** Reste 07-06 (surface 1 candidature `[locale]` trilingue + surface 3 dashboard affilié no-PII).
 
+### Decisions exécution (Plan 08-01)
+
+- **D-08-01-A (TDD logique pure)** : 3 modules purs `lib/admin/{signals,freshness,jobs}.ts` (zéro I/O, aucun import next/@supabase/server-only/fs/fetch) extraits pour être unit-testés sans rendre les RSC (RESEARCH §Wave 0). `signals` = `postedSetupIdSet` (notable: → setup-id Set) + `telegramStatusFor` (2 états posted/unpublished, JAMAIS d'échec persistant, Pitfall 3). `freshness` = `candleColor` (is_stale + bande ambre 1.5× seuil) + `ageColor` + `NEWS_THRESHOLDS` (6h/24h) + `MACRO_THRESHOLDS` (36h/72h), bornes strictement supérieures. `jobs` = `runDurationMs` (null si running/inanalysable) + `latestPerJob` (premier-vu par job_name = plus récent, ordre stable). 33 tests verts (RED prouvé avant GREEN). Le glob vitest `apps/web/src/lib/**/*.test.ts` existait déjà (précédent D-05-01-D) → ZÉRO changement de config.
+- **D-08-01-B (déviation Rule 1)** : token `'failed'` retiré des commentaires JSDoc de `signals.ts` (reformulés « état d'échec persistant ») pour satisfaire `grep -c "'failed'" == 0`. La logique était déjà conforme (`TelegramStatus = 'posted' | 'unpublished'`).
+- **D-08-01-C (shell admin D-01)** : `(admin)/_components/AdminSidebar.tsx` îlot `'use client'` — `usePathname` prefix-match (l'item `/admin` exact-match pour ne pas rester toujours actif), plain `next/link` (admin HORS `[locale]`, JAMAIS le Link i18n), 7 items ordre D-01, icônes lucide (déjà verrouillé), accent `--primary` réservé à l'actif. `layout.tsx` passé en flex 2 colonnes ; gate `requireRole('superadmin')` + `NextIntlClientProvider` + `Toaster` préservés verbatim, sidebar montée SOUS le gate (T-08-01/02/03 mitigés).
+- **D-08-01-D (copy FR centralisée)** : tout le bloc `admin.{nav,dashboard,signals,health,affiliates}.*` ajouté à `fr.json` en une passe (sourcé UI-SPEC §Copywriting Contract) → les plans Wave 2 (08-02/03/04) ne touchent JAMAIS `fr.json` = file-disjoints, parallèles. admin.* mono-FR (en/ar non touchés) ; parité par-namespace 18/18 verte.
+- **Commits 08-01** : f3c624a (RED 33 tests admin), 3f4d54b (GREEN 3 modules purs), 93da8d8 (shell sidebar + layout + fr.json). `pnpm typecheck` 0 erreur, `lint:i18n` exit 0, 0 package npm (T-08-SC accept). **Fondation ADMIN-03/04 posée** (vues consommatrices = Wave 2 ; ADMIN-03/04 NON marqués complets tant que 08-02/03/04 ne sont pas livrés).
+
 ### Open todos / research flags (v2.0)
 
 - **Phase 4 (research flag) :** TronGrid endpoint `walletsolidity`, parsing logs TRC-20, normalisation hex↔base58 — doc TS peu dense, recherche de phase recommandée.
@@ -265,7 +274,7 @@ Progress: [██████████] 100%
 
 ## Session Continuity
 
-**Last session:** 2026-06-19T03:12:30.937Z
+**Last session:** 2026-06-19T03:24:43.078Z
 
 **Last session (archive):** 2026-06-18T02:30:00.000Z — Plan 07-02 COMPLETE (grille de paliers + commission BigInt en logique pure @app/core, AFF-03). TDD : 4a06c4c (RED — 28 golden tests, module `../tiers.js` absent) → cd27a0c (GREEN — `tiers.ts` pur + barrel). `affiliateRateBps(signups)` miroir bit-à-bit du `case` SQL `affiliate_rate_bps` (0016 LIVE) : 17 bornes verrouillées (0/1/99/100/500/501/600/1000/1001/5000/5001/10000/10001/25000/25001/50000/50001), seuil plafond gardé à `>= 50000` pour matcher le SQL (D-07-02-A). `computeCommissionAtomic(base, bps) = (base * BigInt(bps)) / 10000n` floor BigInt zéro float (T-07-FLOAT, D-07-02-B), exact > 2⁵³. `TIERS` (8 paliers) + type `Tier` exportés du barrel. Pureté : zéro I/O (grep imports Supabase/fs/http/fetch == 0), `grep -c "Number(" == 0`. `npx vitest run packages/core` 144/144 verts (28 neufs), `pnpm typecheck` 0 erreur, 0 package npm. Source unique grille + commission réutilisable par le dashboard affiliation. Stopped at : Plan 07-02 terminé.
 
