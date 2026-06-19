@@ -1,10 +1,11 @@
 ---
 phase: 8
 slug: superadmin-consolid-signaux-sant-affili-s
-status: draft
+status: approved
 shadcn_initialized: true
 preset: radix-nova
 created: 2026-06-19
+reviewed_at: 2026-06-19
 ---
 
 # Phase 8 — UI Design Contract
