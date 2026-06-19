@@ -368,7 +368,9 @@ const { data } = await client
 | A3 | Affiliés-perfs superadmin view should aggregate from base tables (not `affiliate_dashboard`, which is auth.uid()-scoped) | Code Examples | If planner reads `affiliate_dashboard` via service_role it returns empty (no auth.uid()). HIGH if missed — flagged explicitly. |
 | A4 | Orange (approaching-stale) band is a UI-only derivation; underlying view stays boolean | Pitfall 4 / Code Examples | If founder wants exact orange thresholds in SQL, needs a view change. LOW — D-06 marks thresholds as discretion. |
 
-## Open Questions
+## Open Questions (RESOLVED)
+
+> All four resolved by the founder during /gsd:plan-phase 8 (2026-06-19): (1) freshness computed **in-RSC**, no migration; (2) Telegram badge **2-state** (Posté/Non publié), failures via job_runs; (3) signal detail = **dedicated admin page** via service_role, no status='active' guard; (4) affiliés-perfs **aggregated from base tables**, not affiliate_dashboard. Plans 08-01..08-04 implement these.
 
 1. **News/macro freshness source (D-06).**
    - What we know: `v_data_freshness` covers candles only (per instrument×timeframe). News (`news.published_at`) and macro (`macro_series.ts`) tables exist with timestamps.
