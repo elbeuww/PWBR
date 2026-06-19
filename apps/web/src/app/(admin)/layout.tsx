@@ -13,12 +13,16 @@ import { NextIntlClientProvider } from 'next-intl'
 import { Toaster } from '@/components/ui/sonner'
 import frMessages from '@/messages/fr.json'
 import { requireRole } from '../../lib/auth/gate'
+import { AdminSidebar } from './_components/AdminSidebar'
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   await requireRole('superadmin')
   return (
     <NextIntlClientProvider locale="fr" messages={frMessages}>
-      <div className="min-h-screen bg-background text-foreground">{children}</div>
+      <div className="flex min-h-screen bg-background text-foreground">
+        <AdminSidebar />
+        <div className="min-w-0 flex-1 overflow-x-auto">{children}</div>
+      </div>
       <Toaster />
     </NextIntlClientProvider>
   )

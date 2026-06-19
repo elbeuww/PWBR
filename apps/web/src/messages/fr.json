@@ -248,6 +248,80 @@
         "cancel": "Annuler"
       }
     },
+    "nav": {
+      "dashboard": "Tableau de bord",
+      "members": "Membres",
+      "queue": "File",
+      "affiliates": "Affiliation",
+      "payouts": "Payouts",
+      "signals": "Signaux",
+      "health": "Santé"
+    },
+    "dashboard": {
+      "title": "Tableau de bord",
+      "kpiActiveMembers": "Membres actifs",
+      "kpiPendingQueue": "File de validation en attente",
+      "kpiHealth": "Santé des données",
+      "healthOk": "OK",
+      "healthLimit": "Limite",
+      "healthStale": "Périmé"
+    },
+    "signals": {
+      "title": "Signaux publiés",
+      "filterInstrument": "Instrument",
+      "filterStatus": "Statut",
+      "statusPosted": "Posté",
+      "statusUnpublished": "Non publié",
+      "colDate": "Date",
+      "colInstrument": "Instrument",
+      "colDirection": "Direction",
+      "colScore": "Score",
+      "colTelegram": "Telegram",
+      "emptyHeading": "Aucun signal publié",
+      "emptyBody": "Les signaux générés par le moteur apparaîtront ici dès leur publication.",
+      "errorLoad": "Impossible de charger les données. Réessayez ou vérifiez les jobs dans Santé.",
+      "detail": {
+        "back": "Retour aux signaux",
+        "instrument": "Instrument",
+        "direction": "Direction",
+        "score": "Score",
+        "status": "Statut",
+        "entry": "Entrée",
+        "stopLoss": "Stop-loss",
+        "takeProfit": "Take-profit",
+        "riskReward": "Ratio R:R",
+        "createdAt": "Créé le",
+        "validUntil": "Valide jusqu'au",
+        "telegram": "Publication Telegram"
+      }
+    },
+    "health": {
+      "title": "Santé jobs & données",
+      "sourceCandles": "Bougies",
+      "sourceNews": "Actualités",
+      "sourceMacro": "Macro",
+      "freshUp": "À jour",
+      "freshLimit": "Limite",
+      "freshStale": "Périmé",
+      "colJob": "Job",
+      "colStatus": "Statut",
+      "colDuration": "Durée",
+      "colLastRun": "Dernier run",
+      "statusOk": "OK",
+      "statusError": "Échec",
+      "emptyHeading": "Aucun run de job enregistré",
+      "emptyBody": "Les exécutions de jobs apparaîtront ici après le premier run."
+    },
+    "affiliates": {
+      "title": "Affiliés & performances",
+      "colEmail": "Affilié",
+      "colReferrals": "Filleuls",
+      "colDue": "Commissions dues",
+      "colPaid": "Commissions payées",
+      "toPayouts": "Gérer les payouts",
+      "emptyHeading": "Aucun affilié",
+      "emptyBody": "Les affiliés approuvés et leurs performances apparaîtront ici."
+    },
     "actionSuccess": "Action effectuée",
     "actionError": "Échec de l'action. Réessaie."
   },
