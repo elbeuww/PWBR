@@ -202,7 +202,11 @@ export async function listContent(locale: string): Promise<CatalogEntry[]> {
 
     const raw = await fs.readFile(absPath, 'utf8')
     const { data, content } = matter(raw)
-    const fm = FrontmatterSchema.parse(data) // frontière D-11 (throw si invalide)
+    // Frontière D-11 : safeParse → un fichier au frontmatter invalide est exclu
+    // du catalogue plutôt que de faire 500 sur tout l'index (contrat « jamais 500 »).
+    const result = FrontmatterSchema.safeParse(data)
+    if (!result.success) continue
+    const fm = result.data
 
     catalog.push({
       slug,

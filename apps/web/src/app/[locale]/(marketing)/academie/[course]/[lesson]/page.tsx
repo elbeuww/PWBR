@@ -52,6 +52,9 @@ export default async function AcademyLessonPage({ params }: LessonProps) {
   }
 
   const { content, meta, body } = rendered
+  // WR-01 : la leçon doit appartenir au cours de l'URL — sinon une leçon serait
+  // servie 200 sous n'importe quel slug de cours (nav cassée + duplication SEO).
+  if (meta.course !== course) notFound()
   const toc = extractToc(body)
 
   // Navigation cours : ordre depuis le frontmatter, voisins dérivés du catalogue.
