@@ -551,5 +551,59 @@
       "tierName": "Palier {tier}",
       "current": "Actuel"
     }
+  },
+  "academy": {
+    "title": "Académie",
+    "subtitle": "Apprenez à utiliser votre plateforme et à exécuter chaque signal, pas à pas.",
+    "navAcademy": "Académie",
+    "startCourse": "Commencer le cours",
+    "readArticle": "Lire l'article",
+    "learnBasicsCta": "Apprenez les bases",
+    "signalExecLink": "Comment exécuter ce signal ?",
+    "filterTheme": "Thème",
+    "filterNiveau": "Niveau",
+    "filterPlateforme": "Plateforme",
+    "resetFilters": "Réinitialiser les filtres",
+    "readingTime": "{minutes} min de lecture",
+    "tocTitle": "Sommaire",
+    "courseBadge": "Cours",
+    "lessonCount": "{count, plural, one {# leçon} other {# leçons}}",
+    "lessonsCount": "{count, plural, one {# leçon} other {# leçons}}",
+    "courseProgress": "Leçon {current} sur {total}",
+    "lessonPrev": "Leçon précédente",
+    "lessonNext": "Leçon suivante",
+    "tradeExampleTitle": "Exemple de trade",
+    "tradeEntry": "Entrée",
+    "tradeStopLoss": "Stop-loss",
+    "tradeTakeProfit": "Take-profit",
+    "tradeRr": "Ratio R:R",
+    "calloutAttention": "Attention",
+    "calloutAstuce": "Astuce",
+    "fallbackBanner": "Cet article n'est pas encore disponible dans votre langue. Version française affichée — traduction à venir.",
+    "emptyHeading": "Aucun contenu ne correspond",
+    "emptyBody": "Aucun article ou cours ne correspond à ces filtres. Réinitialisez les filtres pour tout afficher.",
+    "errorBody": "Contenu indisponible. Le lien est peut-être périmé — retournez à l'Académie.",
+    "errorBackLink": "Retour à l'Académie",
+    "niveauDebutant": "Débutant",
+    "niveauIntermediaire": "Intermédiaire",
+    "plateformeMt4": "MT4",
+    "plateformeMt5": "MT5",
+    "plateformeAutre": "Autre",
+    "theme": {
+      "usage-plateforme": "Usage de la plateforme",
+      "bases-trading": "Bases du trading",
+      "gestion-risque": "Gestion du risque",
+      "analyse-technique": "Analyse technique",
+      "comprendre-signaux": "Comprendre les signaux"
+    },
+    "niveau": {
+      "debutant": "Débutant",
+      "intermediaire": "Intermédiaire"
+    },
+    "plateforme": {
+      "mt4": "MT4",
+      "mt5": "MT5",
+      "autre": "Autre"
+    }
   }
 }

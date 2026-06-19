@@ -356,5 +356,59 @@
       "tierName": "Tier {tier}",
       "current": "Current"
     }
+  },
+  "academy": {
+    "title": "Academy",
+    "subtitle": "Learn to use your platform and execute every signal, step by step.",
+    "navAcademy": "Academy",
+    "startCourse": "Start the course",
+    "readArticle": "Read the article",
+    "learnBasicsCta": "Learn the basics",
+    "signalExecLink": "How do I execute this signal?",
+    "filterTheme": "Theme",
+    "filterNiveau": "Level",
+    "filterPlateforme": "Platform",
+    "resetFilters": "Reset filters",
+    "readingTime": "{minutes} min read",
+    "tocTitle": "Contents",
+    "courseBadge": "Course",
+    "lessonCount": "{count, plural, one {# lesson} other {# lessons}}",
+    "lessonsCount": "{count, plural, one {# lesson} other {# lessons}}",
+    "courseProgress": "Lesson {current} of {total}",
+    "lessonPrev": "Previous lesson",
+    "lessonNext": "Next lesson",
+    "tradeExampleTitle": "Trade example",
+    "tradeEntry": "Entry",
+    "tradeStopLoss": "Stop-loss",
+    "tradeTakeProfit": "Take-profit",
+    "tradeRr": "R:R ratio",
+    "calloutAttention": "Caution",
+    "calloutAstuce": "Tip",
+    "fallbackBanner": "This article is not yet available in your language. Showing the French version — translation coming soon.",
+    "emptyHeading": "No content matches",
+    "emptyBody": "No article or course matches these filters. Reset the filters to show everything.",
+    "errorBody": "Content unavailable. The link may be outdated — go back to the Academy.",
+    "errorBackLink": "Back to the Academy",
+    "niveauDebutant": "Beginner",
+    "niveauIntermediaire": "Intermediate",
+    "plateformeMt4": "MT4",
+    "plateformeMt5": "MT5",
+    "plateformeAutre": "Other",
+    "theme": {
+      "usage-plateforme": "Platform usage",
+      "bases-trading": "Trading basics",
+      "gestion-risque": "Risk management",
+      "analyse-technique": "Technical analysis",
+      "comprendre-signaux": "Understanding signals"
+    },
+    "niveau": {
+      "debutant": "Beginner",
+      "intermediaire": "Intermediate"
+    },
+    "plateforme": {
+      "mt4": "MT4",
+      "mt5": "MT5",
+      "autre": "Other"
+    }
   }
 }

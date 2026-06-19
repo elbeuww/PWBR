@@ -356,5 +356,59 @@
       "tierName": "المستوى {tier}",
       "current": "الحالي"
     }
+  },
+  "academy": {
+    "title": "الأكاديمية",
+    "subtitle": "تعلّم استخدام منصّتك وتنفيذ كل إشارة، خطوة بخطوة.",
+    "navAcademy": "الأكاديمية",
+    "startCourse": "ابدأ الدورة",
+    "readArticle": "اقرأ المقال",
+    "learnBasicsCta": "تعلّم الأساسيات",
+    "signalExecLink": "كيف أنفّذ هذه الإشارة؟",
+    "filterTheme": "الموضوع",
+    "filterNiveau": "المستوى",
+    "filterPlateforme": "المنصّة",
+    "resetFilters": "إعادة ضبط عوامل التصفية",
+    "readingTime": "{minutes} دقيقة قراءة",
+    "tocTitle": "المحتويات",
+    "courseBadge": "دورة",
+    "lessonCount": "{count, plural, zero {# درس} one {# درس} two {درسان} few {# دروس} many {# درسًا} other {# درس}}",
+    "lessonsCount": "{count, plural, zero {# درس} one {# درس} two {درسان} few {# دروس} many {# درسًا} other {# درس}}",
+    "courseProgress": "الدرس {current} من {total}",
+    "lessonPrev": "الدرس السابق",
+    "lessonNext": "الدرس التالي",
+    "tradeExampleTitle": "مثال على صفقة",
+    "tradeEntry": "الدخول",
+    "tradeStopLoss": "وقف الخسارة",
+    "tradeTakeProfit": "جني الأرباح",
+    "tradeRr": "نسبة المخاطرة/العائد",
+    "calloutAttention": "تنبيه",
+    "calloutAstuce": "نصيحة",
+    "fallbackBanner": "هذا المقال غير متوفّر بعد بلغتك. يُعرض النصّ بالفرنسية — الترجمة قادمة قريبًا.",
+    "emptyHeading": "لا يوجد محتوى مطابق",
+    "emptyBody": "لا يوجد مقال أو دورة يطابق عوامل التصفية هذه. أعد ضبط عوامل التصفية لعرض كل شيء.",
+    "errorBody": "المحتوى غير متوفّر. قد يكون الرابط قديمًا — عُد إلى الأكاديمية.",
+    "errorBackLink": "العودة إلى الأكاديمية",
+    "niveauDebutant": "مبتدئ",
+    "niveauIntermediaire": "متوسّط",
+    "plateformeMt4": "MT4",
+    "plateformeMt5": "MT5",
+    "plateformeAutre": "أخرى",
+    "theme": {
+      "usage-plateforme": "استخدام المنصّة",
+      "bases-trading": "أساسيات التداول",
+      "gestion-risque": "إدارة المخاطر",
+      "analyse-technique": "التحليل الفني",
+      "comprendre-signaux": "فهم الإشارات"
+    },
+    "niveau": {
+      "debutant": "مبتدئ",
+      "intermediaire": "متوسّط"
+    },
+    "plateforme": {
+      "mt4": "MT4",
+      "mt5": "MT5",
+      "autre": "أخرى"
+    }
   }
 }
