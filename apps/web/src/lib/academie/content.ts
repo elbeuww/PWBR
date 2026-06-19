@@ -52,14 +52,14 @@ export interface CatalogEntry {
   type: Frontmatter['type']
   theme: Frontmatter['theme']
   niveau: Frontmatter['niveau']
-  plateforme?: Frontmatter['plateforme']
+  plateforme?: Frontmatter['plateforme'] | undefined
   titre: string
   resume: string
   cover: string
   date: string
   readingMinutes: number
-  course?: string
-  order?: number
+  course?: string | undefined
+  order?: number | undefined
 }
 
 export interface ContentLocales {
@@ -141,7 +141,7 @@ export async function resolveContent(
 /** Extrait le slug d'un nom de fichier `{slug}.{locale}.mdx`. */
 function parseFileName(fileName: string): { slug: string; locale: string } | null {
   const m = fileName.match(/^([a-z0-9-]+)\.([a-z]{2})\.mdx$/)
-  if (!m) return null
+  if (!m || m[1] === undefined || m[2] === undefined) return null
   return { slug: m[1], locale: m[2] }
 }
 

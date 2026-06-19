@@ -108,8 +108,8 @@ describe('listContent: index frontmatter-seul (Pattern 3)', () => {
     expect(entry?.titre.length).toBeGreaterThan(0)
     expect(entry?.readingMinutes).toBeGreaterThan(0)
     // index frontmatter-seul : aucun champ de corps compilé exposé
-    expect((entry as Record<string, unknown>).content).toBeUndefined()
-    expect((entry as Record<string, unknown>).body).toBeUndefined()
+    expect((entry as unknown as Record<string, unknown>).content).toBeUndefined()
+    expect((entry as unknown as Record<string, unknown>).body).toBeUndefined()
   })
 
   it('catalogue une leçon avec course + order', async () => {

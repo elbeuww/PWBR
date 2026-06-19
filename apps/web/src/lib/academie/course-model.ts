@@ -25,9 +25,9 @@ export interface CourseModel {
 
 export interface LessonNav {
   /** Leçon précédente dans l'ordre du cours, undefined à la 1ʳᵉ. */
-  prev?: CourseLesson
+  prev?: CourseLesson | undefined
   /** Leçon suivante dans l'ordre du cours, undefined à la dernière. */
-  next?: CourseLesson
+  next?: CourseLesson | undefined
   /** Index 1-based de la leçon courante (0 si l'order demandé est absent). */
   current: number
   /** Nombre total de leçons du cours. */
