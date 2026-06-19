@@ -91,7 +91,7 @@ describe('AcademyParamsSchema exposé', () => {
 
 /** Reconstruit un RawParams (multi-valeur en string[]) depuis URLSearchParams. */
 function parseQueryToRaw(qs: URLSearchParams): Record<string, string | string[] | undefined> {
-  const raw: Record<string, string | string[]> = {}
+  const raw: Record<string, string | string[] | undefined> = {}
   for (const key of new Set(qs.keys())) {
     const all = qs.getAll(key)
     raw[key] = all.length > 1 ? all : all[0]

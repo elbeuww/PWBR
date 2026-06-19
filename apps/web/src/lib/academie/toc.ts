@@ -32,8 +32,8 @@ export function extractToc(body: string): TocItem[] {
     const match = HEADING_RE.exec(line)
     if (!match) continue
 
-    const level = match[1].length as 2 | 3
-    const text = match[2].trim()
+    const level = match[1]!.length as 2 | 3
+    const text = match[2]!.trim()
     items.push({ level, text, slug: slugger.slug(text) })
   }
 

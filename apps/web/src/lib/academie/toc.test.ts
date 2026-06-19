@@ -30,13 +30,13 @@ describe('extractToc: niveaux et structure', () => {
 
 describe('extractToc: slugs cohérents rehype-slug', () => {
   it('titre avec accents → slug non vide et stable', () => {
-    const [item] = extractToc('## Gestion du Risque é à')
+    const item = extractToc('## Gestion du Risque é à')[0]!
     expect(item.slug).toBe('gestion-du-risque-é-à')
     expect(item.slug.length).toBeGreaterThan(0)
   })
 
   it('titre arabe → slug non vide', () => {
-    const [item] = extractToc('## إدارة المخاطر')
+    const item = extractToc('## إدارة المخاطر')[0]!
     expect(item.slug).toBe('إدارة-المخاطر')
     expect(item.slug.length).toBeGreaterThan(0)
   })
