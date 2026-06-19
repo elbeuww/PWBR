@@ -161,7 +161,7 @@ i18n/RTL+rôles avant toute UI publique · RLS signaux avant exposition espace m
   2. Le contenu (articles + cours) est rédigé et publié de façon autonome via fichiers MDX (commit → deploy) — **pas de CMS éditeur** (CMS-02 révisé 2026-06-19, D-01).
 **Plans**: 5 plans (4 vagues)
 - [x] 09-01-PLAN.md — socle pur : frontmatter Zod + searchParams whitelist + reading-time + toc + install deps MDX [CMS-01]
-- [ ] 09-02-PLAN.md — couche fichiers : content.ts (fs/gray-matter, résolution+fallback D-14, anti path-traversal) + course-model + fixtures MDX de preuve [CMS-01, CMS-02]
+- [x] 09-02-PLAN.md — couche fichiers : content.ts (fs/gray-matter, résolution+fallback D-14, anti path-traversal) + course-model + fixtures MDX de preuve [CMS-01, CMS-02]
 - [ ] 09-03-PLAN.md — présentation : composants pédago + mapping MDX + ContentCard + FilterBar + FallbackBanner [CMS-01]
 - [ ] 09-04-PLAN.md — routes RSC (index/article/cours/leçon via compileMDX) + sitemap hreflang + namespace i18n academy [CMS-01, CMS-02]
 - [ ] 09-05-PLAN.md — wiring funnel D-08 (nav/home/signal) + E2E + vérif rendu Vercel preview [CMS-01, LEGAL-01]
