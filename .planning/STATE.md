@@ -3,7 +3,7 @@ gsd_state_version: 1.0
 milestone: v2.0
 milestone_name: milestone
 status: verifying
-last_updated: "2026-06-19T03:41:48.998Z"
+last_updated: "2026-06-19T03:48:01.803Z"
 last_activity: 2026-06-19
 progress:
   total_phases: 9
@@ -285,7 +285,7 @@ Progress: [██████████] 100%
 
 ## Session Continuity
 
-**Last session:** 2026-06-19 — Completed 08-04-PLAN.md (2 tasks). Task 1 (89a8564) : `(admin)/affiliation/affilies/page.tsx` RSC — agrégat affiliés+perfs depuis tables de base (referrals count + commissions dues/payées sommées BigInt, CR-02), JAMAIS affiliate_dashboard (vide sous service_role, A3) ; lien header → payouts ; aucune nouvelle clé fr.json. Task 2 (4218941) : `gating.spec.ts` ACCESS-03b — 6 tests toBe(404) sur /admin/signaux, /admin/signaux/[id], /admin/sante × {non-auth, auth-non-superadmin}, jamais 200/403 (T-04-ADMIN-ELEV) ; additif seul. Déviations Rule 3 : reformulation commentaires (grep-gates) + tests déroulés (≥6 toBe(404)). Payouts intacte (git diff --quiet OK, D-09/D-10 zéro DB-work). `tsc --noEmit` 0 erreur, `lint:i18n` exit 0, `vitest` 507 verts | 4 skip, 0 npm. **ADMIN-03/04 complets. Phase 08 COMPLETE (4/4).** Live-infra E2E ACCESS-03b = human-verify (SKIP). Stopped at : Plan 08-04 terminé.
+**Last session:** 2026-06-19T03:48:01.795Z
 
 **Last session (archive):** 2026-06-19T03:41:29.665Z
 
