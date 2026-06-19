@@ -1,5 +1,7 @@
 /**
- * /[locale]/(affiliate)/dashboard — portail affilié no-PII (AFF-02, D-13/D-14).
+ * /[locale]/affiliation/dashboard — portail affilié no-PII (AFF-02, D-13/D-14).
+ * (Relocalisé depuis (affiliate)/dashboard : collisionnait avec le dashboard général
+ * /[locale]/dashboard — debug admin-route-unreachable, 2026-06-19.)
  *
  * RSC trilingue (FR/EN/AR + RTL via utilities logiques). `requireRole('affiliate')`
  * en tête (porte UX ; la non-fuite repose sur la RLS, pas le gate).
