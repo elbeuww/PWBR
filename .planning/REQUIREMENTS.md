@@ -61,7 +61,7 @@
 ### ADMIN — Dashboard superadmin (Waves 2→4)
 - [ ] **ADMIN-01**: Le superadmin voit les membres (actifs/inactifs, état d'abonnement et de paiement).
 - [ ] **ADMIN-02**: Le superadmin traite la file de validation manuelle des paiements ambigus (activer / rejeter).
-- [ ] **ADMIN-03**: Le superadmin voit les affiliés et leurs performances et gère les payouts de commissions.
+- [x] **ADMIN-03**: Le superadmin voit les affiliés et leurs performances et gère les payouts de commissions.
 - [x] **ADMIN-04**: Le superadmin voit les signaux publiés et la santé des jobs/données (`job_runs`, freshness).
 
 ### CMS — Cours & articles vulgarisés (Wave 4)
@@ -131,7 +131,7 @@
 | AFF-03 | Phase 7 | Complete |
 | AFF-04 | Phase 7 | Complete |
 | AFF-05 | Phase 7 | Complete |
-| ADMIN-03 | Phase 8 | Pending |
+| ADMIN-03 | Phase 8 | Complete |
 | ADMIN-04 | Phase 8 | Complete |
 | CMS-01 | Phase 9 | Pending |
 | CMS-02 | Phase 9 | Pending |

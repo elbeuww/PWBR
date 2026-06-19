@@ -149,7 +149,7 @@ i18n/RTL+rôles avant toute UI publique · RLS signaux avant exposition espace m
 - [x] 08-01-PLAN.md — socle : libs pures admin (signals/freshness/jobs) + tests + shell sidebar + copy FR [ADMIN-03, ADMIN-04]
 - [x] 08-02-PLAN.md — Signaux : liste trade_setups × telegram_posts + filtres + détail admin read-only [ADMIN-04]
 - [x] 08-03-PLAN.md — Santé : feux fraîcheur candles/news/macro + table job_runs + dashboard KPI [ADMIN-04]
-- [ ] 08-04-PLAN.md — Affiliés : perfs agrégées tables de base + wiring payouts existant [ADMIN-03]
+- [x] 08-04-PLAN.md — Affiliés : perfs agrégées tables de base + wiring payouts existant [ADMIN-03]
 **UI hint**: yes
 
 ### Phase 9: CMS cours & articles vulgarisés
