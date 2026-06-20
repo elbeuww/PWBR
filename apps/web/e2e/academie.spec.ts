@@ -36,8 +36,12 @@ const ARTICLE_SLUG = 'ratio-risque-rendement'
 // Cours réel + 1ʳᵉ leçon (content/academie/cours/prendre-en-main-mt5).
 const COURSE_SLUG = 'prendre-en-main-mt5'
 const LESSON_SLUG = '01-installer-mt5'
-// Slug sans variante arabe → déclenche le fallback FR (D-14), jamais 404.
-const FALLBACK_SLUG = 'comprendre-le-levier'
+// Cas de fallback D-14 : la leçon 03 existe en fr+ar mais PAS en en (tous les
+// articles sont trilingues ; seule cette leçon est partielle). Demandée en /en →
+// content.ts sert la version FR + bandeau, jamais un 404.
+const FALLBACK_LESSON = '03-poser-tp-sl'
+// Bandeau de fallback côté UI (academy.fallbackBanner, EN — locale de la page = en).
+const FALLBACK_BANNER_EN = 'Showing the French version'
 
 test.describe('CMS-01 : index Académie trilingue', () => {
   for (const locale of LOCALES) {
@@ -101,21 +105,21 @@ test.describe('I18N-02 : RTL arabe sur le contenu Académie', () => {
   })
 })
 
-test.describe('D-14 : fallback FR quand la variante arabe manque (jamais 404)', () => {
-  test(`/ar/academie/${FALLBACK_SLUG} → contenu FR + bandeau fallback, pas de 404`, async ({
+test.describe('D-14 : fallback FR quand la variante de langue manque (jamais 404)', () => {
+  test(`/en/academie/${COURSE_SLUG}/${FALLBACK_LESSON} → contenu FR + bandeau fallback, pas de 404`, async ({
     page,
   }) => {
-    const res = await page.goto(`/ar/academie/${FALLBACK_SLUG}`)
+    const res = await page.goto(`/en/academie/${COURSE_SLUG}/${FALLBACK_LESSON}`)
     // Jamais 404/500 : le contenu existe en FR, on le sert avec bandeau (D-14).
     expect(res?.status(), 'fallback servi, pas de 404').toBeLessThan(400)
 
-    // La page rend bien un article (titre h1) — pas une page d'erreur.
+    // La page rend bien la leçon (titre h1) — pas une page d'erreur.
     await expect(page.locator('h1').first()).toBeVisible()
+    // Bandeau de fallback effectivement affiché (la vraie preuve D-14, pas juste un 200).
+    await expect(page.getByText(FALLBACK_BANNER_EN).first()).toBeVisible()
     // Disclaimer toujours présent (LEGAL-01 sur le contenu fallback).
-    // Le corps est servi en FR ; le disclaimer suit la locale de page (ar) ou FR selon
-    // l'injection — on vérifie qu'AU MOINS un fragment disclaimer (fr OU ar) est présent.
     const disclaimer = page
-      .getByText(DISCLAIMER_FRAGMENT.ar)
+      .getByText(DISCLAIMER_FRAGMENT.en)
       .or(page.getByText(DISCLAIMER_FRAGMENT.fr))
     await expect(disclaimer.first()).toBeVisible()
   })

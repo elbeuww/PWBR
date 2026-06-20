@@ -39,13 +39,14 @@ describe('resolveContent: résolution (slug, locale)', () => {
 })
 
 describe('resolveContent: fallback FR (D-14)', () => {
-  it("locale ar manquante mais FR présent → {locale:'fr', fallback:true}", async () => {
-    // comprendre-le-levier existe en fr+en, PAS en ar
-    const r = await resolveContent('comprendre-le-levier', 'ar')
+  it("locale manquante mais FR présent → {locale:'fr', fallback:true} + absPath FR", async () => {
+    // 03-poser-tp-sl existe en fr+ar, PAS en en → demande en → fallback FR servi.
+    // (Tous les articles sont désormais trilingues ; seule cette leçon est partielle.)
+    const r = await resolveContent('03-poser-tp-sl', 'en')
     expect(r).not.toBeNull()
     expect(r?.locale).toBe('fr')
     expect(r?.fallback).toBe(true)
-    expect(r?.absPath.endsWith('comprendre-le-levier.fr.mdx')).toBe(true)
+    expect(r?.absPath.endsWith('03-poser-tp-sl.fr.mdx')).toBe(true)
   })
 
   it('leçon 3 (fr seul) demandée en en → fallback FR', async () => {
@@ -120,9 +121,10 @@ describe('listContent: index frontmatter-seul (Pattern 3)', () => {
     expect(lecon?.order).toBe(1)
   })
 
-  it('applique le fallback FR pour une locale partielle (ar) — jamais 404 silencieux', async () => {
+  it('catalogue ar complet — chaque slug apparaît (natif ou via fallback FR, jamais 404)', async () => {
     const cat = await listContent('ar')
-    // comprendre-le-levier n'a pas d'ar mais doit apparaître (via FR)
+    // Le catalogue ar liste TOUS les slugs : ceux avec variante ar native ET ceux
+    // servis en FR par fallback (D-14). comprendre-le-levier doit y figurer.
     const entry = cat.find((c) => c.slug === 'comprendre-le-levier')
     expect(entry).toBeDefined()
   })
@@ -132,14 +134,14 @@ describe('listAllContent: locales réellement présentes (sitemap)', () => {
   it('liste les locales réelles par slug (sans fallback)', async () => {
     const all = await listAllContent()
     const levier = all.find((c) => c.slug === 'comprendre-le-levier')
-    expect(levier?.locales.sort()).toEqual(['en', 'fr'])
+    expect(levier?.locales.sort()).toEqual(['ar', 'en', 'fr'])
     const ratio = all.find((c) => c.slug === 'ratio-risque-rendement')
     expect(ratio?.locales.sort()).toEqual(['ar', 'en', 'fr'])
   })
 
-  it('leçon 3 n’a que fr', async () => {
+  it('leçon 3 (poser TP/SL) a fr + ar, mais pas en', async () => {
     const all = await listAllContent()
     const l3 = all.find((c) => c.slug === '03-poser-tp-sl')
-    expect(l3?.locales).toEqual(['fr'])
+    expect(l3?.locales.sort()).toEqual(['ar', 'fr'])
   })
 })

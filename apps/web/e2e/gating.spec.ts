@@ -47,7 +47,10 @@ async function signUp(page: Page, email: string): Promise<void> {
   await page.locator('input[name="email"]').fill(email)
   await page.locator('input[name="password"]').fill(TEST_PASSWORD)
   await page.locator('button[type="submit"]').click()
-  await expect(page).toHaveURL('/fr/dashboard', { timeout: 10000 })
+  // D-09 : le funnel d'abonnement s'arrête sur l'écran honnête « paiement bientôt »
+  // (pas de flux de paiement en P2). Le signup réussi ouvre une session active et
+  // atterrit ici — c'est ce que ce helper garantit (session prête pour la suite).
+  await expect(page).toHaveURL('/fr/paiement-bientot', { timeout: 10000 })
 }
 
 test.describe('ACCESS-01 / D-08 : non-auth → login + returnTo', () => {
