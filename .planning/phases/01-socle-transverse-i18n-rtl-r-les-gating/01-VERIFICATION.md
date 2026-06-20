@@ -1,28 +1,25 @@
 ---
 phase: 01-socle-transverse-i18n-rtl-r-les-gating
-verified: 2026-06-14T12:00:00Z
-status: human_needed
-score: 13/14 must-haves verified
+verified: 2026-06-20T00:00:00Z
+status: verified
+score: 14/14 must-haves verified (E2E live exécuté)
 overrides_applied: 0
-human_verification:
-  - test: "Lancer `next dev` sur :3000 avec .env.local rempli + migrations 0008/0009/0010 live, puis exécuter `pnpm --filter web test:e2e` (i18n.spec.ts + gating.spec.ts + auth.spec.ts)"
-    expected: "18 tests E2E passent : bascule fr→ar sur même page, dir=rtl en arabe, redirection / → /fr, returnTo non vide sur member non-auth, auth-sans-abo → /fr/tarifs, admin non-superadmin → 404, returnTo=//evil.com reste sur origine, auth.spec.ts non régressé"
-    why_human: "Aucun serveur de développement disponible dans la session de vérification ; Playwright exige l'app live sur :3000"
-  - test: "Vérifier le rendu visuel de l'arabe en production (police système vs Noto Sans Arabic)"
-    expected: "Texte arabe lisible avec interlignage correct (IN-01 : aucun CDN Google Fonts configuré en P1 — accepté, reporté Phase 2 UI)"
-    why_human: "Qualité visuelle impossible à évaluer statiquement"
+human_verification_resolved:
+  - test: "E2E live i18n.spec + gating.spec + auth.spec contre next dev :3000 + Supabase cloud"
+    result: "RÉSOLU 2026-06-20 — 24 tests verts (i18n 6/6, gating 13/13, auth 5/5) + 1 skip documenté (I18N-04 Manual-Only). Bascule fr→ar même page, dir=rtl, / → /fr, returnTo non vide, auth-sans-abo → /tarifs, admin non-superadmin → 404, open-redirect //evil.com bloqué. NB : un bug réel a été trouvé et corrigé au passage — localeDetection laissait '/' partir sur /en pour un navigateur en-US (fix routing.ts, commit dédié)."
+  - test: "Rendu visuel arabe (police système vs Noto Sans Arabic)"
+    result: "ACCEPTÉ-REPORTÉ — IN-01 : aucun CDN Google Fonts en P1, reporté Phase UI. Police système lisible. Non bloquant."
   - test: "I18N-04 — formatage locale-aware"
-    expected: "Aucun test E2E requis en P1 (documenté Manual-Only dans 01-04-PLAN.md : aucune donnée numérique rendue dans l'UI avant P3). À ajouter dans i18n.spec.ts dès qu'une valeur formatée apparaît."
-    why_human: "Pas de donnée formatée dans l'UI P1 ; test.skip() documenté dans i18n.spec.ts"
+    result: "MANUAL-ONLY DOCUMENTÉ — aucune donnée numérique rendue dans l'UI avant P3 ; test.skip() en place. À activer dès qu'une valeur formatée apparaît."
 ---
 
 # Phase 01 : Rapport de vérification
 
 **Objectif de la phase :** Poser le socle transverse — i18n/RTL (next-intl, locales fr/en/ar, ar→RTL) ET la primitive d'accès rôles/gating (profiles.role hors JWT + RLS has_active_subscription) AVANT toute UI publique. Couvre I18N-01..04 + ACCESS-01..04.
 
-**Vérifié :** 2026-06-14T12:00:00Z
-**Statut :** human_needed
-**Re-vérification :** Non — vérification initiale
+**Vérifié :** 2026-06-20T00:00:00Z (E2E live exécuté)
+**Statut :** verified
+**Re-vérification :** Oui — items human_needed levés par run E2E live le 2026-06-20
 
 ---
 
