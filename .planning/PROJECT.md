@@ -22,6 +22,23 @@ L'IA se comporte comme un trader vétéran (50 ans d'expérience). L'analyse cha
 
 Produire, pour chaque opportunité, une analyse fiable et explicable — score /100 + niveau de risque + plan de trade (entrée/SL/TP/R:R/levier) — vulgarisée pour un public non technique. Si tout le reste échoue, **la qualité et la traçabilité de l'analyse d'un trade** doit fonctionner : le % de réussite affiché est toujours mesuré, jamais inventé — c'est le socle de confiance qui fait payer l'abonnement.
 
+## Current Milestone: v2.1 — Mise en vie : identité NEXA, moteur live & track record
+
+**Goal :** Donner à la plateforme son identité visuelle réelle (design **NEXA** sur toute l'app), activer le moteur d'analyse en **routines Claude planifiées sans clé API** (day + swing, timing choisi par le moteur), et rendre le **track record affichable dès le lancement** (backtest du catalogue de patterns + boucle d'outcomes en prod).
+
+**Target features :**
+- **Identité & design system NEXA** reconstruit depuis le HTML de référence (`Nexa - Landing.html`) — tokens, thèmes `volt`/`green` OKLCH, polices (Archivo / Chakra Petch / Space Grotesk / JetBrains Mono / Noto Sans Arabic), hero/scène, animations, marquee, gauges de score — appliqué à **toute la plateforme** (vitrine, espace membre signaux/détail, académie, auth, admin). Trilingue AR-RTL/EN/FR conservé.
+- **Rebranding MERA → NEXA** (*New Era Exchange Alliance* → « Nouvelle Ère · Alliance d'Échange ») + baseline conforme **sans promesse de gain** (slogan « Make Everybody Rich Again » écarté).
+- **Routines d'analyse Claude Code** (Remote, sans clé API, forfait Max ~15 runs/j partagés) : `snapshot → analyze (vétéran) → persist`, déclenchées aux **moments opportuns day & swing** (le moteur choisit), idempotentes + monitoring `job_runs`, secrets via Environments.
+- **Moteur de backtest du catalogue de patterns** → seed `pattern_stats` → **% mesuré affiché dès J1** (avant historique réel), avec N visible et seuil N≥30.
+- **Boucle outcome-tracker en prod** : résolution hit_tp/hit_sl/flat, bascule progressive backtest → track record réel, calibration.
+
+**Key context :**
+- Design **reconstruit** (assets `landing.css`/`landing.js` non fournis) → fidélité interprétative à l'intention du HTML.
+- **Pas de clé API Anthropic** : intelligence via agent Claude Code planifié ; le backend ne fait que lire/écrire Supabase via le SDK.
+- Track record : **infra livrée en v2.0 P5** (`replayOutcome`, `prediction_outcomes`, `pattern_stats`, job `outcome-tracker`, bloc public seuil N≥30) ; le neuf = **backtest** + mise en prod de la boucle.
+- **Hors scope de ce milestone** (restent au backlog) : PAY-AUTO (processeur crypto auto), AFF-AUTO (payouts auto), LEGAL-02 (sign-off juriste), WIRING-01 (ExpiryBanner) sauf si trivial au passage.
+
 ## Shipped Milestone: v2.0 — Plateforme publique d'analyse & signaux (MENA) — livré 2026-06-20
 
 **Statut :** ✅ Livré (9 phases, 37 plans). Vérification automatisée 100 % verte (Vitest 566 ✓, typecheck 0 erreur) ; P01 + P09 live-vérifiés (E2E 32 ✓). Items live restants (P02-P08, dépendances externes) + dette explicite (WIRING-01, LEGAL-02) → `STATE.md → Deferred Items`. **Prochain milestone candidat : W5 automatisation** (PAY-AUTO processeur crypto + webhooks, ENGINE-API clé Anthropic, AFF-AUTO).
@@ -63,14 +80,17 @@ Produire, pour chaque opportunité, une analyse fiable et explicable — score /
 - [x] **Affiliation à paliers (v2.0 Phase 7, 2026-06-18)** : migration 0016 (tables + RLS + RPC commission/payout + vue no-PII), grille paliers + commission BigInt pure golden-testée (miroir SQL), capture `?ref` (cookie 30j) → attribution figée au signup (best-effort), candidature trilingue + dashboard affilié no-PII, back-office payouts manuel. Requirements AFF-01..05.
 - [x] **Superadmin consolidé (v2.0 Phase 8, 2026-06-19)** : `/admin` KPI + `/admin/signaux` (× telegram_posts, filtres URL) + `/admin/sante` (feux fraîcheur + job_runs) + `/admin/affiliation` (perfs + payouts), 404 discret non-superadmin (T-04-ADMIN-ELEV, **live-vérifié** gating E2E). Requirements ADMIN-03/04.
 
-### Active — prochain milestone (W5 automatisation, candidat)
+### Active — milestone en cours (v2.1 : identité NEXA, moteur live & track record)
 
-> v2.0 (plateforme publique) entièrement livré ci-dessus. Le milestone suivant (non démarré) couvre l'automatisation reportée + la dette de clôture.
+> Requirements détaillés (REQ-IDs) dans `.planning/REQUIREMENTS.md`. Trois axes : design NEXA toute l'app · routines d'analyse Claude sans API · backtest + track record en prod.
+
+### Backlog — différé après v2.1
+
+> Reporté au-delà du milestone en cours (automatisation paiement/affiliation + dette de clôture).
 
 - [ ] **WIRING-01** : câbler `ExpiryBanner` (alerte J-3/J-1) avant l'ouverture réelle de l'encaissement (dette PAY-05).
 - [ ] **LEGAL-02** : revue juridique externe signée (gate non-code) avant le 1er encaissement réel.
 - [ ] **PAY-AUTO** : processeur crypto (NOWPayments/Cryptomus) — adresse unique par facture + webhooks (remplace la soumission de hash manuelle).
-- [ ] **ENGINE-API** : clé Anthropic + infra 24/7 (fiabilité des routines pour plateforme publique payante).
 - [ ] **AFF-AUTO** : automatisation des payouts d'affiliation.
 - [ ] Vérifs live différées P02-P08 + UAT P02/P03 (voir `STATE.md → Deferred Items`) à exécuter sur Vercel preview / données seedées.
 
@@ -119,6 +139,10 @@ Produire, pour chaque opportunité, une analyse fiable et explicable — score /
 | **2026-06-13** — Moteur : routines Claude Max pendant la construction, migration clé API Anthropic au lancement payant | Coût zéro avant revenus, fiabilité 24/7 quand des abonnés paient | — Pending |
 | **2026-06-13** — Lancement payant direct (influenceurs déjà engagés) + offre découverte 3 $/15 jours | Pas d'attente de track record ; l'offre d'essai abaisse la barrière ; le Telegram public accumule le track record en parallèle | — Pending |
 | Phases 1-2 (fondations, ingestion) inchangées par le pivot ; roadmap aval (phases 3+) à réviser | Le cœur analytique sert les deux visions ; ne pas geler l'exécution | — Pending |
+| **2026-06-20** — Marque officielle = **NEXA** (*New Era Exchange Alliance* → « Nouvelle Ère · Alliance d'Échange »). Slogan « Make Everybody Rich Again » du mock écarté | Une promesse de gain explicite contredit la contrainte légale dure « aucune promesse de gain » avant encaissement | — v2.1 |
+| **2026-06-20** — Design system **reconstruit** depuis le HTML de référence (assets css/js non fournis) | Fidélité interprétative à l'intention ; pas de source CSS/JS à porter | — v2.1 |
+| **2026-06-20** — Moteur d'analyse activé via **routines Claude Code planifiées sans clé API** (forfait Max, le moteur choisit les moments day/swing) | Coût zéro avant revenus ; lève la dette « configurer routines + 1 run réel » de v1.0 P4 | — v2.1 |
+| **2026-06-20** — % affiché dès J1 = **backtest maison du catalogue de patterns** seedant `pattern_stats`, puis bascule sur le track record réel | Honnêteté produit : un % mesuré dès le lancement sans attendre N≥30 issues réelles | — v2.1 |
 
 ## Evolution
 
@@ -138,4 +162,6 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-06-20 après clôture du milestone v2.0 « Plateforme publique ». Les 9 phases sont livrées et réconciliées dans « Validated » (P1-P9 v2.0 + cœur v1.0 P1-4). Vérification automatisée 100 % verte (Vitest 566 ✓, typecheck 0) ; P01 + P09 live-vérifiés (E2E 32 ✓, bug i18n localeDetection corrigé au passage). Items live différés (P02-P08 + UAT P02/P03) et dette explicite (WIRING-01, LEGAL-02) consignés dans `STATE.md → Deferred Items`. Roadmap collapsée ; détail v2.0 archivé `.planning/milestones/v2.0-ROADMAP.md`. Prochain milestone candidat : W5 automatisation.*
+*Last updated: 2026-06-20 — démarrage du milestone **v2.1 « Mise en vie : identité NEXA, moteur live & track record »** (3 axes : design NEXA toute l'app · routines d'analyse Claude sans API · backtest + track record en prod). Requirements + roadmap en cours de définition.*
+
+*Précédent : 2026-06-20 après clôture du milestone v2.0 « Plateforme publique ». Les 9 phases sont livrées et réconciliées dans « Validated » (P1-P9 v2.0 + cœur v1.0 P1-4). Vérification automatisée 100 % verte (Vitest 566 ✓, typecheck 0) ; P01 + P09 live-vérifiés (E2E 32 ✓, bug i18n localeDetection corrigé au passage). Items live différés (P02-P08 + UAT P02/P03) et dette explicite (WIRING-01, LEGAL-02) consignés dans `STATE.md → Deferred Items`. Roadmap collapsée ; détail v2.0 archivé `.planning/milestones/v2.0-ROADMAP.md`. Prochain milestone candidat : W5 automatisation.*
