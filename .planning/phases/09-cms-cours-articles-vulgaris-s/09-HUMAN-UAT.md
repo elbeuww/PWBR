@@ -3,29 +3,29 @@ status: partial
 phase: 09-cms-cours-articles-vulgaris-s
 source: [09-VERIFICATION.md, 09-05-SUMMARY.md]
 started: 2026-06-19
-updated: 2026-06-19
+updated: 2026-06-20
 ---
 
 ## Current Test
 
-number: 1
-name: Déploiement preview + E2E réel
+number: 2
+name: Index trilingue
 expected: |
-  Brancher l'URL preview Vercel → `PLAYWRIGHT_BASE_URL=<url> pnpm --filter web exec playwright test e2e/academie.spec.ts` → les tests passent (ou écarts documentés).
+  Ouvrir /fr/academie, /en/academie, /ar/academie → articles ET cours listés ;
+  filtres thème/niveau/plateforme fonctionnels ; entrée nav « Académie » présente.
 awaiting: user response
 
-> **PRÉMISSE PÉRIMÉE (vérifié 2026-06-19) :** le chemin projet ne contient plus de `!`
-> (déplacé de `Potatos WILL BECOME RICH !` → `NEXA`). `next build` traverse webpack
-> sans erreur ; `next dev` (turbopack) boote et résout les `@app/*`. Pitfalls 1 & 2 levés.
-> → La validation locale EST possible. MAIS le boot dev révèle un bug bloquant (ci-dessous).
+> **VALIDATION LOCALE OK (2026-06-20) :** dev sur webpack (`next dev`, plus `--turbopack` —
+> Turbopack ne résout pas `.js→.ts` de `@app/core`, fix commit c1a014d). Deux blockers de
+> compilation levés (segment `[course]`→`[slug]` 44203a4 ; dev webpack c1a014d). Home + 8
+> routes Académie = 200. Covers manquants générés (0cab267) + arabe 02/03 + levier ajoutés.
 
 ## Tests
 
 ### 1. Déploiement preview + E2E réel
-expected: Brancher l'URL preview → `PLAYWRIGHT_BASE_URL=<url> pnpm --filter web exec playwright test e2e/academie.spec.ts` → les tests passent (ou écarts documentés).
-result: issue
-reported: "Test local exécuté (premise '!' périmée). `next dev` boote mais crash routing : 'You cannot use different slug names for the same dynamic path (slug !== course)'. Routes Académie cassées — la phase 9 n'a jamais pu compiler. Vercel aurait échoué pareil."
-severity: blocker
+expected: Les routes Académie compilent et se servent ; E2E passe (ou écarts documentés).
+result: pass
+note: "Serving vérifié en local (2026-06-20) : home + 8 routes Académie (fr/en/ar, article, cours, leçon, RTL, fallback) = HTTP 200 ; gardes 404 OK (WR-01, slug inexistant). Deux blockers de compilation corrigés : (a) conflit segment [course]/[slug] → rename (44203a4) ; (b) dev Turbopack ne résolvait pas .js→.ts de @app/core → dev sur webpack (c1a014d). Playwright E2E non encore relancé — serving prouvé par curl."
 
 ### 2. Index trilingue
 expected: `/fr/academie`, `/en/academie`, `/ar/academie` listent articles + cours ; filtres thème/niveau/plateforme fonctionnels ; entrée nav « Académie » présente.
@@ -41,11 +41,13 @@ result: [pending]
 
 ### 5. RTL arabe
 expected: `/ar/academie/<slug>` → mise en page `dir=rtl` ; prix / R:R / nombres restent LTR (`<bdi>`), non inversés.
-result: [pending]
+result: pass
+reported: "Utilisateur : les articles switchent en arabe et changent de côté (RTL OK). Exception signalée : le cours MT5 restait en français → CORRIGÉ (les leçons 02/03 + l'article levier n'avaient pas de .ar.mdx ; ajoutés, commit 0cab267). /ar/.../prendre-en-main-mt5 est désormais 100% arabe."
 
 ### 6. Fallback D-14
-expected: `/ar/academie/comprendre-le-levier` (locale ar manquante) → version FR + bandeau « traduction à venir » ; JAMAIS 404.
+expected: une locale manquante sert le FR + bandeau « traduction à venir » ; JAMAIS 404.
 result: [pending]
+note: "Slug-exemple initial `comprendre-le-levier` désormais traduit en arabe → n'est plus un cas de fallback. Nouvel exemple : `/en/academie/prendre-en-main-mt5/03-poser-tp-sl` (03 n'a que fr+ar → fallback FR). Mécanisme D-14 inchangé (code + tests unitaires intacts)."
 
 ### 7. Funnel D-08
 expected: nav permanente « Académie » + bloc « Apprenez les bases » (home) + lien « Comment exécuter ce signal ? » (détail signal) → tous mènent à `/academie` en conservant la locale.
@@ -57,14 +59,15 @@ result: [pending]
 
 ### 9. Robustesse frontière
 expected: un fichier MDX au frontmatter invalide est exclu de l'index sans 500 (CR-01) ; une leçon n'est servie que sous son propre cours (WR-01, sinon 404).
-result: [pending]
+result: pass
+note: "WR-01 vérifié : /fr/academie/ratio-risque-rendement/01-installer-mt5 (leçon sous mauvais cours) = 404 ; slug inexistant = 404 (pas de 500). CR-01 (frontmatter invalide exclu) couvert par tests unitaires content.test.ts ; non rejoué manuellement."
 
 ## Summary
 
 total: 9
-passed: 0
-issues: 1
-pending: 8
+passed: 3
+issues: 0
+pending: 6
 skipped: 0
 blocked: 0
 
@@ -85,3 +88,25 @@ blocked: 0
     - "Supprimer le dossier [course] vide"
   debug_session: ""
   status_fix: "RÉSOLU 2026-06-19 — [course]/[lesson] renommé en [slug]/[lesson], param course->slug. Dev `✓ Ready in 1044ms` sans erreur routing. Smoke local : 6 routes Académie = HTTP 200 ; rendu MDX (callouts, encadré trade, progression leçon, RTL dir=rtl + <bdi>, fallback D-14 = 200) vérifié par curl."
+
+- truth: "Le dev local sert toutes les pages (y compris celles qui importent @app/core)"
+  status: failed
+  reason: "`next dev --turbopack` plantait sur la home (TrackRecordBlock → @app/core) : « Module not found: Can't resolve './affiliate/tiers.js' » puis './track-record/threshold.js'. Turbopack (Next 15.5) ne réécrit pas .js→.ts pour les sous-imports internes d'un package workspace résolu via son exports map et n'expose pas d'extensionAlias. Build webpack OK (alias câblé) → bug masqué jusqu'au boot dev."
+  severity: blocker
+  test: 1
+  root_cause: "Alias .js→.ts présent uniquement dans le callback webpack de next.config.ts, ignoré par Turbopack."
+  status_fix: "RÉSOLU 2026-06-20 (commit c1a014d) — script dev = `next dev` (webpack, même résolveur que `next build`). `dev:turbo` conservé. Home + 8 routes = 200, log sans erreur."
+
+- truth: "Les articles/leçons affichent leur image de couverture"
+  status: failed
+  reason: "Les 5 covers référencés en frontmatter (cover: /images/academie/*.png) étaient 404 : le dossier apps/web/public/images/academie/ n'existait pas. Articles sans illustration."
+  severity: minor
+  test: 3
+  status_fix: "RÉSOLU 2026-06-20 (commit 0cab267) — 5 covers générés (fal-ai Sana 16:9, convertis en vrai PNG), servis OK par next/image (image/webp) et en statique (image/png)."
+
+- truth: "Le cours MT5 s'affiche en arabe sous /ar"
+  status: failed
+  reason: "Utilisateur : le cours « installer MetaTrader » restait en français sous /ar. Cause : leçons 02-ouvrir-une-position, 03-poser-tp-sl et article comprendre-le-levier sans version .ar.mdx → fallback FR (moteur correct, manque de contenu)."
+  severity: minor
+  test: 5
+  status_fix: "RÉSOLU 2026-06-20 (commit 0cab267) — versions .ar.mdx ajoutées pour les 3. /ar/.../prendre-en-main-mt5 = 100% arabe. NB : comprendre-le-levier n'est donc plus un cas de fallback pour le Test 6."
