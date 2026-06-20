@@ -20,9 +20,8 @@
  * Palier & progression dérivés du NOMBRE D'INSCRITS via @app/core (TIERS, affiliateRateBps) —
  * source unique alignée bit-à-bit sur le SQL. Aucune classe vert/rouge (D-04).
  */
-import { cookies } from 'next/headers'
 import { getTranslations } from 'next-intl/server'
-import { createServerSupabaseClient } from '@app/supabase'
+import { createClient } from '@/lib/supabase/server'
 import { TIERS, affiliateRateBps, formatAtomic } from '@app/core'
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -64,8 +63,7 @@ export default async function AffiliateDashboardPage() {
   const unit = tPay('amountUnit') // « USDT »
 
   // Lecture auth-client RSC (RLS, jamais service_role). La vue est déjà scopée auth.uid().
-  const cookieStore = await cookies()
-  const supabase = createServerSupabaseClient(cookieStore)
+  const supabase = await createClient()
   const { data, error } = await supabase
     .from('affiliate_dashboard')
     .select(

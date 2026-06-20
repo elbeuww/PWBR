@@ -57,7 +57,7 @@ describe('latestPerJob — dernier run par job (D-07)', () => {
     const running = [
       { job_name: 'ingest', status: 'running', started_at: '2026-06-19T03:00:00Z', finished_at: null },
     ]
-    expect(latestPerJob(running)[0].durationMs).toBeNull()
+    expect(latestPerJob(running)[0]!.durationMs).toBeNull()
   })
 
   it('entrée vide → tableau vide', () => {

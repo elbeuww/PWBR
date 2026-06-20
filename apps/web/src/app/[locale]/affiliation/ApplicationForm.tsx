@@ -177,6 +177,7 @@ export function ApplicationForm({ sessionEmail }: ApplicationFormProps) {
               <FormControl>
                 <Input
                   {...field}
+                  value={field.value as number}
                   type="number"
                   min={0}
                   step={1}
