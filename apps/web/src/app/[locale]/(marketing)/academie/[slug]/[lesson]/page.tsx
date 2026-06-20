@@ -1,5 +1,5 @@
 /**
- * /[locale]/academie/[course]/[lesson] — leçon RSC (CMS-01, D-07).
+ * /[locale]/academie/[slug]/[lesson] — leçon RSC (CMS-01, D-07).
  *
  * Même gabarit que l'article : `resolveContent(lessonSlug, locale)` (garde T-09-PATH,
  * confine sous content/academie/ AVANT fs), rendu via `renderMdxFile` → `compileMDX`
@@ -8,6 +8,10 @@
  * Ajoute la navigation préc./suiv. dérivée du modèle cours (`lessonNavigation`, Plan 02 :
  * voisins dans la liste triée par `order`, masqués aux bornes) + l'indicateur
  * `academy.courseProgress`. Liens via `@/i18n/navigation` (préserve la locale).
+ *
+ * Le premier segment d'URL est `slug` (= le slug du cours) : il DOIT porter le même nom
+ * de segment dynamique que la route sœur `academie/[slug]` (détail article/cours), sinon
+ * Next.js refuse de compiler (« different slug names for the same dynamic path »).
  *
  * `<Disclaimer />` injecté par la PAGE après `{content}` (LEGAL-01, non-contournable).
  */
@@ -24,11 +28,11 @@ import { Disclaimer } from '@/components/Disclaimer'
 import { Badge } from '../../../../../../components/ui/badge'
 
 interface LessonProps {
-  params: Promise<{ locale: string; course: string; lesson: string }>
+  params: Promise<{ locale: string; slug: string; lesson: string }>
 }
 
 export default async function AcademyLessonPage({ params }: LessonProps) {
-  const { locale, course, lesson } = await params
+  const { locale, slug, lesson } = await params
   setRequestLocale(locale)
   const t = await getTranslations('academy')
 
@@ -54,13 +58,13 @@ export default async function AcademyLessonPage({ params }: LessonProps) {
   const { content, meta, body } = rendered
   // WR-01 : la leçon doit appartenir au cours de l'URL — sinon une leçon serait
   // servie 200 sous n'importe quel slug de cours (nav cassée + duplication SEO).
-  if (meta.course !== course) notFound()
+  if (meta.course !== slug) notFound()
   const toc = extractToc(body)
 
   // Navigation cours : ordre depuis le frontmatter, voisins dérivés du catalogue.
   const catalog = await listContent(locale)
   const order = meta.order ?? 0
-  const nav = lessonNavigation(course, order, catalog)
+  const nav = lessonNavigation(slug, order, catalog)
 
   return (
     <main className="mx-auto max-w-prose px-4 py-16 text-start md:px-6">
@@ -96,7 +100,7 @@ export default async function AcademyLessonPage({ params }: LessonProps) {
       >
         {nav.prev ? (
           <Link
-            href={`/academie/${course}/${nav.prev.slug}`}
+            href={`/academie/${slug}/${nav.prev.slug}`}
             className="inline-flex h-11 items-center rounded-lg border border-border px-4 text-sm font-semibold text-foreground hover:bg-muted me-auto"
           >
             {t('lessonPrev')}
@@ -106,7 +110,7 @@ export default async function AcademyLessonPage({ params }: LessonProps) {
         )}
         {nav.next ? (
           <Link
-            href={`/academie/${course}/${nav.next.slug}`}
+            href={`/academie/${slug}/${nav.next.slug}`}
             className="inline-flex h-11 items-center rounded-lg border border-border px-4 text-sm font-semibold text-foreground hover:bg-muted ms-auto"
           >
             {t('lessonNext')}
