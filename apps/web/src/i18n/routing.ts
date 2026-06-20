@@ -13,6 +13,10 @@ export const routing = defineRouting({
   locales: ['fr', 'en', 'ar'],
   defaultLocale: 'fr',
   localePrefix: 'always',
+  // Pas de négociation Accept-Language (D-01/02/03) : la racine '/' redirige
+  // toujours vers /fr (defaultLocale). Sans cette ligne, next-intl détecte
+  // Accept-Language par défaut → /en pour un navigateur en-US.
+  localeDetection: false,
 })
 
 export type Locale = (typeof routing.locales)[number]
