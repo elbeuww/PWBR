@@ -22,9 +22,11 @@ L'IA se comporte comme un trader vétéran (50 ans d'expérience). L'analyse cha
 
 Produire, pour chaque opportunité, une analyse fiable et explicable — score /100 + niveau de risque + plan de trade (entrée/SL/TP/R:R/levier) — vulgarisée pour un public non technique. Si tout le reste échoue, **la qualité et la traçabilité de l'analyse d'un trade** doit fonctionner : le % de réussite affiché est toujours mesuré, jamais inventé — c'est le socle de confiance qui fait payer l'abonnement.
 
-## Current Milestone: v2.0 Plateforme publique d'analyse & signaux (MENA)
+## Shipped Milestone: v2.0 — Plateforme publique d'analyse & signaux (MENA) — livré 2026-06-20
 
-**Goal:** Transformer le moteur analytique livré (P1-4) en plateforme publique payante (9 $/mois USDT) — vitrine trilingue, espace membre signaux, paiement crypto on-chain, affiliation, superadmin, contenu éducatif, Telegram — avec un % de réussite mesuré (jamais inventé).
+**Statut :** ✅ Livré (9 phases, 37 plans). Vérification automatisée 100 % verte (Vitest 566 ✓, typecheck 0 erreur) ; P01 + P09 live-vérifiés (E2E 32 ✓). Items live restants (P02-P08, dépendances externes) + dette explicite (WIRING-01, LEGAL-02) → `STATE.md → Deferred Items`. **Prochain milestone candidat : W5 automatisation** (PAY-AUTO processeur crypto + webhooks, ENGINE-API clé Anthropic, AFF-AUTO).
+
+**Goal (atteint):** Transformer le moteur analytique livré (P1-4) en plateforme publique payante (9 $/mois USDT) — vitrine trilingue, espace membre signaux, paiement crypto on-chain, affiliation, superadmin, contenu éducatif, Telegram — avec un % de réussite mesuré (jamais inventé).
 
 **Target features:**
 - Vitrine publique trilingue AR(RTL)/EN/FR + funnel d'abonnement
@@ -55,21 +57,22 @@ Produire, pour chaque opportunité, une analyse fiable et explicable — score /
 
 - [x] **L'Académie — CMS cours & articles vulgarisés (v2.0 Phase 9, 2026-06-19, code livré)** : surface de lecture publique trilingue (fr/en/ar, RTL arabe) alimentée par fichiers MDX versionnés (commit → deploy, **pas d'UI superadmin** — D-01/CMS-02 révisé). Socle pur testé (frontmatter Zod, searchParams whitelist, reading-time, TOC), couche fichiers `content.ts` (scan fs/gray-matter, résolution `(slug, locale)` + fallback FR D-14, garde anti path-traversal `^[a-z0-9-]+$` confinée `path.resolve`) + `course-model` (cours/leçons dérivés sans DB), 9 composants pédago + mapping `MDX_COMPONENTS`, 3 routes RSC (index filtré + article/page-cours + leçon) via `compileMDX(fs.readFile)` EXCLUSIF (contourne le `!` du chemin), sitemap hreflang, namespace i18n `academy` (parité stricte 46 clés), funnel D-08 (nav + home + lien détail signal), 11 fixtures MDX de preuve. `<Disclaimer />` injecté par chaque page (LEGAL-01). Code review : sécurité SAFE, BLOCKER CR-01 (parse→safeParse, jamais 500) + WR-01 (ownership leçon/cours) corrigés. 566/566 tests, tsc académie 0-erreur. Requirements CMS-01, CMS-02, LEGAL-01. **Restant UAT humain (09-HUMAN-UAT.md) :** rendu MDX/RTL/fallback + E2E en Vercel preview (le `next build` local est non-viable — chemin `!`).
 
-### Active — Milestone v2.0 (plateforme publique, pivot 2026-06-13)
+- [x] **Paiement USDT MVP & abonnement — JALON ENCAISSEMENT (v2.0 Phase 4, 2026-06-17)** : adresse TRON atomique BigInt (zéro float), vérif on-chain TronGrid (contrat officiel `.env`, decimals 6, `only_confirmed`), anti-replay `UNIQUE(tx_hash)` global + ordre anti-TOCTOU (arme avant lecture réseau), réservation offset, RPC d'activation idempotente, QR maison zéro-dépendance, job `subscription-expiry`, back-office membres + file ambigus. Requirements PAY-01..06, ADMIN-01/02. **Restant (deferred) :** round-trip testnet réel + **WIRING-01** (ExpiryBanner non câblé, PAY-05) + gate LEGAL-02.
+- [x] **Track record mesuré & % affiché (v2.0 Phase 5, 2026-06-17)** : `replayOutcome` first-touch golden-testé (hit_tp/hit_sl/flat + R), migration 0014 `prediction_outcomes` + vue `pattern_stats` (première lecture anon, get_advisors PASS), job `outcome-tracker` idempotent, bloc public % TOUJOURS mesuré (N visible, seuil N≥30 « échantillon insuffisant ») vitrine + miroir membre + méthodologie trilingue. Requirements TRACK-01..03.
+- [x] **Canal Telegram public (v2.0 Phase 6, 2026-06-18)** : `formatMessage` pur bilingue FR+AR (anti-injection HTML, anti-leak entry/SL/TP, isolats bidi), migration 0015 `telegram_posts` (UNIQUE dedupe), job grammY publication-only idempotent (`job_runs`). Requirements TG-01..03, LEGAL-01.
+- [x] **Affiliation à paliers (v2.0 Phase 7, 2026-06-18)** : migration 0016 (tables + RLS + RPC commission/payout + vue no-PII), grille paliers + commission BigInt pure golden-testée (miroir SQL), capture `?ref` (cookie 30j) → attribution figée au signup (best-effort), candidature trilingue + dashboard affilié no-PII, back-office payouts manuel. Requirements AFF-01..05.
+- [x] **Superadmin consolidé (v2.0 Phase 8, 2026-06-19)** : `/admin` KPI + `/admin/signaux` (× telegram_posts, filtres URL) + `/admin/sante` (feux fraîcheur + job_runs) + `/admin/affiliation` (perfs + payouts), 404 discret non-superadmin (T-04-ADMIN-ELEV, **live-vérifié** gating E2E). Requirements ADMIN-03/04.
 
-> Le cœur analytique (indicateurs, moteur vétéran, persistance) est **livré** ci-dessus. Restent pour v2.0 le track record mesuré + toute la couche produit.
+### Active — prochain milestone (W5 automatisation, candidat)
 
-- [ ] Boucle track record : catalogue de patterns chartiques déterministes + **taux de réussite mesuré par backtest** (PATT-01..02) + prédiction vs résultat (prediction_outcomes) + métriques (win rate, calibration, expectancy) → % de réussite réel affiché
+> v2.0 (plateforme publique) entièrement livré ci-dessus. Le milestone suivant (non démarré) couvre l'automatisation reportée + la dette de clôture.
 
-- [ ] Vitrine publique trilingue (arabe RTL / anglais / français) : présentation, % de réussite, funnel d'abonnement
-- [x] Espace membre gated par abonnement : liste des signaux triés par score, filtres, vue détail trade (chart lightweight-charts + niveaux + explication simple + analyse approfondie dépliable) — _livré v2.0 Phase 3 (2026-06-15)_
-- [ ] Paiement abonnement en USDT (TRC-20) — **deux étages** : (1) MVP lancement : adresse de paiement affichée + l'utilisateur soumet le hash de transaction (+ screenshot optionnel) → vérification du hash on-chain via TronGrid (montant/destinataire/confirmations) avec activation auto, file de validation manuelle dans le superadmin pour les cas tordus ; (2) ensuite : processeur crypto (NOWPayments/Cryptomus) pour l'automatisation complète (adresse unique par facture + webhooks). Renouvellement/expiration automatiques dans les deux étages.
-- [ ] Offre découverte : **3 $ pour 15 jours** d'essai de la plateforme (en plus du 9 $/mois)
-- [ ] Système d'affiliation à paliers : codes promo, tracking des abonnés ramenés, dashboard affilié, calcul et suivi des commissions (palier max 20 % récurrent), paiement des commissions en crypto
-- [ ] Dashboard superadmin : membres (actifs/inactifs/paiements), affiliés et leurs stats, signaux, santé jobs/données
-- [x] CMS articles/cours gratuits vulgarisés (de la base : outils, portefeuille, …) sur la vitrine — _livré v2.0 Phase 9 (2026-06-19), système + 3-5 contenus de preuve ; rédaction de masse = opération continue_
-- [ ] Bot/canal Telegram public : publication des résultats journaliers des trades + win rate permanent
-- [ ] Disclaimers (contenu éducatif, pas de conseil personnalisé, aucune promesse de gain) sur vitrine, espace membre et Telegram
+- [ ] **WIRING-01** : câbler `ExpiryBanner` (alerte J-3/J-1) avant l'ouverture réelle de l'encaissement (dette PAY-05).
+- [ ] **LEGAL-02** : revue juridique externe signée (gate non-code) avant le 1er encaissement réel.
+- [ ] **PAY-AUTO** : processeur crypto (NOWPayments/Cryptomus) — adresse unique par facture + webhooks (remplace la soumission de hash manuelle).
+- [ ] **ENGINE-API** : clé Anthropic + infra 24/7 (fiabilité des routines pour plateforme publique payante).
+- [ ] **AFF-AUTO** : automatisation des payouts d'affiliation.
+- [ ] Vérifs live différées P02-P08 + UAT P02/P03 (voir `STATE.md → Deferred Items`) à exécuter sur Vercel preview / données seedées.
 
 ### Out of Scope
 
@@ -135,4 +138,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-06-19 — Milestone v2.0 « Plateforme publique » : **Phase 9 (l'Académie) complète côté code** — dernière phase fonctionnelle de v2.0 (CMS-01, CMS-02, LEGAL-01 ; 566/566 tests ; UAT Vercel preview tracée en 09-HUMAN-UAT.md). CMS cours/articles MDX trilingues publiés en autonomie (commit → deploy), pas d'UI superadmin (D-01). Cœur analytique v1.0 (P1-4) livré et archivé. NB : « Validated » liste P1-3 v2.0 + P9 ; les entrées des phases v2.0 4-8 restent à réconcilier (dérive PROJECT.md à rattraper hors run d'exécution).*
+*Last updated: 2026-06-20 après clôture du milestone v2.0 « Plateforme publique ». Les 9 phases sont livrées et réconciliées dans « Validated » (P1-P9 v2.0 + cœur v1.0 P1-4). Vérification automatisée 100 % verte (Vitest 566 ✓, typecheck 0) ; P01 + P09 live-vérifiés (E2E 32 ✓, bug i18n localeDetection corrigé au passage). Items live différés (P02-P08 + UAT P02/P03) et dette explicite (WIRING-01, LEGAL-02) consignés dans `STATE.md → Deferred Items`. Roadmap collapsée ; détail v2.0 archivé `.planning/milestones/v2.0-ROADMAP.md`. Prochain milestone candidat : W5 automatisation.*

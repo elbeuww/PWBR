@@ -1,38 +1,64 @@
 ---
 gsd_state_version: 1.0
 milestone: v2.0
-milestone_name: milestone
-status: milestone_complete
-last_updated: "2026-06-19T18:23:28.838Z"
-last_activity: 2026-06-19
+milestone_name: MVP plateforme publique
+status: Awaiting next milestone
+last_updated: "2026-06-20T02:24:18.309Z"
+last_activity: 2026-06-20 — Milestone v2.0 completed and archived
 progress:
   total_phases: 9
-  completed_phases: 10
+  completed_phases: 9
   total_plans: 37
   completed_plans: 37
-  percent: 111
+  percent: 100
 ---
 
 # Project State
 
 **Project:** Plateforme d'Analyse de Trading "Vétéran"
-**Last updated:** 2026-06-14
+**Last updated:** 2026-06-20
 
 ## Project Reference
 
+See: .planning/PROJECT.md (mis à jour 2026-06-20 après clôture v2.0)
+
 **Core value:** Produire, pour chaque opportunité, une analyse fiable et explicable — vulgarisée pour un public non technique — avec un % de réussite TOUJOURS mesuré, jamais inventé : c'est le socle de confiance qui fait payer l'abonnement.
-**Current focus:** Phase 09 — cms-cours-articles-vulgaris-s
+**Current focus:** v2.0 livré — prochain milestone candidat : W5 automatisation (non démarré). Voir Deferred Items pour les vérifs live + dette (WIRING-01, LEGAL-02).
 **Mode:** interactive (MVP vertical)
 **Granularity:** fine
 
 ## Current Position
 
-Phase: 09
-Plan: Not started
-Status: Milestone complete
-Last activity: 2026-06-19
+Phase: Milestone v2.0 complete
+Plan: —
+Status: Awaiting next milestone
+Last activity: 2026-06-20 — Milestone v2.0 completed and archived
 
-Progress: [██████████] 100%
+## Deferred Items
+
+Items acquittés et différés à la clôture du jalon v2.0 le 2026-06-20. Décision
+utilisateur : « Acquitter le reste + clôturer v2.0 ». La couche de vérification
+AUTOMATISÉE est 100 % verte (Vitest 566 ✓, typecheck 0 erreur) ; P01 et P09 sont
+live-vérifiés (E2E 32 ✓). Les items ci-dessous restent ouverts car ils exigent des
+ressources externes non provisionnables en session de développement.
+
+| Catégorie | Item | Raison du report |
+|-----------|------|------------------|
+| verification | P02 (vitrine/légal) | Sign-off juriste externe (LEGAL-02) + revue visuelle RTL — gate non-code |
+| verification | P03 (signaux membre) | Supabase Realtime live + rendu canvas charts + signaux seedés |
+| verification | P04 (paiement USDT) | Paiement on-chain testnet réel + actions superadmin live |
+| verification | P05 (track record) | Vitrine visuelle + RLS anon via devtools, vue pattern_stats live |
+| verification | P06 (Telegram) | Envoi réel : bot token + canal public (secret hors-code) |
+| verification | P07 (affiliation) | Flux live + service_role + session superadmin + données seedées |
+| verification | P08 (superadmin) | 6 checks sur données superadmin seedées (item gating ✅ live-vert) |
+| uat | P02-HUMAN-UAT (2) | mêmes dépendances visuelles/live que P02 |
+| uat | P03-HUMAN-UAT (10) | mêmes dépendances Realtime/canvas/seed que P03 |
+| quick_task | 260617-547 / j1a / nsh / sy5 | Terminées (SUMMARY présentes) — faux-positifs de registre |
+
+**Dette technique explicite (décision requise hors jalon, NON un simple report) :**
+
+- **WIRING-01 (P04 / PAY-05)** : `ExpiryBanner` (alerte J-3/J-1 avant expiration d'abonnement) existe mais n'est rendu nulle part → l'utilisateur n'est PAS informé in-app avant de perdre l'accès. À câbler avant l'ouverture réelle de l'encaissement.
+- **LEGAL-02** : revue juridique externe signée — gate non-code bloquant le PREMIER encaissement réel (Phase 4 en prod), pas la livraison du code. `LEGAL_REVIEW_DONE` reste `false`.
 
 ## Performance Metrics
 
@@ -330,3 +356,7 @@ Progress: [██████████] 100%
 
 ---
 *State updated: 2026-06-14 — milestone v2.0, roadmap 9 phases créée. Cœur analytique v1.0 (P1-4) livré et archivé, sert de socle.*
+
+## Operator Next Steps
+
+- Start the next milestone with /gsd-new-milestone

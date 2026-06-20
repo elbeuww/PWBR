@@ -4,6 +4,32 @@ Historique des milestones livrés du projet.
 
 ---
 
+## v2.0 — MVP plateforme publique (2026-06-14 → 2026-06-20)
+
+**Statut :** Livré. Couche produit publique (MENA, trilingue fr/en/ar) construite autour du cœur analytique v1.0.
+
+**Stats :** 9 phases, 37 plans, 52 tasks. Vérification automatisée 100 % verte (Vitest 566 ✓, typecheck 0 erreur) ; P01 et P09 live-vérifiés (E2E 32 ✓).
+
+**Key accomplishments (un par phase) :**
+
+- **P1 — Socle transverse** : barrière de données RLS non contournable (`profiles.role` hors JWT + table `subscriptions` réelle + `has_active_subscription()` security definer conditionnant la lecture de `trade_setups`/`analyses`), i18n/RTL natif fr/en/ar, primitive de gating partagée UI + RLS. **Live-vérifié.**
+- **P2 — Vitrine & gate légal** : accueil/tarifs/disclaimers trilingues, funnel home→tarifs→signup→paiement-bientot (D-09), gate non-code `LEGAL_REVIEW_DONE` prêt pour l'encaissement.
+- **P3 — Espace membre signaux** : liste `/signaux` (filtres/tri URL-sync, RLS anon) + détail `/signaux/[id]` (chart lightweight-charts v5, explication 2 niveaux, contenu IA verbatim), Realtime, isolation abonné/non-abonné prouvée.
+- **P4 — Paiement USDT MVP** : adresse TRON atomique BigInt, anti-replay `UNIQUE(tx_hash)` global, réservation offset, RPC d'activation idempotente, back-office membres. *(Encaissement réel = ops restant ; gap WIRING-01 + gate LEGAL-02 tracés.)*
+- **P5 — Track record mesuré** : `replayOutcome` golden-testé (hit_tp/hit_sl/flat + R), vue `pattern_stats` (première lecture anon), % TOUJOURS mesuré avec N visible et seuil N≥30, bloc vitrine + miroir membre + méthodologie.
+- **P6 — Canal Telegram public** : `formatMessage` pur bilingue (anti-injection HTML, anti-leak entry/SL/TP, isolats bidi), job d'envoi grammy, seuil partagé avec la vitrine.
+- **P7 — Affiliation à paliers** : capture `?ref` → attribution figée au signup (best-effort), commission BigInt par paliers (miroir SQL), dashboard affilié no-PII, back-office payouts manuel.
+- **P8 — Superadmin consolidé** : `/admin` KPI + `/admin/signaux` + `/admin/sante` + `/admin/affiliation`, 404 discret pour non-superadmin (T-04-ADMIN-ELEV, **live-vérifié** via gating E2E).
+- **P9 — Académie CMS** : contenu éducatif MDX trilingue (`compileMDX` + allowlist composants anti-XSS), fallback FR D-14, funnel D-08, sitemap hreflang. **Live-vérifié** (academie.spec 8/8).
+
+**Correctifs de clôture (2026-06-20) :** bug i18n réel corrigé (`localeDetection` → `/` partait sur `/en` au lieu de `/fr`) ; tests E2E auth/gating alignés sur D-09 ; fallback D-14 rendu réellement testé (unit + E2E).
+
+**Known deferred items at close:** 13 (voir STATE.md → Deferred Items). Vérifs live P02-P08 + UAT P02/P03 reportées (dépendances externes : juriste, testnet on-chain, bot Telegram, données superadmin/realtime seedées, service_role). Dette explicite : **WIRING-01** (ExpiryBanner non câblé, PAY-05) et **LEGAL-02** (sign-off juriste, bloque le 1er encaissement).
+
+**Artefacts archivés :** `.planning/milestones/v2.0-ROADMAP.md` + `v2.0-REQUIREMENTS.md`.
+
+---
+
 ## v1.0 — Moteur analytique déterministe (2026-06-09 → 2026-06-14)
 
 **Statut :** Livré (cœur), clôturé au pivot produit du 2026-06-13.
