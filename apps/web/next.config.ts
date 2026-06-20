@@ -6,6 +6,19 @@ import createNextIntlPlugin from 'next-intl/plugin'
 // inférer un mauvais root à Next (casse la résolution des packages workspace).
 const monorepoRoot = path.join(__dirname, '..', '..')
 
+// Les packages workspace (@app/*) sont en `moduleResolution: NodeNext` et utilisent
+// des imports d'extension `.js` (réécriture ESM TypeScript : `./time/constants.js`
+// pointe en réalité vers `constants.ts`). On garde `.js` (requis par tsc + jobs tsx).
+// Ni webpack (next build) ni Turbopack (next dev) ne résolvent `.js → .ts` par défaut
+// pour ces sous-imports relatifs internes au package → on câble l'alias sur LES DEUX
+// bundlers (le bloc webpack seul laissait `next dev --turbopack` casser : AFF/TRACK
+// « Module not found: Can't resolve './*.js' »).
+const extensionAlias = {
+  '.js': ['.ts', '.tsx', '.js'],
+  '.mjs': ['.mts', '.mjs'],
+  '.cjs': ['.cts', '.cjs'],
+}
+
 const nextConfig: NextConfig = {
   // Nécessaire pour que Next.js transpile les packages workspace locaux
   // Source : 01-RESEARCH.md §Recommended Project Structure
@@ -23,19 +36,16 @@ const nextConfig: NextConfig = {
   turbopack: {
     root: monorepoRoot,
   },
-  // Les packages workspace (@app/*) exportent du TS SOURCE et utilisent des
-  // imports d'extension `.js` (réécriture ESM TypeScript : `./time/constants.js`
-  // pointe en réalité vers `constants.ts`). Le build webpack (next build) ne
-  // résout PAS `.js → .ts` par défaut, contrairement à `tsc`/turbopack-dev →
-  // « Module not found: Can't resolve './*.js' ». On câble l'extensionAlias
-  // webpack pour que ces specifiers `.js` retombent sur les sources `.ts/.tsx`.
+  // L'alias `.js → .ts` est câblé côté webpack uniquement. Turbopack (Next 15.5)
+  // n'expose PAS d'`extensionAlias` (clé rejetée : « Unrecognized key ... at turbopack »)
+  // et ne réécrit pas `.js → .ts` pour les sous-imports internes d'un package workspace
+  // résolu via son `exports` map. Le dev tourne donc sur webpack (`next dev`, sans
+  // `--turbopack`) → même résolveur que `next build`, zéro divergence dev/prod.
   webpack: (config) => {
     config.resolve = config.resolve ?? {}
     config.resolve.extensionAlias = {
       ...(config.resolve.extensionAlias ?? {}),
-      '.js': ['.ts', '.tsx', '.js'],
-      '.mjs': ['.mts', '.mjs'],
-      '.cjs': ['.cts', '.cjs'],
+      ...extensionAlias,
     }
     return config
   },
