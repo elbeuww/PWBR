@@ -1,5 +1,5 @@
 ---
-status: partial
+status: complete
 phase: 09-cms-cours-articles-vulgaris-s
 source: [09-VERIFICATION.md, 09-05-SUMMARY.md]
 started: 2026-06-19
@@ -8,12 +8,7 @@ updated: 2026-06-20
 
 ## Current Test
 
-number: 2
-name: Index trilingue
-expected: |
-  Ouvrir /fr/academie, /en/academie, /ar/academie → articles ET cours listés ;
-  filtres thème/niveau/plateforme fonctionnels ; entrée nav « Académie » présente.
-awaiting: user response
+[testing complete]
 
 > **VALIDATION LOCALE OK (2026-06-20) :** dev sur webpack (`next dev`, plus `--turbopack` —
 > Turbopack ne résout pas `.js→.ts` de `@app/core`, fix commit c1a014d). Deux blockers de
@@ -29,15 +24,15 @@ note: "Serving vérifié en local (2026-06-20) : home + 8 routes Académie (fr/e
 
 ### 2. Index trilingue
 expected: `/fr/academie`, `/en/academie`, `/ar/academie` listent articles + cours ; filtres thème/niveau/plateforme fonctionnels ; entrée nav « Académie » présente.
-result: [pending]
+result: pass
 
 ### 3. Lecture article
 expected: `ratio-risque-rendement` rend callouts (⚠/💡), étapes numérotées, encadré « exemple de trade » ; disclaimer en pied.
-result: [pending]
+result: pass
 
 ### 4. Lecture leçon
 expected: `prendre-en-main-mt5/01-installer-mt5` rend la nav préc./suiv. + progression « Leçon X sur Y » ; disclaimer en pied.
-result: [pending]
+result: pass
 
 ### 5. RTL arabe
 expected: `/ar/academie/<slug>` → mise en page `dir=rtl` ; prix / R:R / nombres restent LTR (`<bdi>`), non inversés.
@@ -46,16 +41,16 @@ reported: "Utilisateur : les articles switchent en arabe et changent de côté (
 
 ### 6. Fallback D-14
 expected: une locale manquante sert le FR + bandeau « traduction à venir » ; JAMAIS 404.
-result: [pending]
-note: "Slug-exemple initial `comprendre-le-levier` désormais traduit en arabe → n'est plus un cas de fallback. Nouvel exemple : `/en/academie/prendre-en-main-mt5/03-poser-tp-sl` (03 n'a que fr+ar → fallback FR). Mécanisme D-14 inchangé (code + tests unitaires intacts)."
+result: pass
+note: "Slug-exemple initial `comprendre-le-levier` désormais traduit en arabe → testé via `/en/academie/prendre-en-main-mt5/03-poser-tp-sl` (03 n'a que fr+ar → fallback FR + bandeau, 200). Mécanisme D-14 inchangé (code + tests unitaires intacts)."
 
 ### 7. Funnel D-08
 expected: nav permanente « Académie » + bloc « Apprenez les bases » (home) + lien « Comment exécuter ce signal ? » (détail signal) → tous mènent à `/academie` en conservant la locale.
-result: [pending]
+result: pass
 
 ### 8. Disclaimer 100 % (LEGAL-01)
 expected: disclaimer présent sur 100 % des articles ET leçons ; aucun crash 500.
-result: [pending]
+result: pass
 
 ### 9. Robustesse frontière
 expected: un fichier MDX au frontmatter invalide est exclu de l'index sans 500 (CR-01) ; une leçon n'est servie que sous son propre cours (WR-01, sinon 404).
@@ -65,9 +60,9 @@ note: "WR-01 vérifié : /fr/academie/ratio-risque-rendement/01-installer-mt5 (l
 ## Summary
 
 total: 9
-passed: 3
+passed: 9
 issues: 0
-pending: 6
+pending: 0
 skipped: 0
 blocked: 0
 
