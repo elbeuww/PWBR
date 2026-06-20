@@ -1,268 +1,277 @@
-# Feature Research
+# Feature Research — Milestone v2.1 « Mise en vie : identité NEXA, moteur live & track record »
 
-**Domain:** Plateforme publique d'abonnement aux signaux de trading (SaaS payant), audience MENA non technique, paiement crypto USDT, acquisition influenceurs/Telegram
-**Researched:** 2026-06-14
-**Confidence:** MEDIUM-HIGH (patterns du domaine signaux + flux paiement USDT vérifiés sur sources externes ; spécificités MENA = MEDIUM, déduit du contexte projet)
+**Domain:** Plateforme d'analyse/signaux trading (MENA, non-technique, trilingue AR-RTL/EN/FR) — milestone subséquent sur app v2.0 déjà livrée.
+**Researched:** 2026-06-20
+**Confidence:** HIGH (design + scheduling + backtest tous ancrés sur le code/infra existant lu : `persist.ts`, `outcome.ts`, `pattern_stats` view 0014, `sessions.ts`, `Nexa - Landing.html`). MEDIUM seulement sur les conventions externes « état de l'art » UI (non re-vérifiées web, jugées stables).
 
-> **Périmètre.** Ce milestone v2.0 est la **couche produit** au-dessus d'un cœur analytique DÉJÀ livré (setups scorés /100 avec entrée/SL/TP/R:R/risque + raisons technique/fondamentale/news, persistés en base Supabase). On ne recherche PAS l'analyse de trading. On recherche : comment EXPOSER, VENDRE, ENCAISSER, et DISTRIBUER ces setups à un public non technique.
->
-> **Axe de priorisation downstream.** Pour chaque feature : ce qu'il faut pour **encaisser le 1er abonnement** (chemin critique cash) vs le reste. Le chemin minimal pour encaisser = vitrine + auth + page paiement USDT (collecte du hash) + activation (même manuelle) + gating de l'espace membre + 1 disclaimer + au moins quelques signaux visibles. Tout le reste est itératif.
+Périmètre : **uniquement le comportement attendu des 3 NOUVELLES capacités** (design system NEXA, routines IA planifiées, backtest + bascule track record). Tout le reste (pages, paiement, académie, affiliation, infra track-record) est **déjà livré** et hors recherche.
 
 ---
 
-## Feature Landscape
+## Axe 1 — DESIGN SYSTEM « NEXA »
 
-### Table Stakes (Users Expect These)
+### Ce que « bon » veut dire pour une UI de signaux financiers
 
-Sans ça, le produit paraît cassé ou pas crédible pour un service de signaux payant.
+Le HTML de référence (`Nexa - Landing.html`, encore brandé MERA) fixe l'intention : OKLCH, multi-thème `volt`/`green` via `data-theme`, tokens sémantiques (`--bg`, `--surface`, `--line`, `--sub`, `--mute`, `--primary`, `--buy`, `--sell`, `--text`, `--mono`), gauges de score en anneau SVG, cartes signal, niveaux entrée/SL/TP, stats de confiance, marquee. Tout est déjà exprimé en **variables CSS sémantiques** — c'est la cible d'architecture, pas une refonte par page.
 
-| Feature | Why Expected | Complexity | Notes |
-|---------|--------------|------------|-------|
-| **Vitrine publique avec proposition de valeur claire** | Premier contact ; un non technique doit comprendre « j'achète quoi » en 10 s | LOW-MED | Hero + 3 bénéfices + exemple de signal flouté/teaser + CTA. Réutilise le design system. RTL arabe obligatoire (pas un afterthought). |
-| **% de réussite / track record visible** | C'est LE déclencheur de confiance qui fait payer. Notre Core Value en dépend | HIGH | Doit être **mesuré, jamais inventé** (contrainte projet + risque légal). Phase 1 = win rate des patterns backtestés ; ensuite track record réel. Voir section dédiée plus bas. Dépend de la boucle track record (PATT-01/02 + prediction_outcomes). |
-| **Pricing affiché + offre découverte** | L'utilisateur veut savoir le prix avant de s'engager | LOW | 9 $/mois + 3 $/15 j. Notre prix est **agressivement bas** vs marché (services concurrents 30-100 $/mois) → argument de conversion fort, à mettre en avant. |
-| **Inscription / connexion (auth)** | Évident. DÉJÀ livré (Supabase SSR, P1) | DONE | Réutiliser. Vérifier parcours trilingue + mobile-first (MENA = mobile dominant). |
-| **Gating de l'espace membre par abonnement** | Le contenu payant ne doit pas fuiter aux non-abonnés | MED | Middleware Next + RLS sur la lecture des signaux selon statut d'abonnement actif. Le gating est le mur qui protège le revenu. |
-| **Liste des signaux triée par score** | Cœur de l'offre. L'abonné veut « les meilleurs trades en haut » | LOW-MED | Données déjà en base. Tri par score /100 desc + statut (actif/clos). @tanstack/react-query + realtime pour push. |
-| **Filtres simples sur la liste** | Marché (crypto/forex/or…), style (day/swing), risque | LOW | Filtres = chips, pas un panneau complexe (public non technique). |
-| **Vue détail d'un trade vulgarisée** | Le différenciateur de fond, mais aussi attendu : « pourquoi ce trade ? » | MED | **Explication simple D'ABORD** (1 paragraphe + niveaux entrée/SL/TP en gros), analyse approfondie **dépliable** (technique/fondamental/news). Chart lightweight-charts avec niveaux tracés. |
-| **Paiement USDT fonctionnel (même MVP manuel)** | Sans encaissement, pas de produit | HIGH | MVP : afficher adresse TRC-20 + l'utilisateur colle son hash → vérif on-chain TronGrid (montant/destinataire/confirmations) → activation. Voir section dédiée. |
-| **Renouvellement / expiration d'abonnement** | L'utilisateur doit savoir quand ça expire ; le système doit couper l'accès | MED | Date d'expiration visible dans l'espace membre + bandeau de relance J-3/J-0 + coupure auto à expiration. Job idempotent (infra jobs déjà en place). |
-| **Disclaimers légaux systématiques** | Obligatoire AVANT 1er encaissement (contrainte projet : conseil non agréé + crypto MENA) | LOW (technique) / HIGH (juridique) | Bandeau « contenu éducatif, pas de conseil, aucune promesse de gain » sur vitrine, espace membre, Telegram. Le travail juridique réel (structure, juridiction) est hors code mais BLOQUANT. |
-| **Dashboard superadmin minimal** | L'opérateur doit valider les paiements et voir qui est actif | MED | Au lancement : file de validation des paiements + liste membres + statut. Le reste s'ajoute. |
-| **i18n trilingue AR(RTL)/EN/FR** | Audience non anglophone majoritairement ; l'arabe RTL est non négociable | HIGH (transverse) | Pas une feature isolée : contrainte transverse sur tout l'UI. RTL casse beaucoup de layouts → traiter tôt. |
-| **Mobile-first** | MENA = trafic majoritairement mobile, acquisition via Telegram (mobile) | MED | Tout doit être pensé téléphone d'abord. |
+### Table Stakes (attendu — sinon l'app paraît cassée/amateur)
 
-### Differentiators (Competitive Advantage)
+| Feature | Why Expected | Complexity | Notes / dépendances infra |
+|---------|--------------|------------|---------------------------|
+| **Token layering primitive→semantic→component** | Sans couche sémantique, chaque thème = réécriture par page | MEDIUM | Le mock définit déjà les tokens sémantiques (`--bg/--surface/--line/--buy/--sell/--primary`). À porter en `@theme`/`:root` Tailwind v4 CSS-first. **Existant à remplacer** : v2.0 P2 a livré « 2 thèmes bleus » + polices Inter/IBM Plex Arabic — NEXA remplace par volt/green + Archivo/Chakra Petch/Space Grotesk/JetBrains Mono/Noto Sans Arabic. |
+| **Multi-thème volt/green, switch sans flash (no-FOUC)** | Thème appliqué après hydratation = flash blanc/mauvaise couleur au 1er paint | MEDIUM | `data-theme` sur `<html>` posé par script inline pré-hydratation (lecture cookie/localStorage). **Existant à réutiliser** : v2.0 P2 a déjà livré un `ThemeToggle` no-flash RTL-safe — étendre, pas réinventer. |
+| **RTL safety (arabe) sur tous les composants du design** | Audience #1 = arabe ; gauges/cartes/niveaux cassent si codés en left/right physiques | MEDIUM | Propriétés logiques Tailwind v4 natives (déjà la norme du projet, « pas de tailwindcss-rtl »). Le mock est `dir=ltr` → **chaque composant porté doit être re-testé en `dir=rtl`** (ordre niveaux, sens anneau, marquee). |
+| **Application transversale sans CSS bespoke par page** | Vitrine + membre + académie + auth + admin doivent partager le même langage | MEDIUM-HIGH | Composants partagés (SignalCard, ScoreGauge, LevelsRow, TrustStat) consommant les tokens. Risque = dérive si une page recode ses couleurs en dur. |
+| **Score gauge (anneau /100) lisible + accessible** | C'est l'objet central de confiance du produit | LOW-MEDIUM | Anneau SVG `stroke-dasharray` (déjà dans le mock). Couleur par bande (vert haut / ambre moyen / rouge bas). **Contrainte** : doit aussi exister en variante non-promesse (le score ≠ % de réussite — voir anti-features). |
+| **Signal card (symbole, direction buy/sell, score, source, TF, style)** | Unité de scan de la liste membre | LOW | Mock fournit la maquette exacte (`fc-dir buy/sell`, ring, `Binance · 4H · Day`). Mappe sur `trade_setups` existants. |
+| **Levels row entrée / SL / TP1·2·3 / (levier)** | Le « plan de trade » est le livrable | LOW | `sd-levels` dans le mock. Couleurs sémantiques `--sell` (stop), `--buy` (TP), `--primary` (levier). **Données déjà persistées** par `persist.ts` (`entry_price` conservateur, `stop_loss`, `take_profits` jsonb, `risk_reward`). |
+| **Trust stats (taux mesuré, instruments suivis, styles)** | Bandeau de preuve | LOW | Mock : `data-count` animés. **Le « 73 % » du mock est un placeholder de démo** — en prod il DOIT venir de `pattern_stats` seuillé (jamais codé en dur). |
+| **Polices self-hostées (perf + offline MENA)** | Google Fonts CDN lent/bloqué selon réseau ; CLS si FOUT | LOW-MEDIUM | Mock charge via `fonts.googleapis.com` — **à self-host** (le projet self-hoste déjà ses polices en P2). 5 familles + Noto Sans Arabic obligatoire pour AR. |
 
-Ce qui nous distingue. Aligné sur la Core Value (analyse traçable + honnêteté du % mesuré).
+### Differentiators (avantage)
 
 | Feature | Value Proposition | Complexity | Notes |
 |---------|-------------------|------------|-------|
-| **Analyse explicable en 2 niveaux (simple → approfondie)** | La plupart des services balancent « BUY BTC entry X SL Y TP Z » sans le pourquoi. Nous expliquons, vulgarisé | MED | C'est le cœur différenciant. La donnée existe déjà (raisons technique/fondamentale/news en base). Le travail = la PRÉSENTATION pédagogique progressive. |
-| **% de réussite honnête et mesuré** | Le marché regorge de win rates gonflés non vérifiés. « Jamais inventé » est un positionnement de confiance | HIGH | Différenciateur SI on communique la méthode (backtest, échantillon). Montrer aussi les pertes (les services crédibles le font). |
-| **Telegram public = preuve permanente** | Win rate affiché en continu + résultats journaliers = machine d'acquisition + preuve sociale vivante | MED | Bot poste les clôtures (gagné/perdu) + win rate cumulé. Transparence (montrer les pertes) = crédibilité. |
-| **Affiliation récurrente à paliers (max 20 %)** | Aligne les influenceurs sur le long terme (commission sur abonnés ACTIFS, pas one-shot) | HIGH | Lève d'acquisition principale. Codes promo + tracking + dashboard affilié + paiement commissions crypto. |
-| **Tarif d'entrée très bas (9 $) + essai 3 $** | Abaisse drastiquement la barrière pour un public MENA sensible au prix | LOW | Différenciateur de positionnement, déjà décidé. L'essai 3 $/15 j convertit mieux qu'un gratuit (filtre les curieux). |
-| **CMS éducatif « de zéro »** | « C'est quoi un portefeuille » → capture le public débutant que les concurrents ignorent | MED | Contenu = acquisition SEO + nurturing + réduction du support. Différencie d'un pur canal de signaux. |
-| **Paiement 100 % crypto natif MENA** | Adapté à l'usage réel (USDT/P2P) là où la carte échoue | HIGH | C'est une nécessité du marché autant qu'un différenciateur vs plateformes carte-only. |
+| **Double univers de marque volt/green** | Identité forte, mémorable ; rare sur un produit de signaux | LOW (une fois le token layering en place) | Quasi gratuit si les tokens sont bien couchés. Persistance du choix utilisateur. |
+| **Gauge animée + scène hero (globe, float-cards, data-rain, marquee)** | « Make it feel alive » → perçu premium/sérieux par un public non-technique | MEDIUM-HIGH | `landing.js` non fourni → **reconstruction interprétative** (parallax `data-depth`, reveal, count-up, tilt). Respecter `prefers-reduced-motion`. |
+| **Cohérence design jusque dans l'admin/auth** | La plupart des concurrents ont une vitrine léchée + un back-office laid | MEDIUM | Différenciateur de soin, pas de fonction. |
 
-### Anti-Features (Commonly Requested, Often Problematic)
+### Anti-Features (design)
 
 | Feature | Why Requested | Why Problematic | Alternative |
 |---------|---------------|-----------------|-------------|
-| **Garantie de gains / « 95 % win rate »** | « Ça vend » | Mensonger, illégal (conseil non agréé + promesse de gain), tue la confiance long terme, expose juridiquement | % mesuré + disclaimers + montrer les pertes |
-| **Processeur crypto automatisé (NOWPayments/Cryptomus) dès le lancement** | Plus propre, automatique | Dépendance tierce, KYC/onboarding du processeur, délai, complexité, peut bloquer le 1er encaissement | MVP = collecte du hash + vérif TronGrid + file superadmin. Processeur en étage 2. |
-| **Exécution automatique des trades / passage d'ordres** | « Je veux juste copier » | Hors scope projet, énorme risque réglementaire et technique (custody, connexion broker), responsabilité directe sur les pertes | Aide à la décision uniquement. Disclaimer explicite. |
-| **Multi-chaînes de paiement (ERC-20, BEP-20, SOL…)** | « Plus de choix » | Multiplie les watchers/vérifs, surface d'erreur, frais ETH élevés ; TRC-20 domine déjà en MENA | TRC-20 USDT uniquement au lancement. Étendre si demande mesurée. |
-| **Notifications temps réel / streaming M1** | « Je veux être alerté à la seconde » | Infra temps réel coûteuse, hors scope, l'analyse est day/swing (pas scalping) | Realtime Supabase pour push des nouveaux signaux (suffisant) + notif Telegram. |
-| **Communauté sociale (profils, follows, chat, leaderboard)** | « Engagement » | Modération, scope énorme, hors v2.0 (déjà Out of Scope projet) | Telegram public suffit comme couche sociale au lancement. |
-| **Auto-traduction machine de l'arabe** | « Gratuit, rapide » | Qualité médiocre en finance/arabe, casse la confiance, RTL mal géré | Traductions humaines/relues des chaînes UI + contenu éducatif clé. |
-| **Paliers d'affiliation complexes (5+ niveaux, MLM)** | « Motiver plus » | Ressemble à un schéma pyramidal (risque légal + réputation), complexité de calcul | Paliers simples basés sur nb d'abonnés actifs, plafond 20 %, 1 seul niveau (pas de sous-affiliés). |
-| **Wallet custodial intégré / garder les fonds des users** | « Pratique » | Custody = régulation lourde, cible de hack, responsabilité | Paiement direct vers cold wallet plateforme, watcher lecture seule. Clés jamais en DB. |
-| **Auto-payout des commissions affiliées on-chain** | « Automatique » | Risque de fuite de fonds, bugs = pertes réelles irréversibles, clés chaudes | Calcul auto du dû + payout MANUEL validé dans superadmin (au moins au lancement). |
+| **Slogan « Make Everybody Rich Again » / promesse de gain visuelle** | Présent dans le mock, accrocheur | **Viole la contrainte légale dure** (aucune promesse de gain avant encaissement) ; déjà tranché 2026-06-20 | Baseline NEXA « Nouvelle Ère · Alliance d'Échange ». Écarter tout copy/visuel suggérant un gain. |
+| **% de réussite codé en dur dans le composant (le « 73 % » du mock)** | Le mock le montre, ça « décore » | Affiche un chiffre non mesuré → casse le socle de confiance | Toujours brancher trust-stats/gauge sur `pattern_stats` seuillé ; « échantillon insuffisant » si N<30. |
+| **Refonte page-par-page avec CSS ad-hoc** | Plus rapide visuellement à court terme | Dette : 5 surfaces qui divergent, thèmes cassés, RTL non testé | Couche tokens + composants partagés d'abord, pages ensuite. |
+| **Confondre `opportunity_score /100` et `% de réussite`** | Les deux sont des « chiffres de confiance » | Le score est généré (qualité du setup) ; le % est mesuré (backtest/réel) — les fusionner ré-introduit un chiffre inventé | Deux UI distinctes : gauge = score ; trust-stat/bandeau = % mesuré seuillé. |
+
+---
+
+## Axe 2 — ROUTINES IA PLANIFIÉES (Claude Code Remote, sans clé API)
+
+### Comment l'agent autonome décide des « moments opportuns » day vs swing
+
+Logique **déjà à moitié spécifiée** dans le code : `apps/jobs/config/sessions.ts` mappe chaque session → classes d'actifs + styles, avec les crons UTC en commentaire. C'est la source de vérité.
+
+| Session | Cron UTC (config agent, hors git) | Styles produits | Classes d'actifs | Rationale timing |
+|---------|-----------------------------------|-----------------|------------------|------------------|
+| `asia` | `00 23 * * 0-4` | **day** | forex, metal, crypto | Pré/ouverture Tokyo (00:00 UTC). Pas d'énergie (marché inactif). |
+| `london` | `00 07 * * 1-5` | **day + swing** | forex, metal, energy, crypto | Ouverture Londres (la session la plus liquide FX) → fenêtre day la plus riche. |
+| `newyork` | `30 12 * * 1-5` | **day** | forex, metal, energy, crypto | Pré-ouverture NY (13:00 UTC). |
+| `eod-swing` | `00 21 * * 1-5` | **swing** | forex, metal, energy, crypto | Avant la clôture quotidienne FX (17:00 NY ≈ 21–22 UTC) → bougies D fraîches pour le swing. |
+
+**Principe de décision (à formaliser, déjà implicite) :**
+- **Day** = déclenché aux **ouvertures de session** (asia/london/newyork) : on analyse sur H1/H4 fraîchement clôturées, validité 24 h (`DAY_VALID_HOURS` dans `persist.ts`).
+- **Swing** = déclenché à la **frontière de clôture quotidienne** (`eod-swing`, + london qui couvre aussi swing) : on analyse sur H4/D, validité 72 h (`SWING_VALID_HOURS`).
+- L'univers réel d'un run = `SESSIONS[session].asset_classes ∩ instruments actifs` (résolu par `resolveSessionUniverse`). Crypto présente dans **chaque** session (24/7).
+- « Moment opportun » = **alignement candle-close × ouverture de session**, pas une décision libre de l'agent. La config est *data-not-code* : changer le périmètre = éditer `sessions.ts`, jamais disperser la logique.
+
+### Cadence vs budget ~15 runs/jour
+
+| Contrainte | Valeur | Source |
+|-----------|--------|--------|
+| Quota Max | ~15 runs/jour, **partagé** avec les sessions interactives Claude Code | `docs/routines-claude.md §2` |
+| Sessions d'analyse définies | **4/jour** (asia, london, newyork, eod-swing) | `sessions.ts` |
+| Marge | 4 runs analyse ≪ 15 → confortable, **mais** un run = pipeline complet `snapshot→analyze→persist` couvrant plusieurs instruments en un seul run | — |
+| Jobs déterministes (ingestion candles/news/macro) | **HORS quota Claude** → Windows Task Scheduler | `docs/routines-claude.md §2/§5` |
+
+→ **Cadence cible : 1 run par session × 4 sessions ouvrables** (jours de semaine ; `asia` dim-jeu, les autres lun-ven). Ne JAMAIS faire tourner l'ingestion déterministe sur le quota Claude.
+
+### Ce que produit UN run d'analyse
+
+Pipeline `snapshot → analyze (vétéran) → persist`, frontière de confiance unique = **`apps/jobs/src/jobs/persist.ts`** (déjà livré v1.0 P4) :
+1. L'agent écrit des **fichiers** (raw JSON par instrument) — il n'écrit jamais en DB directement (D-43).
+2. `persist.ts` (service_role) pour chaque artefact : `stripFence` → `JSON.parse` → `OutputSchema.parse` (Zod §3) → résout le snapshot par hash → `runGuardrails` (R:R ≥ 1.2, cohérence SL/entry/TP, structure non contraire) → `scoreSetup` déterministe (jamais le score de l'agent) → `expirePriorSetups` (clé `session_day`) → `insertAnalysis` + `insertTradeSetups` (status `active`, `valid_until` 24 h/72 h).
+3. Sortie = `{ written, rejected, reasons[] }` (codes normalisés) → `job_runs.stats`.
+
+### Idempotence & comportement « stale »
+
+| Aspect | Comportement | Source |
+|--------|--------------|--------|
+| **Idempotence** | `expirePriorSetups` sur `(instrument_id, style, session, session_day)` expire les setups antérieurs AVANT insert → un re-run du même jour/session ne duplique pas | `persist.ts §f` |
+| **0 écrit + rejets** | `persist` **throw** (« 0 setup écrit sur N rejet(s) ») → pas de succès silencieux | `persist.ts` WR-04 |
+| **PC éteint / agent ne tourne pas** | Ingestion déterministe continue (Task Scheduler) ; **aucune nouvelle analyse/setup** — c'est attendu (l'IA exige l'agent) | `routines-claude.md §5` |
+| **Stale visible** | `job_runs` reste `running` → flag `stale` au dashboard `/admin/sante` (déjà livré v2.0 P8 : feux fraîcheur + `job_runs`) | `routines-claude.md §5` ; PROJECT v2.0 P8 |
+| **Secrets** | `SUPABASE_URL` + `SUPABASE_SERVICE_ROLE_KEY` via Environments Claude Code (chiffrés) ; `dotenv/config` no-op en cloud | `routines-claude.md §3` |
+| **MCP** | Le MCP Supabase stdio local **n'est PAS accessible** en Remote → SDK `supabase-js` HTTPS uniquement | `routines-claude.md §4` |
+
+### Table Stakes (routines)
+
+| Feature | Why Expected | Complexity | Notes |
+|---------|--------------|------------|-------|
+| 4 routines Remote planifiées (asia/london/newyork/eod-swing) | Sans elles, zéro signal frais → produit mort | MEDIUM | Config = lever la dette v1.0 P4 « configurer routines + 1 run réel ». Crons déjà en commentaire `sessions.ts`. |
+| Environment Claude Code (secrets chiffrés + network `*.supabase.co`) | Le run doit écrire en DB | LOW-MEDIUM | À confirmer : network access par défaut (Open Question A1 de `routines-claude.md`). |
+| Monitoring `job_runs` + flag stale au dashboard | PC potentiellement éteint → l'opérateur doit voir la fraîcheur | LOW | Infra déjà livrée (P8). Vérifier que `running` jamais clôturé = stale. |
+| Run réel de bout en bout (snapshot→analyze→persist) ≥ 1 setup persisté | Preuve que le pipeline IA fonctionne en prod | MEDIUM | Le « 1 run réel » reporté de v1.0 P4. |
+
+### Differentiators (routines)
+
+| Feature | Value Proposition | Complexity | Notes |
+|---------|-------------------|------------|-------|
+| Timing piloté par session × candle-close (pas un cron naïf) | Signaux émis quand le marché vient de produire de l'info exploitable | LOW (déjà conçu) | Différencie d'un bot qui poste à heure fixe sans contexte marché. |
+| Scoring déterministe + garde-fous (Claude raisonne, ne chiffre pas) | Anti-hallucination = socle de confiance | — (livré) | Le différenciateur produit majeur ; v2.1 l'active simplement en prod. |
+
+### Anti-Features (routines)
+
+| Feature | Why Requested | Why Problematic | Alternative |
+|---------|---------------|-----------------|-------------|
+| Ingestion candles/news sur le quota Claude | « tout via l'agent » | Brûle le quota 15/j partagé pour du déterministe | Task Scheduler / croner hors quota |
+| Retry agressif d'un JSON non conforme | « ne rien perdre » | Boucle/coût ; le JSON IA peut être structurellement faux | Rejet + raison loggée, pas de retry en P1 (déjà la décision `persist.ts`) |
+| WebSockets / streaming M1 pour « temps réel » | sensation de live | Hors scope P1, infra lourde ; le produit est day/swing | Pulls REST OHLCV + Supabase Realtime pour push des analyses (déjà livré P3) |
+| Laisser l'agent décider librement « quand le marché est intéressant » | autonomie max | Non déterministe, non auditable, gaspille le quota | Fenêtres figées `sessions.ts` (data-not-code) |
+| Clé API Anthropic en v2.1 | fiabilité 24/7 | Hors scope/budget de ce milestone (différé au lancement payant) | Routines Max ; migration API = milestone ultérieur |
+
+---
+
+## Axe 3 — BACKTEST + BASCULE TRACK RECORD
+
+### Comment un backtest de catalogue de patterns produit un win-rate mesuré
+
+L'infra de mesure d'issue existe déjà et est **golden-testée** : `replayOutcome` (`packages/core/src/replay/outcome.ts`) fait exactement le first-touch demandé.
+
+**Algorithme first-touch (déjà livré, à réutiliser tel quel) :**
+- `hit_tp` si TP1 touché avant SL ; `hit_sl` si SL touché avant TP1 (parcours des bougies H1 ordonnées par `ts` croissant).
+- **Bougie ambiguë** (TP1 ET SL dans la même H1) → règle de distance D-04 : le niveau le plus proche de l'entrée est touché en premier (`distTp <= distSl` → `hit_tp`, égalité → `hit_tp`).
+- **flat** (ni TP ni SL avant `valid_until`) → valorisé au close de la dernière bougie ≤ `valid_until` ; `realized_r` signé.
+- **R multiple** : `winR = |TP1 − entry| / |entry − SL|` pour un hit_tp ; `−1` pour un hit_sl ; close-based pour flat.
+- **Anti look-ahead** : les candles DOIVENT être bornées `ts < valid_until` — responsabilité de l'appelant (déjà respectée par `outcome-tracker.ts` qui borne `[created_at, valid_until]`).
+- **Minimum sample** : seuil `MIN_SAMPLE = 30` (`packages/core/src/track-record/threshold.ts`) — sous 30, « échantillon insuffisant », jamais de %.
+
+**Ce qui est NOUVEAU à construire (le backtest) :**
+- Un **moteur de backtest du catalogue de patterns** qui, sur l'historique de candles, (1) détecte chaque occurrence d'un pattern, (2) construit un setup hypothétique (entry/SL/TP cohérent avec les règles `persist.ts`), (3) le rejoue via `replayOutcome` sur les bougies postérieures bornées, (4) agrège win-rate / avg_r / expectancy / N **par pattern** (et par les dimensions de `pattern_stats` : style, asset, asset_class, score_band, risk).
+- Réutilise la détection de structure maison (swings, BOS/CHoCH, S/R, POC) livrée v1.0 P3 + les indicateurs golden-testés.
+
+### Comment le % affiché bascule de backtest-seeded → track record réel
+
+**Contrainte produit dure** : « jamais affirmer un % sans le mesurer ». Le backtest EST une mesure → légitime dès J1, mais doit être **étiqueté backtest** et **remplacé progressivement** par le réel.
+
+**Constat d'architecture (clé pour le requirements author) :** la vue `pattern_stats` (migration 0014) dérive **exclusivement** de `prediction_outcomes` JOINT à `trade_setups` réels + `instruments`. Elle ne connaît PAS le backtest. Donc le backtest **ne peut pas** alimenter `pattern_stats` sans choisir une voie :
+
+| Option de seed | Mécanique | Risque | Verdict |
+|----------------|-----------|--------|---------|
+| **A. Insérer des trade_setups + prediction_outcomes synthétiques** | Marquer `source='backtest'`, réutiliser la vue telle quelle | **Pollue** les tables live (liste membre, realtime, outcome-tracker rejouerait des faux) ; viole « frontière producteur-unique » D-05 | À éviter |
+| **B. Table dédiée `backtest_stats` + blend applicatif** | Backtest écrit ses agrégats (mêmes dimensions/buckets) dans sa propre table ; la couche front COALESCE : réel si N_réel≥30, sinon backtest, avec **label de provenance** | Logique de bascule à coder + tester ; deux sources à garder cohérentes (mêmes buckets) | **Recommandé** |
+| **C. Vue `pattern_stats` étendue (UNION réel + backtest + colonne `provenance`)** | Une seule surface de lecture, provenance portée en SQL | Migration de la vue existante ; le front doit gérer la provenance | Acceptable, plus DB-centrique |
+
+**Règle de bascule recommandée (par bucket/dimension, miroir du seuil existant) :**
+- N_réel ≥ `MIN_SAMPLE` (30) → afficher le **% réel** (track record), provenance = `live`.
+- N_réel < 30 mais backtest disponible → afficher le **% backtest**, provenance = `backtest` (badge explicite « mesuré par backtest »), N_backtest visible.
+- Ni l'un ni l'autre ≥ seuil → « échantillon insuffisant » (comportement actuel).
+- N (réel et/ou backtest) **toujours exposé** (D-12, jamais masqué).
+
+→ Bascule **progressive et par-bucket** : un instrument très tradé passe au réel pendant qu'un instrument rare reste sur backtest. Pas de bascule globale « big bang ».
+
+### Table Stakes (backtest)
+
+| Feature | Why Expected | Complexity | Notes |
+|---------|--------------|------------|-------|
+| % mesuré affiché dès J1 (backtest), pas « insuffisant » partout au lancement | Sinon la vitrine n'a aucune preuve à montrer | HIGH | Le cœur du milestone. Dépend de B/C ci-dessus. |
+| Backtest first-touch réutilisant `replayOutcome` | Cohérence stricte backtest ↔ réel (même définition de victoire) | MEDIUM | **Ne PAS recoder** le first-touch — réutiliser `@app/core replayOutcome` (golden-testé) |
+| Win-rate / avg_r / expectancy / N par pattern + dimensions | Le membre veut savoir quel pattern marche | MEDIUM | Mêmes buckets que `pattern_stats` (overall/style/asset/asset_class/score_band/risk) |
+| Seuil N≥30 + N toujours visible + label provenance backtest/live | « jamais inventé » + honnêteté de la source | LOW | Étendre `applyThreshold` pour porter la provenance |
+| Anti look-ahead vérifié dans le backtest | Un backtest qui triche = % faux = produit malhonnête | MEDIUM | Borner candles `ts < valid_until` ; golden tests dédiés |
+
+### Differentiators (backtest)
+
+| Feature | Value Proposition | Complexity | Notes |
+|---------|-------------------|------------|-------|
+| Bascule progressive par-bucket backtest→réel avec provenance affichée | Honnêteté radicale : le visiteur voit la source du chiffre évoluer | MEDIUM | Rare ; renforce le socle de confiance |
+| Calibration (score_band vs win-rate réel) | Prouve que le score /100 prédit vraiment | MEDIUM | `score_band` déjà dans `pattern_stats` + `recharts` prévu pour la page calibration |
+
+### Anti-Features (backtest)
+
+| Feature | Why Requested | Why Problematic | Alternative |
+|---------|---------------|-----------------|-------------|
+| Insérer des outcomes backtest dans `prediction_outcomes` | « réutiliser la vue » | Pollue les tables live, fausse le track record réel, l'outcome-tracker rejouerait du faux | Table/vue séparée + blend (option B/C) |
+| Bascule globale « big-bang » réel | simple à raisonner | Jette des données backtest encore utiles sur les buckets peu tradés | Bascule par-bucket sur N≥30 |
+| Backtest sur-paramétré / fitté au passé | maximiser le % affiché | Over-fitting → % réel s'effondre → perte de confiance | Catalogue de patterns figé, règles SL/TP identiques au live, R:R≥1.2 |
+| Cacher N pour « faire joli » | UX | Viole D-12 (« jamais masqué ») | N toujours rendu, suffisant ou non |
 
 ---
 
 ## Feature Dependencies
 
 ```
-[Encaisser le 1er abonnement]  ← OBJECTIF CASH
-    ├──requires──> [Auth] (DONE, P1)
-    ├──requires──> [Vitrine + pricing + 1 disclaimer]
-    ├──requires──> [Paiement USDT MVP: adresse + collecte hash]
-    │                   └──requires──> [Vérif on-chain TronGrid]
-    │                                      └──requires──> [Cold wallet + adresse de réception]
-    ├──requires──> [Activation d'abonnement (statut + expiration)]
-    │                   └──requires──> [File validation superadmin (fallback manuel)]
-    └──requires──> [Gating espace membre]
-                        └──requires──> [Liste signaux] (données DONE, présentation à faire)
+[Design tokens NEXA (volt/green, OKLCH, RTL)]
+    └──requires──> [Tailwind v4 CSS-first @theme] (livré)
+    └──enhances──> [ScoreGauge] [SignalCard] [LevelsRow] [TrustStat]
+                       └──TrustStat requires──> [pattern_stats seuillé] (NE PAS hardcoder le 73%)
 
-[% de réussite affiché]
-    └──requires──> [Boucle track record: catalogue patterns + backtest mesuré]
-                        └──requires──> [prediction_outcomes + calibration]
+[Routines Remote planifiées]
+    └──requires──> [Environment Claude Code + secrets]
+    └──requires──> [sessions.ts univers/cron] (livré)
+    └──produces──> [trade_setups actifs via persist.ts] (livré)
+                       └──feeds──> [outcome-tracker → prediction_outcomes] (livré)
+                                       └──feeds──> [pattern_stats RÉEL]
 
-[Telegram public] ──enhances──> [Acquisition] ──feeds──> [Vitrine conversion]
-    └──requires──> [Track record / win rate calculé]
+[Backtest catalogue patterns]
+    └──requires──> [replayOutcome first-touch] (livré, réutiliser)
+    └──requires──> [détection structure + indicateurs] (livré v1.0 P3)
+    └──produces──> [backtest_stats (nouvelle source)]
+                       └──blend avec──> [pattern_stats réel] ──> [% affiché par bucket + provenance]
 
-[Affiliation] ──requires──> [Activation d'abonnement] (compter les abonnés actifs ramenés)
-    └──requires──> [Codes promo au signup]
-    └──requires──> [Payout commissions] (manuel au début)
-
-[Renouvellement/expiration] ──requires──> [Activation] + [Paiement]
-
-[CMS éducatif] ──independent──> (peut être livré en parallèle, faible couplage)
-
-[i18n trilingue] ──cross-cuts──> TOUT (à poser dès la 1re page)
+[TrackRecordBlock affiché] ──requires──> [bascule backtest→réel] ──requires──> [seuil MIN_SAMPLE=30] (livré)
 ```
 
 ### Dependency Notes
 
-- **Encaisser le 1er abonnement requiert le chemin paiement→activation→gating, PAS l'automatisation.** La file de validation superadmin manuelle suffit pour démarrer. C'est le découplage clé : le cash ne dépend ni du processeur crypto, ni de l'affiliation, ni du track record réel.
-- **% de réussite réel dépend de la boucle track record** (catalogue patterns + backtest). Au lancement on affiche le **win rate backtesté des patterns** ; le track record réel s'accumule ensuite. Ne pas bloquer le lancement sur le track record réel.
-- **Affiliation dépend de l'activation d'abonnement** : impossible de compter/commissionner des abonnés actifs sans système d'abonnement fiable. Donc affiliation APRÈS le système de paiement.
-- **Telegram dépend du calcul de win rate** : le canal poste des résultats vérifiés. Le bot peut démarrer en publication semi-manuelle puis s'automatiser.
-- **i18n est transverse** : si posé en retard, RTL arabe force un refactor UI massif. À traiter dès la première page de vitrine.
+- **TrustStat/gauge du design requiert `pattern_stats` seuillé :** le « 73 % » du mock est un placeholder ; le brancher en dur ré-introduit un chiffre inventé (anti-feature critique transverse design×backtest).
+- **Le backtest requiert `replayOutcome` (livré) :** réutilisation obligatoire pour garantir que « victoire backtest » == « victoire réelle » (même first-touch, même règle d'ambiguïté D-04).
+- **`pattern_stats` (réel) dépend des routines :** sans run d'analyse → pas de `trade_setups` → pas d'`prediction_outcomes` → la colonne « réel » reste vide et l'app reste sur backtest. Les 3 axes convergent sur le même bloc de confiance.
+- **Conflit à arbitrer :** backtest ↔ tables live `trade_setups`/`prediction_outcomes` — le backtest ne doit PAS y écrire (frontière producteur-unique D-05). Source séparée requise.
 
 ---
 
-## MVP Definition
+## MVP Definition (v2.1)
 
-### Launch With (v1 — chemin pour ENCAISSER + crédibilité minimale)
+### Launch With (le milestone)
 
-Ruthless : strictement ce qui permet le 1er abonnement payé + ne pas paraître louche.
+- [ ] **Design tokens NEXA volt/green** (OKLCH, sémantiques) + no-flash + RTL — fondation transverse, tout en dépend.
+- [ ] **Composants partagés** ScoreGauge / SignalCard / LevelsRow / TrustStat consommant les tokens, appliqués vitrine + membre + académie + auth + admin.
+- [ ] **Rebranding MERA→NEXA** + baseline sans promesse de gain (slogan écarté).
+- [ ] **4 routines Remote** (asia/london/newyork/eod-swing) configurées + Environment secrets + **1 run réel** persistant ≥ 1 setup.
+- [ ] **Moteur de backtest** du catalogue → `backtest_stats` (mêmes dimensions/buckets que `pattern_stats`), réutilisant `replayOutcome`.
+- [ ] **Bascule backtest→réel par bucket** (N_réel≥30 → live ; sinon backtest ; sinon insuffisant) + **label provenance** + N toujours visible, branché dans `TrackRecordBlock`/`TrustStat`/gauge.
 
-- [ ] **Vitrine publique** (hero, valeur, pricing 9 $ + essai 3 $, teaser signaux, disclaimer) — sans elle, personne ne convertit
-- [ ] **i18n posé dès le départ** (au minimum FR + AR-RTL ; EN suit) — refactor douloureux sinon
-- [ ] **Gating espace membre** par statut d'abonnement — protège le revenu
-- [ ] **Liste signaux triée par score + filtres simples** — données déjà en base, présentation à faire
-- [ ] **Détail trade vulgarisé** (simple d'abord, approfondi dépliable, chart + niveaux) — le produit lui-même
-- [ ] **Paiement USDT MVP** : adresse TRC-20 + collecte hash + vérif TronGrid + activation auto — encaissement
-- [ ] **File de validation paiements superadmin** + liste membres/statut — fallback manuel indispensable
-- [ ] **Activation / expiration / relance d'abonnement** — cycle de vie du revenu
-- [ ] **% de réussite = win rate des patterns backtestés** affiché honnêtement (avec note de méthode + taille d'échantillon) — confiance
-- [ ] **Disclaimers + revue légale réalisée** — BLOQUANT avant 1er encaissement (contrainte projet)
+### Add After Validation (v2.1.x)
 
-### Add After Validation (v1.x — une fois le cash qui rentre)
+- [ ] Calibration visuelle (score_band × win-rate réel) avec `recharts` — quand N réel suffisant sur ≥1 bucket.
+- [ ] Scène hero animée complète (parallax/data-rain/tilt) si la reconstruction interprétative prend du temps — version statique acceptable d'abord.
 
-- [ ] **Affiliation à paliers** (codes promo, tracking, dashboard affilié, payout manuel) — déclencheur : 1ers influenceurs prêts à pousser
-- [ ] **Telegram public automatisé** (résultats journaliers + win rate permanent) — déclencheur : assez de trades clos pour un canal vivant
-- [ ] **CMS éducatif** (premiers articles « de zéro ») — déclencheur : besoin d'acquisition SEO / nurturing
-- [ ] **Track record RÉEL** (prediction_outcomes mûri) remplace/complète le backtest dans l'affichage — déclencheur : échantillon réel suffisant
-- [ ] **Superadmin enrichi** (perfs affiliés, santé jobs/données détaillée, signaux publiés) — déclencheur : volume d'opérations
+### Future Consideration (au-delà)
 
-### Future Consideration (v2+)
-
-- [ ] **Processeur crypto automatisé** (NOWPayments/Cryptomus, adresse unique/facture, webhooks) — déclencheur : volume de paiements manuels ingérable
-- [ ] **Payout commissions automatisé on-chain** — déclencheur : confiance opérationnelle + volume
-- [ ] **Multi-chaînes de paiement** — déclencheur : demande mesurée hors TRC-20
-- [ ] **Communauté sociale** — déjà Out of Scope projet
-- [ ] **Notifications push / app mobile** — déclencheur : rétention à améliorer
-
----
+- [ ] Migration clé API Anthropic (fiabilité 24/7) — au lancement payant réel.
+- [ ] Streaming M1/scalping — après moteur prouvé.
 
 ## Feature Prioritization Matrix
 
 | Feature | User Value | Implementation Cost | Priority |
 |---------|------------|---------------------|----------|
-| Vitrine + pricing + disclaimer | HIGH | LOW-MED | P1 |
-| i18n trilingue (RTL) | HIGH | HIGH | P1 (transverse, tôt) |
-| Gating espace membre | HIGH | MED | P1 |
-| Liste signaux triée + filtres | HIGH | LOW-MED | P1 |
-| Détail trade vulgarisé | HIGH | MED | P1 |
-| Paiement USDT MVP (hash + TronGrid) | HIGH | HIGH | P1 |
-| File validation + membres (superadmin min) | HIGH | MED | P1 |
-| Renouvellement / expiration | HIGH | MED | P1 |
-| % réussite backtest affiché | HIGH | HIGH | P1 |
-| Disclaimers + revue légale | HIGH | LOW code / HIGH juridique | P1 (bloquant) |
-| Affiliation à paliers | HIGH | HIGH | P2 |
-| Telegram public auto | HIGH | MED | P2 |
-| CMS éducatif | MED | MED | P2 |
-| Track record réel (vs backtest) | HIGH | HIGH | P2 |
-| Superadmin enrichi | MED | MED | P2 |
-| Processeur crypto auto | MED | HIGH | P3 |
-| Payout commissions auto | LOW | HIGH | P3 |
-| Multi-chaînes paiement | LOW | HIGH | P3 |
-
-**Priority key:** P1 = lancement (encaisser + crédibilité) · P2 = après validation · P3 = futur.
-
----
-
-## Deep Dives par feature demandée
-
-### 1. Vitrine + funnel d'abonnement
-
-**Comment ça marche / attente utilisateur.** Le visiteur arrive (souvent via lien Telegram d'un influenceur sur mobile). Il doit comprendre en quelques secondes : ce que c'est, la preuve que ça marche, le prix, et comment payer. Funnel typique : vitrine → preuve (win rate + résultats) → pricing → essai 3 $ → page paiement → activation → espace membre.
-
-**Preuve sociale = % de réussite mesuré.** Les services crédibles publient un track record complet incluant les pertes ; les services qui « garantissent » des taux extrêmes sans preuve sont le signal d'arnaque. Notre avantage = montrer la méthode (backtest, échantillon) et les pertes.
-
-**À montrer / NE PAS montrer légalement.** Montrer : exemples d'analyses (teaser flouté), win rate mesuré avec méthode, disclaimers. NE PAS : promesses de gain, « rejoignez et devenez riche », performances individuelles présentées comme reproductibles, conseil personnalisé. Positionnement strictement éducatif.
-
-**Classe : table stakes** (la vitrine, le pricing) + **différenciateur** (preuve honnête + prix bas).
-
-### 2. Espace membre signaux
-
-**Attente.** Une liste « les meilleurs trades en haut » (tri par score), filtrable par marché/style/risque, et un détail qui explique SIMPLEMENT d'abord. Public non technique → pas de jargon en première lecture. L'analyse approfondie (indicateurs, structure, news) est dépliable pour qui veut.
-
-**Données prêtes.** Les setups (score, entrée/SL/TP/R:R, risque, raisons) sont déjà persistés. Le travail v2.0 = lecture gated + présentation pédagogique + chart lightweight-charts avec niveaux tracés.
-
-**Classe : table stakes** (liste + détail) avec la **vulgarisation 2-niveaux en différenciateur**.
-
-### 3. Paiement crypto USDT (MENA)
-
-**Comportement attendu / peurs.** L'audience MENA paie en USDT, souvent acquis en P2P. Peurs réelles : se tromper d'adresse, mauvais réseau (TRC-20 vs autres), ne pas savoir si « c'est passé ». Besoins : adresse copiable en 1 tap + QR, réseau indiqué très clairement (TRC-20), confirmation visible de réception, message rassurant pendant les confirmations.
-
-**Flux MVP (étage 1).** Afficher adresse + montant exact + QR → l'utilisateur paie depuis son wallet/exchange → il colle son **hash de transaction** (TxID, 64 hex) + screenshot optionnel → le backend interroge **TronGrid** pour vérifier : destinataire = notre adresse, montant ≥ dû, token = USDT TRC-20, confirmations suffisantes, statut success → **activation auto**. Cas tordus (montant faux, hash déjà utilisé, sous-paiement) → **file de validation superadmin**.
-
-**Garde-fous critiques.** Hash unique (anti-rejeu : un même TxID ne peut activer qu'un compte une fois), vérifier le **contrat USDT exact** (pas un faux token), montant et destinataire stricts, fenêtre de confirmations. Clés du wallet jamais en DB/code (cold wallet + watcher lecture seule).
-
-**Étage 2 (futur).** Processeur (NOWPayments/Cryptomus) = adresse unique par facture + webhooks → automatisation complète. À reporter pour ne pas bloquer le 1er encaissement.
-
-**Renouvellement / expiration / relance.** Date d'expiration visible, bandeau J-3/J-0, coupure auto à expiration via job idempotent, relance par Telegram/email. Réabonnement = même flux paiement.
-
-**Classe : table stakes** (le MVP hash) + **anti-feature** (processeur auto / multi-chaînes au lancement).
-
-### 4. Affiliation à paliers
-
-**Attente influenceur.** Un code promo à partager, un dashboard montrant : abonnés ramenés (actifs/inactifs), revenus générés, commission due, historique des paiements. Modèle = commission **récurrente** sur abonnés ACTIFS (alignement long terme), plafond **20 %**.
-
-**Mécanique.** Code promo capturé au signup → attribution de l'abonné à l'affilié → à chaque paiement validé d'un filleul actif, créditer la commission selon le palier → payout crypto (manuel validé en superadmin au début). Paliers simples (1 niveau, pas de MLM/sous-affiliés → évite l'apparence pyramidale).
-
-**Classe : différenciateur** (lève d'acquisition) — **P2** (dépend du système d'abonnement).
-
-### 5. Dashboard superadmin
-
-**Ce que l'opérateur doit voir.** Lancement (minimal) : **file de validation des paiements** (cas tordus à valider) + liste membres (actif/inactif/expiration). Enrichi (P2) : affiliés + perfs + commissions à payer, signaux publiés, **santé jobs/données** (réutilise `job_runs` + `v_data_freshness` déjà en place), alertes de staleness.
-
-**Classe : table stakes** (file paiements + membres) puis **enrichi en P2**.
-
-### 6. CMS cours/articles gratuits
-
-**Attente.** Contenu « de zéro » (« c'est quoi un portefeuille / un ordre / le levier ») pour le public débutant. Sert l'acquisition (SEO), le nurturing avant abonnement, et réduit le support. Trilingue.
-
-**Implémentation.** CMS léger (contenu en base + rendu RSC, ou MDX). Pas besoin d'un CMS lourd au début. Faible couplage → livrable en parallèle.
-
-**Classe : différenciateur** (capte les débutants) — **P2**.
-
-### 7. Canal Telegram public
-
-**Rôle.** Moteur d'acquisition : résultats journaliers (gagné/perdu) + **win rate cumulé permanent**. Transparence (montrer les pertes) = crédibilité = conversion. Lien vers vitrine.
-
-**Implémentation.** Bot poste les clôtures de trades + win rate calculé. Peut démarrer en semi-manuel puis s'automatiser. Dépend du calcul de win rate / track record.
-
-**Classe : différenciateur** (preuve sociale vivante) — **P2**.
-
-### 8. % de réussite / track record
-
-**Comment l'afficher honnêtement.** Deux temps : (a) **lancement** = win rate des patterns mesuré par backtest maison, avec mention explicite de la méthode et de la taille d'échantillon ; (b) **ensuite** = track record réel (prediction_outcomes) qui prend le relais. **Jamais un chiffre non mesuré** (Core Value + risque légal).
-
-**Échantillon insuffisant.** Afficher la taille d'échantillon ; sous un seuil, indiquer « échantillon en construction » plutôt qu'un pourcentage trompeur ; ne pas claimer de win rate sur quelques trades. Distinguer clairement backtest vs résultats réels dans l'UI.
-
-**Classe : table stakes** (un % crédible est attendu) avec **l'honnêteté mesurée en différenciateur fort**. — **P1** (backtest) puis **P2** (réel).
-
----
-
-## Competitor Feature Analysis
-
-| Feature | Services de signaux typiques (Telegram VIP, forex/crypto) | Notre approche |
-|---------|-----------------------------------------------------------|----------------|
-| Prix | 30-100 $/mois, parfois 19,95 $ VIP | **9 $/mois + essai 3 $/15 j** (positionnement bas, MENA) |
-| Win rate | Souvent claimé (75-95 %) **non vérifié** | **Mesuré (backtest puis réel), méthode + échantillon affichés** |
-| Explication des trades | Rare (« BUY X, SL Y, TP Z ») | **Vulgarisation 2-niveaux (simple → approfondie)** |
-| Paiement | Carte / PayPal / crypto variable | **USDT TRC-20 natif MENA, MVP hash + TronGrid** |
-| Preuve sociale | Nb d'abonnés Telegram, captures sélectives | **Telegram public transparent (pertes incluses) + win rate permanent** |
-| Affiliation | Souvent one-shot ou absente | **Récurrente sur abonnés actifs, plafond 20 %, 1 niveau** |
-| Langue | Anglais surtout | **Trilingue AR(RTL)/EN/FR** |
-| Éducation | Peu / payante | **CMS gratuit « de zéro »** |
+| Design tokens volt/green no-flash + RTL | HIGH | MEDIUM | P1 |
+| Composants partagés (gauge/card/levels/trust) transverses | HIGH | MEDIUM | P1 |
+| Rebranding NEXA + baseline légale | HIGH | LOW | P1 |
+| 4 routines Remote + 1 run réel persisté | HIGH | MEDIUM | P1 |
+| Backtest catalogue → backtest_stats (réutilise replayOutcome) | HIGH | HIGH | P1 |
+| Bascule backtest→réel par bucket + provenance | HIGH | MEDIUM | P1 |
+| Scène hero animée (parallax/data-rain) | MEDIUM | MEDIUM-HIGH | P2 |
+| Calibration score_band × win-rate | MEDIUM | MEDIUM | P2 |
+| Clé API Anthropic 24/7 | MEDIUM | HIGH | P3 |
 
 ---
 
 ## Sources
 
-- Patterns de pricing, win rate et disclaimers des services de signaux payants — [ValueWalk best signals](https://www.valuewalk.com/investing/best-stock-trading-signals/), [Trasignal paid signals](https://trasignal.com/blog/crypto/paid-trading-signals/), [NFTevening best crypto signals (verified results)](https://nftevening.com/best-crypto-signals/), [DailyForex free vs paid](https://www.dailyforex.com/forex-articles/free-forex-signals-vs-paid-signal-services/243514) — MEDIUM (consensus multi-sources : prix 30-100 $, montrer les pertes, win rates non vérifiés = drapeau rouge)
-- Vérification on-chain USDT TRC-20 (hash/TxID, montant/destinataire/confirmations, TronGrid) — [TRON developers — TRC-20 tx history](https://developers.tron.network/docs/get-trc20-transaction-history), [Kriptomat — vérifier une tx TRC-20](https://kriptomat.hr/en/how-to-check-a-usdt-trc-20-transaction/), [Gem Wallet — track USDT tx](https://gemwallet.com/learn/how-to-track-a-usdt-transaction-and-what-to-do-if-its-not-received/) — HIGH (flux et champs vérifiés)
-- Contexte projet (audience MENA, USDT/P2P, trilingue, contraintes légales, paliers affiliation, cœur analytique livré) — `.planning/PROJECT.md`, `.planning/MILESTONES.md` — HIGH (source projet)
+- `apps/jobs/src/jobs/persist.ts` (frontière de confiance, garde-fous, valid_until 24/72h, idempotence `expirePriorSetups`) — **HIGH** (code livré lu)
+- `apps/jobs/src/jobs/outcome-tracker.ts` + `packages/core/src/replay/outcome.ts` (first-touch, ambiguïté D-04, flat, R, anti look-ahead) — **HIGH** (code golden-testé lu)
+- `supabase/migrations/0014_prediction_outcomes_pattern_stats.sql` (vue dérive de prediction_outcomes+trade_setups ; dimensions/buckets ; D-05 producteur unique ; D-12 N exposé) — **HIGH**
+- `packages/core/src/track-record/threshold.ts` (`MIN_SAMPLE=30`, applyThreshold) — **HIGH**
+- `apps/jobs/config/sessions.ts` (univers session × style, crons UTC asia/london/newyork/eod-swing) — **HIGH**
+- `docs/routines-claude.md` (Remote vs Local, quota 15/j partagé, Environments, MCP cloud≠stdio, stale, horaires UTC) — **HIGH**
+- `Nexa - Landing.html` (tokens sémantiques OKLCH, data-theme volt/green, gauges anneau, signal card, sd-levels, trust stats, marquee ; slogan MERA à écarter) — **HIGH** (référence design)
+- `apps/web/src/components/track-record/TrackRecordBlock.tsx` + `types.ts` (pipeline anon→getPatternStats→applyThreshold→view ; seuil côté front) — **HIGH**
+- `.planning/PROJECT.md` (core value « % mesuré jamais inventé », décisions 2026-06-20 NEXA/routines/backtest, scope/hors-scope v2.1) — **HIGH**
+- Conventions UI « état de l'art » signaux financiers (no-FOUC theming, propriétés logiques RTL, self-host fonts) — **MEDIUM** (training, non re-vérifié web, jugé stable)
 
 ---
-*Feature research for: plateforme publique d'abonnement aux signaux de trading (MENA, USDT, trilingue)*
-*Researched: 2026-06-14*
+*Feature research for: plateforme signaux trading MENA — milestone v2.1 (design NEXA · routines IA · backtest+track record)*
+*Researched: 2026-06-20*

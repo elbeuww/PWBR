@@ -1,322 +1,287 @@
-# Pitfalls Research — v2.0 (couche produit payante greffée sur le cœur analytique livré)
+# Pitfalls Research — v2.1 (identité NEXA · routines Claude sans API · backtest + track record en prod)
 
-**Domain:** Plateforme SaaS payante de signaux trading — paiement crypto USDT TRC-20 on-chain, abonnement + gating multi-rôles, affiliation à paliers, i18n trilingue RTL, Telegram, CMS, track record mesuré — audience MENA non technique
-**Researched:** 2026-06-14
-**Confidence:** HIGH (pièges on-chain/RLS/légal recoupés sources externes + invariants du repo lus dans ARCHITECTURE.md ; spécificités juridiques MENA = MEDIUM, bloquant non-code)
+**Domain:** Reskin trilingue RTL d'une app de signaux trading DÉJÀ LIVRÉE (Next.js 15 + Supabase) · activation du moteur IA via routines Claude Code Remote SANS clé API (Max ~15 runs/j partagés) · moteur de backtest seedant `pattern_stats` + bascule vers outcomes réels
+**Researched:** 2026-06-20
+**Confidence:** HIGH (pièges ancrés dans le code RÉEL du repo : `persist.ts`, `pattern_stats` view 0014, `replayOutcome`, `candle.ts`, `threshold.ts`, `docs/routines-claude.md`) · MEDIUM sur les chiffres exacts de quota/jank device (dépendent de l'environnement runtime)
 
-> **Périmètre.** Pièges SPÉCIFIQUES à l'ajout des features v2.0 sur l'existant (P1-4 livré). On ne re-couvre pas les pièges génériques web. Priorité absolue : **ARGENT** (paiement on-chain, commissions) → **SÉCURITÉ DU REVENU** (gating/RLS) → **LÉGAL** (conseil non agréé + crypto MENA, bloquant avant 1er encaissement) → reste.
+> **Périmètre.** Pièges SPÉCIFIQUES à l'ajout de ces 3 axes sur l'existant v2.0. Pas de pièges génériques web. **Priorité absolue :**
+> 1. **EXPOSITION LÉGALE** — afficher un % non mesuré, réintroduire une promesse de gain (contrainte dure « jamais inventé », slogan MERA écarté). Une seule fuite = risque réglementaire + perte du socle de confiance.
+> 2. **CORRUPTION SILENCIEUSE DES DONNÉES** — look-ahead, double-comptage backtest↔live dans `pattern_stats`, hallucination de chiffres passant `persist.ts`. Invisible, contamine le % affiché, donc retombe en (1).
+> 3. Régressions d'intégration (RTL cassé, sélecteurs E2E, FOUC, quota épuisé, double-publication).
 >
-> Mapping phases = waves d'ARCHITECTURE.md (W1 socle i18n/role · W2 cash paiement/gating · W3 track record/Telegram · W4 affiliation/CMS/superadmin · W5 automatisation).
+> **Fait structurel central (vérifié dans la migration 0014).** La vue `pattern_stats` agrège `prediction_outcomes ⋈ trade_setups ⋈ instruments`. **Il n'existe AUCUNE colonne `source`/`origin`** distinguant un outcome backtesté d'un outcome réel. En l'état, dès qu'on seede le backtest dans cette chaîne, backtest et live sont **indistinguables et additionnés**. C'est le piège #1 data-integrity de ce milestone — voir Pitfall 8.
 
 ---
 
 ## Critical Pitfalls
 
-### Pitfall 1: Accepter un faux token "USDT" ou un transfert sans valeur on-chain
+### Pitfall 1: Afficher un % issu du backtest sans le marquer « mesuré par backtest » (glissement légal)
 
 **What goes wrong:**
-On vérifie qu'une TX existe, qu'elle va vers notre adresse, statut SUCCESS — et on active. Mais le `Transfer` provient d'un **contrat token contrefait nommé "USDT"** (Tron permet à n'importe qui de déployer un TRC-20 nommé USDT), ou c'est un **zero-value/fake transfer** (address-poisoning, frais Tron quasi nuls → spam de fausses TX trivial). L'abonné obtient l'accès sans avoir payé un seul vrai dollar.
+Le backtest seede `pattern_stats`, la vitrine lit la vue via `getPatternStats` + `applyThreshold` (déjà câblé en v2.0 P5) et affiche un %. Mais l'UI ne dit PAS que ce chiffre vient d'un backtest historique, pas de trades réels. Un public non averti le lit comme « la plateforme gagne X% sur de l'argent réel » → promesse implicite de performance.
 
 **Why it happens:**
-La vérif s'arrête au destinataire + montant + statut, sans **ancrer l'identité du contrat émetteur**. Le champ "montant" d'un faux token affiche bien `9` mais dans un actif sans valeur. Les screenshots de wallet sont encore plus faciles à falsifier — ils ne prouvent rien.
+La couche d'affichage existante (`SufficientStat.winRatePct`) ne porte aucune notion de provenance. Le composant rend juste « 64% (N=120) ». Brancher le backtest dessus sans toucher au label = glissement invisible.
 
 **How to avoid:**
-- Vérifier que l'event `Transfer` est émis par **EXACTEMENT** le contrat USDT officiel `TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t` (en `.env`/config, jamais saisi par l'user). Refuser tout autre `contract_address`.
-- Lire le montant depuis le `data` de l'event de CE contrat, decimals = 6 (voir Pitfall 2), jamais depuis une valeur déclarée par l'utilisateur.
-- **Ne jamais activer sur la foi d'un screenshot.** Le screenshot est une pièce de support superadmin, pas une preuve.
-- Exiger `to == adresse plateforme` (comparée en format normalisé — voir Pitfall 6).
+- Le libellé doit être explicite et trilingue : « Taux mesuré par backtest du pattern » vs « Track record réel de la plateforme » — JAMAIS un % nu.
+- Ajouter la provenance dans le contrat de sortie du seuil (ex. `provenance: 'backtest' | 'live' | 'mixed'`) et la rendre obligatoire dans le composant (type qui force le rendu du label).
+- Conserver le test anti-claim de v2.0 (`no-perf-claims`) et l'ÉTENDRE : interdire un `winRatePct` rendu sans son label de provenance adjacent.
+- Réutiliser la méthodologie trilingue déjà livrée (bloc « méthodologie ») et la pointer depuis chaque % backtest.
 
 **Warning signs:**
-Activation avec un `contract_address` ≠ contrat officiel dans les logs ; abonnés actifs sans entrée correspondante dans le watcher de réception du cold wallet ; TX au montant exact mais aucun mouvement de solde réel.
+Un `%` dans le DOM sans nœud de provenance frère ; le test no-perf-claims passe alors que le backtest est branché (= test trop étroit) ; copy marketing qui reparle de « gains ».
 
-**Phase to address:** Wave 2 (paiement USDT MVP, client TronGrid + Route Handler submit).
+**Phase to address:** Axe 3 (backtest → pattern_stats), tâche d'affichage. À cabler AVANT toute mise en visibilité publique du %.
 
 ---
 
-### Pitfall 2: Mauvaise gestion des decimals USDT (6) → montant lu faux par 10^6
+### Pitfall 2: Mélanger backtest et outcomes réels dans le même agrégat → double-comptage / chiffre faux
 
 **What goes wrong:**
-USDT TRC-20 a **6 decimals**. Le `data` de l'event `Transfer` encode `9 000 000` pour 9 USDT. Si on compare cet entier brut à `9`, tout paiement réel est rejeté (sous-paiement apparent) ; si on divise par le mauvais facteur (ex. 10^18 façon ETH/ERC-20), on lit `0.000000000009` et on rejette tout, ou pire on accepte n'importe quoi.
+`pattern_stats` somme tout `prediction_outcomes`. Si le seed backtest insère des lignes dans `prediction_outcomes` (ou dans une table jointe à la vue) sans dimension de séparation, alors : (a) le N affiché double-compte backtest + live ; (b) la bascule « backtest → réel » est impossible à opérer proprement ; (c) un même setup pourrait être compté deux fois (backtest puis résolution live).
 
 **Why it happens:**
-Réflexe ERC-20 (18 decimals) appliqué à TRC-20 ; ou comparaison float qui introduit des erreurs d'arrondi sur les montants.
+La PK `prediction_outcomes.setup_id` lie une issue à un `trade_setups` réel. Le backtest porte sur des patterns/setups HISTORIQUES qui n'ont pas forcément de `trade_setups` live → tentation de fabriquer des `trade_setups` factices ou d'insérer dans `prediction_outcomes` un setup_id qui collisionnera plus tard avec une vraie résolution.
 
 **How to avoid:**
-- Travailler en **entiers (BigInt), unités atomiques (×10^6)** de bout en bout. `dû_atomic = 9 * 1_000_000`. Comparer `montant_atomic >= dû_atomic`. **Jamais de float** sur de l'argent.
-- Centraliser le facteur `USDT_DECIMALS = 6` dans une constante config + test golden (cohérent avec la discipline golden-values du cœur).
-- Test : un paiement de 9.00, 9.01, 8.99 USDT atomiques → verdict attendu (accepté / accepté / file partiel).
+- **Décision d'archi à trancher en début d'axe 3 :** soit une table `backtest_stats` séparée + une vue d'union explicite étiquetée par provenance, soit une colonne `source text not null check (source in ('backtest','live'))` ajoutée à `prediction_outcomes` ET propagée comme dimension dans `pattern_stats` (migration). Ne PAS seeder dans la chaîne live sans ce discriminant.
+- La bascule devient un changement de FILTRE de provenance, jamais une réécriture de chiffres (Pitfall 9).
+- Tester l'idempotence du seed : re-run du backtest → N stable, pas d'accumulation.
 
 **Warning signs:**
-Tous les paiements valides tombent en file superadmin (sous-paiement) ; ou activations sur des montants ridicules. Tests de montants limites absents.
+N qui grimpe à chaque re-run du seed ; un `setup_id` présent à la fois en backtest et live ; impossibilité de répondre « ce % vient d'où ? » par une requête SQL simple.
 
-**Phase to address:** Wave 2.
+**Phase to address:** Axe 3, migration de schéma EN PREMIER (avant d'écrire le moteur de backtest).
 
 ---
 
-### Pitfall 3: Confirmations insuffisantes / réorganisation de chaîne (réorg)
+### Pitfall 3: Look-ahead bias dans le backtest (le pattern « voit » des bougies futures)
 
 **What goes wrong:**
-On active dès qu'on voit la TX (non confirmée / 1 bloc). Une réorg ou une TX non solidifiée disparaît ou est annulée → accès accordé pour un paiement qui n'a jamais été finalisé.
+Le backtest détecte un pattern à l'instant T en utilisant des indicateurs/structure calculés sur des bougies ≥ T, ou rejoue l'outcome sur des bougies que la détection a déjà « vues ». Le win-rate explose artificiellement → on affiche un % flatteur mais faux dès J1.
 
 **Why it happens:**
-Pression du "ça confirme en secondes" sur Tron + envie d'activer instantanément pour l'UX. On confond "vue dans le mempool/dernier bloc" et "finalisée".
+Réutiliser le même tableau de candles pour détecter ET pour résoudre, sans borne stricte. Le repo a DÉJÀ la défense côté live (`lastClosedCandleStart` ne retourne que la bougie clôturée ; `replayOutcome` exige `ts < valid_until`, responsabilité appelant). Le backtest est un NOUVEAU chemin qui ne passe pas par ces gardes s'il est écrit naïvement.
 
 **How to avoid:**
-- Appeler TronGrid avec `only_confirmed: true` sur `gettransactioninfobyid` (endpoint `walletsolidity`) → ne renvoie que les TX **au-delà de la fenêtre de solidification** (~19 blocs / ~1 min). C'est la garantie anti-réorg.
-- Si l'user soumet trop tôt (TX pas encore solidifiée) → laisser `payments` en `pending`, ne PAS activer. Le job `payment-watcher` re-vérifie périodiquement et active quand confirmé.
-- UX : message rassurant "paiement en cours de confirmation (~1-2 min)" plutôt qu'un échec.
+- Réutiliser `replayOutcome` (pur, golden-testé) tel quel : détecter sur `candles[0..i]`, rejouer UNIQUEMENT sur `candles[i+1..i+window]`. Frontière stricte au point de détection.
+- Réutiliser `lastClosedCandleStart` / la convention « jamais la bougie en cours » dans la boucle de backtest.
+- Test golden de non-régression : un pattern dont le futur est tronqué doit donner le même verdict que le live ; injecter une bougie future « parfaite » ne doit JAMAIS changer la détection.
+- Indicateurs (RSI/MACD/ATR…) calculés sur la fenêtre passée seulement, pas sur la série complète pré-chargée.
 
 **Warning signs:**
-Activations puis disparition de la TX du registre ; abonnements actifs sans dépôt finalisé sur le cold wallet.
+Win-rate backtest >> intuition vétéran (ex. 85%+) ; le verdict change si on ajoute des bougies après la détection ; détection et replay partagent la même slice.
 
-**Phase to address:** Wave 2 (submit + `payment-watcher` job ensemble).
+**Phase to address:** Axe 3, moteur de backtest (coeur). Highest data-integrity priority.
 
 ---
 
-### Pitfall 4: Rejeu / double-réclamation d'un hash de transaction
+### Pitfall 4: Échantillon insuffisant (N<30) affiché comme un vrai % parce que le seuil est court-circuité côté backtest
 
 **What goes wrong:**
-Un même TxID est soumis deux fois (même user qui réessaie, ou **deux comptes différents** qui collent le même hash) → deux activations pour un seul paiement. Ou un user récupère un vieux hash légitime d'un tiers vu sur un explorer et le réclame.
+Le seuil `MIN_SAMPLE = 30` (`applyThreshold`) protège la vitrine. Mais le backtest peut produire des buckets fins (par instrument × score_band × période) avec N=8 ; si un nouveau chemin d'affichage backtest n'applique PAS `applyThreshold`, on montre « 75% » sur 8 trades → bruit présenté comme mesure.
 
 **Why it happens:**
-Pas de contrainte d'unicité forte ; ou unicité par `(user_id, tx_hash)` au lieu de `tx_hash` global → le même hash crédite plusieurs comptes.
+`applyThreshold` est appliqué côté front sur la vue live. Un moteur de backtest qui calcule et pré-formate ses propres % (ex. pour le seed ou un dashboard admin) re-implémente la logique sans le garde N≥30.
 
 **How to avoid:**
-- **`UNIQUE` sur `tx_hash` GLOBAL** (pas par user) en DB — un hash ne crédite qu'une fois, jamais. Même discipline upsert idempotent que l'ingestion.
-- L'insertion `payments(pending)` par l'user se heurte à la contrainte unique si déjà soumis → refus propre.
-- Lier la vérif au **destinataire = NOTRE adresse** : un hash de paiement entre tiers ne passera pas le check `to == wallet plateforme`.
-- Idempotence de la transition `pending→verified` (re-run du watcher = no-op).
+- TOUT chemin qui rend un % (vitrine, Telegram, admin, backtest) DOIT passer par `applyThreshold` de `@app/core` (source unique D-11). Interdire tout `Math.round(win_rate*100)` ailleurs (règle lint/grep + test).
+- N affiché BRUT toujours (déjà la discipline D-12) — même backtest.
+- Les buckets fins sous seuil affichent « échantillon insuffisant », jamais un %.
 
 **Warning signs:**
-Deux `subscriptions` actives pointant le même `tx_hash` ; comptes activés avec des hash apparaissant déjà ailleurs.
+Un `* 100` ou `toFixed` sur un win_rate hors de `applyThreshold` ; buckets par instrument avec petits N montrant un % ; divergence vitrine vs Telegram (signe de logique dupliquée).
 
-**Phase to address:** Wave 2.
+**Phase to address:** Axe 3, affichage backtest + dashboard admin métriques.
 
 ---
 
-### Pitfall 5: Fuite du contenu payant — gating UI sans RLS (AP1)
+### Pitfall 5: First-touch ambigu (SL et TP dans la même bougie) — résolu en live, à NE PAS ré-inventer en backtest
 
 **What goes wrong:**
-On vérifie l'abonnement dans `(member)/layout.tsx` et on laisse `trade_setups`/`analyses` en `select using(true)`. Le front lit avec l'**anon-client** : un appel direct (devtools, `supabase-js` en console, script) contourne le layout et **aspire tous les signaux** → le produit payant fuit gratuitement. C'est la fuite directe du revenu.
+Une bougie H1 touche TP1 ET SL. Le verdict dépend de l'hypothèse. Si le backtest applique une règle différente de la prod (`replayOutcome` D-04 : niveau le plus proche de l'entrée gagne, tie → hit_tp), le % backtest n'est pas comparable au % live → la bascule fait « bouger » les chiffres sans raison visible.
 
 **Why it happens:**
-On croit que la porte du layout suffit ("la page n'est pas accessible"). On oublie que la couche données est interrogeable directement avec la clé anon publique.
+Le backtest est écrit comme un script séparé qui ré-implémente la résolution d'outcome au lieu d'appeler `replayOutcome`.
 
 **How to avoid:**
-- RLS `using ( public.has_active_subscription() )` sur `trade_setups` ET `analyses` (remplace la policy `select to authenticated using(true)` de 0006). Helper `security definer`, `search_path` figé (anti-injection schéma, anti-récursion de policy).
-- **Layout = UX (redirige /pricing) ; RLS = sécurité (refuse les lignes).** Défense en profondeur, jamais l'un sans l'autre.
-- Test Playwright/RLS : user sans abonnement actif lit `trade_setups` via anon-client direct → **0 ligne** (répliquer le pattern du journal privé déjà testé).
+- Appeler `replayOutcome` EXACTEMENT (même fonction pure) pour le backtest. Zéro ré-implémentation de la résolution first-touch.
+- Documenter que la règle D-04 est une hypothèse optimiste/conservatrice connue ; si on veut un mode pessimiste (SL d'abord en cas d'ambiguïté), c'est un PARAMÈTRE explicite testé, pas une divergence accidentelle.
+- Pour réduire l'ambiguïté : résoudre sur un timeframe plus fin que celui de génération si dispo (mais cohérent backtest ↔ live).
 
 **Warning signs:**
-Aucune policy modifiée sur trade_setups en migration ; test "non-abonné lit 0 signal" absent ; signaux visibles en réponse API à un compte expiré.
+Deux fonctions de résolution dans le repo ; % backtest et % live qui divergent sur les mêmes setups ; tests golden de `replayOutcome` non réutilisés par le backtest.
 
-**Phase to address:** Wave 2 (RLS signaux migrée AVANT toute exposition de l'espace membre).
+**Phase to address:** Axe 3, moteur de backtest.
 
 ---
 
-### Pitfall 6: Activer l'abonnement sans vérif on-chain serveur / faire confiance au client (AP2)
+### Pitfall 6: Survivorship / selection bias dans le catalogue de patterns (overfitting du catalogue)
 
 **What goes wrong:**
-Une server action insère `subscriptions(active)` ou laisse l'utilisateur écrire `payments.status='verified'`. N'importe qui colle un faux hash (ou édite la requête) → accès gratuit.
+On choisit/ajuste les patterns du catalogue d'après ceux qui « ont bien marché » sur l'historique, et/ou on ne backteste que sur les instruments/périodes favorables. Le % affiché reflète l'overfit, pas une edge réelle → s'effondre en prod, et le track record réel contredit publiquement le backtest.
 
 **Why it happens:**
-Frontière producteur mal étendue : on traite l'écriture de paiement comme une écriture utilisateur ordinaire.
+Tentation de présenter un beau chiffre dès J1. Le catalogue est figé après inspection des résultats (peeking). Périodes calmes seulement, instruments cherry-pickés.
 
 **How to avoid:**
-- RLS `payments` : l'user ne peut insérer QUE `status='pending'` à son nom (`with check user_id=auth.uid() and status='pending'`). **Aucune** policy update/insert `verified`/`active` pour `authenticated`.
-- Transition `pending→verified` + `subscriptions(active)` = **service_role uniquement**, dans le Route Handler `nodejs` server-only après vérif TronGrid stricte (contrat + montant + destinataire + confirmations + hash unique).
-- Comparaison d'adresses TRON en **format normalisé** : les topics renvoient du hex (`41…`), notre wallet est en base58 (`T…`) → convertir (`tron-format-address`) avant comparaison, sinon faux négatif systématique OU comparaison qui passe à côté.
+- Définir le catalogue de patterns AVANT de regarder les résultats de backtest (pré-enregistrement de l'hypothèse).
+- Backtester sur l'ensemble des instruments seedés (12) et sur des régimes variés (trend/range, périodes incluant du stress), pas un sous-ensemble flatteur.
+- Out-of-sample : réserver une fenêtre temporelle non utilisée pour la sélection.
+- Afficher la période et le périmètre du backtest dans la méthodologie (honnêteté + auto-discipline).
 
 **Warning signs:**
-Import du service-client hors de l'allowlist lint (`app/api/payments/**`) ; activation sans appel TronGrid dans la trace ; policy `payments` permettant `verified` à `authenticated`.
+Catalogue modifié après lecture des résultats ; backtest limité aux 2-3 meilleurs instruments ; pas de période out-of-sample ; % backtest >> % live dès les premières résolutions réelles.
 
-**Phase to address:** Wave 2.
+**Phase to address:** Axe 3, conception du catalogue (avant le moteur).
 
 ---
 
-### Pitfall 7: Fenêtre d'expiration de l'offre + sous/sur-paiements ignorés
+### Pitfall 7: Réintroduire une promesse de gain visuelle pendant le reskin NEXA
 
 **What goes wrong:**
-Le prix affiché (9 $ / 3 $) est fixé à l'instant T mais la TX arrive heures/jours plus tard ; ou l'user paie 8.5 (sous-paiement), 12 (sur-paiement), ou pour la mauvaise offre. Sans règle, soit on rejette des paiements de bonne foi (clients furieux), soit on suractive.
+Le HTML de référence porte le slogan « Make Everybody Rich Again » (écarté par décision 2026-06-20). En reconstruisant fidèlement le design, on recopie un hero, une stat « +X% », un compteur de gains, un témoignage chiffré, ou une baseline promettant l'enrichissement → viole la contrainte légale dure.
 
 **Why it happens:**
-Pas de modèle d'**intention de paiement** (montant dû figé + fenêtre de validité) ; comparaison binaire `montant == dû`.
+« Fidélité interprétative au HTML » pousse à tout reproduire. Les visuels marketing chiffrés sont précisément ce qui « vend » dans le mock.
 
 **How to avoid:**
-- Modéliser une **intention** : `payments(expected_amount, offer, created_at)`. Tolérance explicite : `montant >= dû` active (sur-paiement = crédit/ignoré, jamais un rejet) ; `montant < dû` → file superadmin (résolution manuelle : compléter ou rembourser).
-- Pas de "fenêtre d'expiration" qui invalide un vrai paiement reçu : le prix est stable, une TX confirmée correspondant à une offre active crédite cette offre. Documenter la politique sur/sous-paiement côté produit.
-- Tous les cas tordus (mauvais montant, mauvais réseau, sous-paiement) → **file de validation superadmin**, jamais un rejet silencieux qui perd l'argent du client.
+- Baseline officielle = « Nouvelle Ère · Alliance d'Échange », jamais le slogan MERA. Grep du repo pour « rich », « gain », « profit », « gagner », « +%» dans les copies trilingues.
+- Étendre le test `no-perf-claims` de v2.0 aux nouveaux composants NEXA (hero, marquee, gauges) : aucun chiffre de performance non mesuré, aucune baseline de gain.
+- Les gauges de score affichent un score /100 (qualité d'analyse), PAS un % de gain ; vérifier que le marquee ne fait pas défiler des « résultats » chiffrés inventés.
+- Garder le `<Disclaimer />` global sur toutes les pages reskinnées (régression facile au reskin).
 
 **Warning signs:**
-Plaintes "j'ai payé mais pas activé" ; paiements rejetés sans trace ; aucune file superadmin pour les cas partiels.
+Composant hero avec un nombre « % » hardcodé ; marquee de gains ; disparition du Disclaimer sur une page redesignée ; mots-clés gain dans les fichiers de traduction.
 
-**Phase to address:** Wave 2 (modèle payments + file superadmin).
+**Phase to address:** Axe 1 (design NEXA), dès le hero/landing. Legal-exposure → priorité haute.
 
 ---
 
-### Pitfall 8: Vendre des signaux = conseil en investissement non agréé + statut crypto Algérie/MENA (BLOQUANT avant 1er encaissement)
+### Pitfall 8: RTL cassé par des propriétés CSS physiques dans les nouveaux composants
 
 **What goes wrong:**
-On encaisse des abonnements pour des **signaux** (entrée/SL/TP/levier) auprès d'un public non averti → exposition réelle au régime du **conseil en investissement non agréé**. En parallèle, l'**Algérie interdit légalement les cryptomonnaies** (loi de finances 2018) et plusieurs pays MENA ont un statut restrictif/flou → encaisser en USDT sur un wallet local est un risque structurel (pas juste un disclaimer manquant).
+Le reskin introduit `ml-`, `mr-`, `left-`, `right-`, `pl-`, `text-left`, `translate-x`, `rounded-l` etc. en dur. En arabe (`dir=rtl`), tout se retrouve du mauvais côté : flèches, gauges, marquee qui défile dans le mauvais sens, icônes mal alignées. L'app v2.0 utilisait les **propriétés logiques Tailwind v4 natives** (pas de tailwindcss-rtl) — le reskin doit tenir cette discipline sinon régression massive sur l'audience #1 (arabe).
 
 **Why it happens:**
-On traite le légal comme une checkbox UI ("ajouter un disclaimer") au lieu d'un **bloquant structurel** (statut juridique, juridiction d'exploitation, nature du service). Un disclaimer générique copié-collé offre une protection minimale et peut même aggraver la responsabilité.
+Le HTML de référence est probablement LTR-only ; on porte ses classes physiques directement. Les animations JS (translate, marquee) sont les pires car la direction y est codée en dur.
 
 **How to avoid:**
-- **Revue juridique réelle AVANT d'encaisser le 1er abonnement** (contrainte PROJECT.md) : juridiction d'exploitation, structure, statut crypto par pays cible (Algérie en tête), périmètre "éducatif" vs "conseil".
-- **Signaux génériques, jamais personnalisés** : aucune recommandation tenant compte de la situation d'un utilisateur précis (le "personnalisé" bascule clairement en activité régulée). Le produit livré est déjà générique (setups en base) — préserver ça, pas de "que dois-je acheter avec mon capital ?".
-- **Disclaimers rédigés par un juriste**, systématiques sur vitrine + espace membre + Telegram : contenu éducatif, pas de conseil personnalisé, **aucune promesse de gain**, risque de perte total.
-- Aucune communication marketing du type "devenez riche", "95 % de réussite garanti", performances présentées comme reproductibles.
+- Propriétés logiques partout : `ms-`/`me-`/`ps-`/`pe-`, `start-`/`end-`, `text-start`/`text-end`, `rounded-s`/`rounded-e`. Grep d'interdiction (`\b(ml|mr|pl|pr|left|right|text-left|text-right)-` ) dans les nouveaux fichiers.
+- Marquee/animations : direction dérivée de `dir`, pas codée en dur. Tester le défilement en RTL.
+- Hero 3D / gauges : vérifier que les transforms respectent `dir` ou sont neutres en miroir.
+- E2E i18n existant (`e2e/i18n.spec.ts`) à étendre pour vérifier `dir=rtl` sur les nouvelles pages NEXA.
 
 **Warning signs:**
-Date d'encaissement planifiée sans revue juridique signée ; copy marketing promettant des gains ; fonctionnalité "conseil personnalisé"/"que faire de mon argent" ; disclaimer générique non revu.
+Classes physiques dans les nouveaux composants ; gauge/flèche du mauvais côté en arabe ; marquee qui défile L→R en RTL ; un seul `<html lang dir>` cassé.
 
-**Phase to address:** Wave 2 (BLOQUANT parallèle, hors code) — gate de lancement. Disclaimers techniques posables dès Wave 1.
+**Phase to address:** Axe 1, fondation du design system NEXA (tokens + premiers composants).
 
 ---
 
-### Pitfall 9: Rôle dans le JWT cru sans revérification DB (élévation de privilège, AP3)
+### Pitfall 9: La bascule backtest → réel change silencieusement le % affiché
 
 **What goes wrong:**
-On stocke `role` dans `app_metadata`/JWT et on gate dessus. Désync token↔DB (rétrogradation non propagée), révocation difficile, et `getSession()` serveur n'est PAS revérifié → un token stale conserve `superadmin`/accès affilié.
+Le jour où assez d'outcomes réels existent, le système passe du % backtest au % réel. Sans gestion explicite, un visiteur revient et voit « 64% » devenir « 48% » sans explication → perte de confiance brutale, soupçon de manipulation.
 
 **Why it happens:**
-Le JWT semble pratique ("le rôle est déjà dans la session"). On confond `getSession()` (cookie, non revérifié) et `getUser()` (revérifié serveur).
+La bascule est implémentée comme un simple changement de source de données, sans communication ni transition. Pire si Pitfall 2 (mélange) provoque un saut numérique inexpliqué.
 
 **How to avoid:**
-- `role` = source unique sur `profiles` (migration 0008), lu serveur **après `getUser()`**, jamais dans le JWT.
-- RLS via helpers `is_superadmin()`/`has_active_subscription()` `security definer` — la DB tranche, pas le client.
-- `getUser()` partout côté serveur (jamais `getSession()` pour une décision d'accès) — invariant du middleware existant à préserver.
+- Bascule = changement de provenance EXPLICITE et étiqueté (« mesuré par backtest » → « track record réel sur N trades »), pas un remplacement muet.
+- Période de coexistence possible : afficher les deux clairement séparés pendant la montée en N.
+- Seuil de bascule documenté (ex. réel affiché dès N_live≥30 par bucket, sinon backtest), cohérent avec `MIN_SAMPLE`.
+- Jamais réécrire l'historique des chiffres ; la transition est additive et tracée.
 
 **Warning signs:**
-`role` écrit en app_metadata ; gating basé sur un claim de token ; usage de `getSession()` dans un gate.
+% qui saute sans changement de label ; aucune logique de provenance dans le composant ; pas de seuil documenté pour la bascule.
 
-**Phase to address:** Wave 1 (`profiles.role` + `lib/auth/gate.ts` + helpers RLS).
+**Phase to address:** Axe 3, boucle outcome-tracker en prod (transition).
 
 ---
 
-### Pitfall 10: Fraude d'affiliation + double comptage / commissions sur abonnés expirés
+### Pitfall 10: Hallucination de chiffres par l'agent passant la frontière `persist.ts`
 
 **What goes wrong:**
-Auto-parrainage (l'affilié s'abonne via son propre code), faux abonnés (comptes jetables abonnés puis remboursés/expirés), **double comptage** d'une commission récurrente si le job se relance, commissions calculées sur des abonnés **déjà expirés**, et **fuite de PII des filleuls** (l'affilié voit l'email de ses referrals).
+L'agent Claude (vétéran) invente un prix d'entrée/SL/TP, un score, ou un R:R qui « semble » cohérent mais ne dérive pas du snapshot déterministe. Si ça passe `persist.ts`, un signal payant repose sur un chiffre inventé.
 
 **Why it happens:**
-Calcul de commission non idempotent ; "abonné ramené" compté sur l'existence du referral, pas sur l'abonnement **actif au moment de la période** ; table `referrals` exposant des colonnes sensibles via RLS.
+Sortie LLM non fiable par nature. Le repo a DÉJÀ la défense : `persist.ts` est la frontière de confiance UNIQUE (Zod §3 + `runGuardrails` : R:R recalculé sur bord conservateur, cohérence SL/TP par direction, `structure_against`, alloc=100, MIN_RR) + scoring déterministe (jamais le score de l'agent). Le risque v2.1 = AFFAIBLIR cette frontière en activant les routines (ex. nouveau champ de sortie non couvert par Zod, contournement du scoring).
 
 **How to avoid:**
-- **Idempotence stricte** : `commissions` UNIQUE sur `(affiliate_id, referral_id, period)` → re-run du job = no-op (cohérent runner `job_runs`).
-- Commission = **20 % max des abonnés ACTIFS sur la période** (`subscriptions.status='active' AND expires_at>période`), jamais sur un referral historique inactif.
-- Anti auto-parrainage : refuser `referred_user_id == affiliate.user_id` ; détecter les patterns (même IP/wallet, abonnements remboursés rapidement).
-- **1 seul niveau, pas de MLM/sous-affiliés** (apparence pyramidale = risque légal/réputation).
-- **PII filleuls** : la table `referrals` ne porte AUCUNE colonne exploitable (pas d'email). L'affilié voit des **compteurs/alias**, jamais l'identité (AP6). Tester l'isolation cross-affilié (un affilié ne voit pas les referrals d'un autre).
+- Ne rien écrire en DB hors de `persist.ts`. L'agent écrit des FICHIERS, point (D-43).
+- Tout nouveau champ du contrat §3 doit être ajouté au `OutputSchema` Zod ET à `runGuardrails` AVANT d'être consommé.
+- Le scoring reste déterministe (`scoreSetup`), jamais `output.score`.
+- Logs de rejet = codes normalisés seulement (déjà le cas), surveiller le taux de rejet par run (un pic = prompt qui dérive ou snapshot manquant).
 
 **Warning signs:**
-Commission qui double après un re-run ; commissions dues sur des abonnements expirés ; affilié pouvant requêter l'email d'un filleul ; referral où `affiliate.user_id == referred_user_id`.
+Un chemin d'insert hors `persist.ts` ; un champ de sortie consommé sans passer Zod/guardrails ; taux de rejet anormal ; `snapshot_not_found` fréquent (l'agent référence un hash inexistant = il invente).
 
-**Phase to address:** Wave 4 (affiliation : tables + `commission-calc` job + RLS scoped).
+**Phase to address:** Axe 2 (routines Claude). Data-integrity → priorité haute.
 
 ---
 
-### Pitfall 11: i18n/RTL posé après coup → refactor massif (AP4)
+### Pitfall 11: Quota Claude (~15 runs/j) épuisé — partagé avec l'usage interactif
 
 **What goes wrong:**
-On construit la vitrine en `ml-*`/`pl-*`/`text-left`/`left-*` puis on "ajoute l'arabe". RTL inverse tout (marges, paddings, alignements, icônes/flèches directionnelles) → refactor global coûteux. Et le contenu DB (articles, raisonnement des signaux) reste non traduit.
+Les routines day + swing consomment le quota Max (~15 runs/j) PARTAGÉ avec les sessions interactives du fondateur. Une journée de dev interactif intense → plus de runs pour les routines → aucune nouvelle analyse publiée → données `stale` côté membres payants.
 
 **Why it happens:**
-RTL traité comme une feature tardive au lieu d'une contrainte transverse. Confusion entre i18n des **strings UI** et i18n du **contenu DB**.
+Sous-estimation du nombre de routines × instruments × sessions, et oubli que le dev interactif pioche dans le même pot (`docs/routines-claude.md` §2 le note explicitement).
 
 **How to avoid:**
-- Poser `[locale]` + `<html dir={ar?'rtl':'ltr'}>` + **propriétés logiques Tailwind v4 natives** (`ms-*`/`me-*`, `ps-*`/`pe-*`, `start-*`/`end-*`, `text-start/end`) **dès la première page**. Variants `rtl:`/`ltr:` pour les exceptions (flèches). NE PAS installer `tailwindcss-rtl` (abandonné, incompatible v4).
-- **Séparer les deux mécanismes** : strings UI → `messages/{ar,en,fr}.json` (next-intl) ; contenu DB → colonne `locale` + une ligne par langue (`articles(slug, locale)`).
-- **Mélange LTR dans RTL** : prix/symboles/nombres/dates restent LTR au sein d'un paragraphe arabe → utiliser `dir="ltr"` ou `<bdi>` autour des montants (`9 USDT`, dates, TxID), sinon affichage cassé ("USDT 9" inversé, signes mal placés). Formatage via `Intl`/next-intl ICU (pluriels arabes).
-- Traduction **humaine relue** des chaînes finance (pas d'auto-traduction machine — anti-feature).
+- Budget de runs explicite : compter (sessions planifiées × style) et garder une marge sous 15. Une seule routine peut batcher plusieurs instruments par run (1 run = snapshot multi-instruments → analyze → persist).
+- Les jobs déterministes (ingestion candles/news/macro) restent HORS quota via Windows Task Scheduler (déjà le design) — ne JAMAIS les faire passer par une routine Claude.
+- Monitorer la consommation ; alerter si on approche le plafond.
+- Plan de bascule documenté vers clé API Anthropic au lancement payant (décision déjà prise) — le quota Max n'est pas un SLA 24/7.
 
 **Warning signs:**
-Classes `ml/mr/pl/pr/left/right` dans le nouveau code ; prix affichés à l'envers en arabe ; `tailwindcss-rtl` dans package.json ; contenu DB sans colonne `locale`.
+Runs interactifs nombreux les jours de publication manquée ; `job_runs` montrant des routines non exécutées ; dashboard `stale` qui s'allume.
 
-**Phase to address:** Wave 1 (i18n + RTL = tout premier socle, avant toute UI publique).
+**Phase to address:** Axe 2, dimensionnement des routines.
 
 ---
 
-### Pitfall 12: Track record / % de réussite non mesuré, sur-ajusté, ou échantillon insuffisant
+### Pitfall 12: MCP Supabase indisponible en routine Remote → job qui marche en interactif, casse en cloud
 
 **What goes wrong:**
-On affiche un win rate "75 %" non mesuré, ou un backtest **sur-ajusté** (look-ahead, paramètres optimisés a posteriori), ou un % sur 5 trades présenté comme fiable. Cela ruine la Core Value ("jamais inventé") ET ajoute un risque légal (promesse implicite).
+On teste l'analyse en interactif où le MCP Supabase (stdio local `.mcp.json`) marche, puis on planifie la routine Remote où ce MCP n'existe PAS (`docs/routines-claude.md` §4). Le job qui s'appuyait sur le MCP échoue silencieusement en cloud.
 
 **Why it happens:**
-Pression marketing d'afficher un beau chiffre ; confusion backtest vs résultats réels ; pas de seuil d'échantillon minimal.
+Le MCP interactif crée une fausse confiance. La routine Remote n'a accès qu'aux MCP cloud-hosted configurés au dashboard ; le chemin supporté est `supabase-js` via HTTPS.
 
 **How to avoid:**
-- % affiché = **toujours mesuré** : Wave 3 → win rate backtesté des patterns (méthode + taille d'échantillon affichées), puis track record réel (`prediction_outcomes`) qui prend le relais. Distinguer **clairement backtest vs réel** dans l'UI.
-- Réutiliser les **constantes anti look-ahead** déjà livrées (P1, 16/16 golden) dans le backtest des patterns — ne pas réintroduire de fuite temporelle.
-- **Seuil d'échantillon** : sous un minimum, afficher "échantillon en construction", pas un pourcentage. Montrer aussi les pertes (crédibilité).
-- `outcome-tracker` compare les setups expirés au **prix réel** (candles déjà en base) → `prediction_outcomes`/`pattern_stats`, idempotent par `setup_id`.
+- Les jobs lisent/écrivent Supabase EXCLUSIVEMENT via `supabase-js` (service_role), jamais via le MCP (déjà l'invariant d'archi). Vérifier qu'aucune étape de la routine n'appelle un outil MCP Supabase.
+- Tester la routine EN REMOTE (pas seulement en interactif) avant de s'y fier.
+- Confirmer le network access `*.supabase.co` depuis le runtime Anthropic (Open Question A1 de `routines-claude.md` — à valider en début d'axe 2).
+- Secrets via Environments (variables chiffrées), `dotenv/config` no-op en cloud.
 
 **Warning signs:**
-% affiché sans source ni taille d'échantillon ; backtest sans garde-fou temporel ; win rate sur quelques trades ; pas de séparation backtest/réel à l'écran.
+Routine qui réussit en local et échoue/timeout en Remote ; appel à un outil `mcp__supabase__*` dans le script de routine ; erreurs réseau vers `*.supabase.co`.
 
-**Phase to address:** Wave 3 (track record + % vitrine) — alimente Wave 3 Telegram.
+**Phase to address:** Axe 2, configuration de l'Environment + premier run Remote réel.
 
 ---
 
-### Pitfall 13: Fiabilité 24/7 — routines Claude Max non garanties pour une plateforme payante
+### Pitfall 13: FOUC / flash de thème au chargement sur volt/green × light/dark (multi-thème OKLCH)
 
 **What goes wrong:**
-Le moteur tourne via routines Claude Max (PC du fondateur potentiellement éteint, quota Max non garanti). Pour des abonnés payants, **pas de nouveaux signaux** = produit perçu comme mort, churn, remboursements. Migration tardive vers l'API = précipitation.
+Au premier paint, le thème par défaut s'affiche puis bascule vers le thème stocké (cookie/localStorage) → flash visible, pire avec 2 familles (volt/green) × 2 modes (light/dark). v2.0 avait un `ThemeToggle` no-flash RTL-safe ; le reskin NEXA multiplie les axes de thème et peut casser cette garantie.
 
 **Why it happens:**
-On garde le mode "coût zéro" trop longtemps après le lancement payant. Le scheduling local (Windows Task Scheduler) ne suffit plus pour un SLA implicite.
+Le thème est appliqué côté client après hydratation au lieu d'un script inline bloquant dans `<head>` qui pose la classe/attribut AVANT le premier paint. OKLCH + variables CSS aggravent le contraste du flash.
 
 **How to avoid:**
-- Au **lancement payant**, migrer la source de raisonnement agent Max → `@anthropic-ai/sdk` (le contrat JSON §3 + `persist.ts` + garde-fous restent INCHANGÉS — seule l'invocation change) + scheduling **cloud** (GitHub Actions cron / worker croner / Supabase pg_cron). Jobs déjà idempotents → migration sans risque de double-exécution.
-- Garder Windows Task Scheduler comme **backup d'ingestion déterministe** (candles/news/macro restent frais même sans moteur IA) ; afficher l'état via `job_runs` + flag `stale` au dashboard.
-- Budgéter le coût API (passage de "0 token" à facturation, prompt caching sur le system prompt stable).
+- Script inline anti-flash dans `<head>` qui lit la préférence (cookie de préférence pour SSR-cohérence, ou localStorage) et pose `data-theme`/classe AVANT paint, pour les 4 combinaisons.
+- Préférer un cookie lisible en RSC pour rendre le bon thème côté serveur (évite tout flash).
+- Tokens OKLCH définis par thème via `[data-theme=...]`, pas de calcul JS au runtime.
+- Tester les 4 combinaisons × 3 locales (RTL inclus) au reload.
 
 **Warning signs:**
-Abonnés payants alors que le moteur dépend encore du PC/Max ; trous dans la publication des signaux ; pas de monitoring `job_runs` exposé.
+Flash visible au reload ; thème appliqué dans un `useEffect` ; mismatch hydratation (warning React) sur l'attribut de thème.
 
-**Phase to address:** Wave 5 (migration moteur + scheduling cloud), déclenchée AVANT/au lancement payant.
-
----
-
-### Pitfall 14: Sécurité webhook processeur (étage 2) — signature, corps brut, runtime, idempotence (AP5)
-
-**What goes wrong:**
-Le webhook Cryptomus est traité en **Edge runtime** (pas de `crypto` Node ni corps brut) ; ou la signature est vérifiée sur l'objet **re-sérialisé** (l'ordre des clés change le hash → échec ou bypass) ; ou pas d'idempotence (rejeu webhook = double activation) ; ou aucun filtrage IP. Résultat : activation frauduleuse ou doublée = perte directe.
-
-**Why it happens:**
-Réflexe Route Handler par défaut (Edge) ; on vérifie la signature sur `await req.json()` au lieu du corps brut.
-
-**How to avoid:**
-- `export const runtime = 'nodejs'` + `const raw = await req.text()` → vérifier la signature sur le **corps BRUT** : Cryptomus = `md5( base64(json_brut) + PAYMENT_API_KEY )` comparé au champ `sign`.
-- **Idempotence** sur `order_id`/`uuid` (rejeu = no-op).
-- **Whitelist IP** du provider en complément de la signature.
-- Mêmes garde-fous montant/destinataire qu'à l'étage 1.
-
-**Warning signs:**
-Webhook sans `runtime='nodejs'` ; signature calculée sur l'objet parsé ; pas de contrainte unique sur `order_id` ; activation sur webhook non signé.
-
-**Phase to address:** Wave 5 (processeur étage 2).
-
----
-
-### Pitfall 15: Payout commissions on-chain — clé privée exposée / pertes irréversibles
-
-**What goes wrong:**
-Automatiser tôt le paiement des commissions affiliées en crypto → clé privée du wallet de payout en DB/code/env mal protégé, un bug = envoi de fonds réels irréversible (mauvais montant, mauvais destinataire, boucle).
-
-**Why it happens:**
-Envie d'automatiser le payout ; clé chaude nécessaire pour signer/broadcast (TronWeb).
-
-**How to avoid:**
-- **Payout MANUEL** validé en superadmin au lancement (calcul auto du dû, paiement humain tracé `commissions.status=paid`). Anti-feature explicite.
-- Si auto plus tard : TronWeb dans un **job isolé**, clé privée en **secret manager** (JAMAIS DB/code — contrainte PROJECT.md), montant/destinataire re-validés, idempotence stricte, plafond par run.
-- Cold wallet pour les fonds, watcher en lecture seule pour la réception.
-
-**Warning signs:**
-Clé privée trouvée en env/DB/code ; payout automatique sans plafond ni idempotence ; aucune validation humaine sur les sorties de fonds.
-
-**Phase to address:** Wave 5 (reporté ; manuel dès Wave 4).
+**Phase to address:** Axe 1, fondation thèmes (tout début).
 
 ---
 
@@ -324,125 +289,106 @@ Clé privée trouvée en env/DB/code ; payout automatique sans plafond ni idempo
 
 | Shortcut | Immediate Benefit | Long-term Cost | When Acceptable |
 |----------|-------------------|----------------|-----------------|
-| Vérif paiement manuelle (file superadmin) au lieu du processeur | Lance le cash sans dépendance tierce | File sature vers ~1k abonnés (goulot ARCHITECTURE.md) | OUI au MVP (étage 1) — migrer étage 2 quand ingérable |
-| Payout commissions manuel | Zéro risque de fuite de fonds | Travail opérateur croissant | OUI jusqu'à confiance opérationnelle + volume |
-| Gating UI seul, RLS "plus tard" | UI livrée vite | **Fuite directe du revenu** | **JAMAIS** — RLS signaux dès Wave 2 |
-| `role` dans le JWT | Pas de requête DB | Élévation de privilège, désync | **JAMAIS** — `profiles.role` + getUser() |
-| i18n/RTL après la vitrine | Vitrine livrée plus tôt | Refactor UI global | **JAMAIS** — poser dès Wave 1 |
-| % de réussite non mesuré "provisoire" | Beau chiffre marketing | Casse Core Value + risque légal | **JAMAIS** — mesuré ou "en construction" |
-| Disclaimer générique copié | Page "conforme" rapidement | Protection minimale, peut aggraver la responsabilité | **JAMAIS avant encaissement** — revue juriste |
-| Unicité hash par `(user,hash)` | Simple | Même hash crédite plusieurs comptes | **JAMAIS** — UNIQUE global sur `tx_hash` |
+| Seeder le backtest directement dans `prediction_outcomes` sans colonne `source` | Réutilise la vue `pattern_stats` telle quelle, zéro migration | Double-comptage backtest↔live, bascule impossible, % faux affiché publiquement | **Jamais** — c'est la corruption de données #1 |
+| Ré-implémenter la résolution d'outcome dans le backtest | Script autonome rapide | Divergence backtest vs live (first-touch D-04), chiffres non comparables | **Jamais** — appeler `replayOutcome` |
+| Calculer le % côté backtest avec `win_rate*100` au lieu de `applyThreshold` | Affichage admin rapide | Buckets N<30 montrés comme vrais %, divergence vitrine/Telegram | **Jamais** pour tout rendu visible ; OK en interne brut non affiché |
+| Copier les classes CSS physiques du HTML de référence | Reskin plus rapide | Régression RTL massive sur l'audience arabe | MVP seulement si la page n'est jamais servie en `ar` (rare) |
+| Appliquer le thème en `useEffect` | Simple | FOUC sur 4 combinaisons | Jamais pour des pages publiques (vitrine) |
+| Routines Claude comme seul mécanisme de publication | Coût zéro | Pas de SLA, données stale dès quota épuisé/PC off | Pré-lancement uniquement ; clé API au lancement payant |
 
 ## Integration Gotchas
 
 | Integration | Common Mistake | Correct Approach |
 |-------------|----------------|------------------|
-| TronGrid | Vérifier destinataire+montant sans le contrat émetteur | Exiger contrat USDT officiel `TR7NH…Lj6t` ; refuser tout autre token |
-| TronGrid | Lire montant avec 18 decimals (ERC-20) | 6 decimals, BigInt atomique ×10^6 |
-| TronGrid | Activer sur TX non confirmée | `only_confirmed:true` (walletsolidity) + `payment-watcher` re-vérif |
-| TronGrid | Comparer adresse hex (topics `41…`) à base58 (`T…`) | Normaliser via `tron-format-address` avant comparaison |
-| TronGrid | Pas de clé API → rate limit | Header `TRON-PRO-API-KEY` (gratuit) + p-retry/p-limit existants |
-| Cryptomus webhook | Signature sur objet re-sérialisé / Edge runtime | `runtime='nodejs'`, corps brut `req.text()`, MD5(base64(json)+key), IP whitelist |
-| Telegram (grammY) | Spam → rate limit (~1 msg/s/canal) | p-limit + idempotence `telegram_posts(outcome_id)` ; pas de webhook (publication only) |
-| Telegram MarkdownV2 | Échappement strict → messages cassés/rejetés | Échapper ou `parse_mode:'HTML'` ; tester les caractères spéciaux/arabe |
-| Anthropic SDK | Réécrire le contrat JSON en migrant | Changer SEULEMENT l'invocation ; `persist.ts`/Zod/scoring inchangés ; prompt caching |
-| next-intl middleware | Mauvais ordre (session avant locale) | Chaîner : locale (next-intl) → capture `?ref` → `updateSession()` |
+| Routine Claude Remote ↔ Supabase | S'appuyer sur le MCP Supabase (absent en Remote) | `supabase-js` service_role via HTTPS uniquement |
+| Routine Remote ↔ secrets | Coder/committer les clés, ou supposer `.env` présent en cloud | Environments chiffrés ; `dotenv/config` no-op en cloud |
+| Quota Max ↔ dev interactif | Compter les runs routines seuls | Budget partagé interactif + routines, marge sous 15/j |
+| Backtest ↔ `pattern_stats` view | Insérer sans discriminant de provenance | Colonne/table `source` + dimension dans la vue (migration d'abord) |
+| Reskin ↔ E2E existants | Casser les sélecteurs role/testid des 6 spec files | Conserver `data-testid` / rôles ARIA stables sur les éléments testés ; auditer les specs avant merge |
+| Reskin ↔ Disclaimer/RLS gating | Recopier des pages sans le `<Disclaimer />` global / sans le gate abonné | Garder les wrappers de conformité et de gating sur chaque page reskinnée |
 
 ## Performance Traps
 
 | Trap | Symptoms | Prevention | When It Breaks |
 |------|----------|------------|----------------|
-| `has_active_subscription()` appelée à chaque lecture de signal | Lenteur liste signaux | Index `subscriptions(user_id, status, expires_at)` + cache statut au RSC (revalidate court) | ~1k-10k abonnés |
-| File de validation paiement manuelle | Backlog superadmin, activations lentes | Migrer processeur étage 2 (webhooks) | ~1k abonnés |
-| Telegram publication non batchée | Rate limit 1 msg/s atteint | Batcher / espacer via p-limit | Beaucoup de clôtures/jour |
-| `pattern_stats`/win rate recalculé à la volée | Vitrine lente | Vue matérialisée / job pré-calcule | 10k+ visiteurs |
-| Re-pull on-chain de tous les pending à chaque run | Rate limit TronGrid | Borner aux pending récents, p-limit | Volume de paiements en attente |
+| Hero 3D / animations lourdes sur devices MENA bas de gamme | Jank au scroll, batterie, CLS au chargement du hero | `prefers-reduced-motion` respecté, animations CSS/GPU-friendly, dimensions réservées (pas de CLS), lazy/conditional 3D | Dès l'audience réelle (Android entrée de gamme) |
+| Marquee/gauges animés en boucle JS | CPU constant, jank | requestAnimationFrame borné ou animation CSS pure, pause hors viewport | Pages longues, onglets en arrière-plan |
+| Polices self-hosted (Noto Sans Arabic + 4 latines) non optimisées | FOUT, CLS, gros transfert | `font-display: swap`/`optional`, subset, preload des fonts critiques, `next/font` | Connexions MENA lentes |
+| `pattern_stats` view recalculée à chaque hit | Vitrine lente quand outcomes grossissent | Vue OK à petite échelle ; matérialiser si N de résolutions devient grand | >> dizaines de milliers d'outcomes |
+| Backtest sur série complète chargée en mémoire | Lenteur/OOM du job | Fenêtre glissante, pas toute la série indicateurs d'un coup | Longs historiques multi-instruments |
 
 ## Security Mistakes
 
 | Mistake | Risk | Prevention |
 |---------|------|------------|
-| Activer sur faux token "USDT" / screenshot | Accès gratuit, perte de revenu | Contrat officiel exact + vérif on-chain, jamais screenshot |
-| RLS signaux absente (gating UI seul) | Fuite totale du produit payant | RLS `has_active_subscription()` sur trade_setups/analyses |
-| `verified`/`active` écrit par l'anon-client | Auto-activation frauduleuse | Seul service_role transitionne ; user n'écrit que `pending` |
-| `role` dans JWT | Élévation de privilège | `profiles.role` + getUser() + RLS `is_superadmin()` |
-| Service-client importé hors allowlist web | Bypass de la double barrière | Lint allowlist `app/api/payments|webhooks/**` + `server-only` + revue sécu |
-| Clé privée wallet en DB/code/env | Vol de fonds irréversible | Cold wallet + watcher lecture seule ; payout manuel ; secret manager si auto |
-| PII filleul exposée à l'affilié | Fuite de données inter-users | `referrals` sans colonne sensible ; affilié voit alias/compteurs |
-| Webhook sans signature/IP | Activation frauduleuse | Signature corps brut + idempotence + IP whitelist |
-| Helper RLS sans `search_path` figé | Injection de schéma / récursion policy | `security definer set search_path = public` |
+| service_role exposé dans une routine Remote mal configurée | Bypass RLS total, fuite/écriture arbitraire | Environments chiffrés ; service_role jamais côté client/front ; garde ESLint server-only déjà en place |
+| Backtest qui écrit via un client front/anon | Échec ou contournement RLS | Seed via service_role en job, jamais depuis apps/web |
+| Nouveau champ de sortie agent inséré sans Zod/guardrails | Injection de données non validées dans un signal payant | Tout champ passe `OutputSchema` + `runGuardrails` avant insert |
+| `prediction_outcomes` exposé à anon en ajoutant le backtest | Fuite ligne-par-ligne (la vue ne doit exposer QUE des agrégats) | Re-passer `get_advisors` après toute migration touchant la chaîne track record |
+| Reskin qui retire le gating RLS d'une page membre | Signaux payants visibles gratuitement | Conserver le gate abonné sur chaque page reskinnée ; test gating E2E |
 
 ## UX Pitfalls
 
 | Pitfall | User Impact | Better Approach |
 |---------|-------------|-----------------|
-| Réseau de paiement ambigu (TRC-20 non explicite) | User paie sur le mauvais réseau, fonds perdus | Réseau TRC-20 affiché en grand + QR + adresse copiable 1 tap |
-| Échec sec pendant les confirmations | Panique "j'ai perdu mon argent" | Message "confirmation en cours ~1-2 min", statut visible |
-| Prix/dates inversés en arabe (RTL) | Montants illisibles, perte de confiance | `<bdi>`/`dir=ltr` + Intl autour des nombres/devises |
-| Expiration d'abonnement sans préavis | Coupure surprise, churn | Date visible + relance J-3/J-0 (Telegram/email) |
-| Jargon en première lecture du signal | Public non technique perdu | Explication simple d'abord, approfondi dépliable (déjà prévu) |
-| Win rate sans contexte d'échantillon | Méfiance / sentiment d'arnaque | Méthode + taille d'échantillon + pertes montrées |
+| % qui change sans explication à la bascule backtest→réel | Perte de confiance, soupçon de triche | Label de provenance + transition expliquée (Pitfall 9) |
+| Néon OKLCH sur fond sombre sous le seuil de contraste WCAG | Texte illisible, surtout public non technique | Vérifier contraste AA pour le texte ; réserver le néon aux accents non textuels |
+| Animations non désactivables | Mal des transports, exclusion accessibilité | `prefers-reduced-motion` honoré partout |
+| Numéraux arabes incohérents (latins vs arabes-indiens) | Lecture confuse pour l'audience arabe | Décider une convention de chiffres par locale et la tenir (scores, %, prix) |
+| Gauge de score lue comme un % de gain | Promesse implicite | Libeller clairement « score d'analyse /100 », distinct du % track record |
 
 ## "Looks Done But Isn't" Checklist
 
-- [ ] **Vérif paiement :** souvent manque la vérif du **contrat USDT exact** — vérifier que `contract_address == TR7NH…Lj6t`.
-- [ ] **Vérif paiement :** souvent manque `only_confirmed`/anti-réorg — vérifier que les non-solidifiées restent `pending`.
-- [ ] **Hash :** souvent UNIQUE par user au lieu de global — vérifier `UNIQUE(tx_hash)` global + test double-compte.
-- [ ] **Decimals :** souvent oublié 6 vs 18 — test montants limites (9.00/8.99/9.01).
-- [ ] **Gating signaux :** souvent gating UI sans RLS — test "non-abonné lit 0 signal via anon-client".
-- [ ] **Abonnement expiré :** souvent lit encore les signaux — test `expires_at` passé → 0 ligne.
-- [ ] **Rôle :** souvent dans le JWT — vérifier lecture `profiles.role` après getUser().
-- [ ] **Affiliation :** souvent commission non idempotente — test re-run job = même total.
-- [ ] **Affiliation :** souvent PII filleul exposée — test affilié ne voit pas l'email.
-- [ ] **RTL :** souvent classes `ml/mr/left/right` résiduelles — grep le nouveau code.
-- [ ] **RTL :** souvent prix/dates inversés — revue visuelle arabe sur montants.
-- [ ] **% réussite :** souvent sans source/échantillon — vérifier méthode affichée + seuil min.
-- [ ] **Légal :** souvent disclaimer générique — vérifier revue juriste signée AVANT encaissement.
-- [ ] **Webhook (étage 2) :** souvent Edge/objet re-sérialisé — vérifier `nodejs` + corps brut + idempotence.
-- [ ] **Moteur 24/7 :** souvent dépend encore du PC/Max — vérifier scheduling cloud + monitoring `job_runs`.
+- [ ] **% backtest affiché :** souvent manque le LABEL de provenance — vérifier qu'aucun % nu n'est rendu sans « mesuré par backtest » / « réel ».
+- [ ] **pattern_stats + backtest :** souvent manque le discriminant `source` — vérifier qu'une requête SQL sépare backtest et live.
+- [ ] **Backtest :** souvent manque la borne anti-look-ahead — vérifier que détection et replay n'utilisent jamais la même slice.
+- [ ] **Reskin RTL :** souvent reste des propriétés physiques — grep `ml-/mr-/left-/right-` dans les nouveaux fichiers + test `dir=rtl`.
+- [ ] **Thème :** souvent FOUC sur 1 des 4 combinaisons — tester volt/green × light/dark au reload, en RTL.
+- [ ] **Routine Remote :** souvent marche en interactif seulement — vérifier un run Remote réel + network `*.supabase.co`.
+- [ ] **Disclaimer/gating :** souvent retiré au reskin — vérifier `<Disclaimer />` global + gate abonné sur chaque page redesignée.
+- [ ] **E2E :** souvent cassés par le reskin — faire tourner les 6 spec files (auth, gating, i18n, academie, signals-rls, affiliation) avant merge.
+- [ ] **no-perf-claims :** souvent trop étroit — vérifier qu'il couvre les nouveaux composants NEXA (hero, marquee, gauges).
+- [ ] **Quota :** souvent sous-estimé — vérifier le budget de runs vs 15/j partagés.
 
 ## Recovery Strategies
 
 | Pitfall | Recovery Cost | Recovery Steps |
 |---------|---------------|----------------|
-| Faux token activé | MEDIUM | Audit des activations vs réception cold wallet ; révoquer abonnements sans dépôt réel ; ajouter check contrat |
-| Fuite signaux (RLS absente) | HIGH | Ajouter RLS immédiatement ; supposer le contenu compromis ; auditer logs d'accès anon ; rotation éventuelle de clé anon si abus |
-| Double commission | LOW-MEDIUM | Job de réconciliation idempotent ; ajuster `commissions` ; ajouter UNIQUE rétroactif |
-| Rôle JWT exploité | MEDIUM | Migrer vers `profiles.role` ; invalider sessions ; audit des accès admin |
-| RTL refactor tardif | HIGH | Migration globale `ml→ms` etc. ; coûteux — d'où "poser tôt" |
-| % non mesuré publié | MEDIUM (réputation) | Retirer le chiffre ; remplacer par mesuré/"en construction" ; communiquer la méthode |
-| Légal non couvert avant cash | HIGH/CRITIQUE | Stopper l'encaissement ; revue juridique ; rembourser si nécessaire ; restructurer |
-| Clé privée exposée | CRITIQUE | Vider le wallet vers un nouveau cold wallet immédiatement ; rotation ; post-mortem |
+| Backtest mélangé à live dans pattern_stats (P2) | HIGH | Migration `source`, purge des lignes backtest mal taguées, recalcul de la vue, ré-audit get_advisors |
+| % non mesuré affiché publiquement (P1/P4) | HIGH (légal + confiance) | Retirer immédiatement l'affichage, corriger label/seuil, communiquer si déjà public |
+| Promesse de gain réintroduite (P7) | HIGH (légal) | Retirer le visuel, grep complet, étendre no-perf-claims, revue |
+| Look-ahead dans le backtest (P3) | MEDIUM | Re-borner détection/replay, recalculer tout le seed, re-tester golden |
+| RTL cassé (P8) | LOW-MEDIUM | Remplacer propriétés physiques par logiques, re-test dir=rtl |
+| FOUC thème (P13) | LOW | Ajouter script inline anti-flash dans head |
+| Quota épuisé (P11) | LOW | Re-dimensionner/batcher les routines ; planifier bascule clé API |
+| E2E cassés par reskin | LOW | Réaligner sélecteurs/role ; restaurer testids |
 
 ## Pitfall-to-Phase Mapping
 
-| Pitfall | Prevention Phase (wave) | Verification |
-|---------|-------------------------|--------------|
-| 1. Faux token USDT | W2 paiement | Test : TX d'un contrat ≠ officiel → rejet |
-| 2. Decimals 6 | W2 paiement | Tests golden montants limites |
-| 3. Confirmations/réorg | W2 paiement+watcher | Test : non-solidifiée → pending, pas d'activation |
-| 4. Rejeu hash | W2 paiement | Test : même hash 2 comptes → 1 seul crédit |
-| 5. Fuite signaux (RLS) | W2 gating | Test RLS non-abonné → 0 ligne |
-| 6. Activation sans vérif serveur | W2 paiement | Test : user ne peut écrire que pending |
-| 7. Expiration offre / sous-paiement | W2 paiement | Test sur/sous-paiement → crédit/file |
-| 8. Légal conseil non agréé + crypto MENA | W2 (bloquant parallèle) | Revue juriste signée avant 1er encaissement |
-| 9. Rôle JWT (privilège) | W1 role/gate | Test : token stale ne donne pas admin |
-| 10. Fraude/double commission affiliation | W4 affiliation | Test idempotence + isolation PII cross-affilié |
-| 11. i18n/RTL tardif | W1 socle | Grep `ml/mr/left/right` ; revue visuelle arabe |
-| 12. % non mesuré/sur-ajusté | W3 track record | Méthode + échantillon affichés ; anti look-ahead |
-| 13. Fiabilité 24/7 moteur | W5 (avant lancement payant) | Scheduling cloud + `job_runs` exposé |
-| 14. Sécurité webhook étage 2 | W5 processeur | Test signature corps brut + idempotence |
-| 15. Payout on-chain clé privée | W5 (manuel dès W4) | Aucune clé privée en DB/code ; payout tracé |
+| Pitfall | Prevention Phase (axe) | Verification |
+|---------|------------------------|--------------|
+| P1 % backtest sans label provenance | Axe 3 affichage | Test : pas de `winRatePct` rendu sans nœud provenance |
+| P2 mélange backtest/live | Axe 3 migration (d'abord) | Requête SQL sépare source ; N stable au re-seed |
+| P3 look-ahead backtest | Axe 3 moteur | Golden : bougie future n'altère pas la détection |
+| P4 N<30 affiché | Axe 3 affichage | Tout % passe `applyThreshold` ; grep anti `*100` |
+| P5 first-touch divergent | Axe 3 moteur | Backtest appelle `replayOutcome` ; goldens partagés |
+| P6 survivorship/overfit | Axe 3 catalogue (avant moteur) | Catalogue figé avant résultats ; out-of-sample |
+| P7 promesse de gain visuelle | Axe 1 hero/landing | no-perf-claims étendu ; grep mots-clés gain |
+| P8 RTL cassé | Axe 1 fondation design | Grep propriétés physiques ; E2E dir=rtl |
+| P9 bascule silencieuse | Axe 3 outcome-tracker | Label change avec provenance ; seuil documenté |
+| P10 hallucination passe persist | Axe 2 routines | Aucun insert hors persist.ts ; champs sous Zod+guardrails |
+| P11 quota épuisé | Axe 2 dimensionnement | Budget runs < 15/j ; monitoring conso |
+| P12 MCP absent en Remote | Axe 2 config Environment | Run Remote réel réussi ; aucun appel MCP Supabase |
+| P13 FOUC thème | Axe 1 fondation thèmes | Reload sans flash × 4 combinaisons × 3 locales |
 
 ## Sources
 
-- ARCHITECTURE.md v2.0 (anti-patterns AP1-AP6, frontière producteur étendue, modèle RLS multi-rôles, build order par waves) — repo, **HIGH** (source primaire projet)
-- STACK.md v2.0 (TronGrid `only_confirmed`, decimals 6, contrat USDT, Cryptomus signature MD5 corps brut, runtime nodejs, RTL natif Tailwind v4, libs à éviter) — **HIGH**
-- FEATURES.md v2.0 (anti-features : garantie de gains, processeur dès lancement, payout auto, MLM, custody ; % mesuré jamais inventé) — **HIGH**
-- PROJECT.md (légal renforcé post-pivot : conseil non agréé + interdiction crypto Algérie ; clés jamais en DB/code ; revue légale avant 1er encaissement) — **HIGH**
-- [CryptoTimes — fake USDT detection](https://www.cryptotimes.io/learn/fake-usdt-what-it-is-how-to-detect-it/), [Cubex — spot fake USDT transactions](https://getcubex.co/ways-to-spot-fake-usdt-transactions/), [imToken — fake transaction record scam](https://support.token.im/hc/en-us/articles/17009391596697-Be-wary-of-the-fake-transaction-record-scam), [AML Crypto — check USDT TRC20](https://medium.com/@AMLCrypto/how-to-check-usdt-trc20-transaction-for-purity-and-risks-6ad1c13da3bc) — faux token TRC-20, zero-value/fake transfer, screenshots non fiables, contrat officiel `TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t` — **HIGH** (consensus multi-sources)
-- [Adam Tracy — crypto signal regulation](https://adamtracy.io/2023/05/30/crypto-trade-signal-regulation/), [Finance n Investments — financial advice disclaimer](https://financeninvestments.com/financial-advice-disclaimer/) — signaux personnalisés = activité régulée ; disclaimer générique = protection minimale, juriste requis — **MEDIUM** (peu de sources MENA-spécifiques ; régime crypto Algérie depuis PROJECT.md)
+- Code RÉEL du repo (HIGH) : `supabase/migrations/0014_prediction_outcomes_pattern_stats.sql` (absence de colonne `source` — fait central P2), `packages/core/src/replay/outcome.ts` (`replayOutcome`, first-touch D-04), `packages/core/src/time/candle.ts` (`lastClosedCandleStart` anti look-ahead), `packages/core/src/track-record/threshold.ts` (`MIN_SAMPLE=30`, `applyThreshold`), `apps/jobs/src/jobs/persist.ts` (frontière de confiance, guardrails), `apps/web/src/lib/track-record/*` (re-exports vitrine).
+- `docs/routines-claude.md` (HIGH) : quota ~15 runs/j partagé (§2), MCP Supabase absent en Remote (§4), secrets via Environments (§3), network `*.supabase.co` à confirmer (A1), fallback Task Scheduler (§5).
+- `.planning/PROJECT.md` (HIGH) : contrainte légale dure « % jamais inventé », slogan MERA écarté (décisions 2026-06-20), bascule backtest→réel, design reconstruit.
+- `.planning/research/PITFALLS.md` v2.0 (MEDIUM, contexte) : pièges on-chain/RLS/légal du milestone précédent, non re-couverts ici.
+- E2E existants (HIGH, inventaire) : 6 spec files (`auth`, `gating`, `i18n`, `academie`, `signals-rls`, `affiliation-attribution`) utilisant role/testid — à protéger au reskin.
 
 ---
-*Pitfalls research for: v2.0 plateforme publique payante (paiement crypto on-chain, gating multi-rôles, affiliation, i18n RTL, Telegram, CMS, track record) — pièges argent/sécurité du revenu/légal priorisés*
-*Researched: 2026-06-14*
+*Pitfalls research for: reskin NEXA trilingue RTL + routines Claude sans API + backtest/track record en prod*
+*Researched: 2026-06-20*

@@ -1,183 +1,148 @@
-# Stack Research — v2.0 Plateforme publique (couche produit)
+# Stack Research — v2.1 Additions (NEXA identity · routines live · backtest)
 
-**Domain:** Plateforme SaaS par abonnement (signaux trading) — paiement crypto, i18n trilingue RTL, Telegram, CMS, affiliation
-**Researched:** 2026-06-14
-**Confidence:** HIGH (versions npm vérifiées 2026-06-14 ; patterns d'intégration recoupés docs officielles)
-
-> **Périmètre :** UNIQUEMENT les briques neuves de la couche produit v2.0. La stack cœur (Next.js 15, Supabase, Tailwind v4, shadcn/ui, react-query 5, Zod 4, luxon, lightweight-charts 5, recharts 3, monorepo pnpm) est **verrouillée et livrée** — voir CLAUDE.md §Technology Stack. Ne PAS re-rechercher ni remplacer.
-
----
-
-## Synthèse des ajouts (TL;DR)
-
-| Brique v2.0 | Décision | Lib / Version | Nouvelle dépendance ? |
-|-------------|----------|---------------|------------------------|
-| 1a. Paiement USDT MVP (vérif TX hash) | **TronGrid REST direct** (fetch + Zod), pas de SDK | aucune lib (client maison) | Non — réutilise le pattern data-sources |
-| 1a. Conversion adresse TRON hex↔base58 | `tron-format-address` | `0.1.12` | Oui (micro, optionnel) |
-| 1b. Processeur crypto auto (étage 2) | **Cryptomus** (REST + webhook HMAC), client maison | aucune lib (client maison) | Non |
-| 2. i18n trilingue AR(RTL)/EN/FR | **next-intl** | `4.13.0` | Oui |
-| 2. RTL avec Tailwind v4 | **Propriétés logiques natives** (ms-*/me-*, `rtl:`) + `dir` attr | aucune lib | Non |
-| 3. Bot/canal Telegram | **grammY** | `1.43.0` (+ `@grammyjs/runner 2.0.3` si long-polling) | Oui |
-| 4. CMS articles/cours | **Table Supabase + MDX serialisé** | `next-mdx-remote 6.0.0` (+ `gray-matter 4.0.3` si fichiers) | Oui (léger) |
-| 5. Affiliation / superadmin | **100 % Supabase + Next.js existant** | aucune | Non |
-| 6. Fiabilité 24/7 (moteur IA) | **@anthropic-ai/sdk** + scheduler cloud | `@anthropic-ai/sdk 0.104.1` | Oui |
+**Domain:** Trading-signals SaaS (Next.js 15 + Supabase), milestone v2.1 add-ons on an already-shipped v2.0 app
+**Researched:** 2026-06-20
+**Confidence:** HIGH (DESIGN, ROUTINES, BACKTEST)
+**Scope rule:** Only NEW capabilities for the 3 axes. The v2.0 stack is locked and reused — do not re-add it. (Prior v2.0 stack research preserved at `.planning/milestones/` if archived.)
 
 ---
 
-## 1. Paiement crypto USDT TRC-20 on-chain
+## TL;DR — the minimal set
 
-### Étage 1 (MVP) — Vérification d'un TX hash soumis par l'utilisateur
+**Net-new runtime dependencies for the whole milestone: ZERO required, ONE optional.**
 
-**Décision : appeler TronGrid en REST direct (`fetch` + parsing Zod), PAS TronWeb.**
+| Axis | Verdict | New dep |
+|------|---------|---------|
+| DESIGN | CSS + `@theme` (Tailwind v4) + ~120 lines of vanilla TS (IntersectionObserver + rAF). Fonts via `next/font/local`. | **None required.** `motion` (12.x) only if scroll-reveal/tilt orchestration becomes painful across the whole app — defer until proven. |
+| ROUTINES | A Claude Code **scheduled Remote routine** that invokes the existing `tsx` job. No package, no API key. | **None.** Pure config + one new job file. |
+| BACKTEST | Pure TS replaying candles through existing `packages/indicators` + `replayOutcome` (already shipped v2.0 P5). Stats are trivial. | **None.** |
 
-| Option | Verdict | Pourquoi |
-|--------|---------|----------|
-| **TronGrid REST direct** | ✅ **Retenu** | Vérifier UN hash = 1 appel `gettransactioninfobyid`. TronWeb (`6.3.0`, 2.5 Mo, expose signature de TX, gestion de clés privées) est surdimensionné et porte une **surface de risque** (clés) inutile en lecture seule. Le projet a déjà 6 clients data-sources fetch+Zod golden-testés — même pattern, cohérence totale, zéro nouvelle dépendance. |
-| TronWeb `6.3.0` | ❌ Évité MVP | Maintenu (publié 2026-04-22) mais lourd ; utile seulement si on signe/broadcast des TX (paiement de commissions affiliés on-chain — voir étage 2). |
-
-**Endpoint clé (mainnet `https://api.trongrid.io`) :**
-- `POST /walletsolidity/gettransactioninfobyid` avec `{ value: "<txid>", only_confirmed: true }` → renvoie les `log[]` (events) du contrat TRC-20.
-- Parser l'event `Transfer(address,address,uint256)` : `topics[1]`=from, `topics[2]`=to, `data`=montant (decimals USDT = 6). Vérifier `to == wallet plateforme`, `montant >= dû`, statut `SUCCESS`.
-- Confirmations : `only_confirmed: true` ne renvoie que les TX au-delà de la fenêtre de solidification (~19 blocs / ~1 min). C'est la garantie anti-réorg recommandée pour activer un abonnement.
-- Contrat USDT TRC-20 à whitelister : `TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t`.
-
-**Sécurité / garde-fous (frontière de confiance, comme `persist.ts`) :**
-- Adresse plateforme et contrat USDT en `.env` / config, **jamais** saisis par l'utilisateur.
-- Idempotence : `UNIQUE` sur `tx_hash` en DB (un hash ne crédite qu'une fois — anti-rejeu). Même discipline upsert que l'ingestion.
-- Anti double-usage : refuser un hash déjà associé à un autre compte.
-- File de validation superadmin pour les cas tordus (montant partiel, mauvais réseau, confirmations insuffisantes).
-- Clé API TronGrid gratuite recommandée (header `TRON-PRO-API-KEY`) pour relever le rate limit ; `p-retry` + `p-limit` déjà dans la stack.
-
-**Lib utilitaire optionnelle :** `tron-format-address 0.1.12` (hex↔base58) pour normaliser les adresses extraites des topics (format hex `41…`) vers base58 (`T…`) avant comparaison. Léger, sans dépendance. Alternative : conversion maison (~20 lignes).
-
-### Étage 2 — Processeur crypto automatisé
-
-**Décision : Cryptomus (client REST maison fetch+Zod), avec NOWPayments en alternative.**
-
-| Critère | **Cryptomus** ✅ | NOWPayments |
-|---------|------------------|-------------|
-| Adresse unique par facture | Oui (modèle invoice/static wallet) | Oui (deposit address temporaire — appartient à NOWPayments) |
-| Webhook signature | **MD5 du `base64(json)` + payment API key** | HMAC-SHA512 (payload trié par clé avant hash — piège classique) |
-| SDK npm officiel maintenu | ❌ Aucun fiable (`cryptomus@0.0.0` = vide/squat ; SDK Go tiers existe) | ❌ `@nowpaymentsio/nowpayments-api-js@1.0.5` **abandonné (2022)** |
-| API-first / MENA-friendly | Oui (orienté API, accepte USDT TRC-20) | Oui mais orienté hosted checkout |
-
-> **Aucun SDK npm n'est fiable des deux côtés** → dans les deux cas, **client REST maison** (cohérent avec OANDA/Marketaux/FRED déjà faits maison). Cryptomus retenu pour son modèle invoice + USDT TRC-20 natif, audience MENA.
-
-**Vérification de signature webhook (CRITIQUE — argent) :**
-- Cryptomus : `md5( base64( json_payload_brut ) + PAYMENT_API_KEY )` comparé au champ `sign` reçu. **Comparer sur le corps brut**, pas sur l'objet re-sérialisé (l'ordre des clés casserait le hash).
-- Implémenter dans une **Route Handler Next.js** (`app/api/webhooks/cryptomus/route.ts`) avec `export const runtime = 'nodejs'` (besoin de `crypto` Node + corps brut via `await req.text()`), jamais Edge.
-- Idempotence sur `order_id` / `uuid` de paiement (rejeu webhook = no-op).
-- Whitelist d'IP source du provider en complément de la signature.
-
-**Commissions affiliés en crypto (paiement sortant) :** hors MVP. Si automatisé plus tard, c'est le seul cas qui justifie **TronWeb `6.3.0`** (signer/broadcast une TX) — à isoler dans un job, clé privée en cold/secret manager **jamais en DB ni en code** (contrainte PROJECT.md). Recommandation : commencer en **paiement manuel** (le superadmin paie, trace en DB).
+The reference mock (`Nexa - Landing.html`) ships its behaviour in a plain `landing.css` + `landing.js` — **no framework, no animation lib in the markup.** Everything it does (marquee, score rings, scroll-reveal, mouse-tilt, count-up, parallax hero, CSS globe) is reproducible with CSS + a tiny vanilla helper. **Reconstruct, do not import a heavy lib.**
 
 ---
 
-## 2. i18n trilingue AR(RTL) / EN / FR — Next.js 15 App Router
+## Recommended Stack
 
-**Décision : next-intl `4.13.0`.**
+### Core Technologies (NEW for v2.1)
 
-| Option | Verdict | Pourquoi |
-|--------|---------|----------|
-| **next-intl** | ✅ **Retenu** | Conçu **pour l'App Router** (RSC + Client Components), routing localisé natif (`/ar`, `/en`, `/fr`), middleware de détection, formatage ICU (pluriels arabes), `setRequestLocale` pour le rendu statique. peerDep `next: ^15 \|\| ^16` ✓ React 19 ✓. Maintenu activement (publié 2026-06-05). Standard de facto App Router. |
-| next-i18next `16.0.7` | ❌ | Construit autour du **Pages Router** / `getServerSideProps`. Sur App Router c'est de la rame (wrappers i18next manuels). Inutilement complexe ici. |
-| react-i18next nu | ❌ | Pas de routing localisé ni d'intégration RSC — il faut tout recâbler. |
+| Technology | Version | Purpose | Why Recommended |
+|------------|---------|---------|-----------------|
+| **`next/font/local`** | built into Next 15 — no install | Self-host the 5 brand fonts: Archivo, Chakra Petch, Space Grotesk, JetBrains Mono, Noto Sans Arabic | The mock loads them from Google Fonts CDN. Self-host instead: zero layout shift (auto fallback metrics), no third-party render-blocking `<link>` (privacy + MENA latency). Same mechanism already used for Inter/IBM Plex Sans Arabic in v2.0 P2 — extend it. Exposes CSS vars (`--font-archivo`, etc.) consumed by Tailwind `@theme`. |
+| **Tailwind v4 `@theme` + OKLCH custom props** | `tailwindcss 4.3.1` (ALREADY installed) | Brand tokens, two themes `volt`/`green`, RTL | No new dep. The mock already speaks OKLCH (`oklch(0.74 0.16 147)`) — Tailwind v4 is OKLCH-native. Themes via `[data-theme="volt"]`/`[data-theme="green"]` attribute selectors overriding `@theme` custom properties (mirrors the mock's `data-theme` on `<html>`). RTL stays as v2.0: logical properties only, no `tailwindcss-rtl`. |
+| **Vanilla TS animation helpers** | n/a (~120 LOC, client components in `apps/web`) | scroll-reveal, count-up, mouse-tilt, parallax depth | The mock's `.reveal`, `data-count`, `.tilt[data-tilt]`, `.layer[data-depth]` are driven by `landing.js`. Reconstruct with `IntersectionObserver` (reveal), `requestAnimationFrame` (count-up easing), `mousemove`+`transform` (tilt/parallax). Tree-shakeable, SSR-safe (guard in `useEffect`), `prefers-reduced-motion`-aware. Cheaper than any lib for this exact set. |
+| **Claude Code scheduled Remote routine** | platform feature (Max plan) — no npm | Trigger `snapshot → analyze(veteran) → persist` at day/swing windows | Confirmed by `docs/routines-claude.md` + PROJECT.md: intelligence is the agent; backend only reads/writes Supabase via `supabase-js`. No Anthropic API key, no new dependency. The routine is dashboard config that runs the existing `tsx` dispatcher. |
 
-**Intégration Next 15 :**
-- Routing : `[locale]` segment + `middleware.ts` next-intl pour redirection/détection. Locales `['ar','en','fr']`, défaut au choix produit (probablement `ar` pour MENA).
-- RSC : messages chargés serveur via `getMessages()` ; composants client via `<NextIntlClientProvider>`.
-- Rendu statique vitrine : `setRequestLocale(locale)` dans chaque page/layout pour garder le SSG.
-- Messages JSON par namespace (`vitrine`, `signaux`, `legal`…) pour ne pas tout charger.
+### Supporting Libraries
 
-**RTL avec Tailwind v4 — AUCUN plugin nécessaire.**
-- Tailwind v4 supporte nativement les **propriétés logiques** : utiliser `ms-*`/`me-*` (margin), `ps-*`/`pe-*` (padding), `start-*`/`end-*` (inset), `text-start`/`text-end` au lieu de `ml/mr/pl/pr/left/right/text-left`. Elles s'inversent automatiquement selon `dir`.
-- Mettre `<html lang={locale} dir={locale === 'ar' ? 'rtl' : 'ltr'}>` dans le layout racine `[locale]`.
-- Variants `rtl:` / `ltr:` disponibles pour les exceptions ponctuelles (icônes directionnelles, flèches).
-- ⚠️ **NE PAS** installer `tailwindcss-rtl` (`0.9.0`, **abandonné 2022**, incompatible config CSS-first de Tailwind v4) ni `tailwindcss-logical` (redondant — v4 l'intègre).
-- Police arabe : ajouter une font arabe (ex. via `next/font`) et la mapper sur `:lang(ar)`.
+| Library | Version | Purpose | When to Use |
+|---------|---------|---------|-------------|
+| **`motion`** (successor to `framer-motion`) | `12.x` (latest 12.40.0, 2026) | Declarative scroll/enter animations IF vanilla orchestration proves unmaintainable across many app surfaces | **OPTIONAL — defer.** ESM, `motion/react` (React 19 compatible) + vanilla `animate()`. Hybrid engine (WAAPI + JS), GPU-accelerated. Only adopt if applying reveal/stagger to member + academy + admin becomes repetitive enough that hand-rolled IO is worse. For the landing page alone, NOT needed. Budget ~30–40 kB gzip with `LazyMotion`. |
+| **`tw-animate-css`** | `1.4.0` (ALREADY installed) | Keyframe utilities (fade/slide) used by shadcn v4 | Already a dep. Covers simple entrance/exit (dialogs, toasts). Use it before reaching for `motion`. Marquee + rings are NOT here — those are bespoke CSS. |
+| **`lightweight-charts`** | `5.2.0` (ALREADY installed) | Reused as-is if a "replay over history" preview UI is built for backtest | No change. Backtest engine is headless TS; reuse the existing v5 chart from member detail if a visual replay is wanted. |
 
----
+### Development Tools (reused for v2.1)
 
-## 3. Bot / canal Telegram (publication automatisée)
-
-**Décision : grammY `1.43.0`.**
-
-| Option | Downloads/sem | Verdict | Pourquoi |
-|--------|---------------|---------|----------|
-| **grammY** | **~3.83 M** | ✅ **Retenu** | TS natif (types Bot API à jour), **ESM + CJS**, API moderne, plugins (sessions, runner, menus), excellente doc, très maintenu (2026-05-16). Aligné sur les jobs ESM/tsx existants. |
-| telegraf | ~0.38 M | ❌ | Historique, maintenance ralentie, types moins frais. grammY est son successeur de facto. |
-| node-telegram-bot-api | ~0.27 M | ❌ | Le package npm a été **repris/réécrit récemment** (v`1.1.0`, desc « modern TypeScript rewrite ») — historiquement c'était l'API callback `0.6x`. Identité/continuité douteuses → éviter pour un usage prod. |
-
-**Usage pour ce projet (publication, pas de bot interactif) :**
-- Cas principal = **poster dans un canal** (résultats journaliers + win rate). Pas besoin de recevoir des updates → un simple `bot.api.sendMessage(CHANNEL_ID, …)` suffit, appelable depuis un **job tsx** existant. Pas de webhook ni de long-polling nécessaire pour ça.
-- `@grammyjs/runner 2.0.3` UNIQUEMENT si on ajoute plus tard un bot interactif en long-polling (commandes utilisateur). Pas requis MVP.
-- Token bot en `.env` (jamais commité). Rate limit Telegram : ~1 msg/s par canal — `p-limit` déjà dispo.
-- Formatage : `parse_mode: 'HTML'` ou MarkdownV2 ; attention à l'échappement (MarkdownV2 est strict).
-
----
-
-## 4. CMS articles / cours vulgarisés
-
-**Décision : Table Supabase pour le contenu + `next-mdx-remote 6.0.0` pour le rendu. Éviter tout headless CMS externe.**
-
-| Option | Verdict | Pourquoi |
-|--------|---------|----------|
-| **Supabase table + MDX sérialisé** | ✅ **Retenu** | Une table `articles` (slug, locale, title, body_mdx, status, published_at). Édition via le **dashboard superadmin déjà à construire** (textarea MDX + preview). Contenu **trilingue** → la colonne `locale` colle au besoin i18n. RLS : public lit `status='published'`, superadmin écrit. Rendu serveur via `next-mdx-remote/rsc` (compatible RSC). Zéro infra/coût supplémentaire, une seule source de vérité (Postgres). |
-| MDX fichiers (`@next/mdx` + `gray-matter`) | ⚠️ Alternative | Bon si le contenu est versionné en Git et écrit par des devs. Mais ici contenu **non technique, trilingue, édité par le fondateur/équipe** sans redéploiement → la DB est meilleure. `gray-matter 4.0.3` (stable, frozen) seulement si on garde le front-matter fichier. |
-| Headless CMS (Sanity, Strapi, Payload…) | ❌ Évité | Sur-ingénierie + coût/hébergement + 2e source de vérité + 2e système d'auth. Le superadmin Supabase couvre le besoin. |
-
-**Notes :** `next-mdx-remote 6.0.0` (publié 2026-02) supporte RSC. Sanitiser/limiter les composants MDX autorisés (le contenu vient de la DB → traiter comme entrée semi-fiable, pas de composants arbitraires côté éditeur multi-utilisateur). Pour de la prose simple, Markdown pur (`react-markdown`) suffirait — n'introduire MDX que si on veut des composants riches (charts, encarts).
-
----
-
-## 5. Affiliation / superadmin
-
-**Décision : 100 % Supabase + Next.js existant. AUCUNE nouvelle librairie.**
-
-- **Modèle de données** (nouvelles tables) : `affiliates` (user_id, code promo unique, palier, taux), `referrals` (affiliate_id, referred_user_id, subscribed_at), `commissions` (referral_id, period, amount_usdt, status, paid_at). Tout en migrations SQL Supabase (source de vérité unique, comme le cœur).
-- **Calcul des commissions** = job déterministe tsx (récurrent, 20 % max des abos actifs ramenés) → même runner `job_runs` déjà livré. Idempotent par `(affiliate_id, period)`.
-- **Tracking code promo** : capter `?ref=CODE` → cookie → attacher à l'inscription. Pur Next.js (middleware/route handler).
-- **Superadmin** : routes Next.js gated par rôle (claim `role=admin` dans Supabase Auth / table `profiles.role`), RLS stricte. Tables shadcn/ui (déjà dispo) pour les vues membres/affiliés/paiements/santé jobs. react-query (déjà dispo) pour les listes.
-- **RLS** : un affilié ne voit que SES referrals/commissions ; superadmin voit tout (policy `role='admin'`). Tests RLS Playwright comme déjà fait pour le journal privé.
-
-Rien à ajouter — le stack existant (Supabase RLS + jobs + shadcn + react-query) couvre intégralement.
-
----
-
-## 6. Fiabilité 24/7 — Migration routines Max → API Anthropic
-
-**Décision : `@anthropic-ai/sdk 0.104.1` + scheduler cloud (infra non tranchée ici).**
-
-- **SDK** : `@anthropic-ai/sdk 0.104.1` (publié 2026-06-09, très actif). peerDep `zod ^3.25 || ^4` → **compatible Zod 4** de la stack ✓. ESM/CJS ✓. À appeler depuis `apps/jobs` (la routine d'analyse `persist.ts` reste la frontière de confiance — le SDK ne change que la **source du raisonnement**, plus l'agent Max).
-- **Pattern** : remplacer l'appel agent par `client.messages.create({ model, system: prompt_versionné_sha256, messages, … })`. Le prompt versionné + garde-fous Zod + scoring déterministe sont **déjà livrés** → migration = changer l'invocation, pas le contrat JSON §3. Activer `prompt caching` (system prompt stable) pour réduire le coût.
-- **Clé** `ANTHROPIC_API_KEY` en `.env`/secret manager (jamais commitée). Modèle : choisir un modèle Claude courant au moment du lancement (à fixer lors de l'implémentation, pas figé ici).
-- **Scheduling cloud (à noter, choix d'infra reporté)** : options crédibles — GitHub Actions cron (déjà utilisé en CI, gratuit, simple), Supabase Edge Functions + `pg_cron`/`pg_net`, ou un petit worker (Railway/Fly/Render) avec `croner 10.0.1` (déjà dans la stack). **Aucun verrou requis maintenant** ; Windows Task Scheduler reste le backup d'ingestion déterministe. Jobs déjà idempotents → migration cloud sans risque de double-exécution.
-- **Coût** : passage de « 0 token » (Max) à facturation API → à budgéter au lancement payant (cohérent avec la décision PROJECT.md 2026-06-13).
+| Tool | Purpose | Notes |
+|------|---------|-------|
+| **Vitest** (ALREADY `4.1.8`) | Golden tests for the backtest engine + Wilson-interval helper + count-up easing math | Same harness as `packages/indicators`. Fixed candle fixtures → fixed `pattern_stats`. Mirror existing golden-value discipline. |
+| **Playwright** (ALREADY `1.60.0`) | Visual/RTL E2E for the rebrand across surfaces; theme-toggle no-flash; reduced-motion | Add specs: `data-theme` swap, AR-RTL intact, fonts loaded (no FOUT), reveal fires. Extends v2.0 E2E. |
 
 ---
 
 ## Installation
 
 ```bash
-# apps/web — i18n
-pnpm --filter web add next-intl@4.13.0
+# DESIGN — NO new npm package required for the baseline reconstruction.
+# Fonts: place the 5 .woff2 subsets in apps/web/app/fonts/ and wire next/font/local.
+#   Archivo (600–900), Chakra Petch (600/700), Space Grotesk (300–700),
+#   JetBrains Mono (500–700), Noto Sans Arabic (400–700).
+# (No @fontsource needed for these — local files + next/font/local, like the Inter setup.)
 
-# apps/web ou package partagé — rendu CMS (si MDX retenu)
-pnpm --filter web add next-mdx-remote@6.0.0
-pnpm --filter web add gray-matter@4.0.3   # seulement si contenu en fichiers
+# OPTIONAL, only if scroll/stagger orchestration across the whole app gets unwieldy:
+pnpm --filter web add motion        # 12.x — import from "motion/react"
 
-# apps/jobs — Telegram + moteur IA
-pnpm --filter jobs add grammy@1.43.0
-pnpm --filter jobs add @anthropic-ai/sdk@0.104.1
-pnpm --filter jobs add @grammyjs/runner@2.0.3   # seulement si bot interactif long-polling
+# ROUTINES — NO package. Configure a Claude Code Remote routine in the dashboard +
+# add apps/jobs/src/jobs/analyze.ts that runs through the existing dispatch.ts/runJob.ts.
 
-# packages/data-sources (ou payments) — utilitaire TRON optionnel
-pnpm --filter @repo/data-sources add tron-format-address@0.1.12
-
-# TronGrid + Cryptomus = clients fetch+Zod MAISON (aucun paquet npm)
-# RTL = natif Tailwind v4 (aucun paquet)
-# Affiliation/superadmin = Supabase + Next.js existants (aucun paquet)
+# BACKTEST — NO package. New code under packages/core (engine) reusing packages/indicators
+# + the shipped replayOutcome. Optional Wilson-interval helper = ~15 lines, no dep.
 ```
+
+---
+
+## DESIGN — animation decision matrix (the core question)
+
+Verdict per mock feature. **CSS/zero-dep wins for every one.**
+
+| Mock feature (selector) | How the mock does it | Recommended reconstruction | Lib? |
+|---|---|---|---|
+| Ticker **marquee** (`.marquee-track`, duplicated ticks) | CSS `@keyframes` translateX loop on a duplicated track | Pure CSS keyframes + `will-change: transform`; pause on `prefers-reduced-motion`. RTL: reverse direction under `[dir=rtl]`. | **No** |
+| **Score rings / gauges** (`.ring svg`, `.gauge-big`, `stroke-dasharray`) | SVG `stroke-dasharray`/offset + CSS transition; `data-score` sets final dash | SVG + CSS `transition: stroke-dashoffset`; set target via inline style or 1-line `useEffect`. Color is OKLCH per score band. | **No** |
+| **Count-up numbers** (`data-count`, `data-suffix`) | `landing.js` rAF easing 0 → value when in view | `requestAnimationFrame` easing helper (~25 LOC), triggered by IntersectionObserver. | **No** (vanilla) |
+| **Scroll-reveal** (`.reveal`, `.reveal.d1/d2`) | IntersectionObserver toggles a class; CSS transitions; `.d1/.d2` = stagger delays | `IntersectionObserver` adding `.is-visible`; CSS handles transition + delay classes. ~30 LOC, one observer reused app-wide. | **No** (vanilla) |
+| **Mouse-tilt cards** (`.tilt[data-tilt]`, `.mock`, `.signal-demo`, `.price-card`) | `mousemove` → `rotateX/rotateY`, `data-tilt`=max deg | `mousemove`/`mouseleave` handler computing rotation from pointer offset; `transform-style: preserve-3d`. Disable on touch + reduced-motion. ~30 LOC. | **No** (vanilla) |
+| **Parallax hero layers** (`.layer[data-depth]`, float-cards, `data-rain`) | `mousemove`/scroll translates layers by `data-depth` factor | Same pointer handler outputs per-layer `translate3d` scaled by depth. Data-rain = CSS animation on generated spans (or a tiny canvas if perf demands). | **No** (vanilla) |
+| **3D globe** (`.globe`, `.atmo`, `.hero-aura`, `.hero-grid`) | Pure CSS: radial/conic gradients + `border-radius:50%` + blur; grid is a CSS background | Pure CSS gradients + `border-radius` + `filter: blur`. **No three.js / WebGL.** It is a stylised disc, not a textured sphere. | **No** |
+| **Progress bar** (`#progress`) | scroll-linked width | CSS `animation-timeline: scroll()` (modern) or 3-line scroll listener fallback. | **No** |
+| **Theme toggle** `volt`/`green` (`#theme-toggle`, `data-theme`) | sets `data-theme` on root | Reuse v2.0 `next-themes` but with `attribute="data-theme"` + `themes={['volt','green']}`; no-flash already solved in v2.0 P2. | **No** (reuse) |
+
+**Why not a lib by default:** the entire set is CSS-transform + IntersectionObserver + rAF. A library buys declarative ergonomics, not capability. Bundle cost (motion ≈ 30–40 kB, GSAP ≈ 50 kB+) is unjustified for a MENA mobile audience when ~120 LOC of guarded vanilla does it. Keep helpers in `apps/web/lib/anim/` as small client modules, each `prefers-reduced-motion`-aware.
+
+**When `motion` becomes justified:** if the rebrand mandates consistent staggered reveals + shared-layout transitions across *member + academy + admin* and the hand-rolled observer turns into copy-paste sprawl. Then adopt `motion` (not GSAP — see What NOT to Use) with `LazyMotion`. This is a Phase-level decision — flag it, don't pre-commit.
+
+### Fonts — concrete wiring
+
+- 5 families self-hosted via `next/font/local`, each exposing a CSS variable. Subset to mock weights (Archivo 600–900, Chakra Petch 600/700, Space Grotesk 300–700, JetBrains Mono 500–700, Noto Sans Arabic 400–700).
+- **Noto Sans Arabic** = the AR (RTL) face. Decide in requirements whether it *replaces* v2.0's IBM Plex Sans Arabic or co-exists — prefer replace, to keep the weight budget lean. Don't ship both unless a fallback is required.
+- Map vars in Tailwind v4 `@theme`: `--font-display: var(--font-archivo)`, `--font-mono: var(--font-jetbrains)`, etc. Latin display (Archivo/Chakra/Space Grotesk) for LTR; Noto Sans Arabic auto-applied under `[lang=ar]`/`[dir=rtl]`.
+- `display: 'swap'` + `adjustFontFallback` to kill CLS.
+
+### OKLCH multi-theme + RTL with Tailwind v4
+
+- Tokens declared once in `@theme` as OKLCH (matches mock literals). `volt`/`green` are attribute-scoped overrides: `[data-theme=green] { --primary: oklch(...); --buy: ...; }`.
+- The mock keys colour off semantic vars (`--primary`, `--buy`, `--sell`, `--surface`, `--surface-solid`, `--line`, `--line-soft`, `--sub`, `--mute`, `--bg2`, `--accent`, `--text`) — replicate that exact token list so both themes are pure var swaps.
+- RTL unchanged from v2.0: logical properties + `dir` on `<html>` (next-intl ar→rtl). Marquee/tilt/parallax handlers must read `dir` to mirror direction.
+
+---
+
+## ROUTINES — what's actually required (no API key, no new dep)
+
+**Confirmed from `docs/routines-claude.md` + PROJECT.md:** the analysis intelligence is the Claude Code *agent itself* running a scheduled **Remote routine**. There is **NO npm package** and **NO Anthropic API key**. The routine simply executes the existing `tsx` dispatcher; Claude provides the veteran reasoning during the run.
+
+| Requirement | Mechanism | New dep? |
+|---|---|---|
+| Run reasoning without API key | Claude Code scheduled **Remote routine** (cloud), Max plan, ~15 runs/day **shared** with interactive sessions | None |
+| Secrets in the cloud run | **Environments** (encrypted `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`); `dispatch.ts` already loads `dotenv/config` (no-op in cloud) | None |
+| DB access | `supabase-js` over HTTPS (the `.mcp.json` stdio MCP is NOT available in Remote runs — documented) | None (reuse) |
+| The job itself | NEW `apps/jobs/src/jobs/analyze.ts` = `snapshot → analyze → persist.ts`, idempotent, writes `job_runs` | None (new code) |
+| Idempotency / monitoring | Existing `runJob.ts` (startRun/finishRun) + `job_runs` + stale flag | None (reuse) |
+
+### Choosing day vs swing windows — "the engine picks the timing"
+
+Two layers, neither needs a package:
+
+1. **Schedule layer (when the routine fires):** define routine cron windows in the Claude dashboard aligned to `docs/routines-claude.md §6` UTC session times — e.g. `22:30` post-NY (swing / D & H4), `09:15` post-London open (day), `00:15` post-Binance close (crypto daily). This bounds the ~15 runs/day quota.
+2. **Selection layer (which instruments/styles are opportune *within* a run):** a deterministic TS selector in `packages/core` scores candidate (instrument, style, timeframe) tuples by session activity + data freshness (`v_data_freshness`) + last-analysis recency; the agent reasons over the shortlist. Pure TS — `luxon` (ALREADY installed) handles session/DST math. **No scheduler lib.** `croner` (installed) stays as the local backup-daemon option; Windows Task Scheduler as deterministic-ingestion backup.
+
+**Quota guardrail (design constraint, not a lib):** ingestion jobs keep running via Task Scheduler so they never burn the 15 agent runs. Only the `analyze` job consumes agent quota. This split is already documented — v2.1 just activates the analyze routine and lifts the v1.0 P4 debt ("configure routines + 1 real run").
+
+---
+
+## BACKTEST — pure TS, reuse what exists
+
+**Verdict: no new package.** v2.0 P5 already shipped the outcome primitive (`replayOutcome`, first-touch, golden-tested: `hit_tp`/`hit_sl`/`flat` + R), plus `prediction_outcomes`, the `pattern_stats` view, and the public N≥30 gating. The backtest is the same machinery pointed at *historical* candles instead of live ones.
+
+| Need | Solution | New dep? |
+|---|---|---|
+| Replay a pattern catalogue over history | NEW headless engine in `packages/core` (e.g. `backtest/`) iterating stored `candles`, detecting patterns via existing `packages/indicators` (incl. home-made market-structure: BOS/CHoCH/swings), generating setups, resolving with **the existing `replayOutcome`** | None |
+| Compute win-rate per pattern | Count `hit_tp` vs resolved → proportion. Seed `pattern_stats` (same shape the live loop already feeds) | None |
+| Confidence / honesty (N visible, N≥30) | **Wilson score interval** for the proportion — ~15 LOC pure math, golden-testable. Honest band, not a bare point estimate. No stats package. | None |
+| Candle source | Already in Supabase `candles` (v2.0 P2 ingestion). Replay is read-only over history. | None |
+| Determinism / no look-ahead | Anti look-ahead constants (v1.0 P1, 16 golden values) already enforce no future leak — reuse in the replay loop. | None |
+
+**Statistical helpers:** resist `simple-statistics`/`jstat`. The only non-trivial stat is a binomial CI (Wilson) — write it, golden-test against known values (e.g. p̂=0.7, n=30 → known bounds). Everything else is counting. A stats lib would be dead weight for one formula and dilutes the "every number measured and traceable" guarantee.
+
+**Integration point:** backtest writes into the *same* `pattern_stats`/`prediction_outcomes` surfaces the live `outcome-tracker` uses, so the public "% mesuré dès J1" block (already built) shows backtest numbers first, then live outcomes take over as N grows — exactly the PROJECT.md decision. Run it as a one-shot `tsx` job (Task Scheduler / manual) — deterministic, no reasoning → **no agent quota consumed**.
 
 ---
 
@@ -185,13 +150,12 @@ pnpm --filter @repo/data-sources add tron-format-address@0.1.12
 
 | Recommended | Alternative | When to Use Alternative |
 |-------------|-------------|-------------------------|
-| TronGrid REST maison | TronWeb `6.3.0` | Uniquement pour **signer/broadcast** des TX (payer les commissions affiliés on-chain automatiquement). Pas pour de la lecture. |
-| Cryptomus (client maison) | NOWPayments (client maison) | Si on veut un hosted checkout clé en main / branding spécifique. Vérif signature HMAC-SHA512 avec payload trié. |
-| next-intl `4.13.0` | next-i18next `16.0.7` | Seulement si on migrait vers Pages Router (on ne le fera pas). |
-| RTL natif Tailwind v4 | — | Aucun plugin RTL nécessaire ni recommandé sur v4. |
-| grammY `1.43.0` | telegraf `4.16.3` | Si une lib tierce impose telegraf. Sinon grammY supérieur. |
-| Supabase + MDX (DB) | `@next/mdx` fichiers + `gray-matter` | Si contenu versionné en Git, écrit par devs, peu fréquent. |
-| @anthropic-ai/sdk | (rester agent Max) | Tant qu'aucun abonné payant / fiabilité 24/7 non critique. |
+| Vanilla CSS + IO/rAF helpers | `motion` 12.x | If staggered reveals + shared-layout transitions are needed consistently across member+academy+admin and hand-rolled IO becomes maintenance sprawl. Adopt with `LazyMotion`. |
+| Vanilla CSS + IO/rAF helpers | `GSAP` 3.x | Essentially never here. GSAP shines for complex timelines/scrubbing; overkill + heavier than motion for reveal/tilt/marquee. Only for a future cinematic scrollytelling section. |
+| Pure CSS globe (gradients) | `three.js` / R3F (WebGL) | Only if the brand later demands a real textured/interactive 3D globe. The mock globe is a stylised CSS disc — WebGL = large bundle + mobile battery cost for zero current benefit. |
+| `next/font/local` (self-host) | `@fontsource/*` packages | If you prefer npm-managed font files. v2.0 uses `@fontsource/ibm-plex-sans-arabic` — acceptable, but `next/font/local` gives better CLS control + the CSS-var ergonomics Tailwind `@theme` wants. |
+| Hand-written Wilson interval | `simple-statistics` / `jstat` | If the backtest later needs many stats (Sharpe, drawdown distributions, t-tests). For one CI formula, don't. |
+| Claude scheduled routine (no key) | Anthropic API key + cloud cron | At paid public launch when 24/7 reliability for paying subscribers outweighs cost (already flagged in PROJECT.md as the post-launch migration). Out of scope for v2.1. |
 
 ---
 
@@ -199,61 +163,61 @@ pnpm --filter @repo/data-sources add tron-format-address@0.1.12
 
 | Avoid | Why | Use Instead |
 |-------|-----|-------------|
-| `tailwindcss-rtl` `0.9.0` | **Abandonné 2022**, incompatible Tailwind v4 (config CSS-first) | Propriétés logiques natives v4 (`ms-*`, `pe-*`, `start-*`, `rtl:`) |
-| `tailwindcss-logical` | Redondant — Tailwind v4 intègre les logical properties | Natif v4 |
-| `@nowpaymentsio/nowpayments-api-js` `1.0.5` | **Abandonné 2022**, types obsolètes | Client REST maison (NOWPayments ou Cryptomus) |
-| `cryptomus` `0.0.0` (npm) | Package **vide / squat** | Client REST maison Cryptomus |
-| `node-telegram-bot-api` `1.1.0` | Package **repris/réécrit**, continuité d'identité douteuse, API callback historique | grammY |
-| `next-i18next` sur App Router | Pensé pour Pages Router/`getServerSideProps` | next-intl |
-| Headless CMS externe (Sanity/Strapi/Payload) | Sur-ingénierie, coût, 2e source de vérité + 2e auth | Table Supabase + superadmin |
-| TronWeb pour vérifier un hash | 2.5 Mo + surface de risque clés privées pour de la lecture seule | TronGrid REST direct |
-| ORM (Drizzle/Prisma) pour affiliation | Dédouble la source de vérité schéma (migrations SQL Supabase) | Client Supabase typé + repositories (déjà en place) |
-| Webhook crypto en Edge runtime | Besoin du corps brut + `crypto` Node pour vérifier la signature | Route Handler `runtime='nodejs'` |
+| `framer-motion` (the old package name) | Renamed/superseded by `motion`; importing the old name invites version confusion | `motion` (`import { motion } from "motion/react"`) — and only if actually needed |
+| `GSAP` for this milestone | 50 kB+, plugin licensing nuance, timeline power unused by reveal/tilt/marquee | CSS + vanilla, or `motion` |
+| `three.js` / `@react-three/fiber` for the hero globe | Heavy WebGL bundle + mobile cost; the mock globe is pure CSS | CSS radial/conic gradients + blur |
+| `react-fast-marquee` / `embla` for the ticker | A duplicated CSS-keyframe track is smaller and is the mock's own approach | CSS `@keyframes` translateX |
+| Google Fonts CDN `<link>` (as in the raw mock) | Render-blocking, third-party request, CLS, privacy/latency for MENA | `next/font/local` self-host, `display:swap` |
+| Any stats package for the backtest | Only one non-trivial formula (Wilson) needed; dilutes "every number measured" provenance | ~15 LOC hand-written + golden test |
+| Anthropic API key / SDK in v2.1 | Out of scope; intelligence = scheduled agent on Max plan | Claude Code Remote routine running existing `tsx` job |
+| `node-cron` / new scheduler dep for routine windows | TZ/DST handling weaker; routine timing lives in the Claude dashboard + luxon selector | Claude routine schedule + `luxon` (installed) + `croner` (installed) backup |
+| `tailwindcss-rtl` plugin | Tailwind v4 logical properties already give RTL; v2.0 deliberately avoided it | Logical properties + `dir` (next-intl ar→rtl) |
+| Burning agent quota on ingestion/backtest | 15 runs/day shared; deterministic jobs don't need reasoning | Windows Task Scheduler / plain `tsx` runs |
 
 ---
 
 ## Stack Patterns by Variant
 
-**Si lancement immédiat (étage 1 paiement) :**
-- TronGrid REST maison + file superadmin. Pas de dépendance tierce de paiement.
-- Telegram = `sendMessage` depuis un job tsx (pas de runner).
+**If the rebrand stays landing-page-centric (likely first):**
+- Zero new deps. Vanilla helpers in `apps/web/lib/anim/`, Tailwind `@theme` tokens, `next/font/local`.
+- Because the cost/benefit of an animation lib is negative for a single-surface reconstruction.
 
-**Si automatisation paiement (étage 2) :**
-- Ajouter client Cryptomus maison + Route Handler webhook `nodejs` + vérif signature MD5.
-- Adresse unique par facture, idempotence sur `order_id`.
+**If staggered motion must be uniform across member + academy + admin:**
+- Add `motion` 12.x with `LazyMotion` + `domAnimation`; keep marquee/rings/globe in CSS regardless.
+- Because declarative orchestration beats duplicated IO handlers at app scale — but only the reveal/stagger layer, not the bespoke SVG/CSS art.
 
-**Si commissions affiliés payées on-chain automatiquement (plus tard) :**
-- Introduire TronWeb `6.3.0` dans un job isolé, clé privée en secret manager.
+**If a "replay over history" preview UI is requested for backtest:**
+- Reuse `lightweight-charts` v5 (installed) to scrub historical candles + plotted setups; engine stays headless.
+- Because no new charting dep is justified.
 
-**Si bot Telegram devient interactif (v2+) :**
-- Ajouter `@grammyjs/runner` (long-polling) ou webhook grammY via Route Handler.
+**If 24/7 reliability becomes mandatory at paid launch:**
+- Migrate the analyze routine to an Anthropic API key + cloud cron (Vercel Cron / GitHub Actions), keeping `dispatch.ts`/`persist.ts` unchanged.
+- Because Max-plan shared quota (15/day) is a launch-time risk already logged in PROJECT.md.
 
 ---
 
 ## Version Compatibility
 
-| Package | Compatible With | Notes |
-|---------|-----------------|-------|
-| next-intl `4.13.0` | Next 15 & 16, React 19 | peerDep `next: ^12..^16`, `react: ^19` ✓ App Router natif |
-| @anthropic-ai/sdk `0.104.1` | Zod 4 (stack) | peerDep `zod ^3.25 \|\| ^4` ✓ — pas de conflit avec Zod 4 verrouillé |
-| grammY `1.43.0` | jobs ESM/tsx | ESM + CJS ✓ |
-| next-mdx-remote `6.0.0` | Next 15 RSC | import `next-mdx-remote/rsc` pour Server Components |
-| Tailwind v4.3 | RTL natif | Propriétés logiques + variants `rtl:`/`ltr:` — aucun plugin |
-| tron-format-address `0.1.12` | — | Micro-lib, zéro dépendance |
+| Package A | Compatible With | Notes |
+|-----------|-----------------|-------|
+| `motion` 12.x (IF adopted) | React 19 / Next 15 | ESM, `motion/react` entry. Use `LazyMotion` to cap bundle. No conflict with existing deps. Verify peer `react@^19` at install. |
+| `next/font/local` | Next 15 / React 19 | Built-in; no version pin. Generates fallback metrics for CLS. |
+| Tailwind v4 `@theme` OKLCH | `tailwindcss 4.3.1` (installed) | OKLCH-native; `data-theme` attribute overrides for volt/green. shadcn v4 tokens must use the same OKLCH var set. |
+| `next-themes 0.4.6` (installed) | `attribute="data-theme"`, `themes={['volt','green']}` | Reuse v2.0 no-flash pattern; switch class→data-attribute to match the mock. |
+| Backtest engine (new TS) | `packages/indicators` + `replayOutcome` (v2.0 P5) | Same ESM/tsx runtime; golden-test with Vitest 4.1.8. |
+| Claude Remote routine | `supabase-js 2.108.0` only (no MCP in cloud) | Documented constraint; `dispatch.ts` already `dotenv/config`-loads. |
 
 ---
 
 ## Sources
 
-- npm registry (vérifié 2026-06-14) — versions `latest` + dates : tronweb 6.3.0 (2026-04-22), next-intl 4.13.0 (2026-06-05, peerDep next ^15||^16 / react ^19), grammy 1.43.0 (2026-05-16), telegraf 4.16.3, node-telegram-bot-api 1.1.0 (repris), @anthropic-ai/sdk 0.104.1 (2026-06-09, peerDep zod ^3.25||^4), next-mdx-remote 6.0.0 (2026-02), gray-matter 4.0.3, tailwindcss-rtl 0.9.0 (stale 2022), @nowpaymentsio/nowpayments-api-js 1.0.5 (stale 2022), cryptomus 0.0.0 (vide), tron-format-address 0.1.12, @grammyjs/runner 2.0.3 — **HIGH**
-- npm downloads API (last-week, 2026-06-14) — grammy 3.83M >> telegraf 0.38M >> node-telegram-bot-api 0.27M — **HIGH**
-- [TronGrid / TRON dev docs — gettransactioninfobyid, TRC-20 events](https://developers.tron.network/docs/trc20-contract-interaction) — vérif TX (events Transfer, only_confirmed, decimals 6) — **HIGH**
-- [TRON exchange/wallet integration guide](https://developers.tron.network/docs/exchangewallet-integrate-with-the-tron-network) — confirmations / solidification — **MEDIUM**
-- [Cryptomus webhook docs](https://doc.cryptomus.com/merchant-api/payments/webhook) — signature MD5(base64(json)+key) — **MEDIUM** (recoupé doc officielle)
-- [NOWPayments vs Cryptomus 2026](https://nowpayments.io/blog/nowpayments-vs-cryptomus) + [comparatif](https://slashdot.org/software/comparison/Cryptomus-vs-NOWPayments/) — modèles adresse/webhook — **MEDIUM**
-- [Tailwind CSS v4 — logical properties / RTL](https://tailwindcss.com/blog/tailwindcss-v4) + [Flowbite RTL](https://flowbite.com/docs/customize/rtl/) — RTL natif sans plugin — **HIGH**
-- CLAUDE.md §Technology Stack + PROJECT.md (contraintes pivot, sécurité clés) — **HIGH** (source projet)
+- `Nexa - Landing.html` (repo root) — full markup of every animation/feature; confirms vanilla `landing.css`+`landing.js`, no framework/anim-lib in the mock; OKLCH literals; `data-theme` volt/green; the 5 font families — **HIGH** (primary source)
+- `docs/routines-claude.md` — Remote routine model, no API key, Environments secrets, supabase-js-only, 15 runs/day shared quota, UTC session windows — **HIGH** (project doc)
+- `.planning/PROJECT.md` — v2.1 scope, locked stack, backtest→pattern_stats decision, fonts list, themes, rebrand MERA→NEXA — **HIGH** (project source)
+- `apps/web/package.json` + root `package.json` — current installed deps (Tailwind 4.3.1, next-themes 0.4.6, tw-animate-css 1.4.0, lightweight-charts 5.2.0, luxon, croner, Vitest 4.1.8, Playwright 1.60.0) — **HIGH** (repo)
+- WebSearch `motion` npm (2026) — latest 12.40.0, successor to framer-motion, `motion/react` + vanilla `animate`, React/Next compatible — **MEDIUM** (single search; verify peer at install) — https://www.npmjs.com/package/motion · https://motion.dev/docs/react-installation
+- Wilson score interval — standard binomial CI for the N-visible honesty band — **HIGH** (established method)
 
 ---
-*Stack research for: v2.0 plateforme publique (paiement crypto, i18n RTL, Telegram, CMS, affiliation, fiabilité 24/7)*
-*Researched: 2026-06-14*
+*Stack research for: v2.1 — NEXA identity (design system reconstruction) · routines d'analyse Claude sans clé API · backtest + track record en prod*
+*Researched: 2026-06-20*
