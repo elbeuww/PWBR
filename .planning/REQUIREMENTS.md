@@ -26,7 +26,7 @@ Requirements de ce milestone. Chacun est mappé à une phase de la roadmap (voir
 
 - [ ] **UI-01**: La vitrine publique (accueil, tarifs, méthodologie, légal, paiement-bientot) est au design NEXA, trilingue AR/EN/FR.
 - [x] **UI-02**: Le hero animé complet (globe + cartes flottantes + data-rain + tilt/parallaxe) est livré, `prefers-reduced-motion` respecté, sans % nu ni promesse de gain.
-- [ ] **UI-03**: L'espace membre (liste signaux + détail trade + chart lightweight-charts) est au design NEXA, gating RLS préservé.
+- [x] **UI-03**: L'espace membre (liste signaux + détail trade + chart lightweight-charts) est au design NEXA, gating RLS préservé.
 - [ ] **UI-04**: L'Académie (index + article + cours/leçon) est au design NEXA, RTL et fallback FR préservés.
 - [ ] **UI-05**: L'auth (login/signup) et l'espace compte/abonnement sont au design NEXA.
 - [ ] **UI-06**: Le back-office `/admin` est au design NEXA (peut rester plus sobre que le public).
@@ -98,7 +98,7 @@ Chaque requirement → exactement une phase. Phases 10-14 (numérotation continu
 | BRAND-04 | Phase 11 | Complete |
 | UI-01 | Phase 11 | Pending |
 | UI-02 | Phase 11 | Complete |
-| UI-03 | Phase 11 | Pending |
+| UI-03 | Phase 11 | Complete |
 | UI-04 | Phase 11 | Pending |
 | UI-05 | Phase 11 | Pending |
 | UI-06 | Phase 11 | Pending |

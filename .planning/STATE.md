@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v2.1
 milestone_name: "Mise en vie : identité NEXA, moteur live & track record"
 status: executing
-last_updated: "2026-06-21T15:09:46.807Z"
+last_updated: "2026-06-21T15:21:32.249Z"
 last_activity: 2026-06-21
 progress:
   total_phases: 5
   completed_phases: 1
   total_plans: 11
-  completed_plans: 9
-  percent: 82
+  completed_plans: 10
+  percent: 91
 ---
 
 # Project State
@@ -30,8 +30,8 @@ See: .planning/PROJECT.md (mis à jour 2026-06-20 après clôture v2.0)
 ## Current Position
 
 Phase: 11 (composants-nexa-reskin-transversal-rebranding) — EXECUTING
-Plan: 7 of 8
-Status: 11-07 (hero animé greenfield UI-02) livré — code vert (177 tests web). Reste manuel : rendu visuel + reduced-motion OS dans les 3 locales.
+Plan: 8 of 8
+Status: Ready to execute
 **Seul item ouvert (live, non-bloquant) :** vérification runtime no-flash — `pnpm --filter web dev` puis `/fr|/en|/ar/login` avec `localStorage.theme='dark'` + reload → confirmer aucune frame claire au premier paint. Rapport : 10-VERIFICATION.md.
 **Prochaine action à la reprise :** `/clear` puis `/gsd-plan-phase 11` (Composants NEXA, reskin, MERA→NEXA, hero, ExpiryBanner — DESIGN-05, BRAND-01..04, UI-01..07).
 Last activity: 2026-06-21
@@ -102,6 +102,7 @@ ressources externes non provisionnables en session de développement.
 | Phase 11 P04 | ~12min | 3 tasks | 9 files |
 | Phase 11 P05 | ~10min | 3 tasks | 9 files |
 | Phase 11 P07 | ~14min | 3 tasks | 13 files |
+| Phase 11 P06 | ~12min | 2 tasks | 7 files |
 
 ## Roadmap v2.0 (9 phases)
 
@@ -370,6 +371,13 @@ ressources externes non provisionnables en session de développement.
 - **D-11-07-C** : cartes anonymisées via i18n `hero.cards` (jamais DB) — instrument·direction·score·risque, ZÉRO % (D-01) ; `ScoreRing` (11-04) couleur=risque jamais « vert=gagnant » (D-12). Faux positifs de grep neutralisés (commentaire HeroTilt + tolérances obsolètes no-perf-claims/rtl-logical-props + commentaire Marquee) — précédent D-11-04-C.
 - **Commits 11-07** : ee64a29 (Task 1 globe+data-rain CSS-only), adb3f87 (Task 2 cartes+tilt+i18n hero), e8ced78 (Task 3 Hero composé + câblage home), b17c1fc (SUMMARY). Vérifs : no-perf-claims 5/5, rtl-logical-props 3/3, suite web 177/177, `tsc -b --noEmit` exit 0, 0 package npm. UI-02/DESIGN-05/BRAND-04 livrés.
 
+### Decisions exécution (Plan 11-06 — reskin espace membre signaux/détail NEXA, UI-03)
+
+- **D-11-06-A** : le score membre est rendu EXCLUSIVEMENT via `ScoreRing` (couleur=risque, D-12) ; le nombre brut neutre (text-2xl + barre dans SignalCard ; text-3xl dans l'en-tête SignalDetail) est supprimé. Déviation Rule 1 : `SignalDetail.tsx` (hors files_modified du plan) édité pour retirer le score d'en-tête et éviter le doublon avec le ScoreRing de la route détail.
+- **D-11-06-B** : mapping risque DB→ScoreRing — `low→faible`, `medium`/inconnu→`modere`, `high`/`extreme→eleve`. `extreme` replié sur `eleve` (un seul cran colorimétrique extrême ; le label texte i18n reste distinct via `signals.filters.riskExtreme`). Label aria via `scoreRing.ariaTemplate` + `riskLabels.*` (RSC-safe, fourni par l'appelant — precedent FloatingCards 11-04).
+- **D-11-06-C** : frontière RLS strictement préservée (Anti-Pattern 3) — `createClient()` serveur conservé sur liste ET détail (grep=3/3). `SignalsDisclaimerBanner` préservé sur le détail. `signals.eyebrow` ajouté à parité fr/en/ar ; Eyebrow détail réutilise `signalDetail.planTitle`.
+- **Commits 11-06** : 8ae690f (Task 1 ScoreRing SignalCard + Eyebrow liste + i18n), 71274cd (Task 2 détail ScoreRing 96 + Eyebrow + dé-doublon SignalDetail), e193c2c (SUMMARY). Vérifs : no-perf-claims 5/5, parité i18n 18/18, `tsc -b --noEmit` exit 0, `lint:i18n` exit 0, 0 package npm. UI-03/DESIGN-05 livrés.
+
 ### Open todos / research flags (v2.0)
 
 - **Phase 4 (research flag) :** TronGrid endpoint `walletsolidity`, parsing logs TRC-20, normalisation hex↔base58 — doc TS peu dense, recherche de phase recommandée.
@@ -396,7 +404,7 @@ ressources externes non provisionnables en session de développement.
 
 ## Session Continuity
 
-**Last session:** 2026-06-21T14:59:28.131Z
+**Last session:** 2026-06-21T15:21:32.241Z
 
 **Last session (archive):** 2026-06-19T03:41:29.665Z
 
