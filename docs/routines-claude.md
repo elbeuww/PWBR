@@ -153,4 +153,69 @@ Les crons ci-dessous sont la SEULE source de vérité versionnée des horaires (
 
 ---
 
+## 8. Séquence d'un run (orchestration agent-native, single-run)
+
+### 8.1 Single-run handoff — TOUTE la séquence dans UN SEUL run cloud
+
+L'ANALYZE écrit un fichier par `(instrument × style)` sous `run-artifacts/<RUN_ID>/<instrument>_<style>.json`, et l'étape `persist` les **relit** depuis ce même répertoire (`readRunArtifacts`, frontière D-43). **Un clone frais entre deux runs PERD ces fichiers** (`run-artifacts/` est éphémère et gitignoré — §A3). Conséquence absolue :
+
+> **Toute la séquence tourne dans UN SEUL run cloud. JAMAIS une routine par étape.**
+
+Séquence ordonnée (un seul run) :
+
+```
+pnpm install
+  → tsx src/dispatch.ts market-ingest
+  → tsx src/dispatch.ts news-ingest
+  → tsx src/dispatch.ts macro-ingest
+  → tsx src/dispatch.ts technical-engine
+  → tsx src/dispatch.ts fundamental-engine
+  → tsx src/dispatch.ts news-engine
+  → tsx src/dispatch.ts combine-engine
+  → ANALYZE (agent-native : le raisonnement vétéran écrit run-artifacts/<RUN_ID>/*.json)
+  → RUN_ID=<session>-<YYYYMMDD>T<HHmm>Z tsx src/dispatch.ts persist
+```
+
+L'ANALYZE est **agent-native** : c'est le raisonnement de l'agent Claude, PAS un job `analyze.ts` (aucun job de ce nom n'existe ni ne doit être créé). `persist` est la **seule frontière d'écriture IA** (Zod §3 + garde-fous + scoring + immuabilité).
+
+### 8.2 Format RUN_ID (strict)
+
+`persist` exige `RUN_ID` (sinon throw). Format strict (`RUN_ID_RE` = `^[a-z]+-\d{8}T\d{4}Z$`) :
+
+```
+RUN_ID=<session>-<YYYYMMDD>T<HHmm>Z
+```
+
+Exemple concret, exporté sur la ligne de commande persist :
+
+```bash
+RUN_ID=newyork-20260622T1730Z tsx src/dispatch.ts persist
+```
+
+`PROMPT_VERSION` est **optionnel** (sinon `computePromptVersion()` le dérive du prompt versionné). `MODEL_LABEL` défaut `claude-code-max`.
+
+### 8.3 Sémantique marché-calme (D-12-02) — 0 artefact n'est PAS une erreur
+
+Si l'ANALYZE ne produit **AUCUN setup discipliné** (marché calme, rien de tradable), il **N'ÉCRIT AUCUN fichier** et la routine **NE LANCE PAS `persist`**.
+
+- `readRunArtifacts` **throw `no_artifacts`** sur un répertoire vide → appeler `persist` sur rien = bruit/échec artificiel. Un **vrai-vide est un succès normal**, jamais une anomalie de pipeline.
+- À distinguer du cas **all-rejected** : si l'ANALYZE a produit des setups mais que **tous** sont rejetés par les garde-fous (`written=0 && rejected>0`), `persist` **throw légitimement** (WR-04, `persist.ts:369`). C'est une vraie erreur, à ne pas affaiblir.
+
+Règle opérationnelle : la routine n'invoque `persist` **que si l'ANALYZE a écrit ≥1 fichier**. 0 fichier → la séquence se termine en succès sans appeler `persist`.
+
+### 8.4 P-MCP — aucun connecteur Supabase MCP (ROUTINE-05)
+
+Retirer **tout** connecteur Supabase MCP de la routine Remote. L'écriture en base passe **uniquement** par `supabase-js` service_role dans `persist.ts` / `runJob.ts` (la voie invariante du diagramme §4). Le MCP Supabase est un outil interactif local — il n'a aucune place dans une routine cloud (élévation de privilège évitée, T-12-05).
+
+### 8.5 P-SECRET — `SUPABASE_SERVICE_ROLE_KEY` visible aux éditeurs (T-12-04)
+
+La clé `SUPABASE_SERVICE_ROLE_KEY` **bypass la RLS** (accès complet à la base). L'Environment Anthropic **ne dispose pas de secrets store** : la valeur est stockée **en clair** et **visible par tout éditeur de l'Environment**. Donc :
+
+- **Restreindre strictement** qui peut éditer l'Environment (moindre privilège humain).
+- **Ne jamais committer** la clé (voir `.env` gitignoré).
+- **Ne jamais `echo`/logger** la clé dans les étapes du run (pas de dump d'`process.env`).
+- Rotation possible au passage au lancement payant (migration vers une infra à secrets store).
+
+---
+
 *Runbook go-live — Phase 12. Source de vérité hors git : dashboard Anthropic (Environment, secrets, crons). Maintenu par l'équipe dev.*
