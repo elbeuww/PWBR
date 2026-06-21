@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v2.1
 milestone_name: "Mise en vie : identité NEXA, moteur live & track record"
-status: executing
-last_updated: "2026-06-21T02:20:04.552Z"
+status: verifying
+last_updated: "2026-06-21T02:25:50.458Z"
 last_activity: 2026-06-21
 progress:
   total_phases: 5
-  completed_phases: 0
+  completed_phases: 1
   total_plans: 3
-  completed_plans: 2
-  percent: 67
+  completed_plans: 3
+  percent: 100
 ---
 
 # Project State
@@ -29,9 +29,9 @@ See: .planning/PROJECT.md (mis à jour 2026-06-20 après clôture v2.0)
 
 ## Current Position
 
-Phase: 10 (fondation-design-system-nexa) — EXECUTING
-Plan: 3 of 3
-Status: Ready to execute (10-01 + 10-02 COMPLETE ; 10-03 tokens OKLCH restant)
+Phase: 10 (fondation-design-system-nexa) — READY FOR VERIFICATION
+Plan: 3 of 3 (TOUS COMPLETS)
+Status: 10-01 + 10-02 + 10-03 COMPLETE — globals.css migré en système OKLCH 3 couches NEXA (brand green/purple, signaux trading séparés), 5 --font-* repointés. DESIGN-01/03/04 couverts.
 Last activity: 2026-06-21
 
 ## Deferred Items
@@ -93,6 +93,7 @@ ressources externes non provisionnables en session de développement.
 | Phase 09 P05 | ~15 min | 2 tasks | 5 files |
 | Phase 10 P01 | ~12 min | 2 tasks | 6 files |
 | Phase 10 P02 | ~9min | 3 tasks | 12 files |
+| Phase 10 P03 | ~8min | 2 tasks | 1 file |
 
 ## Roadmap v2.0 (9 phases)
 
@@ -324,6 +325,15 @@ ressources externes non provisionnables en session de développement.
 - **D-10-02-C (Pitfall 4)** : Noto en subset `arabic` — `NotoSansArabic-Regular.woff2` = 48 KB (≫ fichier latin ~15 KB), confirme le bon subset (pas de boîtes □□□).
 - **D-10-02-D (no-CDN vérifié live, dépasse le déféré)** : `lib/fonts.ts` réécrit en 5 exports `next/font/local` (zéro `next/font/google`), `[locale]/layout.tsx` injecte les 5 `.variable` sur `<body>`. `fonts.test.ts` GREEN 5/5, `tsc --noEmit` 0 erreur. `no-cdn-fonts.spec.ts` exécuté contre serveur dev :3000 réel → 0 requête Google Fonts (GREEN runtime, pas seulement --list). DESIGN-02 (volet build/exposition + runtime no-CDN) couvert.
 - **Commits 10-02** : b5efb9b (10 .woff2 + 5 @fontsource devDeps + drop IBM Plex), 863dd7c (fonts.ts 5 familles + layout.tsx injection). **Reste 10-03 (tokens OKLCH) gaté par design-tokens.test.ts.**
+
+### Decisions exécution (Plan 10-03 — tokens OKLCH NEXA 3 couches)
+
+- **D-10-03-A (déviation Rule 1 — HEX en commentaire)** : `design-tokens.test.ts` scanne TOUT le fichier (valeur ET commentaire). Les HEX de marque (#03d87f, #63279b, #1E5FBF) placés dans mes commentaires de doc faisaient échouer l'assertion (3) bien que la couche sémantique soit 100% OKLCH. Retiré ces HEX des commentaires (gardé hue OKLCH + noms de var). Intention de la garde (zéro HEX de marque obsolète) respectée.
+- **D-10-03-B (rampe neutre)** : rampe neutre OKLCH chroma ~0.02 hue ~265 (navy-teinté, cohérent avec l'ink NEXA hue 269) pour card/secondary/muted/border/input — plutôt que gris pur. Discrétion Claude (CONTEXT §Claude's Discretion).
+- **D-10-03-C (--destructive résout Unknown #6)** : `--destructive` repointé sur `--nexa-signal-bear` (rouge réel). Avec des signaux dédiés (D-05), plus besoin de garder `--destructive` neutre comme en v2.0 (ancien D-04 v2.0).
+- **D-10-03-D (body font, anti var orpheline)** : body repointé sur `var(--font-sans)` (= Space Grotesk via @theme inline, D-02) plutôt que recréer `--font-latin`. Évite un fallback system-ui silencieux dû à une var orpheline (RESEARCH §Runtime State Inventory). Aucune occurrence de `--font-latin`/`--font-inter`/`--font-ibm-plex-arabic` résiduelle.
+- **D-10-03-E (3 couches / D-05)** : @theme = primitives theme-indépendantes ; :root/.dark = sémantique (seule couche qui flippe) ; @theme inline = component, noms shadcn inchangés, var() only (anti-Pitfall 3). `--primary` = brand green (jamais un signal), signaux trading `--signal-bullish`/`--signal-bearish` exposés à part, définis une seule fois en :root (même teinte dans les 2 thèmes). Règle D-05 documentée en commentaire CSS.
+- **Commits 10-03** : 56be63d (Task 1 — primitives OKLCH + sémantique repointée light/dark, design-tokens GREEN 4/4), f15fa97 (Task 2 — body→Space Grotesk, base layer logique préservé, rtl-logical-props GREEN). `tsc --noEmit` exit 0. **DESIGN-01/03/04 couverts ; Phase 10 ready for verification.**
 
 ### Open todos / research flags (v2.0)
 
