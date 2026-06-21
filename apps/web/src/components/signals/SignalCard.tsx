@@ -33,10 +33,11 @@ export function SignalCard({ signal, locale }: SignalCardProps) {
   const t = useTranslations('signals')
   const isLong = signal.direction === 'long'
 
-  // Couleurs sémantiques trading (UI-SPEC §Color) — UNIQUEMENT direction (D-03).
+  // Direction via tokens NEXA flip-safe (--signal-*, 11-01) — UNIQUEMENT direction (D-03).
+  // Le token flippe seul selon le thème → plus de variantes dark: manuelles.
   const directionClass = isLong
-    ? 'bg-[#15803D]/10 text-[#15803D] dark:bg-[#22C55E]/15 dark:text-[#22C55E]'
-    : 'bg-[#B91C1C]/10 text-[#B91C1C] dark:bg-[#EF4444]/15 dark:text-[#EF4444]'
+    ? 'bg-[var(--signal-bullish)]/10 text-[var(--signal-bullish)]'
+    : 'bg-[var(--signal-bearish)]/10 text-[var(--signal-bearish)]'
 
   const scoreBar = Math.max(0, Math.min(100, signal.opportunity_score))
 
