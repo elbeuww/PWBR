@@ -207,7 +207,7 @@
       "approveDialog": {
         "title": "Approuver la candidature",
         "codeLabel": "Code d'affiliation",
-        "codePlaceholder": "Ex : MERA2026",
+        "codePlaceholder": "Ex : NEXA2026",
         "codeHint": "A-Z et 0-9, de 3 à 20 caractères.",
         "confirm": "Approuver et créer le code",
         "cancel": "Annuler"
