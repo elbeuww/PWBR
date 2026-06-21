@@ -1,10 +1,11 @@
 ---
 phase: 11
 slug: composants-nexa-reskin-transversal-rebranding
-status: draft
+status: approved
 shadcn_initialized: true
 preset: radix-nova
 created: 2026-06-21
+reviewed_at: 2026-06-21
 ---
 
 # Phase 11 — UI Design Contract
