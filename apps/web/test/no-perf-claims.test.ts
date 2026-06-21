@@ -7,6 +7,12 @@
  * « garanti »/« guaranteed »/« profit »/« rentable ». Le test FAIL en listant la
  * clé fautive, la langue et la valeur.
  *
+ * Phase 11 : couverture composant BRAND-04 (hero/marquee/scoreRing/baseline/
+ * confidenceStat). Le scan inclut désormais ces namespaces composant en plus des
+ * 3 marketing. Tolérance à l'absence : un namespace pas encore créé dans le JSON
+ * renvoie `undefined` → `collectStrings(undefined)` = [] (garde `typeof !== object`),
+ * donc aucun faux échec tant que les copy composant ne sont pas posées.
+ *
  * Autorisé explicitement (mentions factuelles, PAS des allégations de perf) :
  *   - le symbole `$` et les prix « 9 $ » / « 3 $ » ;
  *   - la mention « USDT (TRC-20) » ;
@@ -24,7 +30,19 @@ import fr from '../src/messages/fr.json'
 import en from '../src/messages/en.json'
 import ar from '../src/messages/ar.json'
 
-const MARKETING_NAMESPACES = ['home', 'pricing', 'paiement'] as const
+// Namespaces marketing (existants) + namespaces composant Phase 11 (BRAND-04).
+// Les namespaces composant peuvent être absents du JSON tant que la copy n'est pas
+// posée : le scan est tolérant (collectStrings(undefined) === []).
+const SCANNED_NAMESPACES = [
+  'home',
+  'pricing',
+  'paiement',
+  'hero',
+  'marquee',
+  'scoreRing',
+  'baseline',
+  'confidenceStat',
+] as const
 const LOCALES = { fr, en, ar } as const
 
 // « take-profit » / « take-profits » est un terme de plan de trade neutre :
@@ -65,10 +83,18 @@ describe('no-perf-claims : aucun chiffre de perf / promesse de gain (VITR-03)', 
     expect(detectForbidden('entrée, stop-loss, take-profits, ratio R:R')).toBe(false)
   })
 
-  it('ne contient aucune allégation de perf dans home/pricing/paiement (fr/en/ar)', () => {
+  it('scan tolérant : un namespace composant absent du JSON ne jette pas (BRAND-04)', () => {
+    // hero/marquee/scoreRing/... ne sont pas encore créés ; l'accès renvoie
+    // undefined → collectStrings === [], aucun offender, pas d'exception.
+    const missing = (LOCALES.fr as Record<string, unknown>)['hero']
+    expect(missing).toBeUndefined()
+    expect(collectStrings(missing, 'hero')).toEqual([])
+  })
+
+  it('ne contient aucune allégation de perf dans les namespaces scannés (fr/en/ar)', () => {
     const offenders: string[] = []
     for (const [name, messages] of Object.entries(LOCALES)) {
-      for (const ns of MARKETING_NAMESPACES) {
+      for (const ns of SCANNED_NAMESPACES) {
         const namespace = (messages as Record<string, unknown>)[ns]
         for (const { path, value } of collectStrings(namespace, ns)) {
           if (detectForbidden(value)) {
