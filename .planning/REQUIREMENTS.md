@@ -20,7 +20,7 @@ Requirements de ce milestone. Chacun est mappé à une phase de la roadmap (voir
 - [x] **DESIGN-02**: Les 5 familles de polices (Archivo, Chakra Petch, Space Grotesk, JetBrains Mono, Noto Sans Arabic) sont self-hostées via `next/font/local` et exposées en CSS vars.
 - [x] **DESIGN-03**: Le thème clair/sombre est sans flash (script pré-paint), aucun FOUC, RTL-safe.
 - [x] **DESIGN-04**: Le RTL arabe est préservé sur tout le reskin (propriétés logiques uniquement, vérifié sur chaque surface).
-- [ ] **DESIGN-05**: Une bibliothèque de composants NEXA tokenisée existe (boutons, cards, nav, eyebrow, gauges/rings de score, marquee, stats de confiance) — pas de CSS bespoke par page.
+- [x] **DESIGN-05**: Une bibliothèque de composants NEXA tokenisée existe (boutons, cards, nav, eyebrow, gauges/rings de score, marquee, stats de confiance) — pas de CSS bespoke par page.
 
 ### Reskin des surfaces (UI)
 
@@ -91,7 +91,7 @@ Chaque requirement → exactement une phase. Phases 10-14 (numérotation continu
 | DESIGN-02 | Phase 10 | Complete |
 | DESIGN-03 | Phase 10 | Complete |
 | DESIGN-04 | Phase 10 | Complete |
-| DESIGN-05 | Phase 11 | Pending |
+| DESIGN-05 | Phase 11 | Complete |
 | BRAND-01 | Phase 11 | Pending |
 | BRAND-02 | Phase 11 | Pending |
 | BRAND-03 | Phase 11 | Pending |

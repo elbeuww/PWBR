@@ -62,7 +62,7 @@ Détail complet archivé : `.planning/milestones/v2.0-ROADMAP.md`.
   4. Le test `no-perf-claims` couvre les composants NEXA (hero, marquee, gauges) : aucun composant reskiné ne rend de % non mesuré ni de baseline de gain.
   5. L'`ExpiryBanner` (alerte J-3/J-1) est câblé et visible dans l'espace membre/compte (dette WIRING-01/PAY-05 levée au passage).
 **Plans** : 8 plans (6 vagues)
-- [ ] 11-01-PLAN.md — Tokens-résidus : purple accent + amber risque en 3 couches (DESIGN-05)
+- [x] 11-01-PLAN.md — Tokens-résidus : purple accent + amber risque en 3 couches (DESIGN-05)
 - [ ] 11-02-PLAN.md — Wave-0 garde-fous : no-perf-claims composant + no-mera-brand + rtl-scan étendu (BRAND-04/BRAND-01/DESIGN-04)
 - [ ] 11-03-PLAN.md — Recoloration résiduelle : CandleChart (lwc) + SignalCard + ExpiryBanner tokenisé (UI-03/UI-07)
 - [ ] 11-04-PLAN.md — Bibliothèque NEXA : Eyebrow, ScoreRing, Marquee, ConfidenceStat, Logo (DESIGN-05/BRAND-03)
@@ -124,7 +124,7 @@ Détail complet archivé : `.planning/milestones/v2.0-ROADMAP.md`.
 | 8. Superadmin consolidé | v2.0 | 4/4 | Complete | 2026-06-19 |
 | 9. CMS cours & articles | v2.0 | 5/5 | Complete | 2026-06-20 |
 | 10. Fondation design system NEXA | v2.1 | 3/3 | Complete   | 2026-06-21 |
-| 11. Composants NEXA & reskin transversal | v2.1 | 0/8 | Planned | - |
+| 11. Composants NEXA & reskin transversal | v2.1 | 1/8 | In Progress|  |
 | 12. Routines d'analyse Claude (sans API) | v2.1 | 0/? | Not started | - |
 | 13. Backtest catalogue de patterns | v2.1 | 0/? | Not started | - |
 | 14. Track record affiché & boucle prod | v2.1 | 0/? | Not started | - |

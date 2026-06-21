@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v2.1
 milestone_name: "Mise en vie : identité NEXA, moteur live & track record"
 status: executing
-last_updated: "2026-06-21T14:19:30.733Z"
-last_activity: 2026-06-21 -- Phase 11 planning complete
+last_updated: "2026-06-21T14:29:07.927Z"
+last_activity: 2026-06-21
 progress:
   total_phases: 5
   completed_phases: 1
   total_plans: 11
-  completed_plans: 3
-  percent: 27
+  completed_plans: 4
+  percent: 36
 ---
 
 # Project State
@@ -23,18 +23,18 @@ progress:
 See: .planning/PROJECT.md (mis à jour 2026-06-20 après clôture v2.0)
 
 **Core value:** Produire, pour chaque opportunité, une analyse fiable et explicable — vulgarisée pour un public non technique — avec un % de réussite TOUJOURS mesuré, jamais inventé : c'est le socle de confiance qui fait payer l'abonnement.
-**Current focus:** Phase 10 — fondation-design-system-nexa
+**Current focus:** Phase 11 — composants-nexa-reskin-transversal-rebranding
 **Mode:** interactive (MVP vertical)
 **Granularity:** fine
 
 ## Current Position
 
-Phase: 10 (fondation-design-system-nexa) — ✅ COMPLETE & VERIFIED (paused 2026-06-21, reprise demain)
-Plan: 3 of 3 (TOUS COMPLETS)
+Phase: 11 (composants-nexa-reskin-transversal-rebranding) — EXECUTING
+Plan: 2 of 8
 Status: Ready to execute
 **Seul item ouvert (live, non-bloquant) :** vérification runtime no-flash — `pnpm --filter web dev` puis `/fr|/en|/ar/login` avec `localStorage.theme='dark'` + reload → confirmer aucune frame claire au premier paint. Rapport : 10-VERIFICATION.md.
 **Prochaine action à la reprise :** `/clear` puis `/gsd-plan-phase 11` (Composants NEXA, reskin, MERA→NEXA, hero, ExpiryBanner — DESIGN-05, BRAND-01..04, UI-01..07).
-Last activity: 2026-06-21 -- Phase 11 planning complete
+Last activity: 2026-06-21
 
 ## Deferred Items
 
@@ -96,6 +96,7 @@ ressources externes non provisionnables en session de développement.
 | Phase 10 P01 | ~12 min | 2 tasks | 6 files |
 | Phase 10 P02 | ~9min | 3 tasks | 12 files |
 | Phase 10 P03 | ~8min | 2 tasks | 1 file |
+| Phase Phase 11 P01 P01 | ~5min | 2 tasks | 1 files |
 
 ## Roadmap v2.0 (9 phases)
 
@@ -337,6 +338,12 @@ ressources externes non provisionnables en session de développement.
 - **D-10-03-E (3 couches / D-05)** : @theme = primitives theme-indépendantes ; :root/.dark = sémantique (seule couche qui flippe) ; @theme inline = component, noms shadcn inchangés, var() only (anti-Pitfall 3). `--primary` = brand green (jamais un signal), signaux trading `--signal-bullish`/`--signal-bearish` exposés à part, définis une seule fois en :root (même teinte dans les 2 thèmes). Règle D-05 documentée en commentaire CSS.
 - **Commits 10-03** : 56be63d (Task 1 — primitives OKLCH + sémantique repointée light/dark, design-tokens GREEN 4/4), f15fa97 (Task 2 — body→Space Grotesk, base layer logique préservé, rtl-logical-props GREEN). `tsc --noEmit` exit 0. **DESIGN-01/03/04 couverts ; Phase 10 ready for verification.**
 
+### Decisions exécution (Plan 11-01 — tokens component purple accent & amber risque)
+
+- **D-11-01-A** : `--risk-moderate` GARDE sa teinte amber dans les deux thèmes (un risque modéré reste ambre clair/sombre) → déclaré une SEULE fois en `:root`, NON redéclaré en `.dark` (même invariant que `--signal-bullish/bearish`). `--accent-brand` au contraire flippe : `var(--nexa-purple-500)` light -> `var(--nexa-purple-400)` dark (éclairci), repointant sur une primitive dédiée existante de Phase 10.
+- **D-11-01-B** : var()-only strict hors couche 1 — aucun littéral OKLCH/HEX introduit dans `:root`/`.dark`/`@theme inline` (Pitfall 3 : un littéral casserait silencieusement le flip `.dark`). Seule la primitive amber absente était à ajouter (`--nexa-amber-500: oklch(0.7686 0.1647 70.08)`, hue 70, distinct du brand hue 155 et des signals hue 27/149). Le purple primitive existait déjà (Phase 10), non dupliqué.
+- **Commits 11-01** : 54cc3b1 (Task 1 — 5 tokens en 3 couches : primitive amber + 2 sémantiques :root + 1 override .dark + 2 component). Task 2 = garde RTL fondation Phase 10 re-validée verte (2/2, exit 0), aucun fichier modifié. grep multi-critère 7 occurrences. **DESIGN-05 couvert ; tokens consommables par Eyebrow/ScoreRing/ExpiryBanner en Wave 2.**
+
 ### Open todos / research flags (v2.0)
 
 - **Phase 4 (research flag) :** TronGrid endpoint `walletsolidity`, parsing logs TRC-20, normalisation hex↔base58 — doc TS peu dense, recherche de phase recommandée.
@@ -363,7 +370,7 @@ ressources externes non provisionnables en session de développement.
 
 ## Session Continuity
 
-**Last session:** 2026-06-21T13:34:31.007Z
+**Last session:** 2026-06-21T14:28:59.467Z
 
 **Last session (archive):** 2026-06-19T03:41:29.665Z
 
