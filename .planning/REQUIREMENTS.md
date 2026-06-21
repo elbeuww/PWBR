@@ -9,10 +9,10 @@ Requirements de ce milestone. Chacun est mappé à une phase de la roadmap (voir
 
 ### Identité de marque (BRAND)
 
-- [ ] **BRAND-01**: La marque affichée partout est « NEXA » (mark + wordmark) ; toute trace de « MERA » / « Make Everybody Rich Again » est retirée du code et du contenu.
+- [x] **BRAND-01**: La marque affichée partout est « NEXA » (mark + wordmark) ; toute trace de « MERA » / « Make Everybody Rich Again » est retirée du code et du contenu.
 - [ ] **BRAND-02**: Une baseline trilingue conforme (descripteur « Nouvelle Ère · Alliance d'Échange ») est affichée, **sans aucune promesse de gain**.
 - [ ] **BRAND-03**: Un logo NEXA (mark + favicon + variantes clair/sombre + image OG) est intégré au header, au footer et aux métadonnées.
-- [ ] **BRAND-04**: Aucune promesse de gain ni pourcentage non mesuré n'apparaît dans les surfaces reskinées (test automatisé `no-perf-claims` étendu aux composants NEXA).
+- [x] **BRAND-04**: Aucune promesse de gain ni pourcentage non mesuré n'apparaît dans les surfaces reskinées (test automatisé `no-perf-claims` étendu aux composants NEXA).
 
 ### Design system (DESIGN)
 
@@ -92,10 +92,10 @@ Chaque requirement → exactement une phase. Phases 10-14 (numérotation continu
 | DESIGN-03 | Phase 10 | Complete |
 | DESIGN-04 | Phase 10 | Complete |
 | DESIGN-05 | Phase 11 | Complete |
-| BRAND-01 | Phase 11 | Pending |
+| BRAND-01 | Phase 11 | Complete |
 | BRAND-02 | Phase 11 | Pending |
 | BRAND-03 | Phase 11 | Pending |
-| BRAND-04 | Phase 11 | Pending |
+| BRAND-04 | Phase 11 | Complete |
 | UI-01 | Phase 11 | Pending |
 | UI-02 | Phase 11 | Pending |
 | UI-03 | Phase 11 | Pending |
