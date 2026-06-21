@@ -16,6 +16,7 @@
     "dark": "Thème sombre"
   },
   "auth": {
+    "eyebrow": "Compte",
     "loginTitle": "Connexion",
     "signupTitle": "Inscription",
     "emailLabel": "E-mail",
@@ -29,6 +30,7 @@
   },
   "pricing": {
     "title": "Tarifs",
+    "eyebrow": "Abonnement",
     "plan1Title": "Standard",
     "plan1Price": "9 $ / mois",
     "plan1Usdt": "payable en USDT (TRC-20)",
@@ -370,6 +372,7 @@
   },
   "methodology": {
     "title": "Méthodologie de mesure",
+    "eyebrow": "Méthodologie",
     "intro": "Nos chiffres sont mesurés sur des trades réels publiés, jamais inventés. Voici exactement comment.",
     "definitionTitle": "Qu'est-ce qu'un trade gagnant ?",
     "definitionBody": "Un trade est gagnant si son premier take-profit (TP1) est atteint avant le stop-loss.",
@@ -555,6 +558,7 @@
   },
   "academy": {
     "title": "Académie",
+    "eyebrow": "Académie",
     "subtitle": "Apprenez à utiliser votre plateforme et à exécuter chaque signal, pas à pas.",
     "navAcademy": "Académie",
     "startCourse": "Commencer le cours",

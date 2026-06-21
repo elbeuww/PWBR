@@ -159,7 +159,7 @@ export default async function AdminDashboardPage() {
 
   return (
     <main className="mx-auto max-w-6xl px-4 py-8">
-      <h1 className="text-2xl font-semibold">{t('dashboard.title')}</h1>
+      <h1 className="font-display text-2xl font-semibold">{t('dashboard.title')}</h1>
 
       <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         <Link href="/admin/membres" className="rounded-xl outline-none focus-visible:ring-2 focus-visible:ring-primary">

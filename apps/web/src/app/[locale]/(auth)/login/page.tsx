@@ -5,6 +5,9 @@
  */
 import { setRequestLocale, getTranslations } from 'next-intl/server'
 import { Link } from '../../../../i18n/navigation'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Eyebrow } from '@/components/nexa/Eyebrow'
 import { signIn } from '../actions'
 
 export default async function LoginPage({
@@ -21,38 +24,26 @@ export default async function LoginPage({
 
   return (
     <main className="mx-auto max-w-sm px-4 py-20 text-start">
-      <h1 className="text-2xl font-semibold">{t('loginTitle')}</h1>
-      <form action={signIn} className="mt-6 flex flex-col gap-3">
+      <Eyebrow>{t('eyebrow')}</Eyebrow>
+      <h1 className="mt-2 font-display text-2xl font-semibold">{t('loginTitle')}</h1>
+      <form action={signIn} className="mt-6 flex flex-col gap-4">
         {returnTo ? <input type="hidden" name="returnTo" value={returnTo} /> : null}
-        <label className="flex flex-col gap-1 text-sm">
+        <label className="flex flex-col gap-1.5 text-sm font-medium">
           {t('emailLabel')}
-          <input
-            type="email"
-            name="email"
-            required
-            autoComplete="email"
-            className="rounded-md border border-black/15 px-3 py-2"
-          />
+          <Input type="email" name="email" required autoComplete="email" />
         </label>
-        <label className="flex flex-col gap-1 text-sm">
+        <label className="flex flex-col gap-1.5 text-sm font-medium">
           {t('passwordLabel')}
-          <input
-            type="password"
-            name="password"
-            required
-            autoComplete="current-password"
-            className="rounded-md border border-black/15 px-3 py-2"
-          />
+          <Input type="password" name="password" required autoComplete="current-password" />
         </label>
-        <button
-          type="submit"
-          className="mt-2 rounded-md bg-[#2563EB] px-4 py-2 font-semibold text-white"
-        >
+        <Button type="submit" className="mt-2 w-full">
           {t('loginButton')}
-        </button>
+        </Button>
       </form>
       <p className="mt-4 text-sm">
-        <Link href="/signup">{t('signupButton')}</Link>
+        <Link href="/signup" className="text-[var(--accent-brand)] hover:underline">
+          {t('signupButton')}
+        </Link>
       </p>
     </main>
   )

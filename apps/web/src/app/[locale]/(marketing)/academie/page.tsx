@@ -20,6 +20,7 @@ import { listContent, type CatalogEntry } from '../../../../lib/academie/content
 import { parseAcademyParams, type AcademyParams } from '../../../../lib/academie/searchParams'
 import { FilterBar } from '../../../../components/academie/FilterBar'
 import { ContentCard } from '../../../../components/academie/ContentCard'
+import { Eyebrow } from '@/components/nexa/Eyebrow'
 
 interface AcademyIndexProps {
   params: Promise<{ locale: string }>
@@ -134,7 +135,8 @@ export default async function AcademyIndexPage({ params, searchParams }: Academy
   return (
     <main className="mx-auto max-w-6xl px-4 py-16 text-start md:px-6">
       <header className="mb-2">
-        <h1 className="text-2xl font-semibold text-foreground">{t('title')}</h1>
+        <Eyebrow>{t('eyebrow')}</Eyebrow>
+        <h1 className="mt-2 font-display text-2xl font-semibold text-foreground">{t('title')}</h1>
         <p className="mt-4 max-w-prose text-base text-muted-foreground">{t('subtitle')}</p>
       </header>
 

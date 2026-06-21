@@ -22,6 +22,7 @@ import {
   CardFooter,
 } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
+import { Eyebrow } from '@/components/nexa/Eyebrow'
 
 export default async function PricingPage({
   params,
@@ -34,7 +35,8 @@ export default async function PricingPage({
 
   return (
     <main className="mx-auto max-w-screen-xl px-4 py-16 text-start md:px-6 lg:px-8">
-      <h1 className="text-2xl font-semibold">{t('title')}</h1>
+      <Eyebrow>{t('eyebrow')}</Eyebrow>
+      <h1 className="mt-2 font-display text-2xl font-semibold">{t('title')}</h1>
 
       <div className="mt-8 grid gap-6 md:grid-cols-2">
         {/* Offre Standard — 9 $/mois (D-11) */}

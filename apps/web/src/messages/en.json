@@ -16,6 +16,7 @@
     "dark": "Dark theme"
   },
   "auth": {
+    "eyebrow": "Account",
     "loginTitle": "Sign in",
     "signupTitle": "Sign up",
     "emailLabel": "Email",
@@ -29,6 +30,7 @@
   },
   "pricing": {
     "title": "Pricing",
+    "eyebrow": "Subscription",
     "plan1Title": "Standard",
     "plan1Price": "$9 / month",
     "plan1Usdt": "payable in USDT (TRC-20)",
@@ -175,6 +177,7 @@
   },
   "methodology": {
     "title": "Measurement methodology",
+    "eyebrow": "Methodology",
     "intro": "Our figures are measured on real published trades, never invented. Here is exactly how.",
     "definitionTitle": "What is a winning trade?",
     "definitionBody": "A trade is a win if its first take-profit (TP1) is reached before the stop-loss.",
@@ -360,6 +363,7 @@
   },
   "academy": {
     "title": "Academy",
+    "eyebrow": "Academy",
     "subtitle": "Learn to use your platform and execute every signal, step by step.",
     "navAcademy": "Academy",
     "startCourse": "Start the course",

@@ -14,6 +14,7 @@
  */
 import { setRequestLocale, getTranslations } from 'next-intl/server'
 import { Disclaimer } from '@/components/Disclaimer'
+import { Eyebrow } from '@/components/nexa/Eyebrow'
 
 export default async function MethodologyPage({
   params,
@@ -36,7 +37,8 @@ export default async function MethodologyPage({
 
   return (
     <main className="mx-auto max-w-prose px-4 py-16 text-start md:px-6">
-      <h1 className="font-heading text-2xl font-semibold">{t('title')}</h1>
+      <Eyebrow>{t('eyebrow')}</Eyebrow>
+      <h1 className="mt-2 font-display text-2xl font-semibold">{t('title')}</h1>
       <p className="mt-4 text-base text-muted-foreground">{t('intro')}</p>
 
       <div className="mt-10 space-y-8">
