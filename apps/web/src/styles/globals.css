@@ -166,8 +166,13 @@
   * {
     @apply border-border outline-ring/50;
   }
+  /*
+   * Corps = Space Grotesk (D-02). On résout via --font-sans (= var(--font-space-grotesk),
+   * @theme inline) plutôt qu'une var orpheline ; fallback system-ui si la woff2 tarde.
+   * font-family/line-height sont direction-neutres → RTL-safe (DESIGN-04).
+   */
   body {
     @apply bg-background text-foreground;
-    font-family: var(--font-latin), system-ui, sans-serif;
+    font-family: var(--font-sans), system-ui, sans-serif;
   }
 }
