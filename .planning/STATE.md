@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v2.1
 milestone_name: "Mise en vie : identité NEXA, moteur live & track record"
 status: executing
-last_updated: "2026-06-21T18:54:59.887Z"
-last_activity: 2026-06-21 -- Phase 12 planning complete
+last_updated: "2026-06-21T21:43:23.830Z"
+last_activity: 2026-06-21
 progress:
   total_phases: 5
   completed_phases: 2
   total_plans: 17
-  completed_plans: 11
-  percent: 65
+  completed_plans: 12
+  percent: 71
 ---
 
 # Project State
@@ -23,19 +23,19 @@ progress:
 See: .planning/PROJECT.md (mis à jour 2026-06-20 après clôture v2.0)
 
 **Core value:** Produire, pour chaque opportunité, une analyse fiable et explicable — vulgarisée pour un public non technique — avec un % de réussite TOUJOURS mesuré, jamais inventé : c'est le socle de confiance qui fait payer l'abonnement.
-**Current focus:** Phase 11 — composants-nexa-reskin-transversal-rebranding
+**Current focus:** Phase 12 — routines-d-analyse-claude-planifi-es-sans-api
 **Mode:** interactive (MVP vertical)
 **Granularity:** fine
 
 ## Current Position
 
-Phase: 12
-Plan: Not started
+Phase: 12 (routines-d-analyse-claude-planifi-es-sans-api) — EXECUTING
+Plan: 2 of 6
 Status: Ready to execute
 **Plan 11-08 livré :** UI-01/04/05/06 reskinés NEXA (vitrine/académie/auth/admin sobre), UI-07 levé (ExpiryBanner câblé sur abonnement via RLS serveur, dette WIRING-01/PAY-05 close). Gate phase 11 : unit 582✓/0 fail, tsc 0, lint:i18n 0 ; 5 specs E2E human-verify (sélecteurs préservés).
 **Items live non-bloquants restants :** (1) no-flash runtime (10-VERIFICATION.md) ; (2) 5 specs E2E GREEN autoritaire en dev server / Vercel preview (precedent D-01-04-C).
 **Prochaine action à la reprise :** `/clear` puis `/gsd-verify-phase 11` (ou `/gsd-plan-phase 12` — routines d'analyse Claude planifiées).
-Last activity: 2026-06-21 -- Phase 12 planning complete
+Last activity: 2026-06-21
 
 ## Deferred Items
 
@@ -105,6 +105,7 @@ ressources externes non provisionnables en session de développement.
 | Phase 11 P07 | ~14min | 3 tasks | 13 files |
 | Phase 11 P06 | ~12min | 2 tasks | 7 files |
 | Phase 11 P08 | ~25min | 3 tasks | 10 files |
+| Phase 12 P01 | ~12min | 3 tasks | 3 files |
 
 ## Roadmap v2.0 (9 phases)
 
@@ -389,6 +390,13 @@ ressources externes non provisionnables en session de développement.
 - **D-11-08-E (gate de phase)** : suite unit `pnpm vitest run` = **582 passed / 4 skipped / 0 failed** (no-perf-claims, no-mera-brand, rtl-logical-props, parité i18n verts) ; `tsc -b --noEmit` exit 0 ; `lint:i18n` exit 0. **5 specs E2E** (i18n, affiliation-attribution, auth, gating, academie — ROADMAP "6" = coquille confirmée) parsent (35 tests listés), sélecteurs préservés ; exécution GREEN = **human-verify** (precedent D-01-04-C, dev server + Vercel preview requis).
 - **Commits 11-08** : 8112e0e (Task 1 ExpiryBanner abonnement RLS serveur), d3a4dea (Task 2 reskin vitrine/académie/auth/admin + eyebrow i18n), 404454d (SUMMARY). 0 package npm, 0 fork primitif ui/.
 
+### Decisions exécution (Plan 12-01 — tests Wave-0 des routines Claude, ROUTINE-03/04/05)
+
+- **D-12-01-A** : 3 gardes locales (`apps/jobs/__tests__/routine-{persist-empty,idempotence,no-mcp}.test.ts`) verrouillent les invariants des routines AVANT le 1er run cloud : D-12-02 (true-empty `no_artifacts` ≠ all-rejected throw WR-04), idempotence run-level D-45 (expire-avant-insert + `session_day` stable), static-check ROUTINE-05 (0 MCP / 0 clé Anthropic dans `apps/jobs/src`). `git diff --stat apps/jobs/src` VIDE — frontière persist.ts (D-43) intacte.
+- **D-12-01-B** : la commande du plan `pnpm --filter jobs exec vitest run` est inopérante (config vitest racine, globs root-relative) → exécution via `npx vitest run apps/jobs/...` depuis la racine (précédent D-02-02-B). Suite jobs **131/131 verte**, zéro régression.
+- **D-12-01-C** : Task 3 utilise `new RegExp` + `String.includes()` au lieu de regex-littéraux — oxc (vitest 4 / rolldown-vite) mal-parse `/['"][^'"]*mcp.../i` comme une division, cassant le transform. Scan EXCLUT `*.test.ts`/`*.d.ts` ; commentaires (bloc/ligne/JSDoc) retirés avant grep (hygiène grep-gate CLAUDE.md), prouvé non-trivial.
+- **Commits 12-01** : cf507cd (Task 1 D-12-02), 3d90dcf (Task 2 idempotence), 4e9073f (Task 3 ROUTINE-05). 11 cas verts (3+2+6). ROUTINE-03/04/05 marqués complets.
+
 ### Open todos / research flags (v2.0)
 
 - **Phase 4 (research flag) :** TronGrid endpoint `walletsolidity`, parsing logs TRC-20, normalisation hex↔base58 — doc TS peu dense, recherche de phase recommandée.
@@ -415,7 +423,7 @@ ressources externes non provisionnables en session de développement.
 
 ## Session Continuity
 
-**Last session:** 2026-06-21T18:17:39.222Z
+**Last session:** 2026-06-21T21:43:06.568Z
 
 **Last session (archive):** 2026-06-19T03:41:29.665Z
 

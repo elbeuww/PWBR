@@ -84,7 +84,7 @@ Détail complet archivé : `.planning/milestones/v2.0-ROADMAP.md`.
   4. Les runs sont idempotents, tracés dans `job_runs`, avec le flag `stale` visible sur `/admin/sante`, en restant sous le budget de quota (~15 runs/j partagé).
   5. Tout accès DB des jobs passe par `supabase-js` (jamais le MCP cloud) et aucune clé API Anthropic n'est utilisée.
 **Plans** : 6 plans (4 vagues)
-- [ ] 12-01-PLAN.md — Wave-0 : tests validation (persist true-empty/all-rejected, idempotence run-level, static-check no-MCP) (ROUTINE-03/04/05)
+- [x] 12-01-PLAN.md — Wave-0 : tests validation (persist true-empty/all-rejected, idempotence run-level, static-check no-MCP) (ROUTINE-03/04/05)
 - [ ] 12-02-PLAN.md — Runbook : corriger docs/routines-claude.md (réseau Custom *.supabase.co obligatoire, single-run, P-SECRET/P-MCP, RUN_ID) + vérif .gitignore (ROUTINE-01/02/05)
 - [ ] 12-03-PLAN.md — Environment Custom + secrets + allowlist *.supabase.co + run de fumée egress (gate ROUTINE-01) (ROUTINE-01/05)
 - [ ] 12-04-PLAN.md — Revue fondateur du prompt vétéran avant go-live (D-12-08) (ROUTINE-03)
@@ -131,7 +131,7 @@ Détail complet archivé : `.planning/milestones/v2.0-ROADMAP.md`.
 | 9. CMS cours & articles | v2.0 | 5/5 | Complete | 2026-06-20 |
 | 10. Fondation design system NEXA | v2.1 | 3/3 | Complete   | 2026-06-21 |
 | 11. Composants NEXA & reskin transversal | v2.1 | 8/8 | Complete    | 2026-06-21 |
-| 12. Routines d'analyse Claude (sans API) | v2.1 | 0/? | Not started | - |
+| 12. Routines d'analyse Claude (sans API) | v2.1 | 1/6 | In Progress|  |
 | 13. Backtest catalogue de patterns | v2.1 | 0/? | Not started | - |
 | 14. Track record affiché & boucle prod | v2.1 | 0/? | Not started | - |
 
