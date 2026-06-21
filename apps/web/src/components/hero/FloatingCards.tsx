@@ -22,13 +22,19 @@ type HeroCard = {
   riskLabel: string
 }
 
-export async function FloatingCards({ className }: { className?: string }) {
+export async function FloatingCards({
+  className,
+  ariaLabel,
+}: {
+  className?: string
+  ariaLabel?: string
+}) {
   const t = await getTranslations('hero')
   const tScore = await getTranslations('scoreRing')
   const cards = t.raw('cards') as HeroCard[]
 
   return (
-    <ul className={`grid gap-3 ${className ?? ''}`}>
+    <ul aria-label={ariaLabel} className={`grid gap-3 ${className ?? ''}`}>
       {cards.map((card, index) => {
         const ariaLabel = tScore('ariaTemplate', {
           score: card.score,

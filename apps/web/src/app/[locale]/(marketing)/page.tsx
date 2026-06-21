@@ -12,6 +12,7 @@
 import { setRequestLocale, getTranslations } from 'next-intl/server'
 import { Link } from '../../../i18n/navigation'
 import { Button } from '@/components/ui/button'
+import { Hero } from '@/components/hero/Hero'
 import { TrackRecordBlock } from '@/components/track-record/TrackRecordBlock'
 
 // D-08 : la section track record mesuré est ACTIVÉE en Phase 5 (TRACK-03).
@@ -30,17 +31,11 @@ export default async function HomePage({
 
   return (
     <main className="mx-auto max-w-screen-xl px-4 text-start md:px-6 lg:px-8">
-      {/* HERO — bénéfice-first (D-06) */}
-      <section className="py-16 md:py-24">
-        <h1 className="max-w-3xl text-[40px] leading-tight font-semibold md:text-[56px]">
-          {t('heroTitle')}
-        </h1>
-        <p className="mt-6 max-w-2xl text-base text-muted-foreground">{t('heroLede')}</p>
-        <div className="mt-8">
-          <Button asChild size="lg">
-            <Link href="/tarifs">{t('heroCta')}</Link>
-          </Button>
-        </div>
+      {/* HERO — vitrine animée NEXA greenfield (UI-02, D-01..05). Remplace le hero
+          statique : globe filaire + cartes anonymisées + data-rain + tilt, fond
+          ink fixe, reduced-motion respecté. Copy via namespace `hero`. */}
+      <section className="py-12 md:py-16">
+        <Hero />
       </section>
 
       {/* COMMENT ÇA MARCHE — méthode (D-06) */}

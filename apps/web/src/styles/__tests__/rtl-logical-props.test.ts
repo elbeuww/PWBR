@@ -81,9 +81,10 @@ describe('DESIGN-04 : propriétés logiques uniquement (fichiers fondation)', ()
   })
 
   it('scan tolérant : dossier composant absent ne jette pas (DESIGN-04)', () => {
-    // nexa/ et hero/ pas encore créés → listTsx renvoie [] sans exception.
-    expect(listTsx(RESKIN_DIRS[0])).toEqual([])
-    expect(listTsx(RESKIN_DIRS[1])).toEqual([])
+    // listTsx est tolérant à l'absence (dossier inexistant → []). On le prouve sur
+    // un chemin garanti absent ; nexa/ et hero/ existent désormais (11-04/11-07) et
+    // sont scannés par le test de non-régression ci-dessous.
+    expect(listTsx(path.resolve(__dirname, '../../components/__inexistant__'))).toEqual([])
   })
 
   it("n'utilise aucune classe utilitaire physique (fondation + components/nexa + components/hero)", () => {

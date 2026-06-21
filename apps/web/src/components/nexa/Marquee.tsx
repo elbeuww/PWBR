@@ -17,7 +17,7 @@ import { cn } from "@/lib/utils"
  * `aria-label` sur le conteneur.
  *
  * Propriétés logiques uniquement (`gap-*` est direction-neutre) — aucune classe
- * physique (ml-/mr-/pl-/pr-/left-/right-).
+ * utilitaire physique (préfixes margin/padding/inset orientés gauche-droite).
  */
 export async function Marquee({ className }: { className?: string }) {
   const t = await getTranslations("marquee")
