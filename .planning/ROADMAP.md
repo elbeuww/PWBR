@@ -64,7 +64,7 @@ Détail complet archivé : `.planning/milestones/v2.0-ROADMAP.md`.
 **Plans** : 8 plans (6 vagues)
 - [x] 11-01-PLAN.md — Tokens-résidus : purple accent + amber risque en 3 couches (DESIGN-05)
 - [x] 11-02-PLAN.md — Wave-0 garde-fous : no-perf-claims composant + no-mera-brand + rtl-scan étendu (BRAND-04/BRAND-01/DESIGN-04)
-- [ ] 11-03-PLAN.md — Recoloration résiduelle : CandleChart (lwc) + SignalCard + ExpiryBanner tokenisé (UI-03/UI-07)
+- [x] 11-03-PLAN.md — Recoloration résiduelle : CandleChart (lwc) + SignalCard + ExpiryBanner tokenisé (UI-03/UI-07)
 - [ ] 11-04-PLAN.md — Bibliothèque NEXA : Eyebrow, ScoreRing, Marquee, ConfidenceStat, Logo (DESIGN-05/BRAND-03)
 - [ ] 11-05-PLAN.md — Rebranding + assets : Logo header/footer + metadata/OG/icon + MERA→NEXA + baseline (BRAND-01/02/03)
 - [ ] 11-06-PLAN.md — Reskin membre : liste + détail trade + ScoreRing, RLS préservé (UI-03)
@@ -124,7 +124,7 @@ Détail complet archivé : `.planning/milestones/v2.0-ROADMAP.md`.
 | 8. Superadmin consolidé | v2.0 | 4/4 | Complete | 2026-06-19 |
 | 9. CMS cours & articles | v2.0 | 5/5 | Complete | 2026-06-20 |
 | 10. Fondation design system NEXA | v2.1 | 3/3 | Complete   | 2026-06-21 |
-| 11. Composants NEXA & reskin transversal | v2.1 | 2/8 | In Progress|  |
+| 11. Composants NEXA & reskin transversal | v2.1 | 3/8 | In Progress|  |
 | 12. Routines d'analyse Claude (sans API) | v2.1 | 0/? | Not started | - |
 | 13. Backtest catalogue de patterns | v2.1 | 0/? | Not started | - |
 | 14. Track record affiché & boucle prod | v2.1 | 0/? | Not started | - |

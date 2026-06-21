@@ -30,7 +30,7 @@ Requirements de ce milestone. Chacun est mappé à une phase de la roadmap (voir
 - [ ] **UI-04**: L'Académie (index + article + cours/leçon) est au design NEXA, RTL et fallback FR préservés.
 - [ ] **UI-05**: L'auth (login/signup) et l'espace compte/abonnement sont au design NEXA.
 - [ ] **UI-06**: Le back-office `/admin` est au design NEXA (peut rester plus sobre que le public).
-- [ ] **UI-07**: L'`ExpiryBanner` (alerte J-3/J-1, dette WIRING-01/PAY-05) est câblé dans l'espace membre/compte.
+- [ ] **UI-07**: L'`ExpiryBanner` (alerte J-3/J-1, dette WIRING-01/PAY-05) est câblé dans l'espace membre/compte. (11-03 : tokenisation `warning` livrée ; câblage = 11-08.)
 
 ### Routines d'analyse — moteur live sans API (ROUTINE)
 
@@ -102,7 +102,7 @@ Chaque requirement → exactement une phase. Phases 10-14 (numérotation continu
 | UI-04 | Phase 11 | Pending |
 | UI-05 | Phase 11 | Pending |
 | UI-06 | Phase 11 | Pending |
-| UI-07 | Phase 11 | Pending |
+| UI-07 | Phase 11 | In Progress |
 | ROUTINE-01 | Phase 12 | Pending |
 | ROUTINE-02 | Phase 12 | Pending |
 | ROUTINE-03 | Phase 12 | Pending |

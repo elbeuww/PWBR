@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v2.1
 milestone_name: "Mise en vie : identité NEXA, moteur live & track record"
 status: executing
-last_updated: "2026-06-21T14:35:23.610Z"
+last_updated: "2026-06-21T14:40:48.523Z"
 last_activity: 2026-06-21
 progress:
   total_phases: 5
   completed_phases: 1
   total_plans: 11
-  completed_plans: 5
-  percent: 45
+  completed_plans: 6
+  percent: 55
 ---
 
 # Project State
@@ -30,7 +30,7 @@ See: .planning/PROJECT.md (mis à jour 2026-06-20 après clôture v2.0)
 ## Current Position
 
 Phase: 11 (composants-nexa-reskin-transversal-rebranding) — EXECUTING
-Plan: 3 of 8
+Plan: 4 of 8
 Status: Ready to execute
 **Seul item ouvert (live, non-bloquant) :** vérification runtime no-flash — `pnpm --filter web dev` puis `/fr|/en|/ar/login` avec `localStorage.theme='dark'` + reload → confirmer aucune frame claire au premier paint. Rapport : 10-VERIFICATION.md.
 **Prochaine action à la reprise :** `/clear` puis `/gsd-plan-phase 11` (Composants NEXA, reskin, MERA→NEXA, hero, ExpiryBanner — DESIGN-05, BRAND-01..04, UI-01..07).
@@ -98,6 +98,7 @@ ressources externes non provisionnables en session de développement.
 | Phase 10 P03 | ~8min | 2 tasks | 1 file |
 | Phase Phase 11 P01 P01 | ~5min | 2 tasks | 1 files |
 | Phase 11 P02 | ~6min | 3 tasks | 3 files |
+| Phase 11 P03 | ~10min | 3 tasks | 4 files |
 
 ## Roadmap v2.0 (9 phases)
 
@@ -345,6 +346,13 @@ ressources externes non provisionnables en session de développement.
 - **D-11-01-B** : var()-only strict hors couche 1 — aucun littéral OKLCH/HEX introduit dans `:root`/`.dark`/`@theme inline` (Pitfall 3 : un littéral casserait silencieusement le flip `.dark`). Seule la primitive amber absente était à ajouter (`--nexa-amber-500: oklch(0.7686 0.1647 70.08)`, hue 70, distinct du brand hue 155 et des signals hue 27/149). Le purple primitive existait déjà (Phase 10), non dupliqué.
 - **Commits 11-01** : 54cc3b1 (Task 1 — 5 tokens en 3 couches : primitive amber + 2 sémantiques :root + 1 override .dark + 2 component). Task 2 = garde RTL fondation Phase 10 re-validée verte (2/2, exit 0), aucun fichier modifié. grep multi-critère 7 occurrences. **DESIGN-05 couvert ; tokens consommables par Eyebrow/ScoreRing/ExpiryBanner en Wave 2.**
 
+### Decisions exécution (Plan 11-03 — recoloration HEX/amber résiduels → tokens NEXA)
+
+- **D-11-03-A** : lightweight-charts ne lit PAS les CSS vars (canvas). Couleurs résolues via `getComputedStyle(containerRef).getPropertyValue('--token')` au montage, puis re-coloration au flip de thème par un `MutationObserver` sur la classe de `document.documentElement` (toggle `.dark`) qui relit les tokens et appelle `series.applyOptions` + `priceLine.applyOptions`. Choisi plutôt que `resolvedTheme` de next-themes en dépendance du `useEffect` (évite un remount complet du chart à chaque toggle ; recoloration in-place plus fluide). Refs des price lines (entry/SL/TP) conservées en variables locales du `useEffect` pour les re-colorer sans recréer le chart. `themeObserver.disconnect()` ajouté au cleanup.
+- **D-11-03-B** : mapping couleur figé — UP/TP → `--signal-bullish`, DOWN/SL → `--signal-bearish`, entrée → `--foreground` (neutre). Les `--signal-*` gardent leur teinte aux 2 thèmes (perte = rouge partout) ; `--foreground` flippe → l'entrée s'éclaircit en dark. SignalCard direction passe aux mêmes tokens (`bg/text-[var(--signal-*)]`), variantes `dark:` manuelles supprimées (le token flippe seul). Bloc score reste neutre `text-primary` (D-03).
+- **D-11-03-C** : variante `warning` ajoutée à `alertVariants` consommant `var(--risk-moderate)` (amber component-layer 11-01) — zéro littéral `amber-*`/couleur Tailwind nommée. ExpiryBanner passe à `variant="warning"`, logique J-3/J-1 + ICU + CTA intacts. **UI-07 NON marqué complet** : seule la tokenisation `warning` est livrée ici ; le câblage in-app (WIRING-01/PAY-05) est traité en 11-08. UI-03/DESIGN-05 moitié couleur livrée (CandleChart + SignalCard flip-safe). Frontière RLS serveur intacte (aucun `createClient/from(/supabase` ajouté, grep=0).
+- **Commits 11-03** : 51eb874 (Task 1 CandleChart recolor + theme-flip), 571b9c5 (Task 2 SignalCard direction tokens), 67568b3 (Task 3 variante warning alert + ExpiryBanner). Greps acceptance : HEX=0, amber=0, getPropertyValue/applyOptions/MutationObserver présents. RTL test 3/3, `tsc -b --noEmit` 0 erreur sur les 4 fichiers.
+
 ### Open todos / research flags (v2.0)
 
 - **Phase 4 (research flag) :** TronGrid endpoint `walletsolidity`, parsing logs TRC-20, normalisation hex↔base58 — doc TS peu dense, recherche de phase recommandée.
@@ -371,7 +379,7 @@ ressources externes non provisionnables en session de développement.
 
 ## Session Continuity
 
-**Last session:** 2026-06-21T14:35:23.602Z
+**Last session:** 2026-06-21T14:40:48.514Z
 
 **Last session (archive):** 2026-06-19T03:41:29.665Z
 
