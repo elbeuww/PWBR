@@ -8,8 +8,14 @@ import type { Metadata } from 'next'
  * second élément racine (DOM invalide, dir non appliqué).
  */
 export const metadata: Metadata = {
-  title: 'Vétéran Trading Platform',
-  description: "Plateforme d'analyse de trading — usage personnel",
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000'),
+  title: 'NEXA — Nouvelle Ère · Alliance d\'Échange',
+  description: "NEXA : plateforme éducative d'analyse de marché — contenu pédagogique, sans promesse de gain.",
+  openGraph: {
+    title: 'NEXA — Nouvelle Ère · Alliance d\'Échange',
+    description: "NEXA : plateforme éducative d'analyse de marché — contenu pédagogique, sans promesse de gain.",
+    type: 'website',
+  },
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
