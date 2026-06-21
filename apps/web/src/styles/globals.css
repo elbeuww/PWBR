@@ -43,6 +43,10 @@
   --nexa-purple-500: oklch(0.4233 0.1772 302.98);
   --nexa-purple-400: oklch(0.5400 0.1900 302.98); /* eyebrow/accent en thème sombre */
 
+  /* Phase 11 : token component ajouté (DESIGN-05), sans re-décision de palette (Pitfall 4). */
+  /* Amber risque modéré (hue ~70) — distinct du brand hue 155 et des signals hue 27/149. */
+  --nexa-amber-500: oklch(0.7686 0.1647 70.08);
+
   /* Ancres neutres absolues. */
   --nexa-white: oklch(1.0000 0 0);
   --nexa-ink: oklch(0.1663 0.0262 269.37); /* #0a0e1a — fond sombre */
@@ -84,6 +88,9 @@
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
+  /* Phase 11 : token component ajouté (DESIGN-05), sans re-décision de palette (Pitfall 4). */
+  --color-accent-brand: var(--accent-brand);
+  --color-risk-moderate: var(--risk-moderate);
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
@@ -125,6 +132,10 @@
   /* Signaux trading — DISTINCTS de --primary (D-05), consommés en Phase 11. */
   --signal-bullish: var(--nexa-signal-bull);
   --signal-bearish: var(--nexa-signal-bear);
+
+  /* Phase 11 : token component ajouté (DESIGN-05), sans re-décision de palette (Pitfall 4). */
+  --accent-brand: var(--nexa-purple-500);   /* purple accent light (Eyebrow/gradients) */
+  --risk-moderate: var(--nexa-amber-500);   /* amber risque modéré (ScoreRing) — teinte unique aux 2 thèmes */
 }
 
 /*
@@ -150,6 +161,10 @@
   --border: var(--nexa-neutral-900);
   --input: var(--nexa-neutral-900);
   --ring: var(--nexa-green-500);
+
+  /* Phase 11 : token component ajouté (DESIGN-05), sans re-décision de palette (Pitfall 4). */
+  --accent-brand: var(--nexa-purple-400);   /* variante sombre éclaircie (primitive dédiée) */
+  /* --risk-moderate GARDE sa teinte amber dans les 2 thèmes → non redéclaré ici (cf. --signal-*). */
 }
 
 /*
