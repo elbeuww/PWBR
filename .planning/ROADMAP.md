@@ -27,15 +27,15 @@ Détail complet archivé : `.planning/milestones/v2.0-ROADMAP.md`.
 
 ### v2.1 — Mise en vie (Phases 10-14)
 
-- [x] **Phase 10 : Fondation design system NEXA** — Tokens OKLCH en couches + 5 polices self-hostées + thème no-flash RTL-safe (axe design, fondation). (completed 2026-06-21)
-- [ ] **Phase 11 : Composants NEXA, reskin transversal & rebranding** — Bibliothèque tokenisée + reskin de toutes les surfaces + MERA→NEXA + hero animé, sans promesse de gain.
-- [ ] **Phase 12 : Routines d'analyse Claude planifiées (sans API)** — Environment + fenêtres Remote day/swing + 1 run réel snapshot→analyze→persist, monitoré.
-- [ ] **Phase 13 : Backtest du catalogue de patterns (source-discrimination + moteur)** — Migration `source` AVANT seed + catalogue figé + `packages/backtest` réutilisant `replayOutcome` + Wilson golden-testé.
-- [ ] **Phase 14 : Track record affiché & boucle outcomes en prod** — Provenance backtest/réel + N visible + bascule N≥30 + outcome-tracker en prod.
+- [x] **Phase 10: Fondation design system NEXA** — Tokens OKLCH en couches + 5 polices self-hostées + thème no-flash RTL-safe (axe design, fondation). (completed 2026-06-21)
+- [ ] **Phase 11: Composants NEXA, reskin transversal & rebranding** — Bibliothèque tokenisée + reskin de toutes les surfaces + MERA→NEXA + hero animé, sans promesse de gain.
+- [ ] **Phase 12: Routines d'analyse Claude planifiées (sans API)** — Environment + fenêtres Remote day/swing + 1 run réel snapshot→analyze→persist, monitoré.
+- [ ] **Phase 13: Backtest du catalogue de patterns (source-discrimination + moteur)** — Migration `source` AVANT seed + catalogue figé + `packages/backtest` réutilisant `replayOutcome` + Wilson golden-testé.
+- [ ] **Phase 14: Track record affiché & boucle outcomes en prod** — Provenance backtest/réel + N visible + bascule N≥30 + outcome-tracker en prod.
 
 ## Phase Details
 
-### Phase 10 : Fondation design system NEXA
+### Phase 10: Fondation design system NEXA
 **Goal** : Poser le socle de design tokenisé (couleurs OKLCH NEXA, polices, thèmes) sur lequel tout le reskin s'appuiera, avec garantie no-flash et RTL préservé — jamais à retrofitter.
 **Depends on** : v2.0 livré (globals.css, ThemeToggle, i18n/RTL, fonts.ts existants).
 **Requirements** : DESIGN-01, DESIGN-02, DESIGN-03, DESIGN-04
@@ -51,7 +51,7 @@ Détail complet archivé : `.planning/milestones/v2.0-ROADMAP.md`.
 **UI hint** : yes
 **Notes** : Axe design (parallélisable contre Phases 12-13). Adresse Pitfalls P8 (RTL) et P13 (FOUC) en fondation. Aucune nouvelle dépendance runtime (CSS + `next/font/local`). Décision figée : Noto Sans Arabic REMPLACE IBM Plex Sans Arabic (D-01).
 
-### Phase 11 : Composants NEXA, reskin transversal & rebranding
+### Phase 11: Composants NEXA, reskin transversal & rebranding
 **Goal** : Donner à toute la plateforme son identité NEXA via une bibliothèque de composants tokenisée, reskiner chaque route group, et achever le rebranding MERA→NEXA — sans réintroduire la moindre promesse de gain.
 **Depends on** : Phase 10 (tokens + polices + thèmes posés).
 **Requirements** : DESIGN-05, BRAND-01, BRAND-02, BRAND-03, BRAND-04, UI-01, UI-02, UI-03, UI-04, UI-05, UI-06, UI-07
@@ -65,7 +65,7 @@ Détail complet archivé : `.planning/milestones/v2.0-ROADMAP.md`.
 **UI hint** : yes
 **Notes** : Axe design (parallélisable contre Phases 12-13). Adresse Pitfall P7 (promesse de gain visuelle). Reskin = swap de tokens + nouveaux primitifs NEXA, jamais migration du fetch RLS vers le client (Anti-Pattern 3). CandleChart recoloré via l'API JS lwc (Anti-Pattern 5). Conserver `data-testid`/rôles ARIA des 6 spec files E2E.
 
-### Phase 12 : Routines d'analyse Claude planifiées (sans API)
+### Phase 12: Routines d'analyse Claude planifiées (sans API)
 **Goal** : Activer le moteur en production via des routines Claude Code Remote planifiées (day + swing) qui produisent de vrais setups par `snapshot → analyze → persist`, sans clé API, idempotentes et monitorées — levant la dette v1.0 P4.
 **Depends on** : Cœur v1.0 (combine-engine, persist.ts, sessions.ts) — indépendant des Phases 10-11.
 **Requirements** : ROUTINE-01, ROUTINE-02, ROUTINE-03, ROUTINE-04, ROUTINE-05
@@ -78,7 +78,7 @@ Détail complet archivé : `.planning/milestones/v2.0-ROADMAP.md`.
 **Plans** : TBD
 **Notes** : Axe routine (parallélisable contre l'axe design). Config-first : Environments + schedules vivent HORS git (dashboard). Pas de job `analyze.ts` (Anti-Pattern 1) — ANALYZE reste agent-native ; `persist.ts` demeure la seule frontière d'écriture IA. Research flag : valider Open Question A1 (réseau `*.supabase.co` Remote) AVANT de planifier. Adresse Pitfalls P10 (hallucination), P11 (quota), P12 (MCP absent en Remote).
 
-### Phase 13 : Backtest du catalogue de patterns (source-discrimination + moteur)
+### Phase 13: Backtest du catalogue de patterns (source-discrimination + moteur)
 **Goal** : Mesurer un win-rate par pattern via un backtest honnête, en posant d'abord la discrimination de source (anti double-comptage) et en figeant le catalogue, puis en réutilisant `replayOutcome` pour produire un % statistiquement significatif.
 **Depends on** : Cœur v1.0 (`replayOutcome`, `packages/indicators`, `pattern_stats` 0014). Migration source = prérequis dur du moteur.
 **Requirements** : BACKTEST-01, BACKTEST-02, BACKTEST-03, BACKTEST-04
@@ -90,7 +90,7 @@ Détail complet archivé : `.planning/milestones/v2.0-ROADMAP.md`.
 **Plans** : TBD
 **Notes** : Axe backtest. **Ordre dur** : migration source (BACKTEST-01) → catalogue figé (BACKTEST-02) → moteur (BACKTEST-03) → significativité (BACKTEST-04). Inverser corrompt `pattern_stats` (double-comptage silencieux). `packages/backtest` séparé de `packages/indicators` (préserver sa pureté). Aucune écriture dans `trade_setups`/`prediction_outcomes` (Anti-Pattern 2). Research flag : le catalogue = décision fondateur (Borhane) à figer avant le code. Adresse Pitfalls P2, P3, P5, P6.
 
-### Phase 14 : Track record affiché & boucle outcomes en prod
+### Phase 14: Track record affiché & boucle outcomes en prod
 **Goal** : Afficher dès J1 un % de réussite toujours mesuré, étiqueté par provenance avec son N, et faire tourner la boucle outcome-tracker en prod pour basculer progressivement du backtest vers le track record réel.
 **Depends on** : Phase 12 (routine produisant des signaux réels) ET Phase 13 (backtest seedant `pattern_stats`). Surfaces d'affichage reskinées en Phase 11.
 **Requirements** : TRACK-04, TRACK-05, TRACK-06
