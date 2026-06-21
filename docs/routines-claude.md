@@ -226,4 +226,33 @@ La clé `SUPABASE_SERVICE_ROLE_KEY` **bypass la RLS** (accès complet à la base
 
 ---
 
+## 9. Premier run réel (gate ROUTINE-03) — ✅ chaîne prouvée le 2026-06-22
+
+Run one-off `RUN_ID=newyork-20260622T1730Z` (Environment `nexa-jobs`, 0 connecteur MCP) :
+
+- **Pipeline complet OK** : news-ingest, macro-ingest, technical/fundamental/news-engine, combine-engine → 10 snapshots `combined` (5 instruments crypto × 2 styles).
+- **ANALYZE agent-native** : 10 paires examinées, **8 rejetées avec discipline** (bos_choch null, volume contracting, R:R impossible, ATR percentile extrême), **2 retenues**.
+- **persist (frontière D-43)** : `{ written: 2, rejected: 0 }` → 2 `trade_setups` `status='active'` :
+  - `SOLUSDT swing short` — score 53 (recalculé code), R:R global 1.60, entry bord conservateur.
+  - `ETHUSDT swing short` — score 59 (recalculé code), R:R global 2.08, entry bord conservateur.
+- Frontière intacte : le score agent a bien été **écrasé par `scoreSetup`** ; R:R ≥ 1.2 ; entrées conservatrices.
+
+### 9.1 ⚠️ LIMITATION BLOQUANTE pour le LIVE — Binance géo-bloqué depuis le cloud
+
+`market-ingest` n'a inséré **aucune bougie fraîche** : **Binance (`api.binance.com`) bloque l'IP du datacenter cloud Anthropic** (451/403 « Unavailable For Legal Reasons »), malgré l'allowlist. OANDA a aussi échoué (token absent/invalide). Le run a donc tourné sur des **bougies pré-existantes du 2026-06-17** (4 j de stale) → les 2 setups sont une **preuve de chaîne valide**, mais **PAS des signaux frais tradables**.
+
+**À résoudre AVANT que de vrais signaux partent aux membres (2 options) :**
+1. **Basculer le client Binance sur `data-api.binance.vision`** (endpoint données publiques, non géo-bloqué) — modif `packages/data-sources/src/binance/client.ts` (baseUrl MainClient) + allowlist `data-api.binance.vision`. À faire en TDD.
+2. **Ingestion crypto en local** (Windows Task Scheduler, backup déjà prévu §Stack Patterns) qui garde Supabase frais ; le run cloud ne fait que ANALYZE + persist sur données fraîches.
+
+Décision d'archi à trancher (founder) avant l'élargissement (plan 06) et la mise en production des signaux.
+
+### 9.2 Reste à faire pour clore le plan 12-05
+
+- [ ] Résoudre la fraîcheur Binance (§9.1) — **bloquant live**.
+- [ ] Créer les 2 routines Remote **permanentes** : `newyork` (`30 12 * * 1-5`), `eod-swing` (`00 21 * * 1-5`), Environment `nexa-jobs`, 0 connecteur, prompt single-run validé.
+- [ ] Task 3 monitoring : re-run même `session_day` → pas de doublon (idempotence D-45) ; `/admin/sante` affiche le run + flag `stale` ; conso quota < ~15/j.
+
+---
+
 *Runbook go-live — Phase 12. Source de vérité hors git : dashboard Anthropic (Environment, secrets, crons). Maintenu par l'équipe dev.*
