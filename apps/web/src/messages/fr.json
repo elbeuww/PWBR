@@ -626,5 +626,14 @@
       "eleve": "risque élevé"
     },
     "ariaTemplate": "Score {score} sur 100, {risk}"
+  },
+  "confidenceStat": {
+    "inConstruction": "Track record en construction (échantillon insuffisant)",
+    "sampleLabel": "sur {n} trades mesurés",
+    "provenanceBacktest": "Mesuré par backtest",
+    "provenanceReel": "Track record réel"
+  },
+  "baseline": {
+    "text": "Nouvelle Ère · Alliance d'Échange"
   }
 }

@@ -431,5 +431,14 @@
       "eleve": "high risk"
     },
     "ariaTemplate": "Score {score} out of 100, {risk}"
+  },
+  "confidenceStat": {
+    "inConstruction": "Track record being built (sample too small)",
+    "sampleLabel": "across {n} measured trades",
+    "provenanceBacktest": "Measured by backtest",
+    "provenanceReel": "Live track record"
+  },
+  "baseline": {
+    "text": "New Era · Exchange Alliance"
   }
 }

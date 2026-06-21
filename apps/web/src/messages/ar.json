@@ -431,5 +431,14 @@
       "eleve": "مخاطرة مرتفعة"
     },
     "ariaTemplate": "النتيجة {score} من 100، {risk}"
+  },
+  "confidenceStat": {
+    "inConstruction": "سجلّ الأداء قيد الإنشاء (العيّنة غير كافية)",
+    "sampleLabel": "على {n} صفقة مُقاسة",
+    "provenanceBacktest": "مُقاس بالاختبار الرجعي",
+    "provenanceReel": "سجلّ أداء فعلي"
+  },
+  "baseline": {
+    "text": "عهد جديد · تحالف للتبادل"
   }
 }
