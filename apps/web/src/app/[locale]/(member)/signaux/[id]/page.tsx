@@ -23,6 +23,25 @@ import { createClient } from '../../../../../lib/supabase/server'
 import { SignalDetail, type TradeSetupDetail } from '../../../../../components/signals/SignalDetail'
 import { SignalsDisclaimerBanner } from '../../../../../components/signals/SignalsDisclaimerBanner'
 import { CandleChartLazy } from '../../../../../components/signals/CandleChartLazy'
+import { Eyebrow } from '../../../../../components/nexa/Eyebrow'
+import { ScoreRing, type ScoreRisk } from '../../../../../components/nexa/ScoreRing'
+
+/**
+ * Mappe le niveau de risque DB (low/medium/high/extreme) vers la palette ScoreRing
+ * (faible→neutre, modere→amber, eleve→bearish, D-12). high ET extreme → eleve.
+ * Valeur inconnue → modere (repli neutre, jamais l'extrême par défaut).
+ */
+function mapRiskToScoreRisk(risk: string): ScoreRisk {
+  switch (risk) {
+    case 'low':
+      return 'faible'
+    case 'high':
+    case 'extreme':
+      return 'eleve'
+    default:
+      return 'modere'
+  }
+}
 
 /**
  * Schéma Zod du payload §3 affiché (frontière Zod, convention packages/core /
@@ -92,6 +111,7 @@ export default async function SignalDetailPage({ params }: SignalDetailPageProps
   const { locale, id } = await params
   setRequestLocale(locale)
   const t = await getTranslations('signalDetail')
+  const tScore = await getTranslations('scoreRing')
 
   const supabase = await createClient()
 
@@ -131,6 +151,13 @@ export default async function SignalDetailPage({ params }: SignalDetailPageProps
 
   const takeProfits = (payload.take_profits ?? []).map((tp) => tp.price)
 
+  // ScoreRing large (couleur = risque, D-12). Label traduit fourni (RSC-safe).
+  const scoreRisk = mapRiskToScoreRisk(detail.risk_level)
+  const scoreLabel = tScore('ariaTemplate', {
+    score: detail.opportunity_score,
+    risk: tScore(`riskLabels.${scoreRisk}`),
+  })
+
   return (
     <main className="mx-auto max-w-screen-lg px-4 py-10 text-start md:px-6 lg:px-8">
       <Link
@@ -141,6 +168,23 @@ export default async function SignalDetailPage({ params }: SignalDetailPageProps
       </Link>
 
       <SignalsDisclaimerBanner />
+
+      {/* En-tête NEXA : Eyebrow + symbole/direction + ScoreRing large (score = risque). */}
+      <header className="mt-6 flex flex-wrap items-center justify-between gap-4 rounded-xl border border-border bg-card p-6">
+        <div className="flex flex-col gap-2">
+          <Eyebrow>{t('planTitle')}</Eyebrow>
+          <h1 className="font-heading text-2xl font-semibold">
+            <bdi>{detail.instruments.symbol}</bdi>
+          </h1>
+          <p className="text-sm text-muted-foreground">{t('scoreLabel')}</p>
+        </div>
+        <ScoreRing
+          score={detail.opportunity_score}
+          risk={scoreRisk}
+          size={96}
+          label={scoreLabel}
+        />
+      </header>
 
       {candles && candles.length > 0 ? (
         <section className="mt-6">

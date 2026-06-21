@@ -9,8 +9,11 @@
  *
  * Contenu IA = D-10 HARD : rendu échappé par React (texte enfant {…}), JAMAIS
  * d'injection HTML brute, JAMAIS reformulé, JAMAIS une clé i18n. Seuls les TITRES
- * de section passent par next-intl. Le SCORE affiché = colonne opportunity_score
- * (NEUTRE, D-03), jamais dérivé du payload.
+ * de section passent par next-intl.
+ *
+ * Reskin NEXA (11-06) : le SCORE est rendu par `ScoreRing` dans l'en-tête de la
+ * route ([id]/page.tsx) — ce composant ne réaffiche plus le nombre brut pour
+ * éviter le doublon. Direction restituée ici dans l'en-tête sémantique.
  *
  * Server-renderable : compose des enfants client (Collapsible). Classes logiques (RTL).
  */
@@ -74,19 +77,14 @@ export function SignalDetail({ setup, locale }: SignalDetailProps) {
 
   return (
     <article className="mt-6 text-start">
-      {/* En-tête : symbole + direction (sémantique) + score NEUTRE (colonne). */}
+      {/* En-tête : symbole + direction (sémantique). Le score est dans le ScoreRing
+          de l'en-tête de page (11-06) — pas de doublon ici (D-03 préservé). */}
       <header className="flex flex-wrap items-baseline justify-between gap-3 border-b border-foreground/10 pb-4">
         <div className="flex items-baseline gap-3">
           <h1 className="font-heading text-2xl font-semibold">{setup.instruments.symbol}</h1>
           <span className={`text-sm font-semibold ${directionClass}`}>
             {isLong ? tSignals('direction.long') : tSignals('direction.short')}
           </span>
-        </div>
-        <div className="flex items-baseline gap-2">
-          <span className="text-3xl font-semibold tabular-nums text-primary">
-            <bdi>{setup.opportunity_score}</bdi>
-          </span>
-          <span className="text-sm text-muted-foreground">{t('scoreLabel')}</span>
         </div>
       </header>
 
