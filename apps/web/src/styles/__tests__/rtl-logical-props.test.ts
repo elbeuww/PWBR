@@ -16,11 +16,17 @@
  * agit comme garde de NON-RÉGRESSION pendant que les plans 02/03 touchent ces
  * fichiers fondation.
  *
+ * Phase 11 (DESIGN-04) : le scan couvre AUSSI les futurs dossiers composant
+ * `components/nexa/` et `components/hero/` (.tsx récursif). Tolérance « dossier
+ * absent → [] » : vert tant que ces dossiers n'existent pas, protecteur dès leur
+ * création — toute classe physique (ml-/mr-/pl-/pr-/left-/right-) y sera bloquée.
+ *
  * Source : 10-VALIDATION.md §DESIGN-04 ; 10-CONTEXT.md D-V2-02 ; 10-PATTERNS.md
- * §Wave-0 Test Files ; mirror du style text-scan de apps/web/test/no-perf-claims.test.ts.
+ * §Wave-0 Test Files ; 11-PATTERNS.md §Propriétés logiques RTL ; mirror du style
+ * text-scan de apps/web/test/no-perf-claims.test.ts.
  */
 import { describe, it, expect } from 'vitest'
-import { readFileSync } from 'node:fs'
+import { readdirSync, readFileSync, statSync } from 'node:fs'
 import path from 'node:path'
 
 // Fichiers fondation surveillés (touchés par la migration Phase 10).
@@ -28,6 +34,28 @@ const FOUNDATION_FILES = [
   path.resolve(__dirname, '../globals.css'),
   path.resolve(__dirname, '../../app/[locale]/layout.tsx'),
 ] as const
+
+// Dossiers composant Phase 11 (reskin NEXA + hero). Scannés récursivement (.tsx) au
+// moment du run ; absents aujourd'hui → tolérance « dossier absent => liste vide ».
+const RESKIN_DIRS = [
+  path.resolve(__dirname, '../../components/nexa'),
+  path.resolve(__dirname, '../../components/hero'),
+] as const
+
+// Liste récursive des .tsx d'un dossier, tolérante à son absence.
+function listTsx(dir: string): string[] {
+  let entries: string[]
+  try {
+    entries = readdirSync(dir)
+  } catch {
+    return [] // dossier absent (nexa/hero pas encore créés) → vert
+  }
+  return entries.flatMap((entry) => {
+    const full = path.join(dir, entry)
+    if (statSync(full).isDirectory()) return listTsx(full)
+    return path.extname(entry) === '.tsx' ? [full] : []
+  })
+}
 
 // Classes utilitaires Tailwind à propriété PHYSIQUE interdites. Frontière `\b` à
 // gauche, et le préfixe se termine par `-` (ml-, mr-, pl-, pr-, left-, right-).
@@ -52,8 +80,15 @@ describe('DESIGN-04 : propriétés logiques uniquement (fichiers fondation)', ()
     expect(PHYSICAL_CLASS.test('class="ms-4 pe-2 start-0"')).toBe(false)
   })
 
-  it("n'utilise aucune classe utilitaire physique dans les fichiers fondation", () => {
-    const offenders = FOUNDATION_FILES.flatMap(scanFile)
+  it('scan tolérant : dossier composant absent ne jette pas (DESIGN-04)', () => {
+    // nexa/ et hero/ pas encore créés → listTsx renvoie [] sans exception.
+    expect(listTsx(RESKIN_DIRS[0])).toEqual([])
+    expect(listTsx(RESKIN_DIRS[1])).toEqual([])
+  })
+
+  it("n'utilise aucune classe utilitaire physique (fondation + components/nexa + components/hero)", () => {
+    const reskinFiles = RESKIN_DIRS.flatMap(listTsx)
+    const offenders = [...FOUNDATION_FILES, ...reskinFiles].flatMap(scanFile)
     expect(
       offenders,
       `Classes physiques (utiliser logiques ms-/me-/ps-/pe-/start-/end-) :\n${offenders.join('\n')}`,
