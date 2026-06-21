@@ -424,6 +424,36 @@
       "تحليل يومي ومتأرجح"
     ]
   },
+  "hero": {
+    "title": "قرّر بانضباط.",
+    "lede": "كل فرصة مُقيّمة من 100، مع مستوى مخاطرتها وخطّة واضحة: الدخول ووقف الخسارة وجني الأرباح ونسبة العائد إلى المخاطرة.",
+    "ctaPrimary": "اكتشف المنهجية",
+    "ctaSecondary": "اطّلع على الأسعار",
+    "cardsLabel": "أمثلة على إعدادات تم تحليلها",
+    "cards": [
+      {
+        "instrument": "EUR/USD",
+        "direction": "شراء",
+        "score": 82,
+        "risk": "modere",
+        "riskLabel": "مخاطرة متوسّطة"
+      },
+      {
+        "instrument": "BTC/USDT",
+        "direction": "بيع",
+        "score": 67,
+        "risk": "eleve",
+        "riskLabel": "مخاطرة مرتفعة"
+      },
+      {
+        "instrument": "XAU/USD",
+        "direction": "شراء",
+        "score": 74,
+        "risk": "faible",
+        "riskLabel": "مخاطرة منخفضة"
+      }
+    ]
+  },
   "scoreRing": {
     "riskLabels": {
       "faible": "مخاطرة منخفضة",

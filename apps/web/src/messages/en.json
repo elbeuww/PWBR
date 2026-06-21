@@ -424,6 +424,36 @@
       "Day & Swing analysis"
     ]
   },
+  "hero": {
+    "title": "Decide with discipline.",
+    "lede": "Every opportunity scored out of 100, its risk level, and a clear plan: entry, stop-loss, take-profits, R:R ratio.",
+    "ctaPrimary": "Discover the method",
+    "ctaSecondary": "See pricing",
+    "cardsLabel": "Examples of analyzed setups",
+    "cards": [
+      {
+        "instrument": "EUR/USD",
+        "direction": "Long",
+        "score": 82,
+        "risk": "modere",
+        "riskLabel": "Moderate risk"
+      },
+      {
+        "instrument": "BTC/USDT",
+        "direction": "Short",
+        "score": 67,
+        "risk": "eleve",
+        "riskLabel": "High risk"
+      },
+      {
+        "instrument": "XAU/USD",
+        "direction": "Long",
+        "score": 74,
+        "risk": "faible",
+        "riskLabel": "Low risk"
+      }
+    ]
+  },
   "scoreRing": {
     "riskLabels": {
       "faible": "low risk",

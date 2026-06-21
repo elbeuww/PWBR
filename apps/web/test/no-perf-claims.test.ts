@@ -84,11 +84,18 @@ describe('no-perf-claims : aucun chiffre de perf / promesse de gain (VITR-03)', 
   })
 
   it('scan tolérant : un namespace composant absent du JSON ne jette pas (BRAND-04)', () => {
-    // hero/marquee/scoreRing/... ne sont pas encore créés ; l'accès renvoie
-    // undefined → collectStrings === [], aucun offender, pas d'exception.
-    const missing = (LOCALES.fr as Record<string, unknown>)['hero']
+    // Un namespace composant non encore créé renvoie undefined →
+    // collectStrings === [], aucun offender, pas d'exception.
+    const missing = (LOCALES.fr as Record<string, unknown>)['namespaceInexistant']
     expect(missing).toBeUndefined()
-    expect(collectStrings(missing, 'hero')).toEqual([])
+    expect(collectStrings(missing, 'namespaceInexistant')).toEqual([])
+  })
+
+  it('le namespace composant hero est présent et scanné (BRAND-04)', () => {
+    // Posé en 11-07 : la copy hero EST scannée pour les allégations de perf.
+    const hero = (LOCALES.fr as Record<string, unknown>)['hero']
+    expect(hero).toBeDefined()
+    expect(collectStrings(hero, 'hero').length).toBeGreaterThan(0)
   })
 
   it('ne contient aucune allégation de perf dans les namespaces scannés (fr/en/ar)', () => {
