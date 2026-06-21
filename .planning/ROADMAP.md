@@ -83,7 +83,13 @@ Détail complet archivé : `.planning/milestones/v2.0-ROADMAP.md`.
   3. Un run réel de bout en bout produit ≥1 setup persisté via `persist.ts` (frontière de confiance intacte : Zod + guardrails + score recalculé en code, jamais le score de l'agent).
   4. Les runs sont idempotents, tracés dans `job_runs`, avec le flag `stale` visible sur `/admin/sante`, en restant sous le budget de quota (~15 runs/j partagé).
   5. Tout accès DB des jobs passe par `supabase-js` (jamais le MCP cloud) et aucune clé API Anthropic n'est utilisée.
-**Plans** : TBD
+**Plans** : 6 plans (4 vagues)
+- [ ] 12-01-PLAN.md — Wave-0 : tests validation (persist true-empty/all-rejected, idempotence run-level, static-check no-MCP) (ROUTINE-03/04/05)
+- [ ] 12-02-PLAN.md — Runbook : corriger docs/routines-claude.md (réseau Custom *.supabase.co obligatoire, single-run, P-SECRET/P-MCP, RUN_ID) + vérif .gitignore (ROUTINE-01/02/05)
+- [ ] 12-03-PLAN.md — Environment Custom + secrets + allowlist *.supabase.co + run de fumée egress (gate ROUTINE-01) (ROUTINE-01/05)
+- [ ] 12-04-PLAN.md — Revue fondateur du prompt vétéran avant go-live (D-12-08) (ROUTINE-03)
+- [ ] 12-05-PLAN.md — Routines newyork + eod-swing + 1 run réel ≥1 setup persisté (D-43) + monitoring/idempotence (ROUTINE-02/03/04)
+- [ ] 12-06-PLAN.md — Élargissement asia + london après validation du minimal (D-12-01) (ROUTINE-02/04)
 **Notes** : Axe routine (parallélisable contre l'axe design). Config-first : Environments + schedules vivent HORS git (dashboard). Pas de job `analyze.ts` (Anti-Pattern 1) — ANALYZE reste agent-native ; `persist.ts` demeure la seule frontière d'écriture IA. Research flag : valider Open Question A1 (réseau `*.supabase.co` Remote) AVANT de planifier. Adresse Pitfalls P10 (hallucination), P11 (quota), P12 (MCP absent en Remote).
 
 ### Phase 13: Backtest du catalogue de patterns (source-discrimination + moteur)
