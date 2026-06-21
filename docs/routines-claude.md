@@ -63,6 +63,14 @@ C'est exactement ce qui casse le client service_role de `runJob.ts` / `persist.t
 
 L'étape réseau Custom est **gatée par un run de fumée** (ROUTINE-01, plan 03) : un premier run cloud doit écrire dans `job_runs` sans `403 host_not_allowed` dans `job_runs.error` AVANT de planifier les fenêtres.
 
+**Résultat run de fumée (gate ROUTINE-01) — ✅ CONFIRMÉ le 2026-06-21 :**
+
+- **Mode réseau effectif : `Custom` + `*.supabase.co`** (package managers par défaut inclus). Le fallback `Full` n'a **PAS** été nécessaire.
+- Environment cloud : `nexa-jobs` (Anthropic Console, dashboard-only). Secrets `SUPABASE_URL` + `SUPABASE_SERVICE_ROLE_KEY` injectés en variables d'Environment (pas de secrets store dédié — accès édition restreint, P-SECRET).
+- Run one-off `heartbeat` : `corepack enable` → `pnpm install` (660 paquets) → `pnpm --filter jobs exec tsx src/dispatch.ts heartbeat`. Exit 0.
+- Egress prouvé : **aucune** chaîne `403` / `host_not_allowed` / `ENOTFOUND` / `EAI_AGAIN` / `fetch failed`. `job_runs` (`job_name='heartbeat'`) = `status='success'` (projet `csotpitrjxryjkadyiml`), vérifié via REST (HTTP 200). Aucun secret affiché, aucun fichier modifié.
+- ⚠️ **Connecteur MCP Supabase à retirer pour les vraies routines (ROUTINE-05)** : lors du smoke test, un connecteur MCP Supabase était attaché mais pointait vers un autre projet (`agencyhub`) sans table `job_runs` — l'agent l'a ignoré et a écrit via `supabase-js` (voie D-43 correcte). Confirme que le connecteur est inutile ET dangereux : le **supprimer** des routines `newyork`/`eod-swing`/`asia`/`london` (plans 05/06).
+
 **Architecture des jobs (invariante) :**
 ```
 Routine Claude Remote / Task Scheduler / croner
