@@ -45,12 +45,27 @@ export interface CandleChartProps {
   precision: number
 }
 
-// Couleurs sémantiques trading (UI-SPEC §Color) — alignées sur SignalCard.
-const UP_COLOR = '#15803D'
-const DOWN_COLOR = '#B91C1C'
-const ENTRY_COLOR = '#1E5FBF' // brand-blue (neutre)
-const SL_COLOR = '#B91C1C'
-const TP_COLOR = '#15803D'
+/**
+ * Couleurs résolues depuis les tokens NEXA (couche component, flip-safe, 11-01).
+ * lightweight-charts ne lit PAS les CSS vars (canvas) → on résout les tokens via
+ * getComputedStyle au montage ET à chaque flip de thème (Pitfall 5). UP/TP =
+ * --signal-bullish, DOWN/SL = --signal-bearish, entrée = --foreground (neutre).
+ */
+interface ChartColors {
+  up: string
+  down: string
+  entry: string
+}
+
+function readChartColors(el: HTMLElement): ChartColors {
+  const cs = getComputedStyle(el)
+  const read = (name: string): string => cs.getPropertyValue(name).trim()
+  return {
+    up: read('--signal-bullish'),
+    down: read('--signal-bearish'),
+    entry: read('--foreground'),
+  }
+}
 
 /** Convertit un ISO timestamp en UTCTimestamp (secondes) pour lightweight-charts. */
 function toUtcSeconds(iso: string): UTCTimestamp {
@@ -74,9 +89,13 @@ export function CandleChart({
 
     let chart: IChartApi | null = null
     let observer: ResizeObserver | null = null
+    let themeObserver: MutationObserver | null = null
 
     try {
       const digits = Number.isFinite(precision) && precision >= 0 ? Math.trunc(precision) : 2
+
+      // Résolution initiale des couleurs depuis les tokens NEXA (flip-safe).
+      let colors = readChartColors(el)
 
       chart = createChart(el, {
         autoSize: true,
@@ -94,12 +113,12 @@ export function CandleChart({
 
       // API v5 unifiée : addSeries(CandlestickSeries, …) — pas l'ancien helper v4.
       const series: ISeriesApi<'Candlestick'> = chart.addSeries(CandlestickSeries, {
-        upColor: UP_COLOR,
-        downColor: DOWN_COLOR,
-        borderUpColor: UP_COLOR,
-        borderDownColor: DOWN_COLOR,
-        wickUpColor: UP_COLOR,
-        wickDownColor: DOWN_COLOR,
+        upColor: colors.up,
+        downColor: colors.down,
+        borderUpColor: colors.up,
+        borderDownColor: colors.down,
+        wickUpColor: colors.up,
+        wickDownColor: colors.down,
         priceFormat: { type: 'price', precision: digits, minMove: 1 / 10 ** digits },
       })
 
@@ -113,35 +132,59 @@ export function CandleChart({
         })),
       )
 
-      // Lignes de plan légendées (D-12) : entrée neutre dashed, SL rouge, TP vert.
-      series.createPriceLine({
+      // Lignes de plan légendées (D-12) : entrée neutre dashed, SL bearish, TP bullish.
+      // Refs conservées pour re-colorer au flip de thème (applyOptions, Pitfall 5).
+      const entryLine = series.createPriceLine({
         price: entry,
-        color: ENTRY_COLOR,
+        color: colors.entry,
         lineStyle: LineStyle.Dashed,
         lineWidth: 2,
         axisLabelVisible: true,
         title: t('lineEntry'),
       })
-      series.createPriceLine({
+      const slLine = series.createPriceLine({
         price: stopLoss,
-        color: SL_COLOR,
+        color: colors.down,
         lineStyle: LineStyle.Solid,
         lineWidth: 2,
         axisLabelVisible: true,
         title: t('lineSL'),
       })
-      takeProfits.forEach((tp, i) => {
+      const tpLines = takeProfits.map((tp, i) =>
         series.createPriceLine({
           price: tp,
-          color: TP_COLOR,
+          color: colors.up,
           lineStyle: LineStyle.Solid,
           lineWidth: 1,
           axisLabelVisible: true,
           title: `${t('lineTp')}${i + 1}`,
-        })
-      })
+        }),
+      )
 
       chart.timeScale().fitContent()
+
+      // Re-coloration au flip de thème (Pitfall 5) : lightweight-charts ne réagit
+      // pas aux CSS vars → on observe le toggle .dark sur <html>, relit les tokens
+      // résolus et applique les nouvelles couleurs aux séries et price lines.
+      const recolor = (): void => {
+        colors = readChartColors(el)
+        series.applyOptions({
+          upColor: colors.up,
+          downColor: colors.down,
+          borderUpColor: colors.up,
+          borderDownColor: colors.down,
+          wickUpColor: colors.up,
+          wickDownColor: colors.down,
+        })
+        entryLine.applyOptions({ color: colors.entry })
+        slLine.applyOptions({ color: colors.down })
+        tpLines.forEach((line) => line.applyOptions({ color: colors.up }))
+      }
+      themeObserver = new MutationObserver(recolor)
+      themeObserver.observe(document.documentElement, {
+        attributes: true,
+        attributeFilter: ['class'],
+      })
 
       // Repli responsive si autoSize indisponible (anciens navigateurs).
       observer = new ResizeObserver(() => {
@@ -155,6 +198,7 @@ export function CandleChart({
 
     return () => {
       observer?.disconnect()
+      themeObserver?.disconnect()
       chart?.remove()
     }
   }, [candles, entry, stopLoss, takeProfits, precision, t])
