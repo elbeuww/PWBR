@@ -1,10 +1,11 @@
 ---
 phase: 10
 slug: fondation-design-system-nexa
-status: draft
+status: approved
 shadcn_initialized: true
 preset: radix-nova
 created: 2026-06-21
+reviewed_at: 2026-06-21
 ---
 
 # Phase 10 — UI Design Contract
