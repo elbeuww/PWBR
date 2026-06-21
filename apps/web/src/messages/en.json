@@ -423,5 +423,13 @@
       "New York session",
       "Day & Swing analysis"
     ]
+  },
+  "scoreRing": {
+    "riskLabels": {
+      "faible": "low risk",
+      "modere": "moderate risk",
+      "eleve": "high risk"
+    },
+    "ariaTemplate": "Score {score} out of 100, {risk}"
   }
 }

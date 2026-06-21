@@ -618,5 +618,13 @@
       "Session de New York",
       "Analyse Day & Swing"
     ]
+  },
+  "scoreRing": {
+    "riskLabels": {
+      "faible": "risque faible",
+      "modere": "risque modéré",
+      "eleve": "risque élevé"
+    },
+    "ariaTemplate": "Score {score} sur 100, {risk}"
   }
 }
