@@ -46,7 +46,7 @@ export function ExpiryBanner({ currentPeriodEnd, windowDays = 3 }: ExpiryBannerP
   // pas d'espacement vide parasite au-dessus des pages.
   return (
     <div className="mx-auto max-w-screen-xl px-4 pt-6 text-start md:px-6 lg:px-8">
-      <Alert className="border-amber-600/30 bg-amber-500/10 text-amber-800 dark:text-amber-300">
+      <Alert variant="warning">
         <AlertDescription>{t('expiryBanner', { n: remaining })}</AlertDescription>
         <AlertAction>
           <Button asChild size="sm" variant="outline">
