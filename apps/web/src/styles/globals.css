@@ -9,24 +9,63 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 /*
- * D-03 : police arabe self-hostée. --font-arabic pointe sur la variable exposée
- * par next/font/local (lib/fonts.ts), --font-latin sur Inter (next/font/google).
- * Le sélecteur de langue arabe plus bas applique la police ; le RTL vient de
- * <html dir="rtl"> ([locale]/layout).
+ * COUCHE 1 — PRIMITIVES (theme-INDÉPENDANTES, ne flippent JAMAIS).
+ * Phase 10, D-01/D-02/D-04/D-05. Tailwind v4 CSS-first : tout en @theme, AUCUN config.
+ *
+ * Polices : les 5 familles NEXA self-hostées (lib/fonts.ts, next/font/local).
+ *   --font-display  → Archivo        (titres/wordmark)
+ *   --font-sans     → Space Grotesk  (corps/UI — body repointe ici, D-02)
+ *   --font-mono     → JetBrains Mono (chiffres/tabulaire trading)
+ *   --font-accent   → Chakra Petch   (accents techniques)
+ *   --font-arabic   → Noto Sans Arabic (script arabe via :lang(ar) ; REMPLACE IBM Plex, D-01)
+ *
+ * Couleurs : ramps OKLCH brutes de la marque NEXA. Valeurs verrouillées
+ * (10-RESEARCH §layer partitioning + 10-UI-SPEC §Color, re-vérifiées par calcul).
+ *
+ * RÈGLE D-05 (HARD) : --nexa-green-500 (hue 155, vivid, BRAND) ≠ --nexa-signal-bull
+ * (hue 149, sober, SIGNAL). Le vert de marque n'encode JAMAIS une direction de trade.
+ * --primary repointe sur le BRAND green, jamais sur un signal. Les signaux trading
+ * (bull/bear) vivent dans un namespace séparé (--nexa-signal-*), consommés en Phase 11.
  */
 @theme {
-  --font-latin: var(--font-inter);
-  --font-arabic: var(--font-ibm-plex-arabic);
+  /* Polices — repointées sur les 5 familles NEXA (plan 02). */
+  --font-display: var(--font-archivo);
+  --font-sans: var(--font-space-grotesk);
+  --font-mono: var(--font-jetbrains-mono);
+  --font-accent: var(--font-chakra-petch);
+  --font-arabic: var(--font-noto-arabic);
+
+  /* Brand — cyber green (hue 155, vivid). NE PAS confondre avec signal-bull. */
+  --nexa-green-500: oklch(0.7754 0.1896 155.45);
+  --nexa-green-600: oklch(0.7100 0.1800 155.45);
+
+  /* Brand — royal purple (hue 303). */
+  --nexa-purple-500: oklch(0.4233 0.1772 302.98);
+  --nexa-purple-400: oklch(0.5400 0.1900 302.98); /* eyebrow/accent en thème sombre */
+
+  /* Ancres neutres absolues. */
+  --nexa-white: oklch(1.0000 0 0);
+  --nexa-ink: oklch(0.1663 0.0262 269.37); /* #0a0e1a — fond sombre */
+
+  /* Signaux TRADING — séparés du brand (D-05). hue 149 sobre vs brand hue 155. */
+  --nexa-signal-bull: oklch(0.6271 0.1699 149.21); /* #16a34a — haussier, sobre */
+  --nexa-signal-bear: oklch(0.5771 0.2152 27.33);  /* #dc2626 — baissier, rouge réel */
+
+  /* Rampe neutre 5 pas (chroma ~0.02, hue ~265 navy-teinté) — surfaces light. */
+  --nexa-neutral-50: oklch(0.9800 0.0040 265);  /* card/secondary/muted clair */
+  --nexa-neutral-200: oklch(0.9200 0.0080 265); /* border/input clair */
+  --nexa-neutral-500: oklch(0.5500 0.0180 265); /* muted-foreground clair */
+  --nexa-neutral-800: oklch(0.2400 0.0220 265); /* surfaces sombres (card dark) */
+  --nexa-neutral-900: oklch(0.2000 0.0220 265); /* border/input sombre */
 }
 
 /*
- * @theme inline : mappe les tokens de couleur Tailwind (--color-*) sur les
- * variables de marque définies dans :root / .dark ci-dessous. Les composants
- * shadcn/ui (bg-primary, text-foreground, border-border…) consomment ces tokens
- * → stylés automatiquement à la palette de marque bleue (D-01).
+ * COUCHE 3 — COMPONENT (@theme inline). NOMS INCHANGÉS depuis v2.0 (shadcn/ui les
+ * consomme : bg-primary, text-foreground, border-border…). Références var() UNIQUEMENT
+ * — AUCUNE valeur OKLCH/HEX littérale ici (Pitfall 3 : casserait silencieusement .dark).
  */
 @theme inline {
-  --font-sans: var(--font-inter);
+  --font-sans: var(--font-space-grotesk);
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -52,52 +91,65 @@
 }
 
 /*
- * Tokens de marque — valeurs LIGHT (02-UI-SPEC §Color).
- * Bleu institutionnel #1E5FBF. Vert/rouge ABSENTS (D-04 : réservés au trading,
- * aucun widget trading en P2). `--destructive` mappé sur l'accent neutre (jamais rouge).
+ * COUCHE 2 — SÉMANTIQUE (:root / .dark). SEULE couche qui FLIPPE entre thèmes.
+ * Chaque token repointe sur une PRIMITIVE NEXA (var(--nexa-*)) — aucune valeur
+ * littérale HEX/OKLCH ici (sortie du bleu institutionnel v2.0, D-04).
+ *
+ * D-05 : --primary = BRAND green (--nexa-green-500), jamais un signal de trade.
+ * Les signaux trading sont exposés à part (--signal-bullish / --signal-bearish),
+ * distincts de --primary, consommés par les widgets de trading en Phase 11.
+ *
+ * Valeurs LIGHT (rôles 60/30/10 — 02-UI-SPEC §Color).
  */
 :root {
   --radius: 0.625rem;
-  --background: #FFFFFF;        /* dominant 60% */
-  --foreground: #0B1220;        /* texte primaire */
-  --card: #F4F6F9;              /* surface secondaire 30% */
-  --card-foreground: #0B1220;
-  --popover: #FFFFFF;
-  --popover-foreground: #0B1220;
-  --primary: #1E5FBF;           /* accent 10% — CTA, focus, états actifs */
-  --primary-foreground: #FFFFFF;
-  --secondary: #F4F6F9;         /* header/footer/cartes */
-  --secondary-foreground: #0B1220;
-  --muted: #F4F6F9;
-  --muted-foreground: #5B6675;  /* texte atténué */
-  --accent: #F4F6F9;
-  --accent-foreground: #0B1220;
-  --destructive: #5B6675;       /* D-04 : jamais rouge en P2 (neutre) */
-  --border: #E2E7EE;
-  --input: #E2E7EE;
-  --ring: #1E5FBF;              /* focus ring = accent */
+  --background: var(--nexa-white);          /* dominant 60% */
+  --foreground: var(--nexa-ink);            /* texte primaire */
+  --card: var(--nexa-neutral-50);           /* surface secondaire 30% */
+  --card-foreground: var(--nexa-ink);
+  --popover: var(--nexa-white);
+  --popover-foreground: var(--nexa-ink);
+  --primary: var(--nexa-green-500);         /* BRAND green (D-05) — CTA, focus, états actifs */
+  --primary-foreground: var(--nexa-ink);    /* green clair → texte sombre (contraste) */
+  --secondary: var(--nexa-neutral-50);      /* header/footer/cartes */
+  --secondary-foreground: var(--nexa-ink);
+  --muted: var(--nexa-neutral-50);
+  --muted-foreground: var(--nexa-neutral-500); /* texte atténué */
+  --accent: var(--nexa-neutral-50);
+  --accent-foreground: var(--nexa-ink);
+  --destructive: var(--nexa-signal-bear);   /* rouge réel (signaux désormais dédiés, D-05) */
+  --border: var(--nexa-neutral-200);
+  --input: var(--nexa-neutral-200);
+  --ring: var(--nexa-green-500);            /* focus ring = brand green */
+
+  /* Signaux trading — DISTINCTS de --primary (D-05), consommés en Phase 11. */
+  --signal-bullish: var(--nexa-signal-bull);
+  --signal-bearish: var(--nexa-signal-bear);
 }
 
-/* Tokens de marque — valeurs DARK (02-UI-SPEC §Color). */
+/*
+ * Valeurs DARK — n'overrider QUE ce qui flippe. Les signaux GARDENT leur teinte
+ * (une perte est rouge dans les deux thèmes) → définis une seule fois en :root.
+ */
 .dark {
-  --background: #0B1220;        /* near-black navy */
-  --foreground: #E6EBF2;
-  --card: #141C2B;             /* slate navy */
-  --card-foreground: #E6EBF2;
-  --popover: #141C2B;
-  --popover-foreground: #E6EBF2;
-  --primary: #3B82F6;           /* accent dark (contraste) */
-  --primary-foreground: #0B1220;
-  --secondary: #141C2B;
-  --secondary-foreground: #E6EBF2;
-  --muted: #141C2B;
-  --muted-foreground: #9AA7B8;
-  --accent: #141C2B;
-  --accent-foreground: #E6EBF2;
-  --destructive: #9AA7B8;       /* D-04 : neutre, jamais rouge */
-  --border: #26303F;
-  --input: #26303F;
-  --ring: #3B82F6;
+  --background: var(--nexa-ink);            /* near-black navy NEXA */
+  --foreground: oklch(0.95 0.01 260);       /* off-white teinté navy */
+  --card: var(--nexa-neutral-800);          /* slate navy sombre */
+  --card-foreground: oklch(0.95 0.01 260);
+  --popover: var(--nexa-neutral-800);
+  --popover-foreground: oklch(0.95 0.01 260);
+  --primary: var(--nexa-green-500);         /* BRAND green conservé (D-05) */
+  --primary-foreground: var(--nexa-ink);
+  --secondary: var(--nexa-neutral-800);
+  --secondary-foreground: oklch(0.95 0.01 260);
+  --muted: var(--nexa-neutral-800);
+  --muted-foreground: oklch(0.72 0.015 265);
+  --accent: var(--nexa-neutral-800);
+  --accent-foreground: oklch(0.95 0.01 260);
+  --destructive: var(--nexa-signal-bear);   /* rouge réel, même teinte qu'en light */
+  --border: var(--nexa-neutral-900);
+  --input: var(--nexa-neutral-900);
+  --ring: var(--nexa-green-500);
 }
 
 /*
