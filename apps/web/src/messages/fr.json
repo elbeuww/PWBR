@@ -411,6 +411,7 @@
   },
   "signals": {
     "title": "Signaux",
+    "eyebrow": "Espace membre",
     "body": "Les signaux réservés aux abonnés arrivent bientôt.",
     "cardAction": "Voir le détail",
     "direction": {

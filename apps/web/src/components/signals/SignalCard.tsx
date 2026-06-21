@@ -1,11 +1,12 @@
 /**
- * SignalCard — carte signal (Plan 03-02 Task 2 ; MEMB-01, D-01/D-03/D-04).
+ * SignalCard — carte signal (Plan 03-02 Task 2 ; MEMB-01, D-01/D-03/D-04 ;
+ * reskin NEXA UI-03, Plan 11-06).
  *
  * Server-renderable (pas de 'use client') : rend les méta d'un trade_setup actif.
  *
  * Color law D-03 (HARD) : vert = LONG, rouge = SHORT, UNIQUEMENT sur le badge de
- * direction. Le SCORE est NEUTRE (--primary), jamais vert/rouge. La barre fine de
- * score est neutre. Aucune classe directionnelle physique (text-left/right,
+ * direction. Le SCORE passe par `ScoreRing` (11-04) : couleur = RISQUE (D-12),
+ * JAMAIS « vert = gagnant ». Aucune classe directionnelle physique (text-left/right,
  * ml-/mr-/pl-/pr-) → propriétés logiques (ms/me/ps/pe/start/end) pour le RTL.
  *
  * Valeurs numériques (score, R:R, prix, fraîcheur) encadrées <bdi> + Intl
@@ -14,6 +15,7 @@
 import { useTranslations } from 'next-intl'
 import { Link } from '../../i18n/navigation'
 import { Card, CardContent, CardHeader } from '../ui/card'
+import { ScoreRing, type ScoreRisk } from '../nexa/ScoreRing'
 import { formatRelativeAge } from '../../lib/signals/format'
 import type { SignalRow } from '../../lib/signals/queries'
 
@@ -29,8 +31,27 @@ function scoreBandKey(score: number): 'strong' | 'moderate' | 'cautious' {
   return 'cautious'
 }
 
+/**
+ * Mappe le niveau de risque DB (low/medium/high/extreme) vers la palette ScoreRing
+ * (faible→neutre, modere→amber, eleve→bearish, D-12). high ET extreme → eleve
+ * (un seul cran extrême colorimétrique ; le label texte reste distinct via i18n).
+ * Valeur inconnue → modere (repli neutre, jamais l'extrême par défaut).
+ */
+function mapRiskToScoreRisk(risk: string): ScoreRisk {
+  switch (risk) {
+    case 'low':
+      return 'faible'
+    case 'high':
+    case 'extreme':
+      return 'eleve'
+    default:
+      return 'modere'
+  }
+}
+
 export function SignalCard({ signal, locale }: SignalCardProps) {
   const t = useTranslations('signals')
+  const tScore = useTranslations('scoreRing')
   const isLong = signal.direction === 'long'
 
   // Direction via tokens NEXA flip-safe (--signal-*, 11-01) — UNIQUEMENT direction (D-03).
@@ -39,7 +60,12 @@ export function SignalCard({ signal, locale }: SignalCardProps) {
     ? 'bg-[var(--signal-bullish)]/10 text-[var(--signal-bullish)]'
     : 'bg-[var(--signal-bearish)]/10 text-[var(--signal-bearish)]'
 
-  const scoreBar = Math.max(0, Math.min(100, signal.opportunity_score))
+  // ScoreRing (11-04) : couleur = risque, label traduit fourni par l'appelant (RSC-safe).
+  const scoreRisk = mapRiskToScoreRisk(signal.risk_level)
+  const scoreLabel = tScore('ariaTemplate', {
+    score: signal.opportunity_score,
+    risk: tScore(`riskLabels.${scoreRisk}`),
+  })
 
   return (
     <Link
@@ -60,19 +86,17 @@ export function SignalCard({ signal, locale }: SignalCardProps) {
         </CardHeader>
 
         <CardContent className="flex flex-col gap-3">
-          {/* Bloc score — NEUTRE (D-03). */}
-          <div>
-            <div className="flex items-baseline gap-2">
-              <span className="text-2xl font-semibold tabular-nums text-primary">
-                <bdi>{signal.opportunity_score}</bdi>
-              </span>
-              <span className="text-sm font-medium text-muted-foreground">
-                {t(`scoreBands.${scoreBandKey(signal.opportunity_score)}`)}
-              </span>
-            </div>
-            <div className="mt-1 h-1 w-full overflow-hidden rounded-full bg-muted">
-              <div className="h-full rounded-full bg-primary" style={{ inlineSize: `${scoreBar}%` }} />
-            </div>
+          {/* Bloc score — ScoreRing NEXA (couleur = risque, D-12). */}
+          <div className="flex items-center gap-3">
+            <ScoreRing
+              score={signal.opportunity_score}
+              risk={scoreRisk}
+              size={40}
+              label={scoreLabel}
+            />
+            <span className="text-sm font-medium text-muted-foreground">
+              {t(`scoreBands.${scoreBandKey(signal.opportunity_score)}`)}
+            </span>
           </div>
 
           {/* Méta : risque · R:R · style. */}

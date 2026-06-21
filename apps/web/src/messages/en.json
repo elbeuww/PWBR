@@ -216,6 +216,7 @@
   },
   "signals": {
     "title": "Signals",
+    "eyebrow": "Member area",
     "body": "Subscriber-only signals are coming soon.",
     "cardAction": "View details",
     "direction": {
