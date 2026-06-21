@@ -2,15 +2,14 @@
 gsd_state_version: 1.0
 milestone: v2.1
 milestone_name: "Mise en vie : identité NEXA, moteur live & track record"
-status: in_progress
-last_updated: "2026-06-21T00:00:00.000Z"
-last_activity: 2026-06-21
+status: Roadmap v2.1 créée (5 phases, 10-14) — prêt à planifier Phase 10
+last_updated: "2026-06-21T00:49:59.201Z"
+last_activity: 2026-06-21 — Roadmap v2.1 créée, 28/28 requirements mappés
 progress:
   total_phases: 5
   completed_phases: 0
   total_plans: 0
   completed_plans: 0
-  percent: 0
 ---
 
 # Project State
@@ -115,6 +114,7 @@ ressources externes non provisionnables en session de développement.
 14. Track record affiché & boucle outcomes en prod — provenance + N visible + bascule N≥30 + outcome-tracker en prod (TRACK-04..06)
 
 **Arêtes critiques v2.1 :**
+
 - Tokens/thèmes/polices (P10) AVANT composants/reskin (P11) ; no-flash + RTL en fondation.
 - Config Environment + réseau *.supabase.co (P12) AVANT scheduling ; ANALYZE reste agent-native, persist.ts = seule frontière d'écriture IA.
 - Migration source (BACKTEST-01) + catalogue figé (BACKTEST-02) AVANT moteur (BACKTEST-03) et affichage (P14) — inverser corrompt pattern_stats.
@@ -331,7 +331,7 @@ ressources externes non provisionnables en session de développement.
 
 ## Session Continuity
 
-**Last session:** 2026-06-19T16:20:57.956Z
+**Last session:** 2026-06-21T00:49:59.194Z
 
 **Last session (archive):** 2026-06-19T03:41:29.665Z
 
