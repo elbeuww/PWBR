@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v2.1
 milestone_name: "Mise en vie : identité NEXA, moteur live & track record"
 status: executing
-last_updated: "2026-06-21T01:59:38.757Z"
-last_activity: 2026-06-21 -- Phase 10 planning complete
+last_updated: "2026-06-21T02:07:32.932Z"
+last_activity: 2026-06-21
 progress:
   total_phases: 5
   completed_phases: 0
   total_plans: 3
-  completed_plans: 0
-  percent: 0
+  completed_plans: 1
+  percent: 33
 ---
 
 # Project State
@@ -23,16 +23,16 @@ progress:
 See: .planning/PROJECT.md (mis à jour 2026-06-20 après clôture v2.0)
 
 **Core value:** Produire, pour chaque opportunité, une analyse fiable et explicable — vulgarisée pour un public non technique — avec un % de réussite TOUJOURS mesuré, jamais inventé : c'est le socle de confiance qui fait payer l'abonnement.
-**Current focus:** v2.1 « Mise en vie » — roadmap créée (5 phases, 10-14 : design NEXA · routines Claude sans API · backtest + track record). Axe design (P10-11) parallélisable contre axes routine+backtest (P12-13). Prochaine action : planifier Phase 10.
+**Current focus:** Phase 10 — fondation-design-system-nexa
 **Mode:** interactive (MVP vertical)
 **Granularity:** fine
 
 ## Current Position
 
-Phase: Phase 10 — Fondation design system NEXA (not started)
-Plan: —
+Phase: 10 (fondation-design-system-nexa) — EXECUTING
+Plan: 2 of 3
 Status: Ready to execute
-Last activity: 2026-06-21 -- Phase 10 planning complete
+Last activity: 2026-06-21
 
 ## Deferred Items
 
@@ -91,6 +91,7 @@ ressources externes non provisionnables en session de développement.
 | Phase 09 P03 | ~15 min | 3 tasks | 9 files |
 | Phase 09 P04 | ~10 min | 3 tasks | 8 files |
 | Phase 09 P05 | ~15 min | 2 tasks | 5 files |
+| Phase 10 P01 | ~12 min | 2 tasks | 6 files |
 
 ## Roadmap v2.0 (9 phases)
 
@@ -306,6 +307,15 @@ ressources externes non provisionnables en session de développement.
 - **D-08-04-D (payouts intacte — D-09/D-10 zéro DB-work)** : `git diff --quiet apps/web/src/app/(admin)/affiliation/payouts/` exit 0 confirmé. La page payouts existante rend toujours due+paid + lien TronScan et marque payé via RPC `mark_commission_paid` ; atteignable depuis la sidebar (Plan 01) et liée depuis affilies. Aucune migration (schéma payouts déjà en 0016).
 - **Commits 08-04** : 89a8564 (feat affiliés-perfs page), 4218941 (test E2E ACCESS-03b 404). `pnpm tsc --noEmit` 0 erreur, `lint:i18n` exit 0, `npx vitest run` 507 verts | 4 skip (non régressé), 0 package npm (T-08-SC accept). **ADMIN-03 + ADMIN-04 complets. Phase 08 COMPLETE (4/4 plans).**
 
+### Decisions exécution (Plan 10-01 — Wave-0 validation)
+
+- **D-10-01-A (voie A PATTERNS)** : 5 portes de validation Phase 10 créées AVANT toute implémentation. Les 3 tests Vitest vivent sous `apps/web/src/styles/__tests__/` (déjà couvert par le glob existant `apps/**/__tests__/**/*.test.ts`) ; le glob `include` de `vitest.config.ts` est ÉLARGI d'une SEULE entrée `apps/web/tests/**/*.test.ts` (parité/futur) — les 6 entrées existantes + `globals: false` préservés (T-10-01). Les 2 specs Playwright vont sous `apps/web/tests/` (collectées as-named par `testMatch tests/**/*.spec.ts`).
+- **D-10-01-B (RED prouvé par la collecte, T-10-02)** : `design-tokens.test.ts` (3/4 RED : oklch absent, --nexa-green-500 absent, #1E5FBF présent ; la 4e — @theme inline = var() only — GREEN car v2.0 mappe déjà en var()) + `fonts.test.ts` (5/5 RED) échouent par ASSERTION contre v2.0, pas par erreur de collecte (3 Test Files, 11 tests parsés). `rtl-logical-props.test.ts` GREEN (garde de non-régression : layout.tsx utilise ms-/me-).
+- **D-10-01-C (déviation Rule 1 — parser oxc)** : la séquence littérale `*/` dans un commentaire JSDoc (`--color-*/--font-*`) cassait le transform oxc/Vitest (`PARSE_ERROR`, faux RED par collecte échouée) → reformulée en « valeurs de couleur et de police ». Vrai RED d'assertion rétabli.
+- **D-10-01-D (specs Playwright créées, GREEN déféré)** : `no-cdn-fonts.spec.ts` (interception `page.on('request')` zéro Google Fonts) + `no-flash.spec.ts` (thème stocké `dark` via `addInitScript` → `<html class=dark>` fr/en/ar) PARSENT et apparaissent dans `playwright test --list` (4 tests). GREEN déféré au merge wave 02/03 (dev server :3000 requis), conforme au plan.
+- **D-10-01-E (requirements NON marqués complets)** : DESIGN-01..04 restent `Pending`/`[ ]` dans REQUIREMENTS.md — ce plan ne crée que les portes RED, l'implémentation (tokens OKLCH, fonts self-hostées, no-flash) est portée par les plans 10-02/10-03. Le marquage auto du SDK a été réverté.
+- **Commits 10-01** : d25f577 (3 gardes Vitest + glob élargi), 3563199 (2 specs Playwright). `npx vitest run apps/web/src/styles/__tests__` = 3 fichiers collectés, 8 RED + 3 GREEN ; `npx playwright test --list` = 4 tests listés ; 0 package npm. **5 portes Wave-0 posées.** Reste 10-02 (fonts) + 10-03 (tokens) à exécuter contre ces gardes.
+
 ### Open todos / research flags (v2.0)
 
 - **Phase 4 (research flag) :** TronGrid endpoint `walletsolidity`, parsing logs TRC-20, normalisation hex↔base58 — doc TS peu dense, recherche de phase recommandée.
@@ -354,7 +364,9 @@ ressources externes non provisionnables en session de développement.
 
 **Last session (archive):** 2026-06-14 — Completed 02-03-PLAN.md (4 commits : 38c1894 tarifs 9$/3$ + paiement-bientot + funnel signup→paiement-bientot, 86e7001 home bénéfice-first + proof slot masqué, 49ac57e RED no-perf-claims, fa8a5d0 GREEN glob vitest). Cœur conversion de la vitrine livré : home VITR-01, tarifs VITR-02 (USDT TRC-20, D-10/D-11/D-12), funnel honnête D-09, garde no-perf-claims VITR-03/D-08. 15 tests verts, tsc/lint:i18n OK, invariant auth P1 intact. **Phase 02 COMPLETE (3/3 plans).** Stopped at : Plan 02-03 terminé.
 
-**Next action:** Milestone v2.1 — roadmap créée (5 phases, 10-14). Lancer la planification de **Phase 10 (Fondation design system NEXA, DESIGN-01..04)** via `/gsd-execute-phase 10`. Axe design (P10-11) parallélisable contre routine+backtest (P12-13). Research flags à lever au planning : P12 (réseau Remote *.supabase.co, Open Q A1) et P13 (figer le catalogue de patterns — décision fondateur Borhane). Dette héritée v2.0 traitée : WIRING-01/ExpiryBanner → Phase 11 (UI-07). Hors scope v2.1 : LEGAL-02, PAY-AUTO, AFF-AUTO, ENGINE-API.
+**Next action:** Phase 10 — Plan 10-02 (fonts NEXA). Implémenter les 5 polices self-hostées (`next/font/local` : Archivo/Space Grotesk/JetBrains Mono/Chakra Petch/Noto Sans Arabic), copier les 10 `.woff2` dans `apps/web/src/fonts/`, retirer Inter (`next/font/google`) + IBM Plex Arabic, exposer les 5 `--font-*` dans `lib/fonts.ts` + `globals.css`, recâbler `[locale]/layout.tsx`. Cible GREEN : `fonts.test.ts` (les 5 assertions) + `no-cdn-fonts.spec.ts` (dev server). Plan 10-03 (tokens OKLCH) gaté par `design-tokens.test.ts`. Les 5 portes Wave-0 sont posées (d25f577, 3563199) ; design-tokens + fonts sont RED par design jusqu'à l'implémentation.
+
+**Next action (archive):** Milestone v2.1 — roadmap créée (5 phases, 10-14). Lancer la planification de **Phase 10 (Fondation design system NEXA, DESIGN-01..04)** via `/gsd-execute-phase 10`. Axe design (P10-11) parallélisable contre routine+backtest (P12-13). Research flags à lever au planning : P12 (réseau Remote *.supabase.co, Open Q A1) et P13 (figer le catalogue de patterns — décision fondateur Borhane). Dette héritée v2.0 traitée : WIRING-01/ExpiryBanner → Phase 11 (UI-07). Hors scope v2.1 : LEGAL-02, PAY-AUTO, AFF-AUTO, ENGINE-API.
 
 **Next action (archive):** Phase 08 COMPLETE (4/4 plans) — ADMIN-03/04 couverts. Lancer la vérification de phase (`/gsd:verify-phase 08`) puis Phase 09 (CMS cours & articles vulgarisés, CMS-01/02). En suspens hérité : Phase 04 (04-03 vetting lib QR B-04-03, 04-02 LIVE apply B-04-02, 04-01 fixture TronGrid B-04-01) ; E2E live-infra (gating ACCESS-03b, affiliation-attribution) restent human-verify.
 

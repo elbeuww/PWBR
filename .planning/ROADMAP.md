@@ -45,7 +45,7 @@ Détail complet archivé : `.planning/milestones/v2.0-ROADMAP.md`.
   3. Les 5 familles de polices (Archivo, Chakra Petch, Space Grotesk, JetBrains Mono, Noto Sans Arabic) sont servies en self-host (aucun appel CDN au runtime) et exposées en CSS vars.
   4. En arabe, la mise en page reste correctement miroir (propriétés logiques uniquement) sur les surfaces touchées par la fondation.
 **Plans** : 3 plans (3 vagues : 10-01 gate les tests Wave-0, 10-02 polices, 10-03 tokens)
-- [ ] 10-01-PLAN.md — Wave-0 : 5 tests de validation (design-tokens/fonts/rtl-logical + no-cdn/no-flash) + résolution du CONFIG GAP Vitest (DESIGN-01..04)
+- [x] 10-01-PLAN.md — Wave-0 : 5 tests de validation (design-tokens/fonts/rtl-logical + no-cdn/no-flash) + résolution du CONFIG GAP Vitest (DESIGN-01..04)
 - [ ] 10-02-PLAN.md — Migration polices : 5 familles NEXA self-hostées via next/font/local, suppression Inter + IBM Plex (DESIGN-02)
 - [ ] 10-03-PLAN.md — Migration tokens : globals.css en 3 couches OKLCH NEXA (primitive→semantic→component), repointage polices, RTL/no-flash préservés (DESIGN-01/03/04)
 **UI hint** : yes
@@ -115,7 +115,7 @@ Détail complet archivé : `.planning/milestones/v2.0-ROADMAP.md`.
 | 7. Affiliation à paliers | v2.0 | 6/6 | Complete | 2026-06-18 |
 | 8. Superadmin consolidé | v2.0 | 4/4 | Complete | 2026-06-19 |
 | 9. CMS cours & articles | v2.0 | 5/5 | Complete | 2026-06-20 |
-| 10. Fondation design system NEXA | v2.1 | 0/3 | Planned | - |
+| 10. Fondation design system NEXA | v2.1 | 1/3 | In Progress|  |
 | 11. Composants NEXA & reskin transversal | v2.1 | 0/? | Not started | - |
 | 12. Routines d'analyse Claude (sans API) | v2.1 | 0/? | Not started | - |
 | 13. Backtest catalogue de patterns | v2.1 | 0/? | Not started | - |
