@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v2.1
 milestone_name: "Mise en vie : identité NEXA, moteur live & track record"
 status: executing
-last_updated: "2026-06-21T14:52:06.486Z"
+last_updated: "2026-06-21T14:59:28.139Z"
 last_activity: 2026-06-21
 progress:
   total_phases: 5
   completed_phases: 1
   total_plans: 11
-  completed_plans: 7
-  percent: 64
+  completed_plans: 8
+  percent: 73
 ---
 
 # Project State
@@ -30,7 +30,7 @@ See: .planning/PROJECT.md (mis à jour 2026-06-20 après clôture v2.0)
 ## Current Position
 
 Phase: 11 (composants-nexa-reskin-transversal-rebranding) — EXECUTING
-Plan: 5 of 8
+Plan: 6 of 8
 Status: Ready to execute
 **Seul item ouvert (live, non-bloquant) :** vérification runtime no-flash — `pnpm --filter web dev` puis `/fr|/en|/ar/login` avec `localStorage.theme='dark'` + reload → confirmer aucune frame claire au premier paint. Rapport : 10-VERIFICATION.md.
 **Prochaine action à la reprise :** `/clear` puis `/gsd-plan-phase 11` (Composants NEXA, reskin, MERA→NEXA, hero, ExpiryBanner — DESIGN-05, BRAND-01..04, UI-01..07).
@@ -100,6 +100,7 @@ ressources externes non provisionnables en session de développement.
 | Phase 11 P02 | ~6min | 3 tasks | 3 files |
 | Phase 11 P03 | ~10min | 3 tasks | 4 files |
 | Phase 11 P04 | ~12min | 3 tasks | 9 files |
+| Phase 11 P05 | ~10min | 3 tasks | 9 files |
 
 ## Roadmap v2.0 (9 phases)
 
@@ -354,6 +355,13 @@ ressources externes non provisionnables en session de développement.
 - **D-11-03-C** : variante `warning` ajoutée à `alertVariants` consommant `var(--risk-moderate)` (amber component-layer 11-01) — zéro littéral `amber-*`/couleur Tailwind nommée. ExpiryBanner passe à `variant="warning"`, logique J-3/J-1 + ICU + CTA intacts. **UI-07 NON marqué complet** : seule la tokenisation `warning` est livrée ici ; le câblage in-app (WIRING-01/PAY-05) est traité en 11-08. UI-03/DESIGN-05 moitié couleur livrée (CandleChart + SignalCard flip-safe). Frontière RLS serveur intacte (aucun `createClient/from(/supabase` ajouté, grep=0).
 - **Commits 11-03** : 51eb874 (Task 1 CandleChart recolor + theme-flip), 571b9c5 (Task 2 SignalCard direction tokens), 67568b3 (Task 3 variante warning alert + ExpiryBanner). Greps acceptance : HEX=0, amber=0, getPropertyValue/applyOptions/MutationObserver présents. RTL test 3/3, `tsc -b --noEmit` 0 erreur sur les 4 fichiers.
 
+### Decisions exécution (Plan 11-05 — rebranding NEXA visible + metadata)
+
+- **D-11-05-A** : header `[locale]/layout.tsx` — span « Vétéran Trading » → `<Logo variant="full">` + baseline `t('baseline.text')` rendue SOUS le wordmark via `getTranslations('baseline')` dans le RSC (D-16/D-17, ton sobre vétéran zéro hype). `ms-6`/`ms-auto`/ThemeToggle/LanguageSwitcher/slot Footer/`<html lang dir>` unique intacts ; commentaire i18n-ignore retiré. Footer rend `<Logo variant="full">` + Disclaimer + nav légale préservés.
+- **D-11-05-B** : `app/layout.tsx` metadata NEXA (title/description neutres éducatifs sans promesse de gain, `metadataBase` via `NEXT_PUBLIC_SITE_URL` precedent sitemap.ts, `openGraph` type website) ; root reste pass-through (aucun html, Pitfall 7). 3 metadata files racine via next/og natif next@15 (aucun package) : `icon.tsx` 32×32, `apple-icon.tsx` 180×180, `opengraph-image.tsx` 1200×630 — paths SVG exacts du mark Logo, dégradé marque #03d87f→#63279b sur fond ink #0a0e1a ; OG ajoute wordmark + baseline. Asset statique authored (T-11-OG-XSS), zéro % (T-11-LEGAL).
+- **D-11-05-C** : `fr.json:210` `MERA2026`→`NEXA2026` + `dashboard.title` fr/en/ar Vétéran/Veteran Trading→NEXA. Une seule édition codePlaceholder (namespace admin mono-FR, D-04-03-B ; pas d'équivalent en/ar). no-mera-brand.test.ts GREEN (scan apps/web/src zéro MERA/slogan).
+- **Commits 11-05** : 1d0aed1 (Task 1 Logo+baseline header/footer), 0009f9d (Task 2 metadata NEXA + favicon/apple-icon/OG next/og), f46ed09 (Task 3 MERA2026→NEXA2026). Vérifs : no-mera-brand 2/2, no-perf-claims 4/4, `tsc -b --noEmit` exit 0, 0 package npm. BRAND-01/02/03 livrés.
+
 ### Open todos / research flags (v2.0)
 
 - **Phase 4 (research flag) :** TronGrid endpoint `walletsolidity`, parsing logs TRC-20, normalisation hex↔base58 — doc TS peu dense, recherche de phase recommandée.
@@ -380,7 +388,7 @@ ressources externes non provisionnables en session de développement.
 
 ## Session Continuity
 
-**Last session:** 2026-06-21T14:52:06.478Z
+**Last session:** 2026-06-21T14:59:28.131Z
 
 **Last session (archive):** 2026-06-19T03:41:29.665Z
 
