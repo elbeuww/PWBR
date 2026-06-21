@@ -20,6 +20,7 @@ import { LanguageSwitcher } from '../../components/LanguageSwitcher'
 import { ThemeProvider } from '../../components/ThemeProvider'
 import { ThemeToggle } from '../../components/ThemeToggle'
 import { Footer } from '../../components/Footer'
+import { Logo } from '../../components/nexa/Logo'
 import { archivo, spaceGrotesk, jetbrainsMono, chakraPetch, notoArabic } from '../../lib/fonts'
 import '../../styles/globals.css'
 
@@ -42,6 +43,8 @@ export default async function LocaleLayout({
   const messages = await getMessages()
   // D-08c : entrée funnel permanente vers l'Académie (libellé i18n, nav localisée).
   const tAcademy = await getTranslations('academy')
+  // D-15/D-16 : baseline NEXA trilingue rendue au header sous le wordmark.
+  const tBaseline = await getTranslations('baseline')
 
   return (
     <html
@@ -53,7 +56,13 @@ export default async function LocaleLayout({
         <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
           <NextIntlClientProvider messages={messages}>
             <header className="flex h-14 items-center justify-between bg-secondary px-4 md:px-6">
-              <span className="font-semibold">Vétéran Trading</span> {/* i18n-ignore: marque */}
+              {/* D-16 : wordmark NEXA (Logo full) + baseline trilingue (ton sobre vétéran, D-17). */}
+              <div className="flex flex-col">
+                <Logo variant="full" />
+                <span className="text-xs text-muted-foreground tracking-wide">
+                  {tBaseline('text')}
+                </span>
+              </div>
               {/* D-08c : entrée funnel Académie — Link localisé (préserve la locale), libellé i18n. */}
               <Link
                 href="/academie"

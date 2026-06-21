@@ -17,6 +17,7 @@
 import { getTranslations } from 'next-intl/server'
 import { Link } from '@/i18n/navigation'
 import { Disclaimer } from '@/components/Disclaimer'
+import { Logo } from '@/components/nexa/Logo'
 
 // Allowlist alignée sur legal/[doc]/page.tsx (D-14). Si un doc est ajouté là,
 // l'ajouter ici pour qu'il apparaisse dans la nav du footer.
@@ -27,6 +28,10 @@ export async function Footer() {
 
   return (
     <footer className="bg-muted px-4 py-8 md:px-6">
+      {/* Marque NEXA (mark seul, densité footer — BRAND-01). */}
+      <div className="mb-6">
+        <Logo variant="full" />
+      </div>
       <nav aria-label={t('navTitle')} className="mb-6">
         <ul className="flex flex-wrap gap-x-6 gap-y-2 text-sm">
           {DOCS.map((doc) => (

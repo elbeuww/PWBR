@@ -291,7 +291,7 @@
     "atr": "Volatility measure: the average range of price moves, used to size the stop-loss."
   },
   "dashboard": {
-    "title": "Dashboard — Veteran Trading",
+    "title": "Dashboard — NEXA",
     "signOut": "Sign out",
     "connectedAs": "Signed in: {email}",
     "instrumentsTitle": "Active instruments",

@@ -486,7 +486,7 @@
     "atr": "Mesure de volatilité : amplitude moyenne des mouvements de prix, utilisée pour dimensionner le stop-loss."
   },
   "dashboard": {
-    "title": "Tableau de bord — Vétéran Trading",
+    "title": "Tableau de bord — NEXA",
     "signOut": "Déconnexion",
     "connectedAs": "Connecté : {email}",
     "instrumentsTitle": "Instruments actifs",
