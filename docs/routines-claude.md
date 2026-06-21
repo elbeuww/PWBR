@@ -1,8 +1,8 @@
-# Modèle d'exécution des Routines Claude Code
+# Modèle d'exécution des Routines Claude Code — Runbook go-live (Phase 12)
 
-> **Statut :** Documenté et vérifié (Phase 1, plan 01-03).
-> Source de vérité : `01-RESEARCH.md §Summary` + doc officielle `code.claude.com/docs/en/routines`.
-> Ce document est la référence que la Phase 4 (moteur IA) utilisera pour configurer l'Environment + network access.
+> **Statut :** Phase 12, go-live. Runbook reproductible de l'activation des routines Remote.
+> Source de vérité : `12-RESEARCH.md` + `apps/jobs/config/sessions.ts` (crons UTC) + doc officielle `code.claude.com/docs/en/routines`.
+> Ce document est la **SEULE trace versionnée** de la configuration cloud : l'Environment, les secrets et les crons vivent **hors git** (dashboard Anthropic / `/schedule`). Sa reproductibilité dépend entièrement de ce doc — il reflète la réalité corrigée par la recherche, pas les hypothèses P1 périmées.
 
 ---
 
@@ -10,10 +10,10 @@
 
 | Type | Tournent sur | PC éteint OK | Use case |
 |------|-------------|:------------:|---------|
-| **Remote (cloud)** | Serveurs Anthropic | Oui | Analyse IA automatisée (Phase 4+) |
+| **Remote (cloud)** | Serveurs Anthropic | Oui | Analyse IA automatisée (rollout #1) |
 | **Local (Desktop)** | La machine locale | Non | Tests manuels uniquement |
 
-**En Phase 1, AUCUNE Routine n'est planifiée.** L'analyse IA = Phase 4. Ce document pose la base pour cette configuration future.
+**Rollout #1 (D-12-01) :** activer en premier les routines Remote `newyork` et `eod-swing` (voir §6). Les sessions `asia`/`london` sont un élargissement ultérieur (gate ROUTINE-03).
 
 ---
 
@@ -45,9 +45,23 @@ Le dispatcher `apps/jobs/src/dispatch.ts` charge `dotenv/config` en tête — ce
 - Le MCP Supabase connecté interactivement via `.mcp.json` (stdio local) **n'est PAS accessible** dans une Routine Remote.
 - Les jobs appellent donc Supabase via le **SDK `supabase-js`** uniquement (connexion HTTPS vers `*.supabase.co`).
 
-**Network access :**
-- Un projet Supabase cloud est une URL HTTPS publique — accessible depuis le réseau Anthropic sans configuration spéciale *a priori*.
-- À **confirmer en Phase 4** lors de la configuration de l'Environment (Open Question A1 de RESEARCH : network access par défaut vers `*.supabase.co`).
+**Network access (P-NET — corrige D-12-10 / §4 §7 P1 périmés) :**
+
+Le profil réseau **Trusted** activé par défaut sur une Routine Remote **N'INCLUT PAS** `*.supabase.co`. La liste d'hôtes autorisés du profil Trusted vérifiée = `api.anthropic.com`, `github.com`, les package managers (`npm`/`pypi`/`crates`/`yarn`), et les miroirs Ubuntu — **rien de Supabase**. Un appel `supabase-js` vers `*.supabase.co` depuis Trusted échoue avec :
+
+```
+403  x-deny-reason: host_not_allowed
+```
+
+C'est exactement ce qui casse le client service_role de `runJob.ts` / `persist.ts` (la seule voie d'écriture). **L'allowlist Custom est donc OBLIGATOIRE, pas optionnelle.**
+
+**Procédure REQUISE (Environment → Network access) :**
+1. Régler **Network access = `Custom`** (pas `Trusted`).
+2. Ajouter l'hôte `*.supabase.co`.
+3. Cocher **« inclure les package managers par défaut »** (sinon `pnpm install` échoue lui aussi en `host_not_allowed`).
+4. **Fallback `Full`** uniquement si `Custom` se révèle non fonctionnel (bug connu, A2 — GitHub issue #30112). `Full` ouvre tout l'egress : moins de privilège, à n'utiliser qu'en dépannage documenté.
+
+L'étape réseau Custom est **gatée par un run de fumée** (ROUTINE-01, plan 03) : un premier run cloud doit écrire dans `job_runs` sans `403 host_not_allowed` dans `job_runs.error` AVANT de planifier les fenêtres.
 
 **Architecture des jobs (invariante) :**
 ```
@@ -107,23 +121,36 @@ Référence `ARCHITECTURE.md §5` pour les horaires exacts. Résumé :
 | Daily OANDA | 17:00 NY | +24h | Convention close-of-day FX |
 | Daily Binance | 00:00 UTC | +24h | UTC fixe, pas de DST |
 
-Jobs planifiés typiques (à configurer en Phase 4) :
-- `22:30 UTC` : snapshot après clôture NY (H1/H4/D tous actifs)
-- `09:15 UTC` : snapshot après ouverture Londres
-- `00:15 UTC` : snapshot après clôture Binance
+**Crons UTC des routines (source de vérité : `apps/jobs/config/sessions.ts`, lignes 27-32).**
+
+Les crons ci-dessous sont la SEULE source de vérité versionnée des horaires (la config `/schedule` vit hors git). **Rollout #1 (D-12-01)** active uniquement `newyork` et `eod-swing` :
+
+| Routine | Cron UTC | Style | Statut rollout |
+|---------|----------|-------|----------------|
+| `newyork` | `30 12 * * 1-5` | day | **#1 — activée** |
+| `eod-swing` | `00 21 * * 1-5` | swing | **#1 — activée** |
+| `asia` | `00 23 * * 0-4` | day | élargissement (gate ROUTINE-03) |
+| `london` | `00 07 * * 1-5` | day+swing | élargissement (gate ROUTINE-03) |
+
+**Contraintes de saisie dans le dashboard :**
+- **Intervalle minimum 1 h** entre deux runs d'une même routine.
+- L'heure saisie est convertie **local → UTC** par le dashboard : **saisir les valeurs en UTC** (ex. `newyork` = 12:30 UTC) pour qu'elles correspondent aux crons ci-dessus.
+- Tout changement de fenêtre se reflète **d'abord** dans le commentaire de `sessions.ts`, qui reste la source de vérité, **puis** dans `/schedule`.
 
 ---
 
-## 7. Configuration Phase 4 (TODO)
+## 7. Runbook go-live (checklist)
 
-Quand Phase 4 activera les Routines Claude :
+> Réécriture de la checklist : l'étape réseau Custom est REQUISE, gatée par un run de fumée.
 
-- [ ] Créer l'Environment dans le dashboard Claude Code avec `SUPABASE_URL` + `SUPABASE_SERVICE_ROLE_KEY`
-- [ ] Activer network access vers `*.supabase.co` (à confirmer si nécessaire — A1)
-- [ ] Créer les Routines Remote pour les horaires ci-dessus
-- [ ] Vérifier le quota partagé (15 runs/j) vs nombre de jobs planifiés
-- [ ] Documenter le MCP cloud-hosted si un MCP Supabase est nécessaire côté cloud
+- [ ] Créer l'Environment dans le dashboard Claude Code avec `SUPABASE_URL` + `SUPABASE_SERVICE_ROLE_KEY` (P-SECRET — voir §8).
+- [ ] **Network access = `Custom` + `*.supabase.co` + package managers par défaut — REQUIS** (P-NET, §4). `Full` en fallback documenté seulement.
+- [ ] **Run de fumée egress (gate ROUTINE-01)** : un run cloud écrit dans `job_runs` SANS `403 host_not_allowed` — AVANT de planifier les fenêtres.
+- [ ] Retirer tout connecteur Supabase MCP de la routine (P-MCP, §8 — ROUTINE-05).
+- [ ] Créer les Routines Remote `newyork` (`30 12 * * 1-5`) et `eod-swing` (`00 21 * * 1-5`) via `/schedule` (§6).
+- [ ] Vérifier le quota partagé (15 runs/j) vs nombre de routines × runs/jour.
+- [ ] **Run réel de bout en bout (gate ROUTINE-03)** : ≥1 setup persisté via la séquence single-run (§8) avant d'élargir à `asia`/`london`.
 
 ---
 
-*Document créé : Phase 1, plan 01-03. Ne pas éditer manuellement — maintenu par l'équipe dev.*
+*Runbook go-live — Phase 12. Source de vérité hors git : dashboard Anthropic (Environment, secrets, crons). Maintenu par l'équipe dev.*
