@@ -87,7 +87,7 @@ Détail complet archivé : `.planning/milestones/v2.0-ROADMAP.md`.
 - [x] 12-01-PLAN.md — Wave-0 : tests validation (persist true-empty/all-rejected, idempotence run-level, static-check no-MCP) (ROUTINE-03/04/05)
 - [x] 12-02-PLAN.md — Runbook : corriger docs/routines-claude.md (réseau Custom *.supabase.co obligatoire, single-run, P-SECRET/P-MCP, RUN_ID) + vérif .gitignore (ROUTINE-01/02/05)
 - [ ] 12-03-PLAN.md — Environment Custom + secrets + allowlist *.supabase.co + run de fumée egress (gate ROUTINE-01) (ROUTINE-01/05)
-- [ ] 12-04-PLAN.md — Revue fondateur du prompt vétéran avant go-live (D-12-08) (ROUTINE-03)
+- [x] 12-04-PLAN.md — Revue fondateur du prompt vétéran avant go-live (D-12-08) (ROUTINE-03)
 - [ ] 12-05-PLAN.md — Routines newyork + eod-swing + 1 run réel ≥1 setup persisté (D-43) + monitoring/idempotence (ROUTINE-02/03/04)
 - [ ] 12-06-PLAN.md — Élargissement asia + london après validation du minimal (D-12-01) (ROUTINE-02/04)
 **Notes** : Axe routine (parallélisable contre l'axe design). Config-first : Environments + schedules vivent HORS git (dashboard). Pas de job `analyze.ts` (Anti-Pattern 1) — ANALYZE reste agent-native ; `persist.ts` demeure la seule frontière d'écriture IA. Research flag : valider Open Question A1 (réseau `*.supabase.co` Remote) AVANT de planifier. Adresse Pitfalls P10 (hallucination), P11 (quota), P12 (MCP absent en Remote).
@@ -131,7 +131,7 @@ Détail complet archivé : `.planning/milestones/v2.0-ROADMAP.md`.
 | 9. CMS cours & articles | v2.0 | 5/5 | Complete | 2026-06-20 |
 | 10. Fondation design system NEXA | v2.1 | 3/3 | Complete   | 2026-06-21 |
 | 11. Composants NEXA & reskin transversal | v2.1 | 8/8 | Complete    | 2026-06-21 |
-| 12. Routines d'analyse Claude (sans API) | v2.1 | 2/6 | In Progress|  |
+| 12. Routines d'analyse Claude (sans API) | v2.1 | 3/6 | In Progress|  |
 | 13. Backtest catalogue de patterns | v2.1 | 0/? | Not started | - |
 | 14. Track record affiché & boucle prod | v2.1 | 0/? | Not started | - |
 
