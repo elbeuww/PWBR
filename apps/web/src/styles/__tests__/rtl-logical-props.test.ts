@@ -21,6 +21,12 @@
  * absent → [] » : vert tant que ces dossiers n'existent pas, protecteur dès leur
  * création — toute classe physique (ml-/mr-/pl-/pr-/left-/right-) y sera bloquée.
  *
+ * Phase 11 (WR-02 / DESIGN-04) : le scan couvre EN PLUS components/ui/alert.tsx —
+ * composant consommé par ExpiryBanner sur la surface arabe (RTL). WR-02 a identifié
+ * des classes physiques (right-2, pr-18, text-left) dans alert.tsx, corrigées en
+ * end-2 / pe-18 / text-start au commit c34ae9d. Ce garde verrouille la régression :
+ * `text-left` et `text-right` sont également interdits (alignement de texte physique).
+ *
  * Source : 10-VALIDATION.md §DESIGN-04 ; 10-CONTEXT.md D-V2-02 ; 10-PATTERNS.md
  * §Wave-0 Test Files ; 11-PATTERNS.md §Propriétés logiques RTL ; mirror du style
  * text-scan de apps/web/test/no-perf-claims.test.ts.
@@ -30,9 +36,11 @@ import { readdirSync, readFileSync, statSync } from 'node:fs'
 import path from 'node:path'
 
 // Fichiers fondation surveillés (touchés par la migration Phase 10).
+// Phase 11 (WR-02) : alert.tsx ajouté — consommé par ExpiryBanner (surface RTL arabe).
 const FOUNDATION_FILES = [
   path.resolve(__dirname, '../globals.css'),
   path.resolve(__dirname, '../../app/[locale]/layout.tsx'),
+  path.resolve(__dirname, '../../components/ui/alert.tsx'),
 ] as const
 
 // Dossiers composant Phase 11 (reskin NEXA + hero). Scannés récursivement (.tsx) au
@@ -61,7 +69,9 @@ function listTsx(dir: string): string[] {
 // gauche, et le préfixe se termine par `-` (ml-, mr-, pl-, pr-, left-, right-).
 // NE matche PAS ms-/me-/ps-/pe-/start-/end- (logiques) car ml/mr/pl/pr sont des
 // préfixes distincts ; left-/right- restent physiques.
-const PHYSICAL_CLASS = /\b(ml-|mr-|pl-|pr-|left-|right-)/
+// Phase 11 (WR-02) : text-left et text-right ajoutés — alignement de texte physique
+// interdit ; utiliser text-start / text-end à la place.
+const PHYSICAL_CLASS = /\b(ml-|mr-|pl-|pr-|left-|right-|text-left\b|text-right\b)/
 
 function scanFile(filePath: string): string[] {
   const content = readFileSync(filePath, 'utf-8')
@@ -78,6 +88,11 @@ describe('DESIGN-04 : propriétés logiques uniquement (fichiers fondation)', ()
   it('le détecteur attrape bien une classe physique de contrôle (non trivial)', () => {
     expect(PHYSICAL_CLASS.test('class="ml-4 pr-2"')).toBe(true)
     expect(PHYSICAL_CLASS.test('class="ms-4 pe-2 start-0"')).toBe(false)
+    // Phase 11 (WR-02) : text-left / text-right sont des classes physiques interdites.
+    expect(PHYSICAL_CLASS.test('className="text-left"')).toBe(true)
+    expect(PHYSICAL_CLASS.test('className="text-right"')).toBe(true)
+    // text-start / text-end (logiques) ne doivent PAS être flagués.
+    expect(PHYSICAL_CLASS.test('className="text-start text-end"')).toBe(false)
   })
 
   it('scan tolérant : dossier composant absent ne jette pas (DESIGN-04)', () => {
@@ -87,7 +102,7 @@ describe('DESIGN-04 : propriétés logiques uniquement (fichiers fondation)', ()
     expect(listTsx(path.resolve(__dirname, '../../components/__inexistant__'))).toEqual([])
   })
 
-  it("n'utilise aucune classe utilitaire physique (fondation + components/nexa + components/hero)", () => {
+  it("n'utilise aucune classe utilitaire physique (fondation + alert.tsx + components/nexa + components/hero)", () => {
     const reskinFiles = RESKIN_DIRS.flatMap(listTsx)
     const offenders = [...FOUNDATION_FILES, ...reskinFiles].flatMap(scanFile)
     expect(
