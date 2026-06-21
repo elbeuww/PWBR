@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v2.1
 milestone_name: "Mise en vie : identité NEXA, moteur live & track record"
 status: executing
-last_updated: "2026-06-21T02:07:32.932Z"
+last_updated: "2026-06-21T02:20:04.552Z"
 last_activity: 2026-06-21
 progress:
   total_phases: 5
   completed_phases: 0
   total_plans: 3
-  completed_plans: 1
-  percent: 33
+  completed_plans: 2
+  percent: 67
 ---
 
 # Project State
@@ -30,8 +30,8 @@ See: .planning/PROJECT.md (mis à jour 2026-06-20 après clôture v2.0)
 ## Current Position
 
 Phase: 10 (fondation-design-system-nexa) — EXECUTING
-Plan: 2 of 3
-Status: Ready to execute
+Plan: 3 of 3
+Status: Ready to execute (10-01 + 10-02 COMPLETE ; 10-03 tokens OKLCH restant)
 Last activity: 2026-06-21
 
 ## Deferred Items
@@ -92,6 +92,7 @@ ressources externes non provisionnables en session de développement.
 | Phase 09 P04 | ~10 min | 3 tasks | 8 files |
 | Phase 09 P05 | ~15 min | 2 tasks | 5 files |
 | Phase 10 P01 | ~12 min | 2 tasks | 6 files |
+| Phase 10 P02 | ~9min | 3 tasks | 12 files |
 
 ## Roadmap v2.0 (9 phases)
 
@@ -316,6 +317,14 @@ ressources externes non provisionnables en session de développement.
 - **D-10-01-E (requirements NON marqués complets)** : DESIGN-01..04 restent `Pending`/`[ ]` dans REQUIREMENTS.md — ce plan ne crée que les portes RED, l'implémentation (tokens OKLCH, fonts self-hostées, no-flash) est portée par les plans 10-02/10-03. Le marquage auto du SDK a été réverté.
 - **Commits 10-01** : d25f577 (3 gardes Vitest + glob élargi), 3563199 (2 specs Playwright). `npx vitest run apps/web/src/styles/__tests__` = 3 fichiers collectés, 8 RED + 3 GREEN ; `npx playwright test --list` = 4 tests listés ; 0 package npm. **5 portes Wave-0 posées.** Reste 10-02 (fonts) + 10-03 (tokens) à exécuter contre ces gardes.
 
+### Decisions exécution (Plan 10-02 — fonts NEXA self-hostées)
+
+- **D-10-02-A (déviation Rule 3 — paquet Noto absent)** : le plan supposait `@fontsource/noto-sans-arabic` déjà installé ; en réalité seul `@fontsource/ibm-plex-sans-arabic` (ancien D-01) était présent. Provenance vérifiée (`npm view` → 5.2.10, `scripts.postinstall` vide, org Fontsource déjà approuvée au gate supply-chain Task 0) puis `pnpm --filter web add -D @fontsource/noto-sans-arabic`. Pas un install ambigu : paquet officiel attendu, dans le périmètre du checkpoint approuvé (Noto = remplaçant IBM Plex).
+- **D-10-02-B (sourcing)** : .woff2 sources résolus sous `apps/web/node_modules/@fontsource/<name>/files/<name>-<subset>-<weight>-normal.woff2` (résolution pnpm par workspace, PAS à la racine). 10 fichiers copiés aux noms cibles exacts (latin 400/600 ×4 latines + arabic 400/600 Noto), 2 IBM Plex orphelins supprimés.
+- **D-10-02-C (Pitfall 4)** : Noto en subset `arabic` — `NotoSansArabic-Regular.woff2` = 48 KB (≫ fichier latin ~15 KB), confirme le bon subset (pas de boîtes □□□).
+- **D-10-02-D (no-CDN vérifié live, dépasse le déféré)** : `lib/fonts.ts` réécrit en 5 exports `next/font/local` (zéro `next/font/google`), `[locale]/layout.tsx` injecte les 5 `.variable` sur `<body>`. `fonts.test.ts` GREEN 5/5, `tsc --noEmit` 0 erreur. `no-cdn-fonts.spec.ts` exécuté contre serveur dev :3000 réel → 0 requête Google Fonts (GREEN runtime, pas seulement --list). DESIGN-02 (volet build/exposition + runtime no-CDN) couvert.
+- **Commits 10-02** : b5efb9b (10 .woff2 + 5 @fontsource devDeps + drop IBM Plex), 863dd7c (fonts.ts 5 familles + layout.tsx injection). **Reste 10-03 (tokens OKLCH) gaté par design-tokens.test.ts.**
+
 ### Open todos / research flags (v2.0)
 
 - **Phase 4 (research flag) :** TronGrid endpoint `walletsolidity`, parsing logs TRC-20, normalisation hex↔base58 — doc TS peu dense, recherche de phase recommandée.
@@ -342,7 +351,7 @@ ressources externes non provisionnables en session de développement.
 
 ## Session Continuity
 
-**Last session:** 2026-06-21T01:33:39.483Z
+**Last session:** 2026-06-21T02:19:56.018Z
 
 **Last session (archive):** 2026-06-19T03:41:29.665Z
 
@@ -364,7 +373,7 @@ ressources externes non provisionnables en session de développement.
 
 **Last session (archive):** 2026-06-14 — Completed 02-03-PLAN.md (4 commits : 38c1894 tarifs 9$/3$ + paiement-bientot + funnel signup→paiement-bientot, 86e7001 home bénéfice-first + proof slot masqué, 49ac57e RED no-perf-claims, fa8a5d0 GREEN glob vitest). Cœur conversion de la vitrine livré : home VITR-01, tarifs VITR-02 (USDT TRC-20, D-10/D-11/D-12), funnel honnête D-09, garde no-perf-claims VITR-03/D-08. 15 tests verts, tsc/lint:i18n OK, invariant auth P1 intact. **Phase 02 COMPLETE (3/3 plans).** Stopped at : Plan 02-03 terminé.
 
-**Next action:** Phase 10 — Plan 10-02 (fonts NEXA). Implémenter les 5 polices self-hostées (`next/font/local` : Archivo/Space Grotesk/JetBrains Mono/Chakra Petch/Noto Sans Arabic), copier les 10 `.woff2` dans `apps/web/src/fonts/`, retirer Inter (`next/font/google`) + IBM Plex Arabic, exposer les 5 `--font-*` dans `lib/fonts.ts` + `globals.css`, recâbler `[locale]/layout.tsx`. Cible GREEN : `fonts.test.ts` (les 5 assertions) + `no-cdn-fonts.spec.ts` (dev server). Plan 10-03 (tokens OKLCH) gaté par `design-tokens.test.ts`. Les 5 portes Wave-0 sont posées (d25f577, 3563199) ; design-tokens + fonts sont RED par design jusqu'à l'implémentation.
+**Next action:** Phase 10 — Plan 10-03 (tokens OKLCH). Migrer `globals.css` des HEX de marque obsolètes (#1E5FBF/#03d87f/#63279b) vers la palette OKLCH NEXA (`--nexa-green-500` etc.), `@theme inline` = var() only, repointer `--font-latin`/`--font-arabic` vers les 5 nouvelles variables `--font-*` exposées en 10-02. Cible GREEN : `design-tokens.test.ts` (4 assertions, 3 actuellement RED). 10-02 COMPLETE (b5efb9b/863dd7c) : 5 polices NEXA self-hostées, `fonts.test.ts` GREEN 5/5, `no-cdn-fonts.spec.ts` GREEN runtime. `rtl-logical-props.test.ts` + `no-flash.spec.ts` = gardes de non-régression à préserver.
 
 **Next action (archive):** Milestone v2.1 — roadmap créée (5 phases, 10-14). Lancer la planification de **Phase 10 (Fondation design system NEXA, DESIGN-01..04)** via `/gsd-execute-phase 10`. Axe design (P10-11) parallélisable contre routine+backtest (P12-13). Research flags à lever au planning : P12 (réseau Remote *.supabase.co, Open Q A1) et P13 (figer le catalogue de patterns — décision fondateur Borhane). Dette héritée v2.0 traitée : WIRING-01/ExpiryBanner → Phase 11 (UI-07). Hors scope v2.1 : LEGAL-02, PAY-AUTO, AFF-AUTO, ENGINE-API.
 

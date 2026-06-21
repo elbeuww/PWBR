@@ -17,7 +17,7 @@ Requirements de ce milestone. Chacun est mappé à une phase de la roadmap (voir
 ### Design system (DESIGN)
 
 - [ ] **DESIGN-01**: Des tokens OKLCH en couches (primitive→semantic→component) basés sur la palette NEXA (cyber green `#03d87f`, royal purple `#63279b`) vivent dans `globals.css` (`@theme`/`:root`/`.dark`).
-- [ ] **DESIGN-02**: Les 5 familles de polices (Archivo, Chakra Petch, Space Grotesk, JetBrains Mono, Noto Sans Arabic) sont self-hostées via `next/font/local` et exposées en CSS vars.
+- [x] **DESIGN-02**: Les 5 familles de polices (Archivo, Chakra Petch, Space Grotesk, JetBrains Mono, Noto Sans Arabic) sont self-hostées via `next/font/local` et exposées en CSS vars.
 - [ ] **DESIGN-03**: Le thème clair/sombre est sans flash (script pré-paint), aucun FOUC, RTL-safe.
 - [ ] **DESIGN-04**: Le RTL arabe est préservé sur tout le reskin (propriétés logiques uniquement, vérifié sur chaque surface).
 - [ ] **DESIGN-05**: Une bibliothèque de composants NEXA tokenisée existe (boutons, cards, nav, eyebrow, gauges/rings de score, marquee, stats de confiance) — pas de CSS bespoke par page.
@@ -88,7 +88,7 @@ Chaque requirement → exactement une phase. Phases 10-14 (numérotation continu
 | Requirement | Phase | Status |
 |-------------|-------|--------|
 | DESIGN-01 | Phase 10 | Pending |
-| DESIGN-02 | Phase 10 | Pending |
+| DESIGN-02 | Phase 10 | Complete |
 | DESIGN-03 | Phase 10 | Pending |
 | DESIGN-04 | Phase 10 | Pending |
 | DESIGN-05 | Phase 11 | Pending |
