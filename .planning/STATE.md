@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v2.1
 milestone_name: "Mise en vie : identité NEXA, moteur live & track record"
-status: executing
-last_updated: "2026-06-21T15:21:32.249Z"
+status: verifying
+last_updated: "2026-06-21T15:31:45.993Z"
 last_activity: 2026-06-21
 progress:
   total_phases: 5
-  completed_phases: 1
+  completed_phases: 2
   total_plans: 11
-  completed_plans: 10
-  percent: 91
+  completed_plans: 11
+  percent: 100
 ---
 
 # Project State
@@ -29,11 +29,12 @@ See: .planning/PROJECT.md (mis à jour 2026-06-20 après clôture v2.0)
 
 ## Current Position
 
-Phase: 11 (composants-nexa-reskin-transversal-rebranding) — EXECUTING
-Plan: 8 of 8
-Status: Ready to execute
-**Seul item ouvert (live, non-bloquant) :** vérification runtime no-flash — `pnpm --filter web dev` puis `/fr|/en|/ar/login` avec `localStorage.theme='dark'` + reload → confirmer aucune frame claire au premier paint. Rapport : 10-VERIFICATION.md.
-**Prochaine action à la reprise :** `/clear` puis `/gsd-plan-phase 11` (Composants NEXA, reskin, MERA→NEXA, hero, ExpiryBanner — DESIGN-05, BRAND-01..04, UI-01..07).
+Phase: 11 (composants-nexa-reskin-transversal-rebranding) — COMPLETE (8/8 plans)
+Plan: 8 of 8 — terminé
+Status: Phase complete — ready for verification
+**Plan 11-08 livré :** UI-01/04/05/06 reskinés NEXA (vitrine/académie/auth/admin sobre), UI-07 levé (ExpiryBanner câblé sur abonnement via RLS serveur, dette WIRING-01/PAY-05 close). Gate phase 11 : unit 582✓/0 fail, tsc 0, lint:i18n 0 ; 5 specs E2E human-verify (sélecteurs préservés).
+**Items live non-bloquants restants :** (1) no-flash runtime (10-VERIFICATION.md) ; (2) 5 specs E2E GREEN autoritaire en dev server / Vercel preview (precedent D-01-04-C).
+**Prochaine action à la reprise :** `/clear` puis `/gsd-verify-phase 11` (ou `/gsd-plan-phase 12` — routines d'analyse Claude planifiées).
 Last activity: 2026-06-21
 
 ## Deferred Items
@@ -103,6 +104,7 @@ ressources externes non provisionnables en session de développement.
 | Phase 11 P05 | ~10min | 3 tasks | 9 files |
 | Phase 11 P07 | ~14min | 3 tasks | 13 files |
 | Phase 11 P06 | ~12min | 2 tasks | 7 files |
+| Phase 11 P08 | ~25min | 3 tasks | 10 files |
 
 ## Roadmap v2.0 (9 phases)
 
@@ -377,6 +379,15 @@ ressources externes non provisionnables en session de développement.
 - **D-11-06-B** : mapping risque DB→ScoreRing — `low→faible`, `medium`/inconnu→`modere`, `high`/`extreme→eleve`. `extreme` replié sur `eleve` (un seul cran colorimétrique extrême ; le label texte i18n reste distinct via `signals.filters.riskExtreme`). Label aria via `scoreRing.ariaTemplate` + `riskLabels.*` (RSC-safe, fourni par l'appelant — precedent FloatingCards 11-04).
 - **D-11-06-C** : frontière RLS strictement préservée (Anti-Pattern 3) — `createClient()` serveur conservé sur liste ET détail (grep=3/3). `SignalsDisclaimerBanner` préservé sur le détail. `signals.eyebrow` ajouté à parité fr/en/ar ; Eyebrow détail réutilise `signalDetail.planTitle`.
 - **Commits 11-06** : 8ae690f (Task 1 ScoreRing SignalCard + Eyebrow liste + i18n), 71274cd (Task 2 détail ScoreRing 96 + Eyebrow + dé-doublon SignalDetail), e193c2c (SUMMARY). Vérifs : no-perf-claims 5/5, parité i18n 18/18, `tsc -b --noEmit` exit 0, `lint:i18n` exit 0, 0 package npm. UI-03/DESIGN-05 livrés.
+
+### Decisions exécution (Plan 11-08 — reskin transversal NEXA + ExpiryBanner + gate de phase, UI-01/04/05/06/07)
+
+- **D-11-08-A** : clé `eyebrow` ajoutée aux namespaces `pricing`/`methodology`/`academy`/`auth` (fr/en/ar à parité) — l'Eyebrow exige un label traduit, aucune clé réutilisable existante. Parité i18n verte.
+- **D-11-08-B** : token de titre NEXA = `font-display` (Archivo, défini dans `@theme`), PAS `font-heading` (utilitaire no-op non mappé). Déviation Rule 1 : tous les titres des fichiers touchés migrés vers `font-display` (corrige une dérive latente).
+- **D-11-08-C (Rule 1)** : couleurs hardcodées des forms auth (`bg-[#2563EB]`, `border-black/15`) remplacées par primitifs `Input`/`Button` tokenisés + `accent-brand` ; `name`/`type`/`required`/`autoComplete`/`minLength` préservés (sélecteurs E2E auth intacts), logique `signIn`/`signUp` inchangée.
+- **D-11-08-D** : UI-07 levé — `abonnement/page.tsx` câble l'ExpiryBanner via `createClient()` serveur (anon-client RLS, pattern `(member)/layout.tsx:23-34`), select `subscriptions.current_period_end status=active`. Aucun service_role client. **Dette WIRING-01/PAY-05 close.** Admin reskiné sobre (D-18) : `font-display` titre seul, aucun hero/animation ; dots feux conservés (sémantique données, pas marque).
+- **D-11-08-E (gate de phase)** : suite unit `pnpm vitest run` = **582 passed / 4 skipped / 0 failed** (no-perf-claims, no-mera-brand, rtl-logical-props, parité i18n verts) ; `tsc -b --noEmit` exit 0 ; `lint:i18n` exit 0. **5 specs E2E** (i18n, affiliation-attribution, auth, gating, academie — ROADMAP "6" = coquille confirmée) parsent (35 tests listés), sélecteurs préservés ; exécution GREEN = **human-verify** (precedent D-01-04-C, dev server + Vercel preview requis).
+- **Commits 11-08** : 8112e0e (Task 1 ExpiryBanner abonnement RLS serveur), d3a4dea (Task 2 reskin vitrine/académie/auth/admin + eyebrow i18n), 404454d (SUMMARY). 0 package npm, 0 fork primitif ui/.
 
 ### Open todos / research flags (v2.0)
 
