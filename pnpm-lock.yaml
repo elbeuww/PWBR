@@ -175,6 +175,21 @@ importers:
         specifier: 4.4.3
         version: 4.4.3
     devDependencies:
+      '@fontsource/archivo':
+        specifier: ^5.2.8
+        version: 5.2.8
+      '@fontsource/chakra-petch':
+        specifier: ^5.2.7
+        version: 5.2.7
+      '@fontsource/jetbrains-mono':
+        specifier: ^5.2.8
+        version: 5.2.8
+      '@fontsource/noto-sans-arabic':
+        specifier: ^5.2.10
+        version: 5.2.10
+      '@fontsource/space-grotesk':
+        specifier: ^5.2.10
+        version: 5.2.10
       '@tailwindcss/postcss':
         specifier: 4.3.1
         version: 4.3.1
@@ -504,8 +519,23 @@ packages:
   '@floating-ui/utils@0.2.11':
     resolution: {integrity: sha512-RiB/yIh78pcIxl6lLMG0CgBXAZ2Y0eVHqMPYugu+9U0AeT6YBeiJpf7lbdJNIugFP5SIjwNRgo4DhR1Qxi26Gg==}
 
+  '@fontsource/archivo@5.2.8':
+    resolution: {integrity: sha512-Fc4yuMt85MmcYooUVpYHAJRJTymPv2+J9HsMP2f5mxR/0pIWgE2V5XfgNTavPpklX2rJFprdT36iE6Rr8ds9MA==}
+
+  '@fontsource/chakra-petch@5.2.7':
+    resolution: {integrity: sha512-GLbun5WZJNAEc8FtWxwcgo+4Kurqdwejvf671l+YfIjyQgPvTjyxXYP7Ffg2HAY89NGnp3oOvKQjRzfm/fBECw==}
+
   '@fontsource/ibm-plex-sans-arabic@5.2.9':
     resolution: {integrity: sha512-mAs+anYcmatmhTuYApDy/CEEu5iYcfalXp2DB1gBN/6o2ex24lcBs635bwtgV5BNbByCYslIGsQvD4X6s7eVgw==}
+
+  '@fontsource/jetbrains-mono@5.2.8':
+    resolution: {integrity: sha512-6w8/SG4kqvIMu7xd7wt6x3idn1Qux3p9N62s6G3rfldOUYHpWcc2FKrqf+Vo44jRvqWj2oAtTHrZXEP23oSKwQ==}
+
+  '@fontsource/noto-sans-arabic@5.2.10':
+    resolution: {integrity: sha512-Hgj3NwQJ0NquIADW3hFboFjsts4UvEOJQ8tOX0bhQZgpNKHsMawjv/1SZnq0QvRbP6efHTZM/A1k7tdy9S6sbA==}
+
+  '@fontsource/space-grotesk@5.2.10':
+    resolution: {integrity: sha512-XNXEbT74OIITPqw2H6HXwPDp85fy43uxfBwFR5PU+9sLnjuLj12KlhVM9nZVN6q6dlKjkuN8JisW/OBxwxgUew==}
 
   '@formatjs/fast-memoize@3.1.6':
     resolution: {integrity: sha512-H5aexk1Le7T9TPmscacZ+1pR6CTa2n1wq+HDVGXhH8TzUlQQpeXzZs91dRtmFHrbeNbjPFPfQujUqm7MHgVoXQ==}
@@ -4268,7 +4298,17 @@ snapshots:
 
   '@floating-ui/utils@0.2.11': {}
 
+  '@fontsource/archivo@5.2.8': {}
+
+  '@fontsource/chakra-petch@5.2.7': {}
+
   '@fontsource/ibm-plex-sans-arabic@5.2.9': {}
+
+  '@fontsource/jetbrains-mono@5.2.8': {}
+
+  '@fontsource/noto-sans-arabic@5.2.10': {}
+
+  '@fontsource/space-grotesk@5.2.10': {}
 
   '@formatjs/fast-memoize@3.1.6': {}
 
