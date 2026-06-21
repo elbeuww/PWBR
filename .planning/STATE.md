@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v2.1
 milestone_name: "Mise en vie : identité NEXA, moteur live & track record"
 status: executing
-last_updated: "2026-06-21T21:43:23.830Z"
+last_updated: "2026-06-21T21:48:28.291Z"
 last_activity: 2026-06-21
 progress:
   total_phases: 5
   completed_phases: 2
   total_plans: 17
-  completed_plans: 12
-  percent: 71
+  completed_plans: 13
+  percent: 76
 ---
 
 # Project State
@@ -30,7 +30,7 @@ See: .planning/PROJECT.md (mis à jour 2026-06-20 après clôture v2.0)
 ## Current Position
 
 Phase: 12 (routines-d-analyse-claude-planifi-es-sans-api) — EXECUTING
-Plan: 2 of 6
+Plan: 3 of 6
 Status: Ready to execute
 **Plan 11-08 livré :** UI-01/04/05/06 reskinés NEXA (vitrine/académie/auth/admin sobre), UI-07 levé (ExpiryBanner câblé sur abonnement via RLS serveur, dette WIRING-01/PAY-05 close). Gate phase 11 : unit 582✓/0 fail, tsc 0, lint:i18n 0 ; 5 specs E2E human-verify (sélecteurs préservés).
 **Items live non-bloquants restants :** (1) no-flash runtime (10-VERIFICATION.md) ; (2) 5 specs E2E GREEN autoritaire en dev server / Vercel preview (precedent D-01-04-C).
@@ -106,6 +106,7 @@ ressources externes non provisionnables en session de développement.
 | Phase 11 P06 | ~12min | 2 tasks | 7 files |
 | Phase 11 P08 | ~25min | 3 tasks | 10 files |
 | Phase 12 P01 | ~12min | 3 tasks | 3 files |
+| Phase 12 P02 | ~10min | 3 tasks | 1 files |
 
 ## Roadmap v2.0 (9 phases)
 
@@ -397,6 +398,14 @@ ressources externes non provisionnables en session de développement.
 - **D-12-01-C** : Task 3 utilise `new RegExp` + `String.includes()` au lieu de regex-littéraux — oxc (vitest 4 / rolldown-vite) mal-parse `/['"][^'"]*mcp.../i` comme une division, cassant le transform. Scan EXCLUT `*.test.ts`/`*.d.ts` ; commentaires (bloc/ligne/JSDoc) retirés avant grep (hygiène grep-gate CLAUDE.md), prouvé non-trivial.
 - **Commits 12-01** : cf507cd (Task 1 D-12-02), 3d90dcf (Task 2 idempotence), 4e9073f (Task 3 ROUTINE-05). 11 cas verts (3+2+6). ROUTINE-03/04/05 marqués complets.
 
+### Decisions exécution (Plan 12-02 — runbook go-live des routines Claude Remote, doc-only)
+
+- **D-12-02-A (P-NET, corrige D-12-10)** : `docs/routines-claude.md §4` réécrit — le profil **Trusted** par défaut N'INCLUT PAS `*.supabase.co` (hôtes vérifiés = api.anthropic.com, github, package managers, ubuntu) → `403 x-deny-reason: host_not_allowed` sur le client service_role de `runJob.ts`/`persist.ts`. Procédure REQUISE : Network = `Custom` + `*.supabase.co` + package managers par défaut (sinon `pnpm install` échoue aussi) ; fallback `Full` documenté (A2 / issue #30112). Étape gatée par le run de fumée egress (ROUTINE-01, plan 03).
+- **D-12-02-B** : `§6` horaires placeholder (22:30/09:15/00:15) remplacés par les crons UTC alignés sur `apps/jobs/config/sessions.ts` (source de vérité) — `newyork 30 12 * * 1-5` + `eod-swing 00 21 * * 1-5` (rollout #1), `asia 00 23 * * 0-4` / `london 00 07 * * 1-5` (élargissement gate ROUTINE-03). Min interval 1h, saisir en UTC.
+- **D-12-02-C** : `§8` ajouté — single-run handoff (ingest→engines→combine→ANALYZE agent-native→persist dans UN SEUL run cloud ; clone frais perd `run-artifacts/`), RUN_ID strict `<session>-<YYYYMMDD>T<HHmm>Z` (ex. `newyork-20260622T1730Z`), sémantique marché-calme D-12-02 (0 artefact → routine N'APPELLE PAS persist ; `no_artifacts` ≠ erreur ; all-rejected throw légitime WR-04), P-MCP (retirer connecteur Supabase MCP, ROUTINE-05), P-SECRET (SERVICE_ROLE_KEY visible aux éditeurs de l'Environment, jamais commit/log). `§7` TODO converti en checklist go-live exécutable.
+- **D-12-02-D (A3 closed)** : `.gitignore` confirmé — `run-artifacts/` déjà présent ligne 38, `git ls-files run-artifacts/` vide, aucune édition (surgical, verification-only). Pas de commit pour Task 3.
+- **Commits 12-02** : eb14a9b (Task 1 — 3 sections stale), 50c57b9 (Task 2 — §8 single-run/RUN_ID/P-SECRET/P-MCP/calme), ccc078d (SUMMARY). ROUTINE-01/02/05 marqués complets.
+
 ### Open todos / research flags (v2.0)
 
 - **Phase 4 (research flag) :** TronGrid endpoint `walletsolidity`, parsing logs TRC-20, normalisation hex↔base58 — doc TS peu dense, recherche de phase recommandée.
@@ -423,7 +432,7 @@ ressources externes non provisionnables en session de développement.
 
 ## Session Continuity
 
-**Last session:** 2026-06-21T21:43:06.568Z
+**Last session:** 2026-06-21T21:47:52.665Z
 
 **Last session (archive):** 2026-06-19T03:41:29.665Z
 

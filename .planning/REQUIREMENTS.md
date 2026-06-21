@@ -34,8 +34,8 @@ Requirements de ce milestone. Chacun est mappé à une phase de la roadmap (voir
 
 ### Routines d'analyse — moteur live sans API (ROUTINE)
 
-- [ ] **ROUTINE-01**: Un Environment Claude Code est configuré avec les secrets (`SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`) et l'accès réseau `*.supabase.co` confirmé.
-- [ ] **ROUTINE-02**: Des routines Remote planifiées couvrent les fenêtres **day** (ouverture de session + clôture H1/H4) et **swing** (pré-clôture daily), alignées sur `apps/jobs/config/sessions.ts`.
+- [x] **ROUTINE-01**: Un Environment Claude Code est configuré avec les secrets (`SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`) et l'accès réseau `*.supabase.co` confirmé.
+- [x] **ROUTINE-02**: Des routines Remote planifiées couvrent les fenêtres **day** (ouverture de session + clôture H1/H4) et **swing** (pré-clôture daily), alignées sur `apps/jobs/config/sessions.ts`.
 - [x] **ROUTINE-03**: Un run réel de bout en bout `snapshot → analyze (vétéran) → persist` produit ≥1 setup persisté via `persist.ts` (frontière de confiance intacte, score recalculé en code).
 - [x] **ROUTINE-04**: Les runs sont idempotents et monitorés (`job_runs` + flag `stale` visible sur `/admin/sante`), sans dépasser le budget de quota (~15 runs/j partagé).
 - [x] **ROUTINE-05**: Les jobs accèdent à la DB via `supabase-js` uniquement (pas de MCP cloud), sans aucune clé API Anthropic.
@@ -103,8 +103,8 @@ Chaque requirement → exactement une phase. Phases 10-14 (numérotation continu
 | UI-05 | Phase 11 | Complete |
 | UI-06 | Phase 11 | Complete |
 | UI-07 | Phase 11 | Complete |
-| ROUTINE-01 | Phase 12 | Pending |
-| ROUTINE-02 | Phase 12 | Pending |
+| ROUTINE-01 | Phase 12 | Complete |
+| ROUTINE-02 | Phase 12 | Complete |
 | ROUTINE-03 | Phase 12 | Complete |
 | ROUTINE-04 | Phase 12 | Complete |
 | ROUTINE-05 | Phase 12 | Complete |
