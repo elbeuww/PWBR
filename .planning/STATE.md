@@ -2,9 +2,9 @@
 gsd_state_version: 1.0
 milestone: v2.1
 milestone_name: "Mise en vie : identité NEXA, moteur live & track record"
-status: paused
-last_updated: "2026-06-21T02:30:00.000Z"
-last_activity: 2026-06-21 -- Phase 10 complete & verified, paused for resume
+status: verifying
+last_updated: "2026-06-21T13:27:54.354Z"
+last_activity: 2026-06-21 -- Phase 10 exécutée + vérifiée, mise en pause
 progress:
   total_phases: 5
   completed_phases: 1
@@ -363,7 +363,7 @@ ressources externes non provisionnables en session de développement.
 
 ## Session Continuity
 
-**Last session:** 2026-06-21T02:19:56.018Z
+**Last session:** 2026-06-21T13:27:54.345Z
 
 **Last session (archive):** 2026-06-19T03:41:29.665Z
 
