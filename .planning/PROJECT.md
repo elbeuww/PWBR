@@ -80,6 +80,8 @@ Produire, pour chaque opportunité, une analyse fiable et explicable — score /
 - [x] **Affiliation à paliers (v2.0 Phase 7, 2026-06-18)** : migration 0016 (tables + RLS + RPC commission/payout + vue no-PII), grille paliers + commission BigInt pure golden-testée (miroir SQL), capture `?ref` (cookie 30j) → attribution figée au signup (best-effort), candidature trilingue + dashboard affilié no-PII, back-office payouts manuel. Requirements AFF-01..05.
 - [x] **Superadmin consolidé (v2.0 Phase 8, 2026-06-19)** : `/admin` KPI + `/admin/signaux` (× telegram_posts, filtres URL) + `/admin/sante` (feux fraîcheur + job_runs) + `/admin/affiliation` (perfs + payouts), 404 discret non-superadmin (T-04-ADMIN-ELEV, **live-vérifié** gating E2E). Requirements ADMIN-03/04.
 
+- [x] **Composants NEXA, reskin transversal & rebranding (v2.1 Phase 11, 2026-06-21)** : tokens component-layer 3 couches (`--accent-brand` purple + `--risk-moderate` amber), bibliothèque NEXA tokenisée (Eyebrow, ScoreRing `role=meter` couleur=risque, Marquee RTL-aware, ConfidenceStat via `applyThreshold`, Logo SVG marque), recoloration résiduelle vers tokens flip-safe (CandleChart `MutationObserver`+`applyOptions`, SignalCard/SignalDetail `--signal-*`, ExpiryBanner/alert tokenisés), rebranding MERA→NEXA complet (header/footer/metadata, grep=0) + baseline trilingue + assets `next/og` (favicon/apple-icon/OG), hero animé greenfield CSS+vanilla TS (globe/cartes/data-rain/tilt, double-gardé `prefers-reduced-motion`, zéro three/gsap), reskin transversal toutes surfaces (vitrine/académie/auth/compte/admin) + **WIRING-01 clos** (ExpiryBanner câblé sur `/abonnement`, fetch RLS serveur). Garde-fous text-scan (no-perf-claims, no-mera-brand, rtl-logical-props). Suite unit 582/4-skip/0-fail, tsc 0-erreur, code review 0 blocker (WR-01/WR-02 invariants flip-safe+RTL corrigés). Requirements DESIGN-05, BRAND-01..04, UI-01..07. **Restant UAT humain (11-HUMAN-UAT.md) :** rendu multi-locale/RTL + E2E Playwright + reduced-motion + theme-flip CandleChart.
+
 ### Active — milestone en cours (v2.1 : identité NEXA, moteur live & track record)
 
 > Requirements détaillés (REQ-IDs) dans `.planning/REQUIREMENTS.md`. Trois axes : design NEXA toute l'app · routines d'analyse Claude sans API · backtest + track record en prod.
@@ -88,7 +90,7 @@ Produire, pour chaque opportunité, une analyse fiable et explicable — score /
 
 > Reporté au-delà du milestone en cours (automatisation paiement/affiliation + dette de clôture).
 
-- [ ] **WIRING-01** : câbler `ExpiryBanner` (alerte J-3/J-1) avant l'ouverture réelle de l'encaissement (dette PAY-05).
+- [x] **WIRING-01** (résolu Phase 11, 2026-06-21) : `ExpiryBanner` (alerte J-3/J-1) câblé sur `/abonnement` via fetch RLS serveur (`current_period_end`). Dette PAY-05 close.
 - [ ] **LEGAL-02** : revue juridique externe signée (gate non-code) avant le 1er encaissement réel.
 - [ ] **PAY-AUTO** : processeur crypto (NOWPayments/Cryptomus) — adresse unique par facture + webhooks (remplace la soumission de hash manuelle).
 - [ ] **AFF-AUTO** : automatisation des payouts d'affiliation.
