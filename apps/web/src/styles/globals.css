@@ -232,3 +232,58 @@
     animation-name: nexa-scroll-rtl;
   }
 }
+
+/*
+ * Hero NEXA (UI-02, D-02/D-03/D-05) — globe filaire + data-rain CSS-only.
+ *
+ * Double-garde reduced-motion : les keyframes ne sont appliqués que sous
+ * `@media (prefers-reduced-motion: no-preference)`. Sous reduced-motion les deux
+ * éléments restent figés mais RENDUS (composition visuelle préservée, D-05).
+ * transform/opacity/background-position only → composé GPU, pas de reflow.
+ */
+@keyframes nexa-globe-spin {
+  to {
+    transform: rotate(1turn);
+  }
+}
+
+.nexa-globe {
+  display: block;
+  inline-size: 100%;
+  block-size: 100%;
+  transform-origin: center;
+  /* Figé par défaut (reduced-motion / fallback) — toujours visible. */
+  animation: none;
+}
+
+@keyframes nexa-rain {
+  to {
+    background-position: 0 200%;
+  }
+}
+
+.nexa-datarain {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  opacity: 0.06;
+  pointer-events: none;
+  background-image: repeating-linear-gradient(
+    to bottom,
+    var(--primary) 0 2px,
+    transparent 2px 18px
+  );
+  background-size: 100% 200%;
+  /* Figée par défaut (reduced-motion / fallback) — ambiance préservée. */
+  animation: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .nexa-globe {
+    animation: nexa-globe-spin 48s linear infinite;
+  }
+
+  .nexa-datarain {
+    animation: nexa-rain 6s linear infinite;
+  }
+}
