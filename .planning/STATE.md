@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v2.1
 milestone_name: "Mise en vie : identité NEXA, moteur live & track record"
-status: verifying
+status: ready_to_plan
 last_updated: "2026-06-21T15:31:45.993Z"
 last_activity: 2026-06-21
 progress:
   total_phases: 5
-  completed_phases: 2
+  completed_phases: 3
   total_plans: 11
   completed_plans: 11
-  percent: 100
+  percent: 60
 ---
 
 # Project State
@@ -29,9 +29,9 @@ See: .planning/PROJECT.md (mis à jour 2026-06-20 après clôture v2.0)
 
 ## Current Position
 
-Phase: 11 (composants-nexa-reskin-transversal-rebranding) — COMPLETE (8/8 plans)
-Plan: 8 of 8 — terminé
-Status: Phase complete — ready for verification
+Phase: 12
+Plan: Not started
+Status: Ready to plan
 **Plan 11-08 livré :** UI-01/04/05/06 reskinés NEXA (vitrine/académie/auth/admin sobre), UI-07 levé (ExpiryBanner câblé sur abonnement via RLS serveur, dette WIRING-01/PAY-05 close). Gate phase 11 : unit 582✓/0 fail, tsc 0, lint:i18n 0 ; 5 specs E2E human-verify (sélecteurs préservés).
 **Items live non-bloquants restants :** (1) no-flash runtime (10-VERIFICATION.md) ; (2) 5 specs E2E GREEN autoritaire en dev server / Vercel preview (precedent D-01-04-C).
 **Prochaine action à la reprise :** `/clear` puis `/gsd-verify-phase 11` (ou `/gsd-plan-phase 12` — routines d'analyse Claude planifiées).

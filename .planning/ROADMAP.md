@@ -124,7 +124,7 @@ Détail complet archivé : `.planning/milestones/v2.0-ROADMAP.md`.
 | 8. Superadmin consolidé | v2.0 | 4/4 | Complete | 2026-06-19 |
 | 9. CMS cours & articles | v2.0 | 5/5 | Complete | 2026-06-20 |
 | 10. Fondation design system NEXA | v2.1 | 3/3 | Complete   | 2026-06-21 |
-| 11. Composants NEXA & reskin transversal | v2.1 | 8/8 | Complete   | 2026-06-21 |
+| 11. Composants NEXA & reskin transversal | v2.1 | 8/8 | Complete    | 2026-06-21 |
 | 12. Routines d'analyse Claude (sans API) | v2.1 | 0/? | Not started | - |
 | 13. Backtest catalogue de patterns | v2.1 | 0/? | Not started | - |
 | 14. Track record affiché & boucle prod | v2.1 | 0/? | Not started | - |
