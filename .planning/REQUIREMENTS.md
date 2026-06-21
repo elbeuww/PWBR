@@ -83,44 +83,46 @@ Reconnus mais différés au-delà de v2.1.
 
 ## Traceability
 
-À compléter par le roadmapper (chaque requirement → exactement une phase).
+Chaque requirement → exactement une phase. Phases 10-14 (numérotation continue après v2.0).
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| BRAND-01 | TBD | Pending |
-| BRAND-02 | TBD | Pending |
-| BRAND-03 | TBD | Pending |
-| BRAND-04 | TBD | Pending |
-| DESIGN-01 | TBD | Pending |
-| DESIGN-02 | TBD | Pending |
-| DESIGN-03 | TBD | Pending |
-| DESIGN-04 | TBD | Pending |
-| DESIGN-05 | TBD | Pending |
-| UI-01 | TBD | Pending |
-| UI-02 | TBD | Pending |
-| UI-03 | TBD | Pending |
-| UI-04 | TBD | Pending |
-| UI-05 | TBD | Pending |
-| UI-06 | TBD | Pending |
-| UI-07 | TBD | Pending |
-| ROUTINE-01 | TBD | Pending |
-| ROUTINE-02 | TBD | Pending |
-| ROUTINE-03 | TBD | Pending |
-| ROUTINE-04 | TBD | Pending |
-| ROUTINE-05 | TBD | Pending |
-| BACKTEST-01 | TBD | Pending |
-| BACKTEST-02 | TBD | Pending |
-| BACKTEST-03 | TBD | Pending |
-| BACKTEST-04 | TBD | Pending |
-| TRACK-04 | TBD | Pending |
-| TRACK-05 | TBD | Pending |
-| TRACK-06 | TBD | Pending |
+| DESIGN-01 | Phase 10 | Pending |
+| DESIGN-02 | Phase 10 | Pending |
+| DESIGN-03 | Phase 10 | Pending |
+| DESIGN-04 | Phase 10 | Pending |
+| DESIGN-05 | Phase 11 | Pending |
+| BRAND-01 | Phase 11 | Pending |
+| BRAND-02 | Phase 11 | Pending |
+| BRAND-03 | Phase 11 | Pending |
+| BRAND-04 | Phase 11 | Pending |
+| UI-01 | Phase 11 | Pending |
+| UI-02 | Phase 11 | Pending |
+| UI-03 | Phase 11 | Pending |
+| UI-04 | Phase 11 | Pending |
+| UI-05 | Phase 11 | Pending |
+| UI-06 | Phase 11 | Pending |
+| UI-07 | Phase 11 | Pending |
+| ROUTINE-01 | Phase 12 | Pending |
+| ROUTINE-02 | Phase 12 | Pending |
+| ROUTINE-03 | Phase 12 | Pending |
+| ROUTINE-04 | Phase 12 | Pending |
+| ROUTINE-05 | Phase 12 | Pending |
+| BACKTEST-01 | Phase 13 | Pending |
+| BACKTEST-02 | Phase 13 | Pending |
+| BACKTEST-03 | Phase 13 | Pending |
+| BACKTEST-04 | Phase 13 | Pending |
+| TRACK-04 | Phase 14 | Pending |
+| TRACK-05 | Phase 14 | Pending |
+| TRACK-06 | Phase 14 | Pending |
 
 **Coverage:**
 - v1 requirements: 28 total
-- Mapped to phases: 0 (en attente du roadmapper)
-- Unmapped: 28 ⚠️
+- Mapped to phases: 28 ✓
+- Unmapped: 0 ✓
+
+Répartition : Phase 10 = 4 (DESIGN-01..04) · Phase 11 = 12 (DESIGN-05 + BRAND-01..04 + UI-01..07) · Phase 12 = 5 (ROUTINE-01..05) · Phase 13 = 4 (BACKTEST-01..04) · Phase 14 = 3 (TRACK-04..06).
 
 ---
 *Requirements defined: 2026-06-21*
-*Last updated: 2026-06-21 after initial definition (milestone v2.1)*
+*Last updated: 2026-06-21 — roadmap créée, 28/28 requirements mappés aux Phases 10-14.*

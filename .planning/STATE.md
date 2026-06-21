@@ -2,11 +2,11 @@
 gsd_state_version: 1.0
 milestone: v2.1
 milestone_name: "Mise en vie : identité NEXA, moteur live & track record"
-status: planning
-last_updated: "2026-06-20T12:42:41.325Z"
-last_activity: 2026-06-20
+status: in_progress
+last_updated: "2026-06-21T00:00:00.000Z"
+last_activity: 2026-06-21
 progress:
-  total_phases: 0
+  total_phases: 5
   completed_phases: 0
   total_plans: 0
   completed_plans: 0
@@ -23,16 +23,16 @@ progress:
 See: .planning/PROJECT.md (mis à jour 2026-06-20 après clôture v2.0)
 
 **Core value:** Produire, pour chaque opportunité, une analyse fiable et explicable — vulgarisée pour un public non technique — avec un % de réussite TOUJOURS mesuré, jamais inventé : c'est le socle de confiance qui fait payer l'abonnement.
-**Current focus:** v2.0 livré — prochain milestone candidat : W5 automatisation (non démarré). Voir Deferred Items pour les vérifs live + dette (WIRING-01, LEGAL-02).
+**Current focus:** v2.1 « Mise en vie » — roadmap créée (5 phases, 10-14 : design NEXA · routines Claude sans API · backtest + track record). Axe design (P10-11) parallélisable contre axes routine+backtest (P12-13). Prochaine action : planifier Phase 10.
 **Mode:** interactive (MVP vertical)
 **Granularity:** fine
 
 ## Current Position
 
-Phase: Not started (defining requirements)
+Phase: Phase 10 — Fondation design system NEXA (not started)
 Plan: —
-Status: Defining requirements
-Last activity: 2026-06-20 — Milestone v2.1 started
+Status: Roadmap v2.1 créée (5 phases, 10-14) — prêt à planifier Phase 10
+Last activity: 2026-06-21 — Roadmap v2.1 créée, 28/28 requirements mappés
 
 ## Deferred Items
 
@@ -105,6 +105,21 @@ ressources externes non provisionnables en session de développement.
 9. CMS cours & articles vulgarisés (CMS-01/02)
 
 **Arêtes critiques :** i18n/rôles avant UI · RLS signaux avant exposition membre · gate légal signé + subscriptions avant encaissement · subscriptions avant affiliation · outcomes avant Telegram & % affiché.
+
+## Roadmap v2.1 (5 phases, 10-14)
+
+10. Fondation design system NEXA — tokens OKLCH + 5 polices + no-flash RTL (DESIGN-01..04)
+11. Composants NEXA, reskin transversal & rebranding — bibliothèque + reskin toutes surfaces + MERA→NEXA + hero + ExpiryBanner (DESIGN-05, BRAND-01..04, UI-01..07)
+12. Routines d'analyse Claude planifiées (sans API) — Environment + schedules day/swing + 1 run réel snapshot→analyze→persist (ROUTINE-01..05)
+13. Backtest catalogue de patterns — migration source AVANT seed + catalogue figé + packages/backtest réutilisant replayOutcome + Wilson (BACKTEST-01..04)
+14. Track record affiché & boucle outcomes en prod — provenance + N visible + bascule N≥30 + outcome-tracker en prod (TRACK-04..06)
+
+**Arêtes critiques v2.1 :**
+- Tokens/thèmes/polices (P10) AVANT composants/reskin (P11) ; no-flash + RTL en fondation.
+- Config Environment + réseau *.supabase.co (P12) AVANT scheduling ; ANALYZE reste agent-native, persist.ts = seule frontière d'écriture IA.
+- Migration source (BACKTEST-01) + catalogue figé (BACKTEST-02) AVANT moteur (BACKTEST-03) et affichage (P14) — inverser corrompt pattern_stats.
+- P14 dépend de P12 (signaux réels) ET P13 (seed backtest).
+- Research flags : P12 (valider réseau Remote A1) · P13 (figer le catalogue de patterns, décision fondateur).
 
 ## Accumulated Context
 
@@ -338,7 +353,9 @@ ressources externes non provisionnables en session de développement.
 
 **Last session (archive):** 2026-06-14 — Completed 02-03-PLAN.md (4 commits : 38c1894 tarifs 9$/3$ + paiement-bientot + funnel signup→paiement-bientot, 86e7001 home bénéfice-first + proof slot masqué, 49ac57e RED no-perf-claims, fa8a5d0 GREEN glob vitest). Cœur conversion de la vitrine livré : home VITR-01, tarifs VITR-02 (USDT TRC-20, D-10/D-11/D-12), funnel honnête D-09, garde no-perf-claims VITR-03/D-08. 15 tests verts, tsc/lint:i18n OK, invariant auth P1 intact. **Phase 02 COMPLETE (3/3 plans).** Stopped at : Plan 02-03 terminé.
 
-**Next action:** Phase 08 COMPLETE (4/4 plans) — ADMIN-03/04 couverts. Lancer la vérification de phase (`/gsd:verify-phase 08`) puis Phase 09 (CMS cours & articles vulgarisés, CMS-01/02). En suspens hérité : Phase 04 (04-03 vetting lib QR B-04-03, 04-02 LIVE apply B-04-02, 04-01 fixture TronGrid B-04-01) ; E2E live-infra (gating ACCESS-03b, affiliation-attribution) restent human-verify.
+**Next action:** Milestone v2.1 — roadmap créée (5 phases, 10-14). Lancer la planification de **Phase 10 (Fondation design system NEXA, DESIGN-01..04)** via `/gsd-execute-phase 10`. Axe design (P10-11) parallélisable contre routine+backtest (P12-13). Research flags à lever au planning : P12 (réseau Remote *.supabase.co, Open Q A1) et P13 (figer le catalogue de patterns — décision fondateur Borhane). Dette héritée v2.0 traitée : WIRING-01/ExpiryBanner → Phase 11 (UI-07). Hors scope v2.1 : LEGAL-02, PAY-AUTO, AFF-AUTO, ENGINE-API.
+
+**Next action (archive):** Phase 08 COMPLETE (4/4 plans) — ADMIN-03/04 couverts. Lancer la vérification de phase (`/gsd:verify-phase 08`) puis Phase 09 (CMS cours & articles vulgarisés, CMS-01/02). En suspens hérité : Phase 04 (04-03 vetting lib QR B-04-03, 04-02 LIVE apply B-04-02, 04-01 fixture TronGrid B-04-01) ; E2E live-infra (gating ACCESS-03b, affiliation-attribution) restent human-verify.
 
 **Next action (archive):** Phase 07 — Plan 07-06 (surfaces `[locale]` trilingues restantes). Surface 1 = formulaire de candidature `[locale]/affiliation` (form react-hook-form + zod, namespace i18n `affiliate.application.*` à parité STRICTE fr/en/ar + RTL, insert via service_role D-08, toast sonner). Surface 3 = dashboard affilié no-PII `[locale]/(affiliate)/dashboard` (rôle affiliate, vue `affiliate_dashboard` security_invoker en lecture RLS seule via @tanstack/react-query, grille 8 paliers + progression, namespaces `affiliate.dashboard.*`/`affiliate.tiers.*`, zéro ligne par filleul D-13). Back-office (surfaces 2 & 4) déjà livré en 07-05 (6cfa967, 6fa809b). Le job mensuel `affiliate-commission` est enregistré au dispatch. affiliate-rls.test.ts (AFF-02) reste à passer GREEN une fois `.env.test` + 2 users seedés disponibles (deferred-items.md). En suspens Phase 04 : 04-03 vetting lib QR B-04-03, 04-02 LIVE apply B-04-02, 04-01 fixture TronGrid B-04-01. Phase 06 : 06-02 (job grammy) / 06-03 (threat verify graphe packages).
 
@@ -355,7 +372,7 @@ ressources externes non provisionnables en session de développement.
 **Next action (archive):** Phase 04 — Plan 04-01 PARTIEL, **bloqué au checkpoint réseau B-04-01**. Étape humaine requise (ops) : provisionner une clé TronGrid + frapper une vraie TX USDT-test Nile et coller la réponse dans `packages/data-sources/src/trongrid/__fixtures__/nile-trc20-transfer.json`, confirmer A1-A7 dans `GOLDEN.md`. Tant que ce checkpoint n'est pas franchi, le Plan 04 (parseur Zod TronGrid) reste bloqué ; les briques déterministes atomic.ts + address.ts sont déjà livrées et golden-testées. Ne pas marquer 04-01 complet avant la fixture réelle.
 
 ---
-*State updated: 2026-06-14 — milestone v2.0, roadmap 9 phases créée. Cœur analytique v1.0 (P1-4) livré et archivé, sert de socle.*
+*State updated: 2026-06-21 — milestone v2.1 « Mise en vie », roadmap 5 phases (10-14) créée, 28/28 requirements mappés. Numérotation continue après v2.0 (clôturé phase 9).*
 
 ## Operator Next Steps
 
