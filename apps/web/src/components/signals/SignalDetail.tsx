@@ -69,9 +69,11 @@ export function SignalDetail({ setup, locale }: SignalDetailProps) {
   const isLong = p.direction === 'long'
 
   // Color law D-03 : direction = vert/rouge ; score = NEUTRE.
+  // Tokens flip-safe (--signal-bullish/bearish) — alignés sur SignalCard/CandleChart (11-03),
+  // jamais de HEX ni de variante dark: manuelle (les tokens flippent via :root/.dark).
   const directionClass = isLong
-    ? 'text-[#15803D] dark:text-[#22C55E]'
-    : 'text-[#B91C1C] dark:text-[#EF4444]'
+    ? 'text-[var(--signal-bullish)]'
+    : 'text-[var(--signal-bearish)]'
 
   const newsHeadlines = p.news_catalysts.map((n) => n.headline)
 
@@ -109,7 +111,7 @@ export function SignalDetail({ setup, locale }: SignalDetailProps) {
           </div>
           <div>
             <dt className="text-muted-foreground">{t('stopLoss')}</dt>
-            <dd className="font-semibold tabular-nums text-[#B91C1C] dark:text-[#EF4444]">
+            <dd className="font-semibold tabular-nums text-[var(--signal-bearish)]">
               <bdi>{formatPrice(p.stop_loss, precision, locale)}</bdi>
             </dd>
           </div>
@@ -118,7 +120,7 @@ export function SignalDetail({ setup, locale }: SignalDetailProps) {
               <dt className="text-muted-foreground">
                 {t('takeProfit')} {i + 1}
               </dt>
-              <dd className="font-semibold tabular-nums text-[#15803D] dark:text-[#22C55E]">
+              <dd className="font-semibold tabular-nums text-[var(--signal-bullish)]">
                 <bdi>{formatPrice(tp.price, precision, locale)}</bdi>
               </dd>
             </div>
