@@ -41,6 +41,11 @@ export default defineConfig({
       'apps/web/test/**/*.test.ts',
       'apps/web/src/lib/**/*.test.ts',
       'apps/jobs/src/**/*.test.ts',
+      // Phase 10 Wave-0 (DECISION 10-01 voie A) : parité/sécurité du glob — les 3
+      // tests fondation vivent sous apps/web/src/styles/__tests__/ (déjà couvert par
+      // 'apps/**/__tests__/**'), mais on élargit aussi le top-level apps/web/tests/
+      // pour toute future parité Vitest (les .spec.ts Playwright y restent inchangés).
+      'apps/web/tests/**/*.test.ts',
     ],
     globals: false,
   },
