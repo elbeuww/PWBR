@@ -410,5 +410,18 @@
       "mt5": "MT5",
       "autre": "Other"
     }
+  },
+  "marquee": {
+    "label": "Markets covered and trading sessions",
+    "items": [
+      "Forex",
+      "Crypto",
+      "Gold & metals",
+      "Energy",
+      "Tokyo session",
+      "London session",
+      "New York session",
+      "Day & Swing analysis"
+    ]
   }
 }

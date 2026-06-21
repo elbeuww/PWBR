@@ -605,5 +605,18 @@
       "mt5": "MT5",
       "autre": "Autre"
     }
+  },
+  "marquee": {
+    "label": "Marchés couverts et sessions de cotation",
+    "items": [
+      "Forex",
+      "Crypto",
+      "Or & métaux",
+      "Énergie",
+      "Session de Tokyo",
+      "Session de Londres",
+      "Session de New York",
+      "Analyse Day & Swing"
+    ]
   }
 }
