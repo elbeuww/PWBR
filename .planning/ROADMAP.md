@@ -68,7 +68,7 @@ Détail complet archivé : `.planning/milestones/v2.0-ROADMAP.md`.
 - [x] 11-04-PLAN.md — Bibliothèque NEXA : Eyebrow, ScoreRing, Marquee, ConfidenceStat, Logo (DESIGN-05/BRAND-03)
 - [x] 11-05-PLAN.md — Rebranding + assets : Logo header/footer + metadata/OG/icon + MERA→NEXA + baseline (BRAND-01/02/03)
 - [ ] 11-06-PLAN.md — Reskin membre : liste + détail trade + ScoreRing, RLS préservé (UI-03)
-- [ ] 11-07-PLAN.md — Hero animé CSS/vanilla TS : globe + cartes + data-rain + tilt, reduced-motion (UI-02)
+- [x] 11-07-PLAN.md — Hero animé CSS/vanilla TS : globe + cartes + data-rain + tilt, reduced-motion (UI-02)
 - [ ] 11-08-PLAN.md — Reskin transversal (vitrine/académie/auth/compte/admin) + ExpiryBanner abonnement + gate E2E (UI-01/04/05/06/07)
 **UI hint** : yes
 **Notes** : Axe design (parallélisable contre Phases 12-13). Adresse Pitfall P7 (promesse de gain visuelle). Reskin = swap de tokens + nouveaux primitifs NEXA, jamais migration du fetch RLS vers le client (Anti-Pattern 3). CandleChart recoloré via l'API JS lwc (Anti-Pattern 5). Conserver `data-testid`/rôles ARIA des spec files E2E. **Divergence ROADMAP « 6 spec files » tranchée : 5 specs existent (i18n, affiliation-attribution, gating, auth, academie) — la note « 6 » est une coquille ; les 5 sont préservés, aucune 6e créée (plan 11-08).**
@@ -124,7 +124,7 @@ Détail complet archivé : `.planning/milestones/v2.0-ROADMAP.md`.
 | 8. Superadmin consolidé | v2.0 | 4/4 | Complete | 2026-06-19 |
 | 9. CMS cours & articles | v2.0 | 5/5 | Complete | 2026-06-20 |
 | 10. Fondation design system NEXA | v2.1 | 3/3 | Complete   | 2026-06-21 |
-| 11. Composants NEXA & reskin transversal | v2.1 | 5/8 | In Progress|  |
+| 11. Composants NEXA & reskin transversal | v2.1 | 6/8 | In Progress|  |
 | 12. Routines d'analyse Claude (sans API) | v2.1 | 0/? | Not started | - |
 | 13. Backtest catalogue de patterns | v2.1 | 0/? | Not started | - |
 | 14. Track record affiché & boucle prod | v2.1 | 0/? | Not started | - |
