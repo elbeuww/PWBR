@@ -20,7 +20,7 @@ import { LanguageSwitcher } from '../../components/LanguageSwitcher'
 import { ThemeProvider } from '../../components/ThemeProvider'
 import { ThemeToggle } from '../../components/ThemeToggle'
 import { Footer } from '../../components/Footer'
-import { inter, ibmPlexArabic } from '../../lib/fonts'
+import { archivo, spaceGrotesk, jetbrainsMono, chakraPetch, notoArabic } from '../../lib/fonts'
 import '../../styles/globals.css'
 
 export function generateStaticParams() {
@@ -49,7 +49,7 @@ export default async function LocaleLayout({
       dir={locale === 'ar' ? 'rtl' : 'ltr'}
       suppressHydrationWarning
     >
-      <body className={`${inter.variable} ${ibmPlexArabic.variable}`}>
+      <body className={[archivo, spaceGrotesk, jetbrainsMono, chakraPetch, notoArabic].map((f) => f.variable).join(' ')}>
         <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
           <NextIntlClientProvider messages={messages}>
             <header className="flex h-14 items-center justify-between bg-secondary px-4 md:px-6">
