@@ -165,7 +165,7 @@ export function LanguageSwitcher() {
         aria-label={t('label')}
         onClick={() => (open ? closeMenu(false) : openMenu())}
         onKeyDown={onTriggerKeyDown}
-        className="inline-flex min-h-11 min-w-11 items-center gap-2 rounded-md px-3 py-2 text-sm font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2563EB]"
+        className="inline-flex min-h-11 min-w-11 items-center gap-2 rounded-md px-3 py-2 text-sm font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
       >
         <GlobeIcon />
         <span>{t(activeLocale)}</span>
@@ -180,7 +180,7 @@ export function LanguageSwitcher() {
           aria-activedescendant={`${listboxId}-${LOCALES[focusIndex]}`}
           tabIndex={-1}
           onKeyDown={onListKeyDown}
-          className="absolute end-0 z-10 mt-1 min-w-40 rounded-md border border-black/10 bg-white py-1 shadow-md"
+          className="absolute end-0 z-10 mt-1 min-w-40 rounded-md border border-border bg-popover py-1 shadow-md"
         >
           {LOCALES.map((locale, index) => {
             const isActive = locale === activeLocale
@@ -197,7 +197,7 @@ export function LanguageSwitcher() {
                 tabIndex={-1}
                 onClick={() => select(locale)}
                 onFocus={() => setFocusIndex(index)}
-                className="flex cursor-pointer items-center gap-2 px-3 py-2 text-start text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#2563EB] data-[active=true]:font-semibold"
+                className="flex cursor-pointer items-center gap-2 px-3 py-2 text-start text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring data-[active=true]:font-semibold"
                 data-active={isActive}
               >
                 {t(locale)}
