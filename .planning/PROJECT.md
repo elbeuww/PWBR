@@ -22,7 +22,27 @@ L'IA se comporte comme un trader vétéran (50 ans d'expérience). L'analyse cha
 
 Produire, pour chaque opportunité, une analyse fiable et explicable — score /100 + niveau de risque + plan de trade (entrée/SL/TP/R:R/levier) — vulgarisée pour un public non technique. Si tout le reste échoue, **la qualité et la traçabilité de l'analyse d'un trade** doit fonctionner : le % de réussite affiché est toujours mesuré, jamais inventé — c'est le socle de confiance qui fait payer l'abonnement.
 
-## Current Milestone: v2.1 — Mise en vie : identité NEXA, moteur live & track record
+## Current Milestone: v3.0 — Plateforme complète sous identité dark néon NEXA
+
+**Goal :** Faire de NEXA une plateforme pleinement fonctionnelle et scalable (dizaines de milliers d'utilisateurs), unifiée sous l'identité **dark néon** de la landing, avec **dashboards utilisateur et superadmin** complets, construite sur **données seedées** (branchement des vraies API/signaux/paiement reporté).
+
+**Target features :**
+- **Design system v3 « dark néon unique »** : promotion de l'identité de la landing (composants `.nxl`, thème volt/green OKLCH) en design system **global**, thème **dark unique**, en remplacement du DS NEXA light/dark institutionnel des phases 10-11. Polices conservées (Archivo / Chakra Petch / Space Grotesk / JetBrains Mono / Noto Sans Arabic).
+- **Reskin de TOUTES les pages existantes** sur ce nouveau DS (vitrine, légal, auth, espace membre signaux/détail, paiement, compte/abonnement, académie/CMS, admin).
+- **Dashboard utilisateur** complet (vue d'ensemble, signaux suivis, abonnement, affiliation).
+- **Dashboard superadmin** complet/refondu (pilotage signaux, santé système, affiliés, paiements, utilisateurs).
+- **Tests fonctionnels E2E** des flux principaux.
+- **Robustesse & scalabilité DB pour 10k+ users** : audit approfondi (indexes ciblés + EXPLAIN sur requêtes clés, RLS perf via helpers security-definer, pagination/curseurs, Supabase advisors, pooler/pgBouncer, limites Realtime). PAS de test de charge réel dans ce milestone.
+
+**Key context :**
+- **v2.1 mis en pause** : phases 12 (routines d'analyse Claude), 13 (backtest catalogue), 14 (track record prod) **reportées** — elles dépendent des données réelles (« on ajustera les API demain »).
+- L'identité dark néon **remplace assumément** le DS NEXA light/dark des phases 10-11 (refonte produit voulue par le fondateur, 2026-06-22).
+- **Données seedées** réalistes ; aucun branchement API/paiement/signaux réels dans ce milestone.
+- **Scalabilité = conception + audit DB** (pas de test de charge réel).
+- Contraintes conservées : RLS stricte · % TOUJOURS mesuré jamais inventé (VITR-03) · aucune promesse de gain · i18n fr/en/ar + RTL · garde no-mera-brand.
+- **Hors scope** : moteur live (phase 12), LEGAL-02 (sign-off juriste), vérifs live différées v2.0.
+
+## Paused Milestone: v2.1 — Mise en vie : identité NEXA, moteur live & track record (phases 10-11 livrées, 12-14 reportées)
 
 **Goal :** Donner à la plateforme son identité visuelle réelle (design **NEXA** sur toute l'app), activer le moteur d'analyse en **routines Claude planifiées sans clé API** (day + swing, timing choisi par le moteur), et rendre le **track record affichable dès le lancement** (backtest du catalogue de patterns + boucle d'outcomes en prod).
 
@@ -164,6 +184,8 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-06-20 — démarrage du milestone **v2.1 « Mise en vie : identité NEXA, moteur live & track record »** (3 axes : design NEXA toute l'app · routines d'analyse Claude sans API · backtest + track record en prod). Requirements + roadmap en cours de définition.*
+*Last updated: 2026-06-22 — démarrage du milestone **v3.0 « Plateforme complète sous identité dark néon NEXA »** (design system dark unique · reskin toutes pages · dashboards utilisateur & superadmin · tests E2E · scalabilité DB 10k+ users, sur données seedées). v2.1 mis en pause (phases 10-11 livrées, 12-14 reportées car dépendantes des données réelles). Requirements + roadmap en cours de définition.*
+
+*Précédent : 2026-06-20 — démarrage du milestone **v2.1 « Mise en vie : identité NEXA, moteur live & track record »** (3 axes : design NEXA toute l'app · routines d'analyse Claude sans API · backtest + track record en prod). Phases 10-11 livrées ; 12-14 reportées à la reprise du moteur live.*
 
 *Précédent : 2026-06-20 après clôture du milestone v2.0 « Plateforme publique ». Les 9 phases sont livrées et réconciliées dans « Validated » (P1-P9 v2.0 + cœur v1.0 P1-4). Vérification automatisée 100 % verte (Vitest 566 ✓, typecheck 0) ; P01 + P09 live-vérifiés (E2E 32 ✓, bug i18n localeDetection corrigé au passage). Items live différés (P02-P08 + UAT P02/P03) et dette explicite (WIRING-01, LEGAL-02) consignés dans `STATE.md → Deferred Items`. Roadmap collapsée ; détail v2.0 archivé `.planning/milestones/v2.0-ROADMAP.md`. Prochain milestone candidat : W5 automatisation.*
