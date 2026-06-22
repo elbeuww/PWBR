@@ -1,8 +1,10 @@
 # Deferred Items — Phase 15
 
+> **STATUS UPDATE (orchestrator, 2026-06-22):** The item below was RESOLVED **within Phase 15 by Plan 15-03**, not deferred to Phase 16. 15-03 tokenized `LanguageSwitcher.tsx` (`ring-[#2563EB]`→`ring-ring`) and all admin/affiliation palette utilities; `theme-scan.test.ts` is now GREEN (5/5). The note below is kept for historical context only — no Phase 16 action required for THEME-02.
+
 ## From Plan 15-02 (executor, 2026-06-22)
 
-### theme-scan.test.ts (THEME-02 RED gate) — RESOLVED BY PHASE 16, not 15-02
+### theme-scan.test.ts (THEME-02 RED gate) — ~~RESOLVED BY PHASE 16, not 15-02~~ (superseded: resolved by Plan 15-03)
 
 `apps/web/src/styles/__tests__/theme-scan.test.ts` (authored RED in 15-01, commit 29d3e46)
 fails 2 of its assertions. The offending files are NOT in plan 15-02's `files_modified`
