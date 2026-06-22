@@ -1,14 +1,14 @@
 import { getTranslations, getLocale } from 'next-intl/server'
 
 import { Link } from '../../i18n/navigation'
-import { MeraEffects } from './MeraEffects'
+import { NexaLandingEffects } from './NexaLandingEffects'
 
 /**
- * MeraLanding — vitrine NEXA, port FIDÈLE de la maquette (design borhane).
+ * NexaLanding — vitrine NEXA, port FIDÈLE de la maquette (design borhane).
  *
  * Rendu RSC du markup sombre premium (nav, hero globe + data-rain + cartes, marquee,
  * étapes sticky, jauge, carte démo tilt, pricing, Telegram, footer), scopé sous
- * `.mera` (mera.css). Texte 100% i18n next-intl (fr/en/ar). Animations = MeraEffects
+ * `.nxl` (nxl.css). Texte 100% i18n next-intl (fr/en/ar). Animations = NexaLandingEffects
  * (vanilla, reduced-motion). Marque NEXA, aucune promesse de gain, % jamais inventé
  * (rings colorés par RISQUE, jauge = score d'exemple, pas un taux de réussite).
  */
@@ -24,7 +24,7 @@ const RISK_STROKE: Record<string, string> = {
 function Ring({ score, risk, ariaLabel }: { score: number; risk: string; ariaLabel: string }) {
   const dash = (Math.max(0, Math.min(100, score)) / 100) * RING_C
   return (
-    <div className="ring" role="meter" aria-valuenow={score} aria-valuemin={0} aria-valuemax={100} aria-label={ariaLabel}>
+    <div className="score-ring" role="meter" aria-valuenow={score} aria-valuemin={0} aria-valuemax={100} aria-label={ariaLabel}>
       <svg width={46} height={46} viewBox="0 0 46 46" aria-hidden>
         <circle className="rt" cx={23} cy={23} r={18} />
         <circle className="rv" cx={23} cy={23} r={18} stroke={RISK_STROKE[risk] ?? 'var(--sub)'} strokeDasharray={`${dash.toFixed(1)} ${RING_C.toFixed(1)}`} />
@@ -41,7 +41,7 @@ const BRAND_SVG = (
   </svg>
 )
 
-export async function MeraLanding() {
+export async function NexaLanding() {
   const locale = await getLocale()
   const [tNav, tHero, tH, tHow, tScore, tDemo, tPrice, tPricing, tTg, tFoot, tMarquee, tScoreRing] = await Promise.all([
     getTranslations('landing.nav'), getTranslations('landing.hero'), getTranslations('hero'),
@@ -55,14 +55,14 @@ export async function MeraLanding() {
   const langs: Array<[string, string]> = [['fr', 'FR'], ['en', 'EN'], ['ar', 'AR']]
 
   return (
-    <div className="mera" data-theme="volt">
-      <MeraEffects />
-      <div className="mera-progress" aria-hidden />
+    <div className="nxl" data-theme="volt">
+      <NexaLandingEffects />
+      <div className="nxl-progress" aria-hidden />
 
       {/* NAV */}
       <nav className="nx-nav">
         <div className="wrap nav-inner">
-          <a className="brand" href="#top"><span className="mark-tile">{BRAND_SVG}</span><span className="word">NEX<b>A</b></span></a>
+          <a className="brand" href="#top"><span className="mark-tile">{BRAND_SVG}</span><span className="word">NEX<b>A</b></span></a>{/* i18n-ignore autonyme marque NEXA */}
           <div className="nav-links">
             <a href="#how">{tNav('how')}</a>
             <a href="#score">{tNav('score')}</a>
@@ -81,9 +81,9 @@ export async function MeraLanding() {
       </nav>
 
       {/* THEME TOGGLE */}
-      <div className="mera-theme-toggle" aria-label="Green / Volt">
-        <button type="button" data-theme="green" data-active="0">Green</button>
-        <button type="button" data-theme="volt" data-active="1">Volt</button>
+      <div className="nxl-theme-toggle" aria-label="Green / Volt">{/* i18n-ignore noms de thème (identité couleur) */}
+        <button type="button" data-theme="green" data-active="0">Green</button>{/* i18n-ignore */}
+        <button type="button" data-theme="volt" data-active="1">Volt</button>{/* i18n-ignore */}
       </div>
 
       {/* HERO */}
@@ -281,7 +281,7 @@ export async function MeraLanding() {
         <div className="wrap">
           <div className="foot-grid">
             <div>
-              <a className="brand" href="#top"><span className="mark-tile">{BRAND_SVG}</span><span className="word">NEX<b>A</b></span></a>
+              <a className="brand" href="#top"><span className="mark-tile">{BRAND_SVG}</span><span className="word">NEX<b>A</b></span></a>{/* i18n-ignore autonyme marque NEXA */}
               <p style={{ color: 'var(--sub)', fontSize: 14, maxInlineSize: '32ch', marginBlockStart: 14 }}>{tFoot('tag')}</p>
             </div>
             <div className="foot-links">

@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="volt" dir="ltr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>MERA — Make Everybody Rich Again</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=Chakra+Petch:wght@600;700&family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@500;600;700&family=Noto+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="landing.css" />
+</head>
+<body>
+<div id="progress"></div>
+
+<!-- NAV -->
+<nav>
+  <div class="wrap nav-inner">
+    <a class="brand" href="#top">
+      <span class="mark-tile"><svg width="18" height="18" viewBox="0 0 30 30" fill="none" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 19l5-6 4 4 9-11"/><path d="M24 6v6h-6"/></svg></span>
+      <span class="word">MER<b>A</b></span>
+    </a>
+    <div class="nav-links">
+      <a href="#how" data-i18n="nav_how">Comment ça marche</a>
+      <a href="#score" data-i18n="nav_score">Le score</a>
+      <a href="#pricing" data-i18n="nav_pricing">Tarifs</a>
+      <a href="#telegram" data-i18n="nav_tg">Telegram</a>
+    </div>
+    <div class="nav-spacer"></div>
+    <div class="lang-switch">
+      <button data-lang="fr" data-active="1">FR</button>
+      <button data-lang="en" data-active="0">EN</button>
+      <button data-lang="ar" data-active="0">AR</button>
+    </div>
+    <a class="btn btn-ghost btn-sm" href="#pricing" data-i18n="nav_login">Se connecter</a>
+    <a class="btn btn-primary btn-sm" href="#pricing" data-i18n="nav_start">Commencer</a>
+  </div>
+</nav>
+
+<!-- THEME TOGGLE -->
+<div id="theme-toggle" aria-label="Univers de marque">
+  <button data-theme="green" data-active="0">Green</button>
+  <button data-theme="volt" data-active="1">Volt</button>
+</div>
+
+<!-- HERO -->
+<header class="hero" id="top">
+  <div class="hero-aura"></div>
+  <div class="hero-grid"></div>
+  <div class="wrap hero-inner">
+    <div class="hero-copy">
+      <span class="eyebrow"><span class="dot"></span><span data-i18n="hero_eyebrow">Plateforme d'analyse &amp; signaux · MENA</span></span>
+      <h1>Make<br />Everybody<br /><span class="accent">Rich</span> Again</h1>
+      <p class="lede" data-i18n="hero_lede">Des signaux de trade complets — entrée, stop, objectifs, score sur 100 — expliqués simplement. Notre IA analyse la crypto et le forex 24&nbsp;h/24. Toi, tu décides.</p>
+      <div class="hero-cta">
+        <a class="btn btn-primary" href="#pricing" data-i18n="hero_cta1">Commencer · 3 $/mois</a>
+        <a class="btn btn-ghost" href="#how" data-i18n="hero_cta2">Comment ça marche</a>
+      </div>
+      <div class="hero-trust">
+        <div class="stat"><div class="n"><span data-count="73" data-suffix="%">0%</span></div><div class="l" data-i18n="trust1_l">Taux de réussite mesuré</div></div>
+        <div class="stat"><div class="n">24/7</div><div class="l" data-i18n="trust2_l">Marchés analysés</div></div>
+        <div class="stat"><div class="n">AR · EN · FR</div><div class="l" data-i18n="trust3_l">Trilingue</div></div>
+      </div>
+    </div>
+
+    <!-- 3D SCENE : globe + chiffres de bourse -->
+    <div class="scene">
+      <div class="data-rain" id="dataRain"></div>
+      <div class="globe-wrap layer" data-depth="0.35"><div class="atmo"></div><div class="globe"></div></div>
+      <div class="layer float-card" data-depth="1.6" style="top:4%; left:-5%; z-index:3;">
+        <div class="fc-top"><span class="fc-sym">BTC/USD</span><span class="fc-dir buy" data-i18n="dir_buy">Achat</span></div>
+        <div style="display:flex; align-items:center; gap:12px; margin-top:6px;">
+          <div class="fc-score" style="color:oklch(0.74 0.16 147)">92</div>
+          <div class="ring"><svg width="46" height="46" viewBox="0 0 46 46"><circle class="rt" cx="23" cy="23" r="18"/><circle class="rv" cx="23" cy="23" r="18" stroke="oklch(0.74 0.16 147)" stroke-dasharray="104 113"/></svg><div class="rn" style="color:oklch(0.74 0.16 147)">92</div></div>
+        </div>
+      </div>
+      <div class="layer float-card" data-depth="2.1" style="bottom:6%; right:-7%; z-index:3;">
+        <div class="fc-top"><span class="fc-sym">EUR/USD</span><span class="fc-dir sell" data-i18n="dir_sell">Vente</span></div>
+        <div style="display:flex; align-items:center; gap:12px; margin-top:6px;">
+          <div class="fc-score" style="color:oklch(0.74 0.16 110)">64</div>
+          <div class="ring"><svg width="46" height="46" viewBox="0 0 46 46"><circle class="rt" cx="23" cy="23" r="18"/><circle class="rv" cx="23" cy="23" r="18" stroke="oklch(0.74 0.16 110)" stroke-dasharray="72 113"/></svg><div class="rn" style="color:oklch(0.74 0.16 110)">64</div></div>
+        </div>
+      </div>
+      <div class="layer" data-depth="2.6" style="top:64%; left:0%; z-index:3; font-family:var(--mono); font-size:12px; color:var(--sub); background:var(--surface-solid); border:1px solid var(--line); border-radius:9px; padding:8px 12px;">
+        XAU/USD&nbsp; <span style="color:var(--buy)">▲ 84</span>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- MARQUEE -->
+<div class="marquee">
+  <div class="marquee-track">
+    <span class="tick"><b>BTC/USD</b> <span class="up">▲ 2.4%</span></span>
+    <span class="tick"><b>ETH/USD</b> <span class="up">▲ 1.1%</span></span>
+    <span class="tick"><b>XAU/USD</b> <span class="up">▲ 0.6%</span></span>
+    <span class="tick"><b>EUR/USD</b> <span class="down">▼ 0.3%</span></span>
+    <span class="tick"><b>SOL/USD</b> <span class="up">▲ 4.2%</span></span>
+    <span class="tick"><b>WTI/USD</b> <span class="down">▼ 1.2%</span></span>
+    <span class="tick"><b>XAG/USD</b> <span class="up">▲ 0.8%</span></span>
+    <span class="tick"><b>BNB/USD</b> <span class="down">▼ 0.5%</span></span>
+    <span class="tick"><b>BTC/USD</b> <span class="up">▲ 2.4%</span></span>
+    <span class="tick"><b>ETH/USD</b> <span class="up">▲ 1.1%</span></span>
+    <span class="tick"><b>XAU/USD</b> <span class="up">▲ 0.6%</span></span>
+    <span class="tick"><b>EUR/USD</b> <span class="down">▼ 0.3%</span></span>
+    <span class="tick"><b>SOL/USD</b> <span class="up">▲ 4.2%</span></span>
+    <span class="tick"><b>WTI/USD</b> <span class="down">▼ 1.2%</span></span>
+    <span class="tick"><b>XAG/USD</b> <span class="up">▲ 0.8%</span></span>
+    <span class="tick"><b>BNB/USD</b> <span class="down">▼ 0.5%</span></span>
+  </div>
+</div>
+
+<!-- HOW -->
+<section class="block" id="how">
+  <div class="wrap">
+    <div class="reveal">
+      <div class="sec-eyebrow" data-i18n="how_eyebrow">Comment ça marche</div>
+      <h2 class="sec-title" data-i18n="how_title">Trois étapes,<br />zéro jargon</h2>
+      <p class="sec-lede" data-i18n="how_lede">Pensé pour les débutants comme pour les confirmés. On vulgarise tout — mais on montre aussi le détail à qui veut comprendre.</p>
+    </div>
+    <div class="steps" style="margin-top:56px;">
+      <div class="steps-sticky reveal d1">
+        <div class="mock tilt" data-tilt="6">
+          <div style="font-family:var(--mono); font-size:11px; letter-spacing:.1em; text-transform:uppercase; color:var(--mute); margin-bottom:10px;" data-i18n="mock_live">Signaux en direct</div>
+          <div class="mock-row">
+            <div><div class="mock-sym">BTC/USD</div><div class="mock-sub" data-i18n="mock_btc">Achat · 4H · Day</div></div>
+            <div class="ring"><svg width="46" height="46" viewBox="0 0 46 46"><circle class="rt" cx="23" cy="23" r="18"/><circle class="rv" cx="23" cy="23" r="18" stroke="oklch(0.74 0.16 147)" stroke-dasharray="104 113"/></svg><div class="rn" style="color:oklch(0.74 0.16 147)">92</div></div>
+          </div>
+          <div class="mock-row">
+            <div><div class="mock-sym">XAU/USD</div><div class="mock-sub" data-i18n="mock_xau">Achat · 1D · Swing</div></div>
+            <div class="ring"><svg width="46" height="46" viewBox="0 0 46 46"><circle class="rt" cx="23" cy="23" r="18"/><circle class="rv" cx="23" cy="23" r="18" stroke="oklch(0.74 0.16 134)" stroke-dasharray="95 113"/></svg><div class="rn" style="color:oklch(0.74 0.16 134)">84</div></div>
+          </div>
+          <div class="mock-row">
+            <div><div class="mock-sym">EUR/USD</div><div class="mock-sub" data-i18n="mock_eur">Vente · 1H · Day</div></div>
+            <div class="ring"><svg width="46" height="46" viewBox="0 0 46 46"><circle class="rt" cx="23" cy="23" r="18"/><circle class="rv" cx="23" cy="23" r="18" stroke="oklch(0.74 0.16 110)" stroke-dasharray="72 113"/></svg><div class="rn" style="color:oklch(0.74 0.16 110)">64</div></div>
+          </div>
+        </div>
+      </div>
+      <div class="steps-list">
+        <div class="step reveal"><div class="num">01</div><h3 data-i18n="step1_t">L'IA analyse en continu</h3><p data-i18n="step1_p">Crypto, forex, or, argent, pétrole — analysés 24&nbsp;h/24 par un moteur qui raisonne comme un trader vétéran. Les chiffres sont calculés en code, jamais inventés.</p></div>
+        <div class="step reveal"><div class="num">02</div><h3 data-i18n="step2_t">Chaque opportunité notée /100</h3><p data-i18n="step2_p">Un score d'opportunité, un niveau de risque, et le plan de trade complet : zone d'entrée, stop-loss, objectifs (TP1·2·3) et levier suggéré.</p></div>
+        <div class="step reveal"><div class="num">03</div><h3 data-i18n="step3_t">Tu reçois, expliqué simplement</h3><p data-i18n="step3_p">D'abord le « pourquoi » en clair. Puis l'analyse approfondie — technique, fondamentale, actualités — pour qui veut creuser. Tu gardes la décision.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SCORE -->
+<section class="block" id="score" style="background:var(--bg2); border-top:1px solid var(--line-soft); border-bottom:1px solid var(--line-soft);">
+  <div class="wrap score-feature">
+    <div class="reveal">
+      <div class="gauge-big" data-score="92">
+        <svg width="280" height="280" viewBox="0 0 100 100">
+          <circle class="gt" cx="50" cy="50" r="43"></circle>
+          <circle class="gv" cx="50" cy="50" r="43" stroke="oklch(0.74 0.16 147)" stroke-dasharray="0 270"></circle>
+        </svg>
+        <div class="center"><div class="gnum" style="color:oklch(0.74 0.16 147)">92</div><div class="glbl" data-i18n="score_lbl">Score / 100</div></div>
+      </div>
+    </div>
+    <div class="reveal d1">
+      <div class="sec-eyebrow" data-i18n="score_eyebrow">Le score de réussite</div>
+      <h2 class="sec-title" data-i18n="score_title">Un chiffre<br />que tu peux croire</h2>
+      <p class="sec-lede" data-i18n="score_lede">Chaque signal porte une note de 0 à 100 et un pourcentage de réussite. Ce pourcentage est <b style="color:var(--text)">mesuré par notre backtest</b> — jamais affirmé sans preuve. Avec le temps, c'est le track record réel de la plateforme qui s'affiche.</p>
+      <div style="display:flex; gap:30px; margin-top:30px; flex-wrap:wrap;">
+        <div><div style="font-family:var(--mono); font-weight:700; font-size:34px; color:var(--primary)"><span data-count="73" data-suffix="%">0%</span></div><div style="color:var(--sub); font-size:13.5px; margin-top:2px;" data-i18n="score_s1l">réussite mesurée</div></div>
+        <div><div style="font-family:var(--mono); font-weight:700; font-size:34px;"><span data-count="12">0</span></div><div style="color:var(--sub); font-size:13.5px; margin-top:2px;" data-i18n="score_s2l">instruments suivis</div></div>
+        <div><div style="font-family:var(--mono); font-weight:700; font-size:34px;">2</div><div style="color:var(--sub); font-size:13.5px; margin-top:2px;" data-i18n="score_s3l">styles · Day &amp; Swing</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SIGNAL DEMO -->
+<section class="block">
+  <div class="wrap">
+    <div class="reveal" style="text-align:center; max-width:620px; margin:0 auto 44px;">
+      <div class="sec-eyebrow" data-i18n="demo_eyebrow">Un exemple concret</div>
+      <h2 class="sec-title" data-i18n="demo_title">Tout, sur une carte</h2>
+    </div>
+    <div class="reveal d1" style="max-width:680px; margin:0 auto;">
+      <div class="signal-demo tilt" data-tilt="7">
+        <div class="sd-head">
+          <div style="display:flex; align-items:center; gap:13px;">
+            <div style="width:42px; height:42px; border-radius:11px; background:var(--surface); border:1px solid var(--line); display:flex; align-items:center; justify-content:center; font-size:18px; color:var(--sub);">◈</div>
+            <div>
+              <div style="font-weight:600; font-size:19px;">BTC/USD</div>
+              <div style="font-family:var(--mono); font-size:11px; letter-spacing:.06em; text-transform:uppercase; color:var(--mute); margin-top:2px;">Binance · 4H · Day</div>
+            </div>
+          </div>
+          <div style="display:flex; align-items:center; gap:14px;">
+            <span class="fc-dir buy" style="font-size:11px; padding:6px 11px;" data-i18n="dir_buy">Achat</span>
+            <div class="ring" style="width:54px; height:54px;"><svg width="54" height="54" viewBox="0 0 46 46"><circle class="rt" cx="23" cy="23" r="18"/><circle class="rv" cx="23" cy="23" r="18" stroke="oklch(0.74 0.16 147)" stroke-dasharray="104 113"/></svg><div class="rn" style="color:oklch(0.74 0.16 147); font-size:15px;">92</div></div>
+          </div>
+        </div>
+        <div style="font-size:13.5px; color:var(--sub); margin-top:14px;" data-i18n="demo_sub">Cassure de range haussière · réussite mesurée 74 %</div>
+        <div class="sd-levels">
+          <div><div class="k" data-i18n="k_entry">Entrée</div><div class="v">64,820</div></div>
+          <div><div class="k" data-i18n="k_stop">Stop</div><div class="v" style="color:var(--sell)">62,400</div></div>
+          <div><div class="k">TP1·2·3</div><div class="v" style="color:var(--buy)">66.5k+</div></div>
+          <div><div class="k" data-i18n="demo_k4">Levier</div><div class="v" style="color:var(--primary)">x3</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section class="block" id="pricing" style="background:var(--bg2); border-top:1px solid var(--line-soft);">
+  <div class="wrap">
+    <div class="reveal" style="text-align:center; max-width:600px; margin:0 auto;">
+      <div class="sec-eyebrow" data-i18n="price_eyebrow">Tarifs · payé en USDT</div>
+      <h2 class="sec-title" data-i18n="price_title">Commence pour 3 $</h2>
+      <p class="sec-lede" style="margin:16px auto 0;" data-i18n="price_lede">Sans carte bancaire. Paiement en USDT, activation automatique, annulable à tout moment.</p>
+    </div>
+    <div class="price-grid">
+      <div class="price-card tilt reveal d1" data-tilt="5">
+        <div class="price-name" data-i18n="p1_name">Découverte</div>
+        <div class="price-amt">3 $<small> <span data-i18n="p_per">/ mois</span></small></div>
+        <div class="price-usdt" data-i18n="p1_usdt">≈ 3 USDT · pour tester la plateforme</div>
+        <ul class="price-feats">
+          <li><span class="ck">›</span> <span data-i18n="p1_f1">Tous les signaux en temps réel</span></li>
+          <li><span class="ck">›</span> <span data-i18n="p1_f2">Score /100 &amp; plan de trade complet</span></li>
+          <li><span class="ck">›</span> <span data-i18n="p1_f3">Explications vulgarisées</span></li>
+          <li><span class="ck">›</span> <span data-i18n="p1_f4">Annulable à tout moment</span></li>
+        </ul>
+        <a class="btn btn-ghost" href="#" style="width:100%; justify-content:center;" data-i18n="p1_cta">Commencer l'essai</a>
+      </div>
+      <div class="price-card popular tilt reveal d2" data-tilt="5">
+        <span class="price-badge" data-i18n="p2_badge">Le plus choisi</span>
+        <div class="price-name" data-i18n="p2_name">Standard</div>
+        <div class="price-amt">9 $<small> <span data-i18n="p_per">/ mois</span></small></div>
+        <div class="price-usdt" data-i18n="p2_usdt">≈ 9 USDT · l'accès complet</div>
+        <ul class="price-feats">
+          <li><span class="ck">›</span> <span data-i18n="p2_f1">Tout l'essai Découverte</span></li>
+          <li><span class="ck">›</span> <span data-i18n="p2_f2">Analyses approfondies (technique + news)</span></li>
+          <li><span class="ck">›</span> <span data-i18n="p2_f3">Toutes les paires &amp; les deux styles</span></li>
+          <li><span class="ck">›</span> <span data-i18n="p2_f4">Cours &amp; contenus pour progresser</span></li>
+        </ul>
+        <a class="btn btn-primary" href="#" style="width:100%; justify-content:center;" data-i18n="p2_cta">S'abonner · 9 $/mois</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TELEGRAM -->
+<section class="tg-band" id="telegram">
+  <div class="wrap tg-inner">
+    <div class="reveal">
+      <div class="sec-eyebrow" data-i18n="tg_eyebrow">Canal Telegram public</div>
+      <h2 class="sec-title" style="font-size:clamp(26px,3vw,40px);" data-i18n="tg_title">Les résultats,<br />au grand jour</h2>
+      <p class="sec-lede" style="margin-top:14px;" data-i18n="tg_lede">Chaque jour, les trades partagés et le pourcentage de trades gagnants — visible en permanence. La preuve avant la promesse.</p>
+    </div>
+    <div class="reveal d1" style="text-align:center;">
+      <div style="font-family:var(--mono); font-weight:700; font-size:64px; color:var(--primary); line-height:1;"><span data-count="73" data-suffix="%">0%</span></div>
+      <div style="color:var(--sub); margin:8px 0 20px;" data-i18n="tg_stat_l">trades gagnants · mesuré</div>
+      <a class="btn btn-primary" href="#" data-i18n="tg_cta">Rejoindre le canal</a>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="wrap">
+    <div class="foot-grid">
+      <div>
+        <a class="brand" href="#top">
+          <span class="mark-tile"><svg width="18" height="18" viewBox="0 0 30 30" fill="none" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 19l5-6 4 4 9-11"/><path d="M24 6v6h-6"/></svg></span>
+          <span class="word">MER<b>A</b></span>
+        </a>
+        <p style="color:var(--sub); font-size:14px; max-width:32ch; margin-top:14px;" data-i18n="foot_tag">Make Everybody Rich Again. Analyse &amp; signaux, expliqués simplement.</p>
+      </div>
+      <div class="foot-links">
+        <div class="foot-col"><h4 data-i18n="foot_c1">Produit</h4><a href="#how" data-i18n="nav_how">Comment ça marche</a><a href="#score" data-i18n="nav_score">Le score</a><a href="#pricing" data-i18n="nav_pricing">Tarifs</a><a href="#telegram" data-i18n="nav_tg">Telegram</a></div>
+        <div class="foot-col"><h4 data-i18n="foot_c2">Apprendre</h4><a href="#" data-i18n="foot_c2_1">Cours gratuits</a><a href="#" data-i18n="foot_c2_2">C'est quoi un signal ?</a><a href="#" data-i18n="foot_c2_3">Gérer son risque</a></div>
+        <div class="foot-col"><h4 data-i18n="foot_c3">Langue</h4><a href="#" data-lang="ar">العربية</a><a href="#" data-lang="en">English</a><a href="#" data-lang="fr">Français</a></div>
+      </div>
+    </div>
+    <p class="disclaimer" data-i18n="disclaimer">
+      Contenu strictement éducatif. MERA ne fournit pas de conseil en investissement personnalisé et ne promet aucun gain. Le trading comporte un risque de perte, parfois supérieur au capital engagé avec effet de levier. Les performances passées et les taux mesurés par backtest ne préjugent pas des résultats futurs. Le statut des crypto-actifs varie selon les juridictions — informe-toi sur la réglementation applicable dans ton pays avant tout paiement.
+    </p>
+  </div>
+</footer>
+
+<script src="landing.js"></script>
+</body>
+</html>

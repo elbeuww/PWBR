@@ -3,9 +3,9 @@
 import { useEffect } from 'react'
 
 /**
- * MeraEffects — port vanilla de landing.js (design borhane) en composant client.
+ * NexaLandingEffects — port vanilla de landing.js (design borhane) en composant client.
  *
- * Anime la vitrine `.mera` : thème Green/Volt (persisté), data-rain, parallaxe de
+ * Anime la vitrine `.nxl` : thème Green/Volt (persisté), data-rain, parallaxe de
  * scène, tilt 3D, reveal au scroll + compteurs + jauge, barre de progression, nav
  * scrolled. TOUT est gardé reduced-motion. AUCUNE lib (D-05). Le texte/i18n est
  * rendu côté serveur (next-intl) — ce composant ne touche QUE le comportement.
@@ -15,9 +15,9 @@ const RAIN_POOL = [
   '+2.4%', '−0.3%', '+1.1%', '+4.2%', '−1.2%', '0.78', '92', '64', '84', '+0.6%', '−0.5%',
 ]
 
-export function MeraEffects() {
+export function NexaLandingEffects() {
   useEffect(() => {
-    const root = document.querySelector<HTMLElement>('.mera')
+    const root = document.querySelector<HTMLElement>('.nxl')
     if (!root) return
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches
     const cleanups: Array<() => void> = []
@@ -26,14 +26,14 @@ export function MeraEffects() {
     const setTheme = (t: string) => {
       root.setAttribute('data-theme', t)
       try { localStorage.setItem('nexa-landing-theme', t) } catch { /* ignore */ }
-      root.querySelectorAll<HTMLElement>('.mera-theme-toggle button').forEach((b) => {
+      root.querySelectorAll<HTMLElement>('.nxl-theme-toggle button').forEach((b) => {
         b.setAttribute('data-active', b.dataset.theme === t ? '1' : '0')
       })
     }
     let savedTheme = 'volt'
     try { savedTheme = localStorage.getItem('nexa-landing-theme') || 'volt' } catch { /* ignore */ }
     setTheme(savedTheme)
-    root.querySelectorAll<HTMLElement>('.mera-theme-toggle button').forEach((b) => {
+    root.querySelectorAll<HTMLElement>('.nxl-theme-toggle button').forEach((b) => {
       const handler = () => setTheme(b.dataset.theme || 'volt')
       b.addEventListener('click', handler)
       cleanups.push(() => b.removeEventListener('click', handler))
@@ -64,7 +64,7 @@ export function MeraEffects() {
     }
 
     // ── Progress + nav scrolled + parallaxe ──
-    const progress = root.querySelector<HTMLElement>('.mera-progress')
+    const progress = root.querySelector<HTMLElement>('.nxl-progress')
     const nav = root.querySelector<HTMLElement>('.nx-nav')
     const layers = Array.from(root.querySelectorAll<HTMLElement>('.scene .layer'))
     let mx = 0, my = 0, sy = 0

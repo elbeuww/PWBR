@@ -13,6 +13,7 @@
  */
 import { NextIntlClientProvider, hasLocale } from 'next-intl'
 import { setRequestLocale, getMessages, getTranslations } from 'next-intl/server'
+import { headers } from 'next/headers'
 import { notFound } from 'next/navigation'
 import { routing } from '../../i18n/routing'
 import { Link } from '../../i18n/navigation'
@@ -46,6 +47,12 @@ export default async function LocaleLayout({
   // D-15/D-16 : baseline NEXA trilingue rendue au header sous le wordmark.
   const tBaseline = await getTranslations('baseline')
 
+  // La home rend la vitrine `.nxl` plein écran (nav/footer propres) → on masque le
+  // shell NEXA (header + Footer) uniquement sur `/[locale]` racine. x-pathname posé
+  // par le middleware (lisible en RSC, cf. lib/auth/gate.ts).
+  const pathname = (await headers()).get('x-pathname') ?? ''
+  const isHome = /^\/[a-z]{2}\/?$/.test(pathname)
+
   return (
     <html
       lang={locale}
@@ -55,28 +62,30 @@ export default async function LocaleLayout({
       <body className={[archivo, spaceGrotesk, jetbrainsMono, chakraPetch, notoArabic].map((f) => f.variable).join(' ')}>
         <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
           <NextIntlClientProvider messages={messages}>
-            <header className="flex h-14 items-center justify-between bg-secondary px-4 md:px-6">
-              {/* D-16 : wordmark NEXA (Logo full) + baseline trilingue (ton sobre vétéran, D-17). */}
-              <div className="flex flex-col">
-                <Logo variant="full" />
-                <span className="text-xs text-muted-foreground tracking-wide">
-                  {tBaseline('text')}
-                </span>
-              </div>
-              {/* D-08c : entrée funnel Académie — Link localisé (préserve la locale), libellé i18n. */}
-              <Link
-                href="/academie"
-                className="ms-6 text-sm font-medium text-foreground hover:text-primary"
-              >
-                {tAcademy('navAcademy')}
-              </Link>
-              <div className="ms-auto flex items-center gap-2">
-                <ThemeToggle />
-                <LanguageSwitcher />
-              </div>
-            </header>
+            {!isHome && (
+              <header className="flex h-14 items-center justify-between bg-secondary px-4 md:px-6">
+                {/* D-16 : wordmark NEXA (Logo full) + baseline trilingue (ton sobre vétéran, D-17). */}
+                <div className="flex flex-col">
+                  <Logo variant="full" />
+                  <span className="text-xs text-muted-foreground tracking-wide">
+                    {tBaseline('text')}
+                  </span>
+                </div>
+                {/* D-08c : entrée funnel Académie — Link localisé (préserve la locale), libellé i18n. */}
+                <Link
+                  href="/academie"
+                  className="ms-6 text-sm font-medium text-foreground hover:text-primary"
+                >
+                  {tAcademy('navAcademy')}
+                </Link>
+                <div className="ms-auto flex items-center gap-2">
+                  <ThemeToggle />
+                  <LanguageSwitcher />
+                </div>
+              </header>
+            )}
             {children}
-            <Footer />
+            {!isHome && <Footer />}
           </NextIntlClientProvider>
         </ThemeProvider>
       </body>
