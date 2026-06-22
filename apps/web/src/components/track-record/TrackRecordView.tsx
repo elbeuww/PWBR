@@ -215,9 +215,9 @@ function SignedMetric({
 
   const tone =
     value > 0
-      ? 'text-emerald-700 dark:text-emerald-400'
+      ? 'text-[--signal-bullish]'
       : value < 0
-        ? 'text-red-700 dark:text-red-400'
+        ? 'text-destructive'
         : 'text-foreground'
 
   return (

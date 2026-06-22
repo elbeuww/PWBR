@@ -127,7 +127,7 @@ export default async function AdminPayoutsPage() {
                         {t('payouts.badgePaid')}
                       </Badge>
                     ) : (
-                      <Badge className="border-amber-600/30 bg-amber-500/10 text-amber-700 dark:text-amber-400">
+                      <Badge className="border-[--risk-moderate]/30 bg-[--risk-moderate]/10 text-[--risk-moderate]">
                         {t('payouts.badgeDue')}
                       </Badge>
                     )}
