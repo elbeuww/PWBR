@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v3.0
 milestone_name: Plateforme complète sous identité dark néon NEXA
 status: executing
-last_updated: "2026-06-22T14:01:33.288Z"
+last_updated: "2026-06-22T14:08:40.889Z"
 last_activity: 2026-06-22
 progress:
   total_phases: 12
   completed_phases: 2
   total_plans: 20
-  completed_plans: 16
-  percent: 80
+  completed_plans: 17
+  percent: 85
 ---
 
 # Project State
@@ -31,7 +31,7 @@ See: .planning/PROJECT.md (mis à jour 2026-06-20 après clôture v2.0)
 
 Milestone: v3.0 — Plateforme complète sous identité dark néon NEXA (7 phases, 15-21)
 Phase: 15 (design-system-v3-dark-n-on-unique) — EXECUTING
-Plan: 2 of 3
+Plan: 3 of 3
 Status: Ready to execute
 Last activity: 2026-06-22
 
@@ -106,6 +106,7 @@ ressources externes non provisionnables en session de développement.
 | Phase 12 P01 | ~12min | 3 tasks | 3 files |
 | Phase 12 P02 | ~10min | 3 tasks | 1 files |
 | Phase 15 P01 | ~5min | 2 tasks | 2 files |
+| Phase 15 P02 | ~8min | 3 tasks | 7 files |
 
 ## Roadmap v2.0 (9 phases)
 
@@ -436,6 +437,13 @@ ressources externes non provisionnables en session de développement.
 - **THEME-02 / THEME-05 NON marqués complets** : leurs gates sont authorés ici mais la satisfaction réelle dépend des Plans 02+03 (`theme-scan` est intentionnellement RED jusque-là). Marquage différé à la fin du reskin/tokenisation.
 - **Commits 15-01** : c82f494 (Task 1 — contrast-aa GREEN 8/8), 29d3e46 (Task 2 — theme-scan RED-by-design 2+3).
 
+### Decisions exécution (Plan 15-02 — DS figé GREEN dark unique, THEME-01/03/04)
+
+- **D-15-02-A** : promotion SÉMANTIQUE (D-03) — les valeurs `.nxl[data-theme="green"]` (nexa-landing.css) copiées VERBATIM en littéraux HEX/OKLCH dans `:root` (PAS une de-scope mécanique de `.nxl`, Pitfall #1). Exception Phase-15 à la règle « var() only en Layer 2 » : la couche ne flippe plus (thème dark unique, D-04) donc les littéraux y vivent. `.dark` RÉCONCILIÉ aux MÊMES valeurs gelées → sous `forcedTheme="dark"` (où `.dark` gagne toujours) la plateforme ne peut plus peindre le navy hérité (`--nexa-ink`/`--nexa-neutral-800`). Sélecteur `.dark` conservé (D-06 : CandleChart MutationObserver + sonner). Layer 1 `@theme`, Layer 3 `@theme inline`, `:lang(ar)` byte-unchanged (D-11/D-12). Signaux (`--signal-*`) + accents (`--accent-brand`/`--risk-moderate`) restent DISTINCTS via primitives (D-05).
+- **D-15-02-B** : `forcedTheme="dark"` (suppr. `defaultTheme`/`enableSystem`) ; `ThemeToggle.tsx` supprimé (seul consommateur de `useTranslations('theme')`) ; namespace i18n top-level `theme {toggleLabel,light,dark}` purgé fr/en/ar en parité STRICTE (T-15-02) — la clé `theme` imbriquée (admin) préservée (1 occurrence/locale). `theme-parity.test.ts` INVERSÉ (asserte l'ABSENCE). `<html lang dir suppressHydrationWarning>` intact (D-12 / no-FOUC).
+- **D-15-02-C (out of scope, deferred)** : `theme-scan.test.ts` (gate RED de 15-01) reste RED — ses fichiers fautifs (`LanguageSwitcher.tsx` `ring-[#2563EB]` + utilitaires palette brute des pages admin/affiliation) sont la **surface de reskin Phase 16** (RESKIN-01..06), hors `files_modified` de 15-02. Loggé `deferred-items.md`. La suite de vérif propre au plan (contrast-aa, design-tokens, rtl-logical-props, theme-parity) est 100 % verte.
+- **Commits 15-02** : b9ff5b5 (Task 1 — :root/.dark frozen GREEN), 09e4112 (Task 2 — forcedTheme=dark + delete ThemeToggle), 5bd8f14 (Task 3 — purge i18n theme + parity inversée).
+
 ### Open todos / research flags (v2.0)
 
 - **Phase 4 (research flag) :** TronGrid endpoint `walletsolidity`, parsing logs TRC-20, normalisation hex↔base58 — doc TS peu dense, recherche de phase recommandée.
@@ -462,7 +470,7 @@ ressources externes non provisionnables en session de développement.
 
 ## Session Continuity
 
-**Last session:** 2026-06-22T14:01:10.105Z
+**Last session:** 2026-06-22T14:08:23.094Z
 
 **Last session (archive):** 2026-06-19T03:41:29.665Z
 
