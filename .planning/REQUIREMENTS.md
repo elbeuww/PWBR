@@ -10,7 +10,7 @@ Requirements de ce milestone. Chacun est mappé à une phase de la roadmap (voir
 ### Design system dark néon unique (THEME)
 
 - [x] **THEME-01**: Le visiteur voit toute la plateforme dans un **thème dark néon unique** cohérent (tokens sémantiques promus depuis la landing `.nxl`), sans option de thème clair.
-- [ ] **THEME-02**: Les composants UI partagés (boutons, cartes, badges, inputs, tables, dialogs, nav) héritent du DS dark via les tokens sémantiques — pas de CSS bespoke par page, **aucune collision d'utilitaires Tailwind** (ex. `ring`/glow).
+- [x] **THEME-02**: Les composants UI partagés (boutons, cartes, badges, inputs, tables, dialogs, nav) héritent du DS dark via les tokens sémantiques — pas de CSS bespoke par page, **aucune collision d'utilitaires Tailwind** (ex. `ring`/glow).
 - [x] **THEME-03**: Le thème néon par défaut (**green ou volt** — à trancher en phase design) est figé pour toute la plateforme.
 - [x] **THEME-04**: Le RTL arabe et l'absence de flash (no-FOUC, `forcedTheme="dark"`, propriétés logiques) sont préservés sous le thème unique.
 - [ ] **THEME-05**: Le contraste respecte **WCAG AA** sur les surfaces dark, y compris translucides.
@@ -90,7 +90,7 @@ Exclusions explicites de ce milestone, avec raison.
 | REQ-ID | Phase | Statut |
 |--------|-------|--------|
 | THEME-01 | Phase 15 — Design system v3 « dark néon unique » | Complete |
-| THEME-02 | Phase 15 — Design system v3 « dark néon unique » | Pending |
+| THEME-02 | Phase 15 — Design system v3 « dark néon unique » | Complete |
 | THEME-03 | Phase 15 — Design system v3 « dark néon unique » | Complete |
 | THEME-04 | Phase 15 — Design system v3 « dark néon unique » | Complete |
 | THEME-05 | Phase 15 — Design system v3 « dark néon unique » | Pending |

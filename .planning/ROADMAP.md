@@ -36,7 +36,7 @@ Détail complet archivé : `.planning/milestones/v2.0-ROADMAP.md`.
 
 ### v3.0 — Plateforme complète sous identité dark néon NEXA (Phases 15-21)
 
-- [ ] **Phase 15: Design system v3 « dark néon unique »** — Promotion de la couche sémantique `.nxl` (landing) en DS global dark unique, `forcedTheme="dark"`, retrait du toggle clair, décision green vs volt, contraste WCAG AA, no-FOUC + RTL préservés. (THEME)
+- [x] **Phase 15: Design system v3 « dark néon unique »** — Promotion de la couche sémantique `.nxl` (landing) en DS global dark unique, `forcedTheme="dark"`, retrait du toggle clair, décision green vs volt, contraste WCAG AA, no-FOUC + RTL préservés. (THEME) (completed 2026-06-22)
 - [ ] **Phase 16: Reskin transversal de toutes les pages** — Vitrine, légal, auth, compte/abonnement, espace membre signaux/détail+chart, paiement/funnel, Académie, admin repeints sur le DS v3, RLS/i18n/disclaimers/no-perf-claims/no-mera-brand préservés. (RESKIN)
 - [ ] **Phase 17: Fondation DB scalable (perf avant charge)** — Migration `0017` : wrap RLS `(select …)` + index sur colonnes de policy, index composites keyset alignés `ORDER BY`, infra matviews KPIs (unique index + wrapper `is_superadmin()`), Broadcast vs `postgres_changes`, migrations non bloquantes `CONCURRENTLY`. (SCALE perf)
 - [ ] **Phase 18: Seed de données réalistes à l'échelle** — `seed.ts` faker déterministe, idempotent, FK-cohérent (~10k users + signaux/paiements/affiliés/outcomes), labels `backtest`/`démo` (aucun chiffre de perf fabriqué), RLS re-testée depuis client anon. (SEED)
@@ -140,7 +140,7 @@ Détail complet archivé : `.planning/milestones/v2.0-ROADMAP.md`.
 **Plans** : 3 plans (2 vagues)
 - [x] 15-01-PLAN.md — Wave-0 gardes : test contraste WCAG AA (opaque + surfaces translucides compositées) + scan bespoke/collision Tailwind, verrouillés AVANT migration (THEME-02/THEME-05)
 - [x] 15-02-PLAN.md — Promotion + gel : GREEN figé en `:root`, `.dark` réconcilié aux mêmes valeurs (forced `.dark` ne flippe plus vers navy), `forcedTheme="dark"`, suppression ThemeToggle, purge namespace i18n `theme` (THEME-01/THEME-03/THEME-04)
-- [ ] 15-03-PLAN.md — Tokenisation résiduelle : `ring-[#2563EB]` → `ring-ring` (LanguageSwitcher) + utilitaires palette bruts → tokens sémantiques sur 8 surfaces admin/affiliation/track-record (THEME-02)
+- [x] 15-03-PLAN.md — Tokenisation résiduelle : `ring-[#2563EB]` → `ring-ring` (LanguageSwitcher) + utilitaires palette bruts → tokens sémantiques sur 8 surfaces admin/affiliation/track-record (THEME-02)
 **UI hint** : yes
 **Notes** : Arête dure : DS figé AVANT tout reskin (sinon double passage). Migration = **promotion sémantique** : copier les valeurs GREEN `.nxl[data-theme="green"]` dans `:root` (D-02/D-03, jamais de copie mécanique du sélecteur `.nxl` — Pitfall #1) ; le sélecteur `.dark` **reste présent** (D-06, observé par CandleChart + sonner) mais réconcilié aux mêmes valeurs GREEN que `:root` ; suppression du **toggle** + `forcedTheme="dark"`. Primitives (couche 1) et noms shadcn (couche 3) intacts ; RTL/i18n orthogonaux non touchés (purge du seul namespace `theme`). Research flag résolu : GREEN tranché (D-01) + matrice de contraste AA translucide compositée (D-09/D-10). Parallélisme : 15-02 (globals/layout/messages) // 15-03 (LanguageSwitcher + admin/affiliation/track-record), fichiers disjoints.
 
@@ -236,7 +236,7 @@ Détail complet archivé : `.planning/milestones/v2.0-ROADMAP.md`.
 | 12. Routines d'analyse Claude (sans API) | v2.1 | 4/6 | ⏸️ Paused | - |
 | 13. Backtest catalogue de patterns | v2.1 | 0/? | ⏸️ Paused | - |
 | 14. Track record affiché & boucle prod | v2.1 | 0/? | ⏸️ Paused | - |
-| 15. Design system v3 « dark néon unique » | v3.0 | 2/3 | In Progress|  |
+| 15. Design system v3 « dark néon unique » | v3.0 | 3/3 | Complete   | 2026-06-22 |
 | 16. Reskin transversal de toutes les pages | v3.0 | 0/? | Not started | - |
 | 17. Fondation DB scalable | v3.0 | 0/? | Not started | - |
 | 18. Seed de données réalistes à l'échelle | v3.0 | 0/? | Not started | - |
