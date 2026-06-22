@@ -10,11 +10,6 @@
     "en": "English",
     "ar": "العربية"
   },
-  "theme": {
-    "toggleLabel": "Toggle theme",
-    "light": "Light theme",
-    "dark": "Dark theme"
-  },
   "auth": {
     "eyebrow": "Account",
     "loginTitle": "Sign in",

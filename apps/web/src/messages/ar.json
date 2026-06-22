@@ -10,11 +10,6 @@
     "en": "English",
     "ar": "العربية"
   },
-  "theme": {
-    "toggleLabel": "تبديل السمة",
-    "light": "السمة الفاتحة",
-    "dark": "السمة الداكنة"
-  },
   "auth": {
     "eyebrow": "الحساب",
     "loginTitle": "تسجيل الدخول",

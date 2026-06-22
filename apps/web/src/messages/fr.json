@@ -10,11 +10,6 @@
     "en": "English",
     "ar": "العربية"
   },
-  "theme": {
-    "toggleLabel": "Changer de thème",
-    "light": "Thème clair",
-    "dark": "Thème sombre"
-  },
   "auth": {
     "eyebrow": "Compte",
     "loginTitle": "Connexion",
