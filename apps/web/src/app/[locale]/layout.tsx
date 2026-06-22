@@ -7,7 +7,8 @@
  * - Garde anti-flash next-themes posée sur <html> (script pré-paint, no-flash).
  * - ThemeProvider (next-themes, class) autour de NextIntlClientProvider (D-02).
  * - Polices self-hostées exposées en variables CSS sur <body> (D-03, lib/fonts.ts).
- * - Header avec LanguageSwitcher + ThemeToggle ancrés à l'`end` logique (RTL-aware).
+ * - Header avec LanguageSwitcher ancré à l'`end` logique (RTL-aware ; ThemeToggle retiré, D-04).
+ * - ThemeProvider forcedTheme="dark" (D-04) : thème dark unique, aucun chemin clair.
  *
  * Source : 01-RESEARCH.md §Pattern 1 ; 02-RESEARCH.md §Pattern 1 ; D-02/D-03/D-10 ; UI-SPEC §Shell
  */
@@ -19,7 +20,6 @@ import { routing } from '../../i18n/routing'
 import { Link } from '../../i18n/navigation'
 import { LanguageSwitcher } from '../../components/LanguageSwitcher'
 import { ThemeProvider } from '../../components/ThemeProvider'
-import { ThemeToggle } from '../../components/ThemeToggle'
 import { Footer } from '../../components/Footer'
 import { Logo } from '../../components/nexa/Logo'
 import { archivo, spaceGrotesk, jetbrainsMono, chakraPetch, notoArabic } from '../../lib/fonts'
@@ -60,7 +60,7 @@ export default async function LocaleLayout({
       suppressHydrationWarning
     >
       <body className={[archivo, spaceGrotesk, jetbrainsMono, chakraPetch, notoArabic].map((f) => f.variable).join(' ')}>
-        <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
+        <ThemeProvider attribute="class" forcedTheme="dark">
           <NextIntlClientProvider messages={messages}>
             {!isHome && (
               <header className="flex h-14 items-center justify-between bg-secondary px-4 md:px-6">
@@ -79,7 +79,6 @@ export default async function LocaleLayout({
                   {tAcademy('navAcademy')}
                 </Link>
                 <div className="ms-auto flex items-center gap-2">
-                  <ThemeToggle />
                   <LanguageSwitcher />
                 </div>
               </header>
