@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v3.0
 milestone_name: Plateforme complète sous identité dark néon NEXA
 status: executing
-last_updated: "2026-06-22T13:35:08.757Z"
-last_activity: 2026-06-22 -- Phase 15 planning complete
+last_updated: "2026-06-22T14:01:33.288Z"
+last_activity: 2026-06-22
 progress:
   total_phases: 12
   completed_phases: 2
   total_plans: 20
-  completed_plans: 15
-  percent: 75
+  completed_plans: 16
+  percent: 80
 ---
 
 # Project State
@@ -23,17 +23,17 @@ progress:
 See: .planning/PROJECT.md (mis à jour 2026-06-20 après clôture v2.0)
 
 **Core value:** Produire, pour chaque opportunité, une analyse fiable et explicable — vulgarisée pour un public non technique — avec un % de réussite TOUJOURS mesuré, jamais inventé : c'est le socle de confiance qui fait payer l'abonnement.
-**Current focus:** Phase 15 — design-system-v3-dark-neon-unique (milestone v3.0)
+**Current focus:** Phase 15 — design-system-v3-dark-n-on-unique
 **Mode:** interactive (MVP vertical)
 **Granularity:** fine
 
 ## Current Position
 
 Milestone: v3.0 — Plateforme complète sous identité dark néon NEXA (7 phases, 15-21)
-Phase: 15 — Design system v3 « dark néon unique » (Not started)
-Plan: —
+Phase: 15 (design-system-v3-dark-n-on-unique) — EXECUTING
+Plan: 2 of 3
 Status: Ready to execute
-Last activity: 2026-06-22 -- Phase 15 planning complete
+Last activity: 2026-06-22
 
 ## Deferred Items
 
@@ -105,6 +105,7 @@ ressources externes non provisionnables en session de développement.
 | Phase 11 P08 | ~25min | 3 tasks | 10 files |
 | Phase 12 P01 | ~12min | 3 tasks | 3 files |
 | Phase 12 P02 | ~10min | 3 tasks | 1 files |
+| Phase 15 P01 | ~5min | 2 tasks | 2 files |
 
 ## Roadmap v2.0 (9 phases)
 
@@ -427,6 +428,14 @@ ressources externes non provisionnables en session de développement.
 - **D-12-02-D (A3 closed)** : `.gitignore` confirmé — `run-artifacts/` déjà présent ligne 38, `git ls-files run-artifacts/` vide, aucune édition (surgical, verification-only). Pas de commit pour Task 3.
 - **Commits 12-02** : eb14a9b (Task 1 — 3 sections stale), 50c57b9 (Task 2 — §8 single-run/RUN_ID/P-SECRET/P-MCP/calme), ccc078d (SUMMARY). ROUTINE-01/02/05 marqués complets.
 
+### Decisions exécution (Plan 15-01 — gardes Wave-0 contraste WCAG AA + scan THEME-02)
+
+- **D-15-01-A** : `contrast-aa.test.ts` utilise une math WCAG canonique auto-contenue (sRGB gamma-expand + 0.2126/0.7152/0.0722 ; conversion OKLCH→linéaire→sRGB CSS Color 4). `text/bg` reproduit l'ancre D-09 **18.93:1 à l'identique** ; `primary/bg` (~12.9) et `muted/bg` (~7.1) divergent des ancres gelées 11.39 / 6.76 (rendu OKLCH navigateur gamut-dépendant). Les ancres D-09 restent la **spec gelée** encodée en littéraux ; les assertions de PASSAGE portent sur le plancher AA réel + proximité au ratio canonique avec une tolérance couvrant les deux modèles — **aucune fausse couleur, aucun faux-vert**.
+- **D-15-01-B** : les deux gardes Wave-0 sont auto-contenues, **zéro nouvelle dépendance** (contrainte T-15-SC). `contrast-aa` = math-only → GREEN quel que soit l'état du fichier (la spec). `theme-scan` se lie à l'arbre → **RED-par-design** sur les hardcodes résiduels (`ring-[#2563EB]` LanguageSwitcher 168/200 + utilitaires palette brute) = la cible GREEN objective des Plans 02 (suppression ThemeToggle) + 03 (tokenisation).
+- **D-15-01-C (Rule 1)** : fixture SANITY de `theme-scan` corrigée (ajout des variantes `dark:text-*-400` manquantes) pour que les 13 regex `FORBIDDEN_PALETTE` matchent toutes — le bloc sanity doit passer indépendamment de l'état de l'arbre.
+- **THEME-02 / THEME-05 NON marqués complets** : leurs gates sont authorés ici mais la satisfaction réelle dépend des Plans 02+03 (`theme-scan` est intentionnellement RED jusque-là). Marquage différé à la fin du reskin/tokenisation.
+- **Commits 15-01** : c82f494 (Task 1 — contrast-aa GREEN 8/8), 29d3e46 (Task 2 — theme-scan RED-by-design 2+3).
+
 ### Open todos / research flags (v2.0)
 
 - **Phase 4 (research flag) :** TronGrid endpoint `walletsolidity`, parsing logs TRC-20, normalisation hex↔base58 — doc TS peu dense, recherche de phase recommandée.
@@ -453,7 +462,7 @@ ressources externes non provisionnables en session de développement.
 
 ## Session Continuity
 
-**Last session:** 2026-06-22T12:55:10.963Z
+**Last session:** 2026-06-22T14:01:10.105Z
 
 **Last session (archive):** 2026-06-19T03:41:29.665Z
 

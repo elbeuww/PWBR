@@ -138,7 +138,7 @@ Détail complet archivé : `.planning/milestones/v2.0-ROADMAP.md`.
   4. En arabe, la mise en page reste correctement miroir (propriétés logiques uniquement) sous le thème unique, sur les surfaces touchées par la fondation.
   5. Un test de contraste prouve WCAG AA sur les surfaces dark, y compris les surfaces translucides (overlays, cartes glow).
 **Plans** : 3 plans (2 vagues)
-- [ ] 15-01-PLAN.md — Wave-0 gardes : test contraste WCAG AA (opaque + surfaces translucides compositées) + scan bespoke/collision Tailwind, verrouillés AVANT migration (THEME-02/THEME-05)
+- [x] 15-01-PLAN.md — Wave-0 gardes : test contraste WCAG AA (opaque + surfaces translucides compositées) + scan bespoke/collision Tailwind, verrouillés AVANT migration (THEME-02/THEME-05)
 - [ ] 15-02-PLAN.md — Promotion + gel : GREEN figé en `:root`, `.dark` réconcilié aux mêmes valeurs (forced `.dark` ne flippe plus vers navy), `forcedTheme="dark"`, suppression ThemeToggle, purge namespace i18n `theme` (THEME-01/THEME-03/THEME-04)
 - [ ] 15-03-PLAN.md — Tokenisation résiduelle : `ring-[#2563EB]` → `ring-ring` (LanguageSwitcher) + utilitaires palette bruts → tokens sémantiques sur 8 surfaces admin/affiliation/track-record (THEME-02)
 **UI hint** : yes
@@ -236,7 +236,7 @@ Détail complet archivé : `.planning/milestones/v2.0-ROADMAP.md`.
 | 12. Routines d'analyse Claude (sans API) | v2.1 | 4/6 | ⏸️ Paused | - |
 | 13. Backtest catalogue de patterns | v2.1 | 0/? | ⏸️ Paused | - |
 | 14. Track record affiché & boucle prod | v2.1 | 0/? | ⏸️ Paused | - |
-| 15. Design system v3 « dark néon unique » | v3.0 | 0/3 | Planned | - |
+| 15. Design system v3 « dark néon unique » | v3.0 | 1/3 | In Progress|  |
 | 16. Reskin transversal de toutes les pages | v3.0 | 0/? | Not started | - |
 | 17. Fondation DB scalable | v3.0 | 0/? | Not started | - |
 | 18. Seed de données réalistes à l'échelle | v3.0 | 0/? | Not started | - |
