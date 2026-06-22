@@ -85,8 +85,46 @@ Exclusions explicites de ce milestone, avec raison.
 
 ## Traceability
 
-> Rempli par le roadmapper : mapping REQ-ID → phase.
+> Mapping REQ-ID → phase (rempli par la roadmap 2026-06-22). Couverture 100 % : 35/35 requirements v1 mappés à exactement une phase. Numérotation des phases continue après v2.1 (phase 14) → v3.0 démarre à la phase 15.
 
 | REQ-ID | Phase | Statut |
 |--------|-------|--------|
-| _(à compléter par la roadmap)_ | | |
+| THEME-01 | Phase 15 — Design system v3 « dark néon unique » | Pending |
+| THEME-02 | Phase 15 — Design system v3 « dark néon unique » | Pending |
+| THEME-03 | Phase 15 — Design system v3 « dark néon unique » | Pending |
+| THEME-04 | Phase 15 — Design system v3 « dark néon unique » | Pending |
+| THEME-05 | Phase 15 — Design system v3 « dark néon unique » | Pending |
+| RESKIN-01 | Phase 16 — Reskin transversal de toutes les pages | Pending |
+| RESKIN-02 | Phase 16 — Reskin transversal de toutes les pages | Pending |
+| RESKIN-03 | Phase 16 — Reskin transversal de toutes les pages | Pending |
+| RESKIN-04 | Phase 16 — Reskin transversal de toutes les pages | Pending |
+| RESKIN-05 | Phase 16 — Reskin transversal de toutes les pages | Pending |
+| RESKIN-06 | Phase 16 — Reskin transversal de toutes les pages | Pending |
+| SCALE-01 | Phase 17 — Fondation DB scalable | Pending |
+| SCALE-02 | Phase 17 — Fondation DB scalable | Pending |
+| SCALE-03 | Phase 17 — Fondation DB scalable | Pending |
+| SCALE-04 | Phase 17 — Fondation DB scalable | Pending |
+| SCALE-05 | Phase 17 — Fondation DB scalable | Pending |
+| SEED-01 | Phase 18 — Seed de données réalistes à l'échelle | Pending |
+| SEED-02 | Phase 18 — Seed de données réalistes à l'échelle | Pending |
+| SEED-03 | Phase 18 — Seed de données réalistes à l'échelle | Pending |
+| UDASH-01 | Phase 19 — Dashboard utilisateur | Pending |
+| UDASH-02 | Phase 19 — Dashboard utilisateur | Pending |
+| UDASH-03 | Phase 19 — Dashboard utilisateur | Pending |
+| UDASH-04 | Phase 19 — Dashboard utilisateur | Pending |
+| UDASH-05 | Phase 19 — Dashboard utilisateur | Pending |
+| UDASH-06 | Phase 19 — Dashboard utilisateur | Pending |
+| ADASH-01 | Phase 20 — Dashboard superadmin (cockpit 4 axes) | Pending |
+| ADASH-02 | Phase 20 — Dashboard superadmin (cockpit 4 axes) | Pending |
+| ADASH-03 | Phase 20 — Dashboard superadmin (cockpit 4 axes) | Pending |
+| ADASH-04 | Phase 20 — Dashboard superadmin (cockpit 4 axes) | Pending |
+| ADASH-05 | Phase 20 — Dashboard superadmin (cockpit 4 axes) | Pending |
+| ADASH-06 | Phase 20 — Dashboard superadmin (cockpit 4 axes) | Pending |
+| ADASH-07 | Phase 20 — Dashboard superadmin (cockpit 4 axes) | Pending |
+| E2E-01 | Phase 21 — Tests E2E + audit de scalabilité | Pending |
+| E2E-02 | Phase 21 — Tests E2E + audit de scalabilité | Pending |
+| SCALE-06 | Phase 21 — Tests E2E + audit de scalabilité | Pending |
+
+**Couverture :** 35/35 requirements v1 mappés, aucun orphelin, aucun doublon.
+- THEME (5) → Phase 15 · RESKIN (6) → Phase 16 · SCALE-01..05 (5) → Phase 17 · SEED (3) → Phase 18 · UDASH (6) → Phase 19 · ADASH (7) → Phase 20 · E2E (2) + SCALE-06 (1) → Phase 21.
+- **Note SCALE :** SCALE-01..05 (conception perf) en Phase 17 ; SCALE-06 (audit chiffré sur seed ~10k) en Phase 21 — l'audit exige les données seedées et les dashboards en place.

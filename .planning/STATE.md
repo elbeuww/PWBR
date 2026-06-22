@@ -6,7 +6,7 @@ status: planning
 last_updated: "2026-06-22T01:38:05.019Z"
 last_activity: 2026-06-22
 progress:
-  total_phases: 0
+  total_phases: 7
   completed_phases: 0
   total_plans: 0
   completed_plans: 0
@@ -23,16 +23,17 @@ progress:
 See: .planning/PROJECT.md (mis à jour 2026-06-20 après clôture v2.0)
 
 **Core value:** Produire, pour chaque opportunité, une analyse fiable et explicable — vulgarisée pour un public non technique — avec un % de réussite TOUJOURS mesuré, jamais inventé : c'est le socle de confiance qui fait payer l'abonnement.
-**Current focus:** Phase 12 — routines-d-analyse-claude-planifi-es-sans-api
+**Current focus:** Phase 15 — design-system-v3-dark-neon-unique (milestone v3.0)
 **Mode:** interactive (MVP vertical)
 **Granularity:** fine
 
 ## Current Position
 
-Phase: Not started (defining requirements)
+Milestone: v3.0 — Plateforme complète sous identité dark néon NEXA (7 phases, 15-21)
+Phase: 15 — Design system v3 « dark néon unique » (Not started)
 Plan: —
-Status: Defining requirements
-Last activity: 2026-06-22 — Milestone v3.0 started
+Status: Roadmap created — awaiting phase planning (`/gsd:plan-phase 15`)
+Last activity: 2026-06-22 — Roadmap v3.0 créée (7 phases 15-21, 35/35 requirements v1 mappés)
 
 ## Deferred Items
 
@@ -134,6 +135,29 @@ ressources externes non provisionnables en session de développement.
 - Migration source (BACKTEST-01) + catalogue figé (BACKTEST-02) AVANT moteur (BACKTEST-03) et affichage (P14) — inverser corrompt pattern_stats.
 - P14 dépend de P12 (signaux réels) ET P13 (seed backtest).
 - Research flags : P12 (valider réseau Remote A1) · P13 (figer le catalogue de patterns, décision fondateur).
+
+**Statut v2.1 : EN PAUSE.** Phases 10-11 livrées ; phases 12-14 (routines Claude, backtest, track record prod) reportées car dépendantes des **données réelles** (branchement API/signaux). Reprises à la reprise du moteur live.
+
+## Roadmap v3.0 (7 phases, 15-21) — sur données seedées
+
+15. Design system v3 « dark néon unique » — promotion couche sémantique `.nxl` en DS global dark unique, `forcedTheme="dark"`, retrait toggle clair, décision green vs volt, WCAG AA, no-FOUC + RTL (THEME-01..05)
+16. Reskin transversal de toutes les pages — vitrine/légal/auth/compte/membre/paiement/académie/admin sur DS v3, RLS/i18n/disclaimers/no-perf-claims/no-mera-brand préservés (RESKIN-01..06)
+17. Fondation DB scalable (perf avant charge) — migration 0017 : wrap RLS `(select …)` + index colonnes de policy, index composites keyset, infra matviews KPIs (unique index + wrapper `is_superadmin()`), Broadcast vs postgres_changes, migrations `CONCURRENTLY` (SCALE-01..05)
+18. Seed de données réalistes à l'échelle — `seed.ts` faker déterministe/idempotent FK-cohérent ~10k, labels `backtest`/`démo` (zéro chiffre fabriqué), RLS re-testée client anon (SEED-01..03)
+19. Dashboard utilisateur — groupe `(dash)` : vue d'ensemble, signaux suivis/historique keyset, watchlist `user_followed_setups` (revue IDOR), abonnement+ExpiryBanner, affiliation intégrée, paramètres (UDASH-01..06)
+20. Dashboard superadmin (cockpit 4 axes) — Acquisition/Revenus(MRR mesuré)/Ops/Conformité, tables virtualisées paginées keyset, gating `is_superadmin()` 404 discret, matviews P17, jamais service_role côté pages (ADASH-01..07)
+21. Tests E2E + audit de scalabilité — Playwright flux principaux + isolation RLS/gating, audit DB `EXPLAIN ANALYZE`+`get_advisors`+`pg_stat_statements` à ~10k (E2E-01/02, SCALE-06)
+
+**Arêtes critiques v3.0 (build order strict, source `research/SUMMARY.md`) :**
+
+- DS v3 figé (P15) AVANT reskin (P16) — migrer la couche sémantique, jamais copier-coller `.nxl` (Pitfall #1).
+- Fondation DB scalable (P17) AVANT exposition à l'échelle — fix RLS `(select …)` + index = gain >100×, le plus rentable (Pitfalls #2/#4).
+- Seed massif (P18) AVANT dashboards (P19-20) ET audit (P21) — sans ~10k FK-cohérent, ni démo ni mesure fiable (Pitfall #5) ; seed après la fondation DB (re-tester la RLS optimisée à l'échelle).
+- Dashboards (P19-20) AVANT E2E + audit (P21) — l'audit valide l'assemblage complet sur seed.
+- Parallélisme : axe design (P15-16) // axe DB (P17-18), surfaces disjointes ; convergence aux dashboards (P19-20).
+- Garde-fous transverses : RLS stricte (jamais service_role côté pages) · % TOUJOURS mesuré jamais inventé (VITR-03/no-perf-claims) · aucune promesse de gain · i18n fr/en/ar + RTL · no-mera-brand · données SEEDÉES uniquement.
+- Research flags : P15 (décision green vs volt + matrice contraste AA translucide) · P17/P21 (seuils OFFSET→keyset et postgres_changes→Broadcast à confirmer par EXPLAIN ANALYZE post-seed).
+- Couverture : 35/35 requirements v1 mappés (THEME 5→P15 · RESKIN 6→P16 · SCALE-01..05→P17 · SEED 3→P18 · UDASH 6→P19 · ADASH 7→P20 · E2E 2 + SCALE-06→P21), aucun orphelin, aucun doublon.
 
 ## Accumulated Context
 
