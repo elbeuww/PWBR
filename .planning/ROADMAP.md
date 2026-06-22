@@ -137,9 +137,12 @@ Détail complet archivé : `.planning/milestones/v2.0-ROADMAP.md`.
   3. Le thème néon par défaut (green ou volt — décision produit tranchée et documentée dans cette phase) est figé en `:root` pour toute la plateforme.
   4. En arabe, la mise en page reste correctement miroir (propriétés logiques uniquement) sous le thème unique, sur les surfaces touchées par la fondation.
   5. Un test de contraste prouve WCAG AA sur les surfaces dark, y compris les surfaces translucides (overlays, cartes glow).
-**Plans** : TBD
+**Plans** : 3 plans (2 vagues)
+- [ ] 15-01-PLAN.md — Wave-0 gardes : test contraste WCAG AA (opaque + surfaces translucides compositées) + scan bespoke/collision Tailwind, verrouillés AVANT migration (THEME-02/THEME-05)
+- [ ] 15-02-PLAN.md — Promotion + gel : GREEN figé en `:root`, `.dark` réconcilié aux mêmes valeurs (forced `.dark` ne flippe plus vers navy), `forcedTheme="dark"`, suppression ThemeToggle, purge namespace i18n `theme` (THEME-01/THEME-03/THEME-04)
+- [ ] 15-03-PLAN.md — Tokenisation résiduelle : `ring-[#2563EB]` → `ring-ring` (LanguageSwitcher) + utilitaires palette bruts → tokens sémantiques sur 8 surfaces admin/affiliation/track-record (THEME-02)
 **UI hint** : yes
-**Notes** : Arête dure : DS figé AVANT tout reskin (sinon double passage). Migration = copier les valeurs `.dark`/`.nxl` dans `:root`, supprimer `.dark` + le toggle, `forcedTheme="dark"` ; primitives (couche 1) et noms shadcn (couche 3) intacts ; RTL/i18n orthogonaux non touchés. Adresse Pitfall #1 (dé-scopage `.nxl` mécanique → débordement global des tokens). Research flag : décision green vs volt + matrice de contraste AA en dark sur surfaces translucides.
+**Notes** : Arête dure : DS figé AVANT tout reskin (sinon double passage). Migration = **promotion sémantique** : copier les valeurs GREEN `.nxl[data-theme="green"]` dans `:root` (D-02/D-03, jamais de copie mécanique du sélecteur `.nxl` — Pitfall #1) ; le sélecteur `.dark` **reste présent** (D-06, observé par CandleChart + sonner) mais réconcilié aux mêmes valeurs GREEN que `:root` ; suppression du **toggle** + `forcedTheme="dark"`. Primitives (couche 1) et noms shadcn (couche 3) intacts ; RTL/i18n orthogonaux non touchés (purge du seul namespace `theme`). Research flag résolu : GREEN tranché (D-01) + matrice de contraste AA translucide compositée (D-09/D-10). Parallélisme : 15-02 (globals/layout/messages) // 15-03 (LanguageSwitcher + admin/affiliation/track-record), fichiers disjoints.
 
 ### Phase 16: Reskin transversal de toutes les pages
 **Goal** : Repeindre toutes les surfaces existantes de la plateforme sur le DS v3 dark néon figé, d'un seul passage, en préservant intégralement le gating RLS, l'i18n/RTL, les disclaimers et les garde-fous textuels.
@@ -233,7 +236,7 @@ Détail complet archivé : `.planning/milestones/v2.0-ROADMAP.md`.
 | 12. Routines d'analyse Claude (sans API) | v2.1 | 4/6 | ⏸️ Paused | - |
 | 13. Backtest catalogue de patterns | v2.1 | 0/? | ⏸️ Paused | - |
 | 14. Track record affiché & boucle prod | v2.1 | 0/? | ⏸️ Paused | - |
-| 15. Design system v3 « dark néon unique » | v3.0 | 0/? | Not started | - |
+| 15. Design system v3 « dark néon unique » | v3.0 | 0/3 | Planned | - |
 | 16. Reskin transversal de toutes les pages | v3.0 | 0/? | Not started | - |
 | 17. Fondation DB scalable | v3.0 | 0/? | Not started | - |
 | 18. Seed de données réalistes à l'échelle | v3.0 | 0/? | Not started | - |
