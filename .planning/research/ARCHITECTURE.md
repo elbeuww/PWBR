@@ -1,303 +1,367 @@
 # Architecture Research
 
-**Domain:** v2.1 integration into an existing pnpm monorepo (Next.js 15 + Supabase trading-analysis platform). Three axes: NEXA reskin · live AI routines · backtest seeding.
-**Researched:** 2026-06-20
-**Confidence:** HIGH (read against real source files; every integration point cites a real path)
+**Domain:** Plateforme SaaS trading (Next.js 15 App Router + Supabase RLS) — milestone v3.0 « dark néon NEXA » : DS dark-unique, dashboards user + superadmin, scalabilité DB 10k+.
+**Researched:** 2026-06-22
+**Confidence:** HIGH (archi existante lue dans le repo ; patterns Supabase/Postgres vérifiés sur docs officielles 2026)
 
-> Scope: **integration only**. Build ON the existing architecture, do not redesign it. The single AI write boundary (`persist.ts`) stays sacred.
+> Milestone SUBSÉQUENT. Ce document cible UNIQUEMENT l'intégration du neuf dans l'archi livrée (phases 1-11). Tout ce qui n'est pas listé « modifié/neuf » reste tel quel.
 
 ---
 
-## Standard Architecture (existing, as-built — what we plug into)
+## Standard Architecture
 
-### System Overview
+### System Overview (état cible v3.0)
 
 ```
 ┌──────────────────────────────────────────────────────────────────────┐
-│  SCHEDULER LAYER (agnostic — D-08)                                     │
-│  Claude Code Remote routine │ Windows Task Scheduler │ croner daemon   │
-└───────────────┬──────────────────────────────────────────────────────┘
-                │ argv[2] = job name   (+ env: RUN_ID, SUPABASE_*)
-                ▼
-┌──────────────────────────────────────────────────────────────────────┐
-│  apps/jobs  (tsx ESM)                                                   │
-│  dispatch.ts ── JOB_REGISTRY ──► runJob.ts (startRun/finishRun)        │
-│       │                              │ service_role, lazy client        │
-│       ▼                              ▼                                   │
-│  ingest jobs        engine jobs      job_runs (monitoring)              │
-│  market/news/macro  technical/       outcome-tracker, telegram-publish  │
-│  /calendar          fundamental/news ─► combine-engine ─► [ANALYZE] ─►  │
-│                                                            persist.ts    │
-└───────────────┬───────────────────────────────────┬───────────────────┘
-                │ supabase-js (HTTPS, NOT MCP)        │ reads run-artifacts/
-                ▼                                     │
-┌──────────────────────────────────────────────────────────────────────┐
-│  Supabase (Postgres + RLS + Realtime)                                  │
-│  candles · news · macro · snapshots · analyses · trade_setups          │
-│  prediction_outcomes ─► pattern_stats (VIEW, anon-readable)            │
-└───────────────┬──────────────────────────────────────────────────────┘
-                │ anon client + RLS gates (has_active_subscription)
-                ▼
-┌──────────────────────────────────────────────────────────────────────┐
-│  apps/web  (Next.js 15 App Router, RSC)                                │
-│  [locale]/(marketing)/(member)/(account)/(auth) + (admin)             │
-│  globals.css @theme tokens · shadcn/ui v4 · CandleChart (lwc v5)      │
-└──────────────────────────────────────────────────────────────────────┘
-
-shared packages:  core (replayOutcome, OutputSchema, scoring, threshold)
-                  indicators (RSI/.../structure: swings, BOS/CHoCH, S/R, POC)
-                  data-sources (Binance/OANDA/Finnhub/Marketaux/FRED/FairEconomy)
-                  supabase (generated types + typed repositories)
+│  CLIENT (navigateur) — dark unique, RTL-aware, reduced-motion gardé    │
+│  ┌──────────────┐ ┌──────────────┐ ┌──────────────┐ ┌──────────────┐  │
+│  │ Vitrine .nxl │ │ Espace membre│ │ Dash USER    │ │ Dash ADMIN   │  │
+│  │ (landing)    │ │ (signaux)    │ │ (NEUF)       │ │ (refondu)    │  │
+│  └──────┬───────┘ └──────┬───────┘ └──────┬───────┘ └──────┬───────┘  │
+└─────────┼────────────────┼────────────────┼────────────────┼─────────┘
+          │  RSC fetch (anon-client + cookies)   │ react-query (client islands)
+┌─────────┴────────────────┴────────────────┴────────────────┴─────────┐
+│  NEXT.JS 15 — App Router                                               │
+│  middleware composé : handleI18n ∘ updateSession ∘ x-pathname          │
+│  ┌────────────────────────────────────────────────────────────────┐   │
+│  │ [locale]/(public|member|account|dash) + (admin) hors-locale     │   │
+│  │ gate.ts : requireUser / requireActiveSub / requireRole          │   │
+│  │ Design System GLOBAL dark (globals.css) — `.nxl` dé-scopé        │   │
+│  └────────────────────────────────────────────────────────────────┘   │
+└──────────────────────────────┬────────────────────────────────────────┘
+                               │ @supabase/ssr (cookies) · service_role (jobs only)
+┌──────────────────────────────┴────────────────────────────────────────┐
+│  SUPABASE Postgres 15 — RLS STRICTE (source de vérité = migrations SQL) │
+│  Tables: profiles, subscriptions, trade_setups, analyses, payments,    │
+│          referrals, commissions, affiliates, job_runs, pattern_stats…  │
+│  Helpers security-definer: has_active_subscription(), is_superadmin()  │
+│  NEUF: vues + MATVIEWS KPI (admin) · index keyset · RLS (select auth.uid())│
+│  Realtime postgres_changes (hérite RLS) · Pooler Supavisor (txn 6543)  │
+└────────────────────────────────────────────────────────────────────────┘
 ```
 
-### The single AI write boundary (do NOT bypass)
+### Component Responsibilities
 
-`apps/jobs/src/jobs/persist.ts` is the **only** path from agent output to DB. The agent
-**never writes the DB**; it writes JSON files under `run-artifacts/<run_id>/<instrument>_<style>.json`.
-`persist.ts` reads them (`readRunArtifacts`), then: stripFence → JSON.parse → `OutputSchema.safeParse`
-(Zod) → `getSnapshotByHash(raw_indicators_ref)` → `runGuardrails` (R:R, SL/TP coherence, structure-against)
-→ `scoreSetup` (deterministic /100, agent's score discarded) → `expirePriorSetups` → `insertAnalysis` +
-`insertTradeSetups`. **All v2.1 routine work must keep this boundary intact.**
+| Component | Responsibility | Statut v3.0 |
+|-----------|----------------|-------------|
+| **DS global dark** (`globals.css`) | Tokens 3 couches OKLCH, dark UNIQUE, plus de flip | **MODIFIÉ** (fusion `.nxl` → tokens globaux) |
+| `nexa-landing.css` (`.nxl`) | Ambiance riche vitrine | **MODIFIÉ** (dé-scopé : ce qui est réutilisable monte en DS ; le reste reste local mais sans dépendre du flip) |
+| `[locale]/layout.tsx` (shell) | Seul `<html lang dir>`, header, ThemeProvider | **MODIFIÉ** (retrait toggle light + `forcedTheme=dark`) |
+| `(member)/layout.tsx` | Gate abo + ExpiryBanner | inchangé (gate), reskin only |
+| `(dash)/` user dashboard | Vue d'ensemble / signaux suivis / abo / affiliation | **NEUF** |
+| `(admin)/layout.tsx` + pages | Pilotage signaux/santé/affiliés/paiements/users | **MODIFIÉ/refondu** (KPI via matviews) |
+| `gate.ts` | requireUser/ActiveSub/Role | inchangé (réutilisé tel quel) |
+| `packages/supabase` repos | Accès typé au-dessus du client | **+ repos neufs** (keyset list, KPI reads) |
+| migrations SQL | Source de vérité schéma + RLS | **+ migrations neuves** (RLS perf, index, matviews) |
 
 ---
 
-## Integration Map — NEW vs MODIFIED (by axis)
+## Recommended Project Structure (deltas v3.0)
 
-### AXIS 1 — NEXA Design System
+```
+apps/web/src/
+├── app/
+│   ├── [locale]/
+│   │   ├── layout.tsx            # MODIFIÉ : dark forcé, toggle retiré
+│   │   ├── (member)/             # reskin only
+│   │   ├── (account)/            # reskin only
+│   │   └── (dash)/               # NEUF : groupe dashboard utilisateur
+│   │       ├── layout.tsx        # NEUF : gate requireUser + nav dash (RSC)
+│   │       ├── page.tsx          # NEUF : overview (RSC, agrège vues SQL)
+│   │       ├── signaux-suivis/   # NEUF : keyset list (RSC) + island react-query
+│   │       ├── abonnement/       # peut réutiliser (account) — éviter doublon
+│   │       └── affiliation/      # NEUF côté dash user (miroir no-PII existant)
+│   └── (admin)/                  # hors [locale], FR fixe — REFONDU
+│       ├── layout.tsx            # inchangé (requireRole superadmin)
+│       ├── page.tsx              # MODIFIÉ : KPI lus depuis matviews
+│       ├── utilisateurs/         # NEUF/étendu : keyset + filtres URL
+│       ├── paiements/            # étendu
+│       └── sante/                # étendu (job_runs, advisors)
+├── components/
+│   ├── nexa/                     # primitives DS promues (ex-.nxl réutilisables)
+│   ├── landing/nexa-landing.css  # MODIFIÉ : dé-scopé partiellement
+│   └── dash/                     # NEUF : cartes KPI, tables keyset, sparklines
+└── styles/globals.css           # MODIFIÉ : DS dark unique
 
-**Decision: tokens live in `apps/web/src/styles/globals.css` `@theme` / `:root` / `.dark`. Do NOT create a shared design-token package.**
+supabase/migrations/
+├── 0017_rls_perf_select_authuid.sql   # NEUF : réécrit toutes les policies en (select …)
+├── 0018_scale_indexes_keyset.sql      # NEUF : index keyset par requête clé
+├── 0019_admin_kpi_matviews.sql        # NEUF : matviews KPI + unique index + refresh
+└── 0020_user_dashboard_views.sql      # NEUF : vues d'agrégation user (RLS héritée)
+```
 
-Rationale (HIGH): the existing system is already Tailwind v4 CSS-first — the entire token surface
-(`--color-*` mapped via `@theme inline`, brand values in `:root`/`.dark`) lives in one file
-(`globals.css`, 122 lines). Only `apps/web` consumes it (jobs render nothing). A shared package would
-add a build step and a second source of truth for zero benefit. shadcn/ui components already consume the
-mapped tokens (`bg-primary`, `text-foreground`, `border-border`), so re-skinning is mostly **swapping
-the CSS variable values**, not touching components.
+### Structure Rationale
 
-| Concern | Integration point | New / Modified |
-|---------|-------------------|----------------|
-| Token values (OKLCH NEXA palette) | `apps/web/src/styles/globals.css` `:root` + `.dark` | **MODIFIED** — replace blue `#1E5FBF`/`#3B82F6` hex with OKLCH NEXA tokens. Keep the `@theme inline` mapping table as-is. |
-| Two brand themes `volt` / `green` | `globals.css` — add `[data-brand="volt"]` / `[data-brand="green"]` selectors layered on `:root`/`.dark` | **NEW** — a *second axis* orthogonal to light/dark. light/dark stays `.dark` class (next-themes); brand becomes a `data-brand` attribute on `<html>`. The two compose: `.dark[data-brand="green"]` overrides where needed. |
-| Brand selection provider | `apps/web/src/components/ThemeProvider.tsx` (wraps next-themes) | **MODIFIED** — keep next-themes for light/dark; add a tiny `BrandProvider` setting `data-brand` with the same no-flash pre-paint script pattern already used for theme. |
-| No-flash guarantee | `[locale]/layout.tsx` `<html suppressHydrationWarning>` + next-themes pre-paint | **MODIFIED (carefully)** — the brand attribute needs the SAME pre-paint inline-script treatment as `.dark`, or brand flashes on load. #1 reskin pitfall. |
-| Fonts (Archivo / Chakra Petch / Space Grotesk / JetBrains Mono / Noto Sans Arabic) | `apps/web/src/lib/fonts.ts` + `src/fonts/*.woff2` | **MODIFIED** — extend the existing `next/font/local` + `next/font/google` pattern. Add font CSS vars; map in `@theme` (`--font-sans`, new `--font-display`, `--font-mono`). Keep `:lang(ar)` rule, swap IBM Plex Arabic → Noto Sans Arabic. |
-| RTL preservation | next-intl `dir="rtl"` (`[locale]/layout.tsx`) + Tailwind v4 logical properties | **PRESERVE** — every NEW NEXA component (hero, marquee, gauges, scene) MUST use logical props (`ms`/`me`/`ps`/`pe`/`start`/`end`/`text-start`), NEVER physical (`ml`/`pl`/`left`/`text-left`). ThemeToggle is the reference pattern (already RTL-safe). |
-| CandleChart (lightweight-charts v5) | `apps/web/src/components/signals/CandleChart.tsx` (+ `CandleChartLazy.tsx`, no-SSR) | **MODIFIED** — lwc colors are set via JS API (`layout`, `grid`, series colors), NOT CSS tokens. Reskin = read NEXA OKLCH values from CSS vars at runtime (`getComputedStyle(document.documentElement)`) or pass a resolved theme object. Must react to dark/light AND brand switch. Keep canvas; do not rebuild. |
-| RLS-gated server components | `(member)/signaux` RSC (anon client + RLS) | **PRESERVE** — reskin is purely presentational. Do NOT move data fetching to client to "make styling easier" — that breaks the `has_active_subscription()` gate. Restyle inside the existing RSC → client-component boundary. |
-
-**Component inventory — restyle (token-driven, no rebuild) vs rebuild (new NEXA primitives):**
-
-| Restyle only (consume new tokens) | Rebuild / Build new (NEXA-specific) |
-|-----------------------------------|-------------------------------------|
-| All `components/ui/*` shadcn primitives (button, card, badge, table, tabs, dialog, select, input, progress…) — token swap | Hero / "scène" (landing) — **NEW** |
-| `Footer.tsx`, `Disclaimer.tsx`, `LanguageSwitcher.tsx`, `ThemeToggle.tsx` | Marquee — **NEW** |
-| `signals/SignalCard`, `SignalList`, `FilterBar`, `SignalDetail`, `ContributingFactors`, `RealtimeBadge`, `GlossaryTooltip` | Score gauges (/100 visual) — **NEW** (replaces/augments `ui/progress`) |
-| `track-record/TrackRecordBlock`, `TrackRecordView` | Brand theme switcher (volt/green) — **NEW** |
-| `academie/*` (Callout, ContentCard, Steps, Toc, Figure, TradeExample, mdx-components) | NEXA header/nav shell — **MODIFY** existing header in `[locale]/layout.tsx` |
-| `member/ExpiryBanner`, `admin/*` row-action components | Animations layer — **NEW** (respect `prefers-reduced-motion`) |
-| `CandleChart` — **MODIFY** (runtime theme injection, not rebuild) | |
-
-**Rebranding MERA → NEXA:** the hardcoded `"Vétéran Trading"` string in `[locale]/layout.tsx` header
-(marked `i18n-ignore: marque`) → `"NEXA"`. Audit i18n message files for any brand/slogan strings; the
-"Make Everybody Rich Again" slogan is explicitly **excluded** (legal: no gain promise — already enforced
-by the `no-perf-claims` test from v2.0 P2).
+- **`(dash)/` séparé de `(member)/` :** le dashboard user n'exige pas forcément un abo actif (vue d'ensemble + abo + affiliation accessibles à un user authentifié sans abo, pour le faire convertir). Gate = `requireUser`, pas `requireActiveSub`. Les listes de signaux **suivis** restent gated par la RLS `has_active_subscription()` (défense en profondeur — le gate UX ne remplace jamais la RLS).
+- **`(admin)/` reste hors `[locale]` :** déjà mono-FR (D-15). Refonte = pages + matviews, pas de changement de groupe.
+- **matviews dans migrations, pas en SQL ad-hoc :** source de vérité unique (CLAUDE.md « PAS d'ORM, migrations = vérité »).
 
 ---
 
-### AXIS 2 — Live AI Routines (Claude Code Remote, no API key)
+## Architectural Patterns
 
-**Key finding: there is NO `analyze` job and there should not be one. The ANALYZE step is agent-native reasoning, not a registered job.**
+### Pattern 1 — Migration DS « multi-thème → dark unique » sans casser RTL/no-flash/i18n
 
-Verified: `dispatch.ts` `JOB_REGISTRY` has no `analyze` entry; `persist.ts` reads agent-produced FILES
-via `runArtifacts.ts`; comments in `persist.ts`/`combine-engine.ts` call ANALYZE "04-04" and state
-*"l'agent écrit des FICHIERS ; seul persist insère"*. `runArtifacts.ts` expects
-`run-artifacts/<run_id>/<instrument>_<style>.json` with `RUN_ID_RE = /^[a-z]+-\d{8}T\d{4}Z$/`.
+**What :** Le DS actuel a 3 couches (primitives OKLCH theme-indépendantes → sémantique `:root`/`.dark` qui FLIPPE → component `@theme inline` noms shadcn). Le neuf supprime le flip : on garde **une seule** couche sémantique = les valeurs dark, et on dé-scope les bonnes parties de `.nxl`.
 
-**The routine pipeline (per scheduled run):**
+**When to use :** dès le début du milestone (arête critique : DS AVANT reskin).
 
-```
-Claude Code Remote routine (15 runs/day, shared quota — docs/routines-claude.md §2)
-  │  Environment injects SUPABASE_URL + SUPABASE_SERVICE_ROLE_KEY (§3)
-  │
-  ├─1─ deterministic prep (job invocations, NO AI):
-  │     tsx dispatch.ts technical-engine
-  │     tsx dispatch.ts fundamental-engine
-  │     tsx dispatch.ts news-engine
-  │     tsx dispatch.ts combine-engine     ← assembles snapshot kind='combined'
-  │
-  ├─2─ ANALYZE (agent-native, NO job):
-  │     agent reads combined snapshots for the session universe (sessionUniverse.ts),
-  │     reasons per (instrument × style) using prompts/veteran.md,
-  │     WRITES run-artifacts/<run_id>/<SYMBOL>_<style>.json  (raw §3 JSON each)
-  │     exports RUN_ID=<session>-<YYYYMMDD>T<HHmm>Z
-  │
-  └─3─ persist (single boundary):
-        RUN_ID=… tsx dispatch.ts persist     ← validates/scores/inserts immutably
+**Trade-offs :** approche conservatrice (réécrire la couche sémantique, pas les primitives ni les noms component) = zéro casse des composants shadcn consommateurs (`bg-primary`, `text-foreground`…). Risque si on touche les primitives ou les noms component → casse silencieuse (Pitfall connu du repo).
+
+**Recette concrète (ordre interne) :**
+1. **Couche 2 (sémantique) :** copier les valeurs `.dark { … }` actuelles dans `:root { … }`, supprimer le bloc `.dark`. Les tokens ne flippent plus → dark partout. Garder les noms component (couche 3) **intacts**.
+2. **`@custom-variant dark` :** laisser le variant exister mais ne plus poser `.dark` (il devient inerte) pour minimiser le diff ; retirer progressivement les usages `dark:` résiduels du JSX.
+3. **`ThemeProvider` / `layout.tsx` :** retirer `ThemeToggle`, fixer `forcedTheme="dark"` (next-themes) → garde le script no-flash sur `<html>` mais sans alternance. RTL (`dir`) et i18n (`NextIntlClientProvider`) **non touchés** (orthogonaux au thème).
+4. **`.nxl` :** promouvoir vers `globals.css` ce qui est partagé (auras, grilles, reveal, marquee — déjà tokenisés via `var()`). Laisser sous `.nxl` ce qui est spécifique vitrine. Critère : si un effet utilise déjà `var(--primary)/--accent-brand`, il monte sans risque. Les valeurs HEX littérales de `.nxl[data-theme]` (`--bg:#070b08`…) deviennent les **nouvelles valeurs primitives dark** du DS — mappées en OKLCH (cohérence couche 1), pas copiées en HEX brut.
+
+**Garde-fous à conserver :** text-scan RTL logical-props, no-flash, parité i18n. Ajouter un garde « no light-theme residue » (grep `dark:` / `data-theme` orphelins).
+
+**Example :**
+```css
+/* AVANT (flip) */
+:root { --background: var(--nexa-white); }
+.dark { --background: var(--nexa-ink); }
+/* APRÈS (dark unique) — couche 3 (noms component) inchangée */
+:root { --background: var(--nexa-ink); /* + reste des valeurs dark */ }
+/* plus de bloc .dark ; --color-background: var(--background) reste tel quel */
 ```
 
-| Concern | Integration point | New / Modified |
-|---------|-------------------|----------------|
-| Where the agent plugs in | Between `combine-engine` (job) and `persist` (job). The agent IS the analyze step; it produces files, not DB rows. | **NEW orchestration**, no new job module. |
-| Should `analyze.ts` be a new job? | **NO.** A job runs deterministic code under `runJob`. Veteran reasoning is the agent itself (no API key → cannot call Claude from inside a job). Adding `apps/jobs/src/jobs/analyze.ts` would require an API key — out of scope. The artifact-file contract (`runArtifacts.ts`) is precisely the seam that lets the agent be the analyzer. | — |
-| Snapshot building feeds the agent | `technical-engine` + `fundamental-engine` + `news-engine` → `combine-engine` → `snapshots` table (kind='combined', `content_hash`). Agent reads combined snapshots; `output.raw_indicators_ref` = that hash, resolved by `getSnapshotByHash` in persist. | **PRESERVE** (already built). The hash linkage is the integrity contract. |
-| Session universe per run | `apps/jobs/config/sessions.ts` (`SESSIONS` map: asset_classes × styles) + `apps/jobs/src/jobs/sessionUniverse.ts` (`resolveSessionUniverse`). | **PRESERVE** — defines which instrument×style pairs the agent analyzes per session. |
-| Schedule windows (day/swing triggers) | Cron declared in `sessions.ts` header: asia `00 23 * * 0-4`, london `00 07 * * 1-5`, newyork `30 12 * * 1-5`, eod-swing `00 21 * * 1-5`. Authoritative UTC table in `docs/routines-claude.md §6`. | **NEW (config in Claude dashboard)** — these windows become the actual Remote routine schedules. "The engine chooses the moment" = these pre-declared session windows, not free-form. Routine config lives **outside git** (ARCHITECTURE §5 note). |
-| Secrets | Claude Code **Environments** inject `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`. `dispatch.ts` loads `dotenv/config` (no-op in cloud). | **NEW (dashboard setup)** — see `docs/routines-claude.md §7 TODO` checklist. |
-| Connectivity | supabase-js HTTPS only. **MCP Supabase is NOT available in Remote routines** (docs §4, Pitfall 5). Confirm `*.supabase.co` network access at setup. | **PRESERVE** — every job already uses supabase-js, never MCP. |
-| Monitoring | `runJob` writes `job_runs` (running→success/error). Agent-native ANALYZE has no `runJob` wrapper → if the agent dies mid-run, `persist` throws `no_artifacts`, and the missing combined→setups chain shows as `stale` on `/admin/sante`. | **PRESERVE**. Optional: a thin `analyze-marker` heartbeat job to record the ANALYZE attempt in `job_runs` (LOW priority observability). |
-| Quota (15 runs/day shared) | Deterministic ingestion must NOT consume Claude quota → stays on Windows Task Scheduler (docs §5). Only ANALYZE runs in routines. | **PRESERVE** — keep ingestion off the agent path. |
+### Pattern 2 — Dashboards : RSC pour la donnée, islands client pour l'interactif
 
-**This axis is mostly configuration + lifting the v1.0 P4 debt ("configurer routines + 1 run réel"),
-not new code.** The seams already exist. New code, if any: a per-session orchestration wrapper the
-routine calls (a `.cmd`/shell chaining the engine jobs, then the agent, then persist), and optional
-observability glue.
+**What :** Layout + page de premier rendu = RSC (lecture anon-client + cookies → RLS). Tri/filtre/pagination temps réel = Client Components ciblés sous `@tanstack/react-query` (déjà dans la stack). L'admin KPI lit des **matviews** (pas de COUNT/GROUP BY live).
+
+**When to use :** tous les dashboards. RSC par défaut (cohérent avec le repo) ; react-query seulement là où l'UX exige refetch/optimistic sans full reload.
+
+**Trade-offs :** RSC = pas de waterfall client, SEO/perf, mais navigations filtrées coûtent un round-trip serveur → d'où les islands react-query pour les listes très interactives (`/dash/signaux-suivis`, tables admin). Realtime reste via `postgres_changes` (hérite RLS) comme en phase 3, pas de polling.
+
+**Agrégation — vue SQL vs requête :**
+- **User overview** : vue SQL simple (jointures scopées RLS, faible cardinalité par user) → `0020_user_dashboard_views.sql`. La vue **hérite** de la RLS des tables sous-jacentes (pas de SECURITY DEFINER → pas de fuite cross-user).
+- **Admin KPI** (totaux globaux : MRR, users actifs, signaux/jour, santé jobs) : **matview** rafraîchie périodiquement, pas une vue live (cf. Pattern 4).
+
+**Example :**
+```tsx
+// (dash)/page.tsx — RSC, agrège la vue user
+const supabase = await createClient()
+const { data } = await supabase.from('v_user_overview').select('*').single()
+// pas de service_role : RLS scope user_id = (select auth.uid())
+```
+
+### Pattern 3 — Keyset (cursor) pagination en RSC pour les grandes listes
+
+**What :** Remplacer `OFFSET`/`.range()` par un curseur composite `(tri, id)`. En Supabase JS : `.or()` + `.lt()/.gt()` + `.order()` + `.limit()`. Le curseur transite par searchParams (RSC-friendly, partageable, pas d'état client).
+
+**When to use :** listes membres (signaux), tables admin users/paiements — toute table qui dépasse quelques milliers de lignes. **Garder l'offset** uniquement pour l'admin où l'accès « page N aléatoire » est exigé et la table reste petite.
+
+**Trade-offs :** O(1) vs O(n) — sur 10M lignes, OFFSET profond ≈ 8 s vs keyset ≈ constant (bench vérifié). Coût : exige un **index composite** exactement aligné sur l'ORDER BY, et pas de saut « page 500 » direct (acceptable pour feeds/infinite-scroll).
+
+**Example :**
+```ts
+// tri opportunity_score desc, id desc — curseur = (score, id) du dernier vu
+let q = supabase.from('trade_setups')
+  .select('id, opportunity_score, instrument_id, created_at')
+  .order('opportunity_score', { ascending: false })
+  .order('id', { ascending: false })
+  .limit(20)
+if (cursor) {
+  // (score, id) < (cursorScore, cursorId)
+  q = q.or(`opportunity_score.lt.${cursor.score},and(opportunity_score.eq.${cursor.score},id.lt.${cursor.id})`)
+}
+```
+> Index requis : `(opportunity_score desc, id desc)` — voir Pattern 5.
+
+### Pattern 4 — Matviews pour les KPI superadmin
+
+**What :** Les KPI globaux (totaux, agrégats temporels) sont précalculés en `MATERIALIZED VIEW` avec **unique index** (obligatoire pour `REFRESH … CONCURRENTLY` qui ne verrouille pas les lecteurs). Refresh planifié.
+
+**When to use :** dashboard admin uniquement (lecture super-admin via `is_superadmin()`), tolérance fraîcheur minutes. Jamais pour de la donnée par-user (utiliser une vue scopée RLS).
+
+**Trade-offs :** lecture O(1) constante quelle que soit la taille des tables ; coût = recompute complet à chaque refresh (acceptable à 10k users). Refresh : `pg_cron` (extension Supabase) si dispo, sinon job existant (l'archi a déjà `job_runs` + Windows Task Scheduler) qui appelle un RPC `refresh_admin_kpis()`.
+
+**Sécurité :** une matview ne porte pas de RLS → la protéger par une **vue/RPC vérifiant `is_superadmin()`** OU restreindre les GRANT à un rôle non exposé. Ne jamais exposer la matview brute à `authenticated`/`anon`.
+
+**Example :**
+```sql
+create materialized view admin_kpi_daily as
+  select date_trunc('day', created_at) d,
+         count(*) filter (where status='active') active_subs
+  from public.subscriptions group by 1;
+create unique index admin_kpi_daily_d_idx on admin_kpi_daily (d); -- requis CONCURRENTLY
+-- refresh: select cron.schedule('refresh-kpi','*/10 * * * *',
+--   $$refresh materialized view concurrently admin_kpi_daily$$);
+```
+
+### Pattern 5 — RLS performante : `(select auth.uid())` + index ciblés
+
+**What :** Les policies actuelles appellent `auth.uid()` / `has_active_subscription()` **directement** (vérifié dans migrations 0006/0009) → Postgres réévalue la fonction **par ligne**. Le fix : envelopper dans un sous-`SELECT` → Postgres en fait un **initPlan** mis en cache **par requête** (une seule évaluation). Gain mesuré >100x sur grandes tables (docs Supabase).
+
+**When to use :** AVANT toute montée en charge (arête critique : perf DB AVANT exposition à l'échelle). S'applique à **toutes** les policies du repo (`profiles`, `subscriptions`, `trade_setups`, `analyses`, `payments`, `referrals`, `commissions`…).
+
+**Trade-offs :** réécriture mécanique, zéro changement de sémantique (le `(select …)` est valide car le résultat ne dépend pas de la ligne). Limite : ne pas envelopper une fonction qui prend une colonne de la ligne en argument.
+
+**Example :**
+```sql
+-- AVANT (réévalué par ligne) — état actuel du repo
+using (user_id = auth.uid())
+using (public.has_active_subscription())
+-- APRÈS (initPlan, évalué une fois)
+using (user_id = (select auth.uid()))
+using ((select public.has_active_subscription()))
+```
+> Compléter par des **index B-tree** sur les colonnes RLS (`user_id`) et les clés d'ORDER BY keyset. Vérifier avec `EXPLAIN (ANALYZE)` + `get_advisors` (lint `0003_auth_rls_initplan`).
 
 ---
 
-### AXIS 3 — Backtest Engine (seed `pattern_stats`)
+## Data Flow
 
-**Decision: new package `packages/backtest`. Do NOT put it in `packages/indicators`.**
-
-Rationale (HIGH): `packages/indicators` is a pure deterministic *calculation* library (golden-tested:
-same candles → same values + same hash). Backtesting is a *simulation/orchestration* concern that
-**consumes** indicators + structure detection + `replayOutcome` (which lives in `@app/core`). Mixing
-simulation into the indicators package would pollute its purity contract. A dedicated package keeps the
-dependency direction clean: `backtest → core + indicators + supabase`.
-
-| Concern | Integration point | New / Modified |
-|---------|-------------------|----------------|
-| Where it lives | `packages/backtest/` (new workspace) — pure detect/simulate/aggregate logic | **NEW** |
-| Backtest runner job | `apps/jobs/src/jobs/backtest.ts` + register in `dispatch.ts` `JOB_REGISTRY` | **NEW** (job wraps the package, writes via service_role under `runJob`) |
-| Reuse `replayOutcome` | `import { replayOutcome } from '@app/core'` — same first-touch TP1-vs-SL logic the live `outcome-tracker` uses (same `ReplaySetup`/`ReplayCandle` types). | **REUSE** — identical outcome semantics between backtest and live = honest, comparable %. |
-| Reuse structure detection | `@app/indicators`: `detectSwings`, `detectBosChoch`, `clusterLevels`, `computePoc`, plus RSI/MACD/EMA/ATR/Bollinger wrappers. | **REUSE** — pattern detection over historical candles uses the EXACT same detectors as live → the catalogue % measures the same patterns the engine emits. |
-| Data source | `candles` table (historical OHLCV, already ingested) via a backtest repository (or reuse the `getCandlesForReplay` pattern in `packages/supabase`). | **REUSE / extend** `packages/supabase` repositories. |
-| Where backtest results land | **NEW source distinct from live `prediction_outcomes`.** New table `backtest_outcomes` (mirrors prediction_outcomes shape: pattern, outcome, realized_r, candle_count) + extend `pattern_stats` view with a `source` column ('backtest' \| 'live'), OR a sibling view `pattern_stats_seed`. | **NEW migration** (next number after 0016 → 0017). Keep live `prediction_outcomes` untouched (its frontière D-05 = producer-unique). |
-| `pattern_stats` consumption | `packages/supabase/src/repositories/patternStats.ts` → re-exported by `apps/web/src/lib/track-record/patternStats.ts`. Front already reads it (TrackRecordBlock/View) with N≥30 threshold (`@app/core` `applyThreshold`, `MIN_SAMPLE`). | **MODIFIED** — repository/view gains `source` awareness so the front shows backtest-seeded % at J1, then progressively switches to live as N(live)≥30. N stays visible (D-12). |
-
-**Backtest data flow:**
+### Request Flow (dashboard user, état cible)
 
 ```
-candles (historical, table)
-   │
-   ▼  packages/backtest/detect.ts
-pattern detection  ── @app/indicators (swings, BOS/CHoCH, S/R, POC, RSI…)
-   │  → "at bar T, pattern P fired with implied entry/SL/TP"
-   ▼  packages/backtest/simulate.ts
-simulate outcome  ── @app/core replayOutcome (first-touch TP1 vs SL, realized_r)
-   │  → { pattern, outcome, realized_r } per detected instance
-   ▼  packages/backtest/aggregate.ts (or SQL view)
-aggregate by pattern → win_rate, avg_r(winners), expectancy, N
-   │
-   ▼  apps/jobs/src/jobs/backtest.ts  (service_role, runJob, job_runs)
-backtest_outcomes table  ──►  pattern_stats (source='backtest')
-   │
-   ▼  apps/web track-record block — % MEASURED at J1 (N visible, ≥30 gate)
+[User authentifié] → /dash
+   ↓ middleware (handleI18n ∘ updateSession → cookies frais + x-pathname)
+[(dash)/layout RSC] requireUser()            ← gate UX
+   ↓
+[(dash)/page RSC] anon-client.from('v_user_overview')
+   ↓ RLS: user_id = (select auth.uid())       ← vraie barrière
+[Postgres] vue scopée → lignes du seul user
+   ↓
+[RSC stream HTML] + island react-query (signaux suivis, keyset cursor)
+   ↓ realtime postgres_changes (hérite RLS) → push nouveaux signaux
 ```
 
-**Honesty invariant (PROJECT.md core value):** the displayed % must be measured, never asserted.
-Backtest seeds the % *before* live N≥30 exists; the live `outcome-tracker` loop accumulates real
-outcomes in parallel; the front transitions backtest→live as the live sample matures. Both use the
-SAME `replayOutcome` so the two measurements are methodologically comparable.
+### Request Flow (admin KPI)
+
+```
+[superadmin] → /admin
+   ↓ (admin)/layout requireRole('superadmin') → sinon notFound() (404 discret)
+[page RSC] read wrapper(is_superadmin()) → admin_kpi_daily (matview)
+   ↓ lecture O(1) précalculée (pas de COUNT live)
+[refresh] pg_cron OU job_runs → refresh materialized view concurrently (hors requête)
+```
+
+### Key Data Flows
+
+1. **DS unifié** : `.nxl[data-theme]` (HEX) → primitives OKLCH dark (couche 1) → sémantique `:root` (plus de `.dark`) → noms component inchangés → composants shadcn rendus en dark sans flip.
+2. **Keyset** : searchParams `?cursor=score_id` → `.or(...)` Supabase → page suivante O(1) → nouveau curseur renvoyé au client.
+3. **Realtime** : inchangé phase 3 (`postgres_changes`, replica identity FULL sur `trade_setups`) — hérite de la RLS performante (donc bénéficie aussi du fix `(select …)`).
 
 ---
 
-## Recommended Build Order (dependency-respecting)
+## Scaling Considerations
 
-```
-1. DESIGN tokens first        globals.css OKLCH NEXA + volt/green + fonts.ts + no-flash brand script
-       → verify: light/dark/volt/green compose with no flash; RTL logical props intact
-2. DESIGN reskin              shadcn token-driven restyle → signals/track-record/academie/admin
-       → then NEW NEXA primitives (hero, marquee, gauges, scene, animations)
-       → CandleChart runtime theme injection (dark/light/brand reactive)
-       → verify: RLS-gated RSC untouched; CandleChart recolors; AR-RTL screens correct
-3. ROUTINES — snapshot path   confirm technical/fundamental/news → combine-engine produces combined
-       → verify: snapshots kind='combined' with content_hash for session universe
-4. ROUTINES — agent + persist Environment secrets + Remote routine schedules (sessions.ts crons)
-       → agent ANALYZE writes run-artifacts → RUN_ID=… persist → trade_setups
-       → verify: 1 real run end-to-end (lifts v1.0 P4 debt); job_runs green; stale flag works
-5. BACKTEST engine            packages/backtest (detect→simulate→aggregate) reusing core+indicators
-       → migration 0017 backtest_outcomes + pattern_stats source column
-       → apps/jobs backtest.ts job
-       → verify: golden values; same replayOutcome as live; N visible
-6. BACKTEST display           patternStats repo/view source-aware → front shows seeded % at J1
-       → outcome-tracker live loop in prod → progressive backtest→live switch
-       → verify: % always measured; N≥30 threshold; honest source labelling
-```
+| Scale | Architecture Adjustments |
+|-------|--------------------------|
+| 0-1k users | Archi actuelle suffit. Appliquer quand même `(select auth.uid())` (dette zéro-coût) + index `user_id`. |
+| 1k-10k users | **Cœur du milestone.** RLS initPlan partout · index keyset · matviews KPI · pooler **transaction mode (port 6543)** pour les RSC/serverless (connexions courtes nombreuses). |
+| 10k-100k+ | Curseurs partout (zéro OFFSET profond), matviews + `pg_cron`, surveiller `get_advisors` perf, envisager read-replica si lecture domine ; Realtime : borner les canaux par client. |
 
-**Why this order:** tokens before reskin (components consume tokens). Snapshot before analyze (agent
-needs combined snapshots). Persist boundary before any setup display. Backtest engine before display
-(can't show % without measured data). Design (Axis 1) is independent of Axes 2–3 and can run in
-parallel by a separate workstream.
+### Scaling Priorities (ordre « ce qui casse en premier »)
+
+1. **RLS réévaluée par ligne (casse en 1er)** → `(select auth.uid())` + `(select has_active_subscription())` sur **toutes** les policies. Vérifié docs Supabase, gain >100x.
+2. **OFFSET profond sur listes** → keyset pagination + index composite aligné ORDER BY. O(n)→O(1).
+3. **COUNT/GROUP BY live sur dashboard admin** → matviews + refresh planifié.
+4. **Épuisement des connexions (serverless)** → **Supavisor transaction mode (6543)** : partage les connexions directes (≤ limite compute). Attention : **pas de prepared statements** en txn mode (le repo n'utilise pas d'ORM type Prisma → non bloquant ; ne pas activer de prepared statements côté client). Session mode (5432) réservé aux migrations/longues sessions.
+5. **Realtime** → hérite RLS (donc du fix #1) ; limiter les souscriptions, repli silencieux déjà en place.
 
 ---
 
-## Anti-Patterns (v2.1-specific)
+## Anti-Patterns
 
-### Anti-Pattern 1: Adding an `analyze.ts` job that calls Claude
-**What people do:** create `apps/jobs/src/jobs/analyze.ts` invoking an Anthropic API.
-**Why wrong:** no API key in scope (cost constraint); breaks the "agent reasons natively, writes files"
-seam; duplicates the veteran prompt logic.
-**Instead:** the Remote routine's agent IS the analyzer. It writes `run-artifacts/<run_id>/*.json`;
-`persist.ts` reads them. The artifact-file contract is the integration point.
+### Anti-Pattern 1 — Reskinner les dashboards avant d'unifier le DS
 
-### Anti-Pattern 2: Writing trade_setups outside persist.ts
-**What people do:** seed setups directly from backtest, or let the agent insert.
-**Why wrong:** destroys the single confidence boundary (D-43) — Zod/guardrails/deterministic scoring/
-immutability all live in persist. Backtest measures *outcomes of detected patterns*, not setups.
-**Instead:** backtest writes `backtest_outcomes` (its own producer boundary), never `trade_setups`.
+**What people do :** appliquer le look dark néon page par page pendant que le DS flippe encore.
+**Why it's wrong :** double travail (chaque composant retouché deux fois), tokens incohérents, regressions light/dark. Viole l'arête critique « DS AVANT reskin ».
+**Do this instead :** figer le DS dark unique (Pattern 1) **d'abord**, puis reskin mécanique qui ne fait que consommer les tokens stabilisés.
 
-### Anti-Pattern 3: Moving RLS-gated data fetch to the client to ease reskin
-**What people do:** convert `(member)/signaux` RSC to a client component for styling convenience.
-**Why wrong:** the `has_active_subscription()` RLS gate depends on the server anon-client RSC pattern;
-client fetch leaks the gate / exposes the anon key path.
-**Instead:** restyle within the existing RSC→client boundary; presentational only.
+### Anti-Pattern 2 — Exposer la donnée à l'échelle avant le fix RLS/index
 
-### Anti-Pattern 4: Physical CSS direction utilities in NEW NEXA components
-**What people do:** `ml-`, `pl-`, `left-`, `text-left`, fixed `transform: translateX`.
-**Why wrong:** breaks Arabic RTL (the whole MENA audience). v2.0 went to lengths for logical-prop RTL.
-**Instead:** logical props only (`ms`/`me`/`ps`/`pe`/`start`/`end`/`text-start`); mirror animations for RTL.
+**What people do :** ouvrir les dashboards/listes 10k users avec les policies `auth.uid()` bare et de l'OFFSET.
+**Why it's wrong :** dégradation O(n)/par-ligne invisible en seed, catastrophique en charge. Viole « perf DB AVANT montée en charge ».
+**Do this instead :** migrations `0017` (RLS initPlan) + `0018` (index keyset) AVANT d'exposer/reskinner les listes.
 
-### Anti-Pattern 5: Theming CandleChart via CSS classes
-**What people do:** expect Tailwind tokens to recolor the canvas.
-**Why wrong:** lightweight-charts renders to canvas; CSS tokens don't reach it.
-**Instead:** read resolved OKLCH values from CSS vars (or a theme object) and pass via the lwc JS API;
-re-apply on dark/light AND brand change.
+### Anti-Pattern 3 — Matview exposée sans garde superadmin
+
+**What people do :** `grant select on admin_kpi_daily to authenticated`.
+**Why it's wrong :** une matview ne porte pas de RLS → fuite de KPI globaux à tout user connecté.
+**Do this instead :** wrapper RPC/vue vérifiant `is_superadmin()`, GRANT restreint.
+
+### Anti-Pattern 4 — service_role dans les dashboards pour « simplifier » l'agrégation
+
+**What people do :** lire les KPI/listes avec le client service_role (bypass RLS) côté page.
+**Why it's wrong :** casse l'invariant du repo (service_role réservé aux jobs, double barrière lint + server-only) ; un bug de scope = fuite cross-user totale.
+**Do this instead :** anon-client + vues scopées RLS (user) ; matviews + garde superadmin (admin).
+
+### Anti-Pattern 5 — Garder un `data-theme`/`dark:` résiduel après le passage dark-unique
+
+**What people do :** laisser des utilitaires `dark:` ou `.nxl[data-theme="volt"]` actifs.
+**Why it's wrong :** chemins de rendu morts, incohérences, regressions au moindre re-mount.
+**Do this instead :** garde text-scan « no light residue », `forcedTheme="dark"`, un seul `data-theme` (ou aucun).
 
 ---
 
-## Integration Points Summary
+## Build Order (respecte les arêtes critiques)
+
+```
+WAVE 1 — Design System dark unique  [DS AVANT reskin]
+  1. globals.css : couche sémantique → valeurs dark, suppression .dark
+  2. layout.tsx : forcedTheme dark, retrait ThemeToggle, no-flash conservé
+  3. .nxl : promotion des effets tokenisés en DS global + garde no-light-residue
+        └─ verif : RTL/i18n/no-flash intacts ; composants shadcn rendus dark
+
+WAVE 2 — Scalabilité DB  [perf DB AVANT exposition à l'échelle]
+  4. 0017 RLS initplan : (select auth.uid()) / (select has_*()) sur TOUTES policies
+  5. 0018 index keyset + index user_id RLS  (EXPLAIN ANALYZE + get_advisors)
+  6. 0019 matviews KPI admin + unique index + refresh (pg_cron/job_runs)
+  7. 0020 vues d'agrégation user (RLS héritée)
+        └─ verif : advisors perf PASS, EXPLAIN sans seq-scan par-ligne
+
+WAVE 3 — Dashboards (consomment DS figé + DB perf-ready)
+  8. (dash)/ user : layout requireUser, overview (vue), signaux-suivis (keyset+rq),
+     abonnement, affiliation                          [dépend de 1-3 et 4-7]
+  9. (admin)/ refonte : KPI matviews, users/paiements keyset, santé
+        └─ realtime postgres_changes (hérite RLS fixée)
+
+WAVE 4 — Reskin transversal restant + E2E
+ 10. reskin pages restantes sur DS figé (vitrine/légal/auth/académie)
+ 11. E2E Playwright flux principaux + gardes (RTL, gating RLS, anti-IDOR)
+```
+
+**Arêtes critiques (non négociables) :** `1→2→3` avant `8,9,10` (DS avant reskin). `4→5` avant `8,9` exposés à l'échelle (perf avant charge). `6` (matview) avant `9` (admin KPI). `5` (index keyset) avant toute liste paginée keyset.
+
+---
+
+## Integration Points
 
 ### Internal Boundaries
 
 | Boundary | Communication | Notes |
 |----------|---------------|-------|
-| agent ANALYZE ↔ persist | files: `run-artifacts/<run_id>/<symbol>_<style>.json` | RUN_ID format strict, path-traversal-guarded (`runArtifacts.ts`) |
-| combine-engine ↔ agent | `snapshots` (kind='combined', content_hash) | hash = `raw_indicators_ref` integrity link resolved in persist |
-| persist ↔ DB | supabase-js service_role, single writer | D-43 sole AI write boundary — keep sacred |
-| backtest ↔ pattern_stats | `backtest_outcomes` → view (source='backtest') | distinct from live `prediction_outcomes` (D-05) |
-| backtest / outcome-tracker ↔ core | `replayOutcome` (shared) | identical outcome semantics = comparable % |
-| web tokens ↔ components | `globals.css` `@theme` vars | reskin = token swap, not component rewrite |
-| brand/theme ↔ html | next-themes `.dark` + `data-brand` attr | both need no-flash pre-paint scripts |
+| `(dash)` ↔ Supabase | anon-client + cookies (RSC) ; react-query (islands) | RLS = vraie barrière ; gate = UX. Jamais service_role. |
+| `(admin)` ↔ matviews | RSC read via wrapper `is_superadmin()` | matview hors RLS → garde explicite obligatoire. |
+| DS global ↔ `.nxl` | tokens `var(--primary)`, `--accent-brand` | dé-scope = montée des effets tokenisés ; le reste local. |
+| middleware ↔ RSC | `x-pathname` header + cookies updateSession | inchangé ; `forcedTheme` ne touche pas i18n/RTL. |
+| jobs ↔ matviews | `refresh materialized view concurrently` via RPC | réutilise `job_runs` + Windows Task Scheduler (backup) ou pg_cron. |
 
-### External / Config
+### External Services
 
 | Service | Integration Pattern | Notes |
 |---------|---------------------|-------|
-| Claude Code Remote routines | Environments (secrets) + cron schedules (sessions.ts windows) | NOT git; dashboard config; 15 runs/day shared quota |
-| Supabase (Remote) | supabase-js HTTPS, NOT MCP | confirm `*.supabase.co` network access at setup |
-| Windows Task Scheduler | `run-job.cmd <job>` | keeps deterministic ingestion off Claude quota |
+| Supabase Postgres | migrations SQL versionnées (CLI/MCP) | source de vérité unique, PAS d'ORM. |
+| Supavisor (pooler) | **transaction mode 6543** pour RSC/serverless | pas de prepared statements en txn mode — OK (pas d'ORM Prisma). Session 5432 = migrations. |
+| Realtime | `postgres_changes`, replica identity FULL | hérite RLS (donc du fix initPlan) ; borner les canaux. |
+| pg_cron (extension) | refresh matviews planifié | si indisponible → fallback job_runs. |
 
 ---
 
 ## Sources
 
-- `apps/jobs/src/{dispatch,runJob}.ts`, `apps/jobs/src/jobs/{persist,combine-engine,outcome-tracker,runArtifacts}.ts`, `apps/jobs/config/sessions.ts`, `apps/jobs/prompts/veteran.md` — as-built code — **HIGH**
-- `apps/web/src/styles/globals.css`, `apps/web/src/lib/fonts.ts`, `apps/web/src/app/[locale]/layout.tsx`, `apps/web/src/components/ThemeToggle.tsx`, component inventory under `apps/web/src/components/*` — **HIGH**
-- `packages/core/src/index.ts` + `replay/outcome.ts`, `packages/indicators/src/index.ts`, `packages/supabase/src/repositories/patternStats.ts` — shared package surfaces — **HIGH**
-- `supabase/migrations/0014_prediction_outcomes_pattern_stats.sql` — pattern_stats view + D-05/D-12 — **HIGH**
-- `docs/routines-claude.md` (routine model, quota, Environments, MCP-not-available, session UTC windows) — **HIGH** (project invariant doc)
-- `.planning/PROJECT.md` (v2.1 scope, three axes, constraints, key decisions) — **HIGH**
+- Repo NEXA (lu 2026-06-22) : `globals.css` (3 couches tokens, flip `.dark`), `nexa-landing.css` (`.nxl[data-theme]`), `[locale]/layout.tsx` (shell, ThemeProvider `defaultTheme="light"`), `(member)/(admin)/layout.tsx`, migrations `0006`/`0009` (policies `auth.uid()` bare, helpers security-definer), `anon-client.ts`, `packages/supabase` repos — **HIGH** (source projet directe).
+- [Supabase — RLS Performance and Best Practices](https://supabase.com/docs/guides/troubleshooting/rls-performance-and-best-practices-Z5Jjwv) — `(select auth.uid())` → initPlan, >100x ; index sur colonnes RLS ; wrapper security-definer — **HIGH**.
+- [Supabase — Database Advisors (0003_auth_rls_initplan)](https://supabase.com/docs/guides/database/database-advisors?lint=0003_auth_rls_initplan) — lint qui détecte la réévaluation par-ligne — **HIGH**.
+- [Supabase — Supavisor FAQ](https://supabase.com/docs/guides/troubleshooting/supavisor-faq-YyP5tI) et [Connect to your database](https://supabase.com/docs/guides/database/connecting-to-postgres) — transaction mode (6543) partage les connexions, pas de prepared statements ; session mode (5432) — **HIGH**.
+- [Supabase agent-skills — data pagination](https://github.com/supabase/agent-skills/blob/main/skills/supabase-postgres-best-practices/references/data-pagination.md) et [SupaExplorer — cursor not OFFSET](https://supaexplorer.com/best-practices/supabase-postgres/data-pagination/) — keyset O(1) vs OFFSET O(n), `.gt()/.lt()` Supabase, index composite requis — **HIGH/MEDIUM**.
+- [PostgreSQL — REFRESH MATERIALIZED VIEW](https://www.postgresql.org/docs/current/sql-refreshmaterializedview.html) — `CONCURRENTLY` requiert unique index, ne verrouille pas les lecteurs ; pg_cron pour le refresh — **HIGH**.
 
 ---
-*Architecture research for: v2.1 integration (NEXA reskin · live AI routines · backtest seeding)*
-*Researched: 2026-06-20*
+*Architecture research for: plateforme trading Next.js 15 + Supabase, milestone v3.0 dark néon / dashboards / scalabilité 10k+*
+*Researched: 2026-06-22*
