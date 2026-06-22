@@ -429,6 +429,67 @@
       "Day & Swing analysis"
     ]
   },
+  "landing": {
+    "how": {
+      "eyebrow": "How it works",
+      "title": "Three steps, zero jargon",
+      "lede": "Built for beginners and seasoned traders alike. We explain everything in plain words — and show the detail to anyone who wants to dig in.",
+      "mockLabel": "Examples of analyzed setups",
+      "step1Title": "The AI analyzes continuously",
+      "step1Body": "Crypto, forex, gold, silver, oil — analyzed by an engine that reasons like a veteran trader. The numbers are computed in code, never invented.",
+      "step2Title": "Every opportunity scored out of 100",
+      "step2Body": "An opportunity score, a risk level, and the full plan: entry zone, stop-loss, targets and R:R ratio.",
+      "step3Title": "You get it, explained simply",
+      "step3Body": "First the why in plain words. Then the deep analysis — technical, fundamental, news — for those who want to dig in. You keep the decision."
+    },
+    "score": {
+      "eyebrow": "The opportunity score",
+      "title": "A number you can understand",
+      "lede": "Every signal carries a 0–100 score and a risk level, derived in code from the data — never from an opinion. The success rate is shown only when it is actually measured.",
+      "exampleLabel": "Example score",
+      "stat1Value": "5",
+      "stat1Label": "markets covered",
+      "stat2Value": "H1 · H4 · D",
+      "stat2Label": "horizons analyzed",
+      "stat3Value": "Day · Swing",
+      "stat3Label": "two styles"
+    },
+    "demo": {
+      "eyebrow": "A concrete example",
+      "title": "Everything, on one card",
+      "instrument": "BTC/USDT",
+      "meta": "Binance · 4H · Day",
+      "direction": "Buy",
+      "note": "Educational example — not a real signal.",
+      "kEntry": "Entry",
+      "kStop": "Stop",
+      "kTargets": "Targets",
+      "kRr": "R:R ratio",
+      "vEntry": "64,820",
+      "vStop": "62,400",
+      "vTargets": "66.5k · 68k · 71k",
+      "vRr": "2.4",
+      "ariaScore": "Example score 92 out of 100, low risk"
+    },
+    "telegram": {
+      "eyebrow": "Public Telegram channel",
+      "title": "Results, out in the open",
+      "lede": "Every day, the shared trades and how they play out — always visible. Proof before the promise.",
+      "cta": "Join the channel"
+    },
+    "pricing": {
+      "eyebrow": "Pricing · paid in USDT",
+      "title": "Start for $3",
+      "lede": "No bank card. Pay in USDT, automatic activation, cancel anytime.",
+      "popularBadge": "Most chosen",
+      "discoveryCta": "Start the trial",
+      "standardCta": "Subscribe",
+      "feat1": "All signals in real time",
+      "feat2": "Score out of 100 & full trade plan",
+      "feat3": "Plain-language explanations",
+      "feat4": "Deep analysis — technical, fundamental, news"
+    }
+  },
   "hero": {
     "title": "A veteran's analysis. A beginner's clarity.",
     "lede": "Scored out of 100, risk level, a complete trade plan — the why in plain words, the detail for those who want to dig in. You keep the decision.",

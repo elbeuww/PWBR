@@ -287,3 +287,67 @@
     animation: nexa-rain 6s linear infinite;
   }
 }
+
+/*
+ * ─── Landing (vitrine NEXA) — ambiance riche, tokens UNIQUEMENT, reduced-motion gardé.
+ * Toutes les couleurs dérivent des tokens via var()/color-mix (aucun littéral HEX/OKLCH,
+ * aucune couleur de signal codée en dur). Effets composés GPU (opacity/transform/filter).
+ */
+
+/* Aura radiale derrière le hero — lueur brand green + purple, theme-safe. */
+.nexa-hero-aura {
+  position: absolute;
+  inset-block-start: -25%;
+  inset-inline: -10%;
+  block-size: 75%;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(40% 60% at 72% 28%, color-mix(in oklch, var(--primary) 38%, transparent), transparent 70%),
+    radial-gradient(45% 55% at 22% 8%, color-mix(in oklch, var(--accent-brand) 34%, transparent), transparent 70%);
+  filter: blur(22px);
+  opacity: 0.6;
+}
+
+/* Grille filaire de fond — discrète, masquée en fondu radial. */
+.nexa-hero-grid {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.5;
+  background-image:
+    linear-gradient(to right, color-mix(in oklch, var(--primary) 12%, transparent) 1px, transparent 1px),
+    linear-gradient(to bottom, color-mix(in oklch, var(--primary) 12%, transparent) 1px, transparent 1px);
+  background-size: 46px 46px;
+  -webkit-mask-image: radial-gradient(72% 72% at 50% 28%, black, transparent 82%);
+  mask-image: radial-gradient(72% 72% at 50% 28%, black, transparent 82%);
+}
+
+/* Bande Telegram — dégradé de marque. */
+.nexa-band {
+  background:
+    radial-gradient(60% 120% at 15% 0%, color-mix(in oklch, var(--accent-brand) 30%, transparent), transparent 60%),
+    radial-gradient(60% 120% at 90% 100%, color-mix(in oklch, var(--primary) 26%, transparent), transparent 60%),
+    var(--card);
+}
+
+/*
+ * Reveal au scroll — entrée subtile (translation only). Le contenu reste TOUJOURS
+ * visible (jamais opacity:0) : une anim qui masque le contenu = pire qu'aucune anim.
+ * Scroll-driven CSS pur, no-op si non supporté ou reduced-motion.
+ */
+@keyframes nexa-rise {
+  from { transform: translateY(16px); }
+  to { transform: none; }
+}
+.nexa-reveal { opacity: 1; }
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .nexa-reveal {
+      animation: nexa-rise linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 30%;
+    }
+  }
+}
