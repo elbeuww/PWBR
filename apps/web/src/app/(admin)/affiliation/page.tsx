@@ -98,7 +98,7 @@ export default async function AdminAffiliationQueuePage() {
                     <bdi>{r.interactions ?? '—'}</bdi>
                   </TableCell>
                   <TableCell>
-                    <Badge className="border-amber-600/30 bg-amber-500/10 text-amber-700 dark:text-amber-400">
+                    <Badge className="border-[--risk-moderate]/30 bg-[--risk-moderate]/10 text-[--risk-moderate]">
                       {t('affiliateQueue.badgePending')}
                     </Badge>
                   </TableCell>

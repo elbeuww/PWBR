@@ -194,7 +194,7 @@ export default async function AdminSignalsPage({
                   <TableCell>{s.score}</TableCell>
                   <TableCell>
                     {s.telegram === 'posted' ? (
-                      <Badge className="border-emerald-600/30 bg-emerald-500/10 text-emerald-700 dark:text-emerald-400">
+                      <Badge className="border-[--signal-bullish]/30 bg-[--signal-bullish]/10 text-[--signal-bullish]">
                         {telegramLabel.posted}
                       </Badge>
                     ) : (

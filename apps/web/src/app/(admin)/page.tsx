@@ -53,7 +53,7 @@ function worstColor(a: FreshnessColor, b: FreshnessColor): FreshnessColor {
 const DOT_CLASS: Record<FreshnessColor, string> = {
   green: 'bg-emerald-500',
   amber: 'bg-amber-500',
-  red: 'bg-red-500',
+  red: 'bg-destructive',
 }
 
 interface DashboardKpis {

@@ -64,7 +64,7 @@ interface SourceFreshness {
 const DOT_CLASS: Record<FreshnessColor, string> = {
   green: 'bg-emerald-500',
   amber: 'bg-amber-500',
-  red: 'bg-red-500',
+  red: 'bg-destructive',
 }
 
 function fmtDateTime(iso: string | null): string {
@@ -214,11 +214,11 @@ export default async function AdminHealthPage() {
                   </TableCell>
                   <TableCell>
                     {j.status === 'success' ? (
-                      <Badge className="border-emerald-600/30 bg-emerald-500/10 text-emerald-700 dark:text-emerald-400">
+                      <Badge className="border-[--signal-bullish]/30 bg-[--signal-bullish]/10 text-[--signal-bullish]">
                         {t('health.statusOk')}
                       </Badge>
                     ) : j.status === 'error' ? (
-                      <Badge className="border-red-600/30 bg-red-500/10 text-red-700 dark:text-red-400">
+                      <Badge className="border-destructive/30 bg-destructive/10 text-destructive">
                         {t('health.statusError')}
                       </Badge>
                     ) : (
