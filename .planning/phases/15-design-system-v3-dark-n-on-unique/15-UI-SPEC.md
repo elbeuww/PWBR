@@ -1,10 +1,11 @@
 ---
 phase: 15
 slug: design-system-v3-dark-neon-unique
-status: draft
+status: approved
 shadcn_initialized: true
 preset: radix-nova (baseColor neutral, cssVariables, lucide, rsc)
 created: 2026-06-22
+reviewed_at: 2026-06-22
 ---
 
 # Phase 15 — UI Design Contract
