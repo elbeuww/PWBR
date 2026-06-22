@@ -1,0 +1,255 @@
+/*
+ * mera.css — vitrine NEXA animée (port fidèle de la maquette, design borhane).
+ * Sombre premium. Thèmes Green/Volt via .mera[data-theme]. TOUT est scopé sous
+ * `.mera` pour ne JAMAIS fuiter dans le reste de l'app (qui garde globals.css).
+ */
+
+.mera {
+  --maxw: 1180px;
+  --sans: var(--font-space-grotesk), system-ui, sans-serif;
+  --mono: var(--font-jetbrains-mono), ui-monospace, monospace;
+  --display: var(--font-archivo), sans-serif;
+  --buy: oklch(0.82 0.18 150);
+  --sell: oklch(0.68 0.2 24);
+  --warn: oklch(0.82 0.15 80);
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* GREEN MACHINE */
+.mera[data-theme="green"] {
+  --bg: #070b08;
+  --bg2: #0b110d;
+  --surface: rgba(255, 255, 255, 0.035);
+  --surface-solid: #0f1611;
+  --line: rgba(255, 255, 255, 0.1);
+  --line-soft: rgba(255, 255, 255, 0.06);
+  --text: #eafff1;
+  --sub: rgba(212, 244, 224, 0.64);
+  --mute: rgba(212, 244, 224, 0.4);
+  --primary: oklch(0.84 0.18 150);
+  --on-primary: #051009;
+  --glow: oklch(0.84 0.18 150 / 0.55);
+  --display: var(--font-archivo), sans-serif;
+  --display-weight: 800;
+  --head-track: -0.02em;
+  --hero-aura: radial-gradient(60% 50% at 70% 30%, oklch(0.5 0.13 150 / 0.3), transparent 70%),
+    radial-gradient(50% 50% at 15% 70%, oklch(0.4 0.08 160 / 0.22), transparent 70%);
+}
+
+/* VOLT / DEGEN */
+.mera[data-theme="volt"] {
+  --bg: #08080f;
+  --bg2: #0c0c16;
+  --surface: rgba(255, 255, 255, 0.04);
+  --surface-solid: #12121d;
+  --line: rgba(255, 255, 255, 0.11);
+  --line-soft: rgba(255, 255, 255, 0.06);
+  --text: #f2f3ff;
+  --sub: rgba(214, 216, 244, 0.64);
+  --mute: rgba(214, 216, 244, 0.4);
+  --primary: oklch(0.88 0.2 128);
+  --on-primary: #0a1400;
+  --glow: oklch(0.88 0.2 128 / 0.55);
+  --display: var(--font-chakra-petch), sans-serif;
+  --display-weight: 700;
+  --head-track: 0;
+  --hero-aura: radial-gradient(55% 50% at 74% 26%, oklch(0.55 0.2 128 / 0.22), transparent 70%),
+    radial-gradient(55% 55% at 18% 70%, oklch(0.5 0.22 300 / 0.28), transparent 70%);
+}
+
+.mera { background: var(--bg); color: var(--text); font-family: var(--sans); line-height: 1.5; -webkit-font-smoothing: antialiased; min-block-size: 100svh; }
+.mera *, .mera *::before, .mera *::after { box-sizing: border-box; }
+.mera a { color: inherit; text-decoration: none; }
+.mera .mono { font-family: var(--mono); }
+.mera .wrap { max-inline-size: var(--maxw); margin-inline: auto; padding-inline: 28px; }
+
+/* scroll progress */
+.mera .mera-progress { position: fixed; inset-block-start: 0; inset-inline-start: 0; block-size: 2.5px; inline-size: 0%; background: var(--primary); z-index: 100; box-shadow: 0 0 12px var(--glow); }
+
+/* NAV */
+.mera .nx-nav { position: fixed; inset-block-start: 0; inset-inline: 0; z-index: 90; transition: background 0.3s, border-color 0.3s, backdrop-filter 0.3s; border-block-end: 1px solid transparent; }
+.mera .nx-nav.scrolled { background: color-mix(in oklch, var(--bg) 78%, transparent); backdrop-filter: blur(16px); border-block-end: 1px solid var(--line-soft); }
+.mera .nav-inner { display: flex; align-items: center; gap: 28px; block-size: 68px; }
+.mera .nav-links { display: flex; gap: 26px; margin-inline-start: 18px; }
+.mera .nav-links a { font-size: 14.5px; color: var(--sub); font-weight: 500; transition: color 0.2s; }
+.mera .nav-links a:hover { color: var(--text); }
+.mera .nav-spacer { flex: 1; }
+
+/* brand mark */
+.mera .brand { display: inline-flex; align-items: center; gap: 11px; }
+.mera .brand .word { font-family: var(--display); font-weight: var(--display-weight); font-size: 21px; letter-spacing: 0.02em; color: var(--text); }
+.mera .brand .word b { color: var(--primary); font-weight: inherit; }
+.mera .mark-tile { inline-size: 30px; block-size: 30px; border-radius: 8px; background: var(--primary); display: flex; align-items: center; justify-content: center; box-shadow: 0 0 22px -4px var(--glow); }
+.mera[data-theme="volt"] .mark-tile { border-radius: 0; inline-size: 14px; block-size: 30px; }
+.mera .mark-tile svg { stroke: var(--bg); }
+.mera[data-theme="volt"] .mark-tile svg { display: none; }
+
+/* buttons */
+.mera .btn { display: inline-flex; align-items: center; gap: 9px; cursor: pointer; border: none; font-family: var(--sans); font-weight: 600; font-size: 15px; padding: 13px 22px; border-radius: 11px; transition: transform 0.15s var(--ease), box-shadow 0.2s, background 0.2s; }
+.mera .btn-primary { background: var(--primary); color: var(--on-primary); box-shadow: 0 8px 30px -10px var(--glow); }
+.mera .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 14px 40px -10px var(--glow); }
+.mera .btn-ghost { background: var(--surface); color: var(--text); border: 1px solid var(--line); }
+.mera .btn-ghost:hover { transform: translateY(-2px); border-color: var(--primary); }
+.mera .btn-sm { padding: 10px 17px; font-size: 14px; }
+
+/* theme toggle (flottant) */
+.mera .mera-theme-toggle { position: fixed; inset-inline-end: 22px; inset-block-end: 22px; z-index: 95; display: flex; gap: 3px; padding: 5px; border-radius: 100px; background: color-mix(in oklch, var(--bg) 70%, transparent); backdrop-filter: blur(12px); border: 1px solid var(--line); box-shadow: 0 10px 40px -12px rgba(0, 0, 0, 0.6); }
+.mera .mera-theme-toggle button { border: none; cursor: pointer; font-family: var(--mono); font-size: 11px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; padding: 8px 14px; border-radius: 100px; background: transparent; color: var(--sub); transition: all 0.2s; }
+.mera .mera-theme-toggle button[data-active="1"] { background: var(--primary); color: var(--on-primary); }
+
+/* HERO */
+.mera .hero { position: relative; min-block-size: 100svh; display: flex; align-items: center; padding-block: 120px 80px; overflow: hidden; }
+.mera .hero-aura { position: absolute; inset: 0; background: var(--hero-aura); z-index: 0; pointer-events: none; }
+.mera .hero-grid { position: absolute; inset: 0; z-index: 0; opacity: 0.5; pointer-events: none; background-image: linear-gradient(var(--line-soft) 1px, transparent 1px), linear-gradient(90deg, var(--line-soft) 1px, transparent 1px); background-size: 64px 64px; -webkit-mask-image: radial-gradient(70% 70% at 50% 40%, #000, transparent 90%); mask-image: radial-gradient(70% 70% at 50% 40%, #000, transparent 90%); }
+.mera .hero-inner { position: relative; z-index: 2; display: grid; grid-template-columns: 1.05fr 0.95fr; gap: 40px; align-items: center; inline-size: 100%; }
+
+.mera .eyebrow { display: inline-flex; align-items: center; gap: 10px; font-family: var(--mono); font-size: 12px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--primary); border: 1px solid var(--line); border-radius: 100px; padding: 7px 14px; margin-block-end: 26px; }
+.mera .eyebrow .dot { inline-size: 7px; block-size: 7px; border-radius: 50%; background: var(--primary); box-shadow: 0 0 10px var(--glow); }
+.mera .hero h1 { font-family: var(--display); font-weight: var(--display-weight); font-size: clamp(38px, 5.4vw, 76px); line-height: 0.98; letter-spacing: var(--head-track); text-transform: uppercase; }
+.mera .hero h1 .accent { color: var(--primary); }
+.mera .hero .lede { font-size: clamp(16px, 1.5vw, 19px); color: var(--sub); max-inline-size: 46ch; margin-block-start: 24px; font-weight: 300; }
+.mera .hero-cta { display: flex; gap: 14px; margin-block-start: 34px; flex-wrap: wrap; }
+.mera .hero-trust { display: flex; gap: 28px; margin-block-start: 36px; flex-wrap: wrap; }
+.mera .hero-trust .stat .n { font-family: var(--mono); font-weight: 700; font-size: 30px; color: var(--text); letter-spacing: -0.02em; }
+.mera .hero-trust .stat .l { font-size: 12.5px; color: var(--sub); margin-block-start: 2px; }
+
+/* hero scene */
+.mera .scene { position: relative; block-size: 460px; perspective: 1200px; transform-style: preserve-3d; }
+.mera .scene .layer { position: absolute; will-change: transform; }
+.mera .float-card { background: color-mix(in oklch, var(--surface-solid) 92%, transparent); border: 1px solid var(--line); border-radius: 13px; padding: 12px 15px; box-shadow: 0 18px 50px -18px rgba(0, 0, 0, 0.7); backdrop-filter: blur(6px); }
+.mera .float-card .fc-top { display: flex; align-items: center; gap: 9px; }
+.mera .float-card .fc-sym { font-family: var(--sans); font-weight: 600; font-size: 14px; }
+.mera .float-card .fc-dir { font-family: var(--mono); font-size: 9.5px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; padding: 3px 8px; border-radius: 6px; }
+.mera .fc-dir.buy { color: var(--buy); background: color-mix(in oklch, var(--buy) 16%, transparent); }
+.mera .fc-dir.sell { color: var(--sell); background: color-mix(in oklch, var(--sell) 16%, transparent); }
+.mera .float-card .fc-score { font-family: var(--mono); font-weight: 700; font-size: 22px; margin-block-start: 8px; }
+
+/* mini ring */
+.mera .ring { position: relative; inline-size: 46px; block-size: 46px; }
+.mera .ring svg { transform: rotate(-90deg); }
+.mera .ring .rt { fill: none; stroke: var(--line); stroke-width: 9; }
+.mera .ring .rv { fill: none; stroke-width: 9; stroke-linecap: round; }
+.mera .ring .rn { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-family: var(--mono); font-weight: 700; font-size: 13px; }
+
+/* MARQUEE */
+.mera .marquee { border-block: 1px solid var(--line-soft); padding-block: 18px; overflow: hidden; background: var(--bg2); white-space: nowrap; }
+.mera .marquee-track { display: inline-flex; gap: 44px; animation: mera-scrollx 32s linear infinite; }
+@keyframes mera-scrollx { to { transform: translateX(-50%); } }
+[dir="rtl"] .mera .marquee-track { animation-name: mera-scrollx-rtl; }
+@keyframes mera-scrollx-rtl { to { transform: translateX(50%); } }
+.mera .tick { display: inline-flex; align-items: center; gap: 10px; font-family: var(--mono); font-size: 14px; color: var(--sub); }
+.mera .tick b { color: var(--text); font-weight: 600; }
+.mera .tick .up { color: var(--buy); }
+.mera .tick .down { color: var(--sell); }
+
+/* SECTION shell */
+.mera section.block { position: relative; padding-block: 110px; }
+.mera .sec-eyebrow { font-family: var(--mono); font-size: 12px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--primary); margin-block-end: 16px; }
+.mera .sec-title { font-family: var(--display); font-weight: var(--display-weight); font-size: clamp(30px, 4vw, 50px); line-height: 1.02; letter-spacing: var(--head-track); text-transform: uppercase; }
+.mera .sec-lede { color: var(--sub); font-size: 17px; max-inline-size: 56ch; margin-block-start: 16px; font-weight: 300; }
+
+/* reveal */
+.mera .reveal { opacity: 0; transform: translateY(34px); transition: opacity 0.8s var(--ease), transform 0.8s var(--ease); }
+.mera .reveal.in { opacity: 1; transform: none; }
+.mera .reveal.d1 { transition-delay: 0.08s; }
+.mera .reveal.d2 { transition-delay: 0.16s; }
+.mera .reveal.d3 { transition-delay: 0.24s; }
+
+/* STEPS */
+.mera .steps { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: start; }
+.mera .steps-sticky { position: sticky; inset-block-start: 120px; block-size: fit-content; }
+.mera .step { padding-block: 36px; border-block-start: 1px solid var(--line-soft); }
+.mera .step:first-child { border-block-start: none; }
+.mera .step .num { font-family: var(--mono); font-size: 13px; color: var(--primary); letter-spacing: 0.1em; }
+.mera .step h3 { font-family: var(--display); font-weight: var(--display-weight); font-size: 26px; margin-block-start: 10px; text-transform: uppercase; letter-spacing: var(--head-track); }
+.mera .step p { color: var(--sub); font-size: 15.5px; margin-block-start: 10px; max-inline-size: 42ch; }
+
+/* mock card */
+.mera .mock { background: var(--surface-solid); border: 1px solid var(--line); border-radius: 20px; padding: 22px; box-shadow: 0 40px 90px -40px rgba(0, 0, 0, 0.8); transform-style: preserve-3d; }
+.mera .mock-row { display: flex; align-items: center; justify-content: space-between; padding-block: 14px; border-block-start: 1px solid var(--line-soft); }
+.mera .mock-row:first-of-type { border-block-start: none; }
+.mera .mock-sym { font-weight: 600; font-size: 16px; }
+.mera .mock-sub { font-family: var(--mono); font-size: 10.5px; color: var(--mute); text-transform: uppercase; letter-spacing: 0.06em; margin-block-start: 2px; }
+
+/* big score */
+.mera .score-feature { display: grid; grid-template-columns: 0.9fr 1.1fr; gap: 60px; align-items: center; }
+.mera .gauge-big { position: relative; inline-size: 280px; block-size: 280px; margin-inline: auto; }
+.mera .gauge-big svg { transform: rotate(-90deg); overflow: visible; }
+.mera .gauge-big .gt { fill: none; stroke: var(--line); stroke-width: 7; }
+.mera .gauge-big .gv { fill: none; stroke-width: 7; stroke-linecap: round; transition: stroke-dasharray 1.3s var(--ease); }
+.mera .gauge-big .center { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.mera .gauge-big .gnum { font-family: var(--mono); font-weight: 700; font-size: 78px; letter-spacing: -0.03em; }
+.mera .gauge-big .glbl { font-family: var(--mono); font-size: 12px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--mute); margin-block-start: 8px; }
+
+/* TILT card / signal demo */
+.mera .tilt { transform-style: preserve-3d; transition: transform 0.2s var(--ease); will-change: transform; }
+.mera .signal-demo { background: var(--surface-solid); border: 1px solid var(--line); border-radius: 18px; padding: 24px; box-shadow: 0 40px 90px -40px rgba(0, 0, 0, 0.8); }
+.mera .sd-head { display: flex; align-items: flex-start; justify-content: space-between; }
+.mera .sd-levels { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-block-start: 20px; padding-block-start: 18px; border-block-start: 1px solid var(--line-soft); }
+.mera .sd-levels .k { font-family: var(--mono); font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--mute); }
+.mera .sd-levels .v { font-family: var(--mono); font-weight: 600; font-size: 15px; margin-block-start: 4px; }
+
+/* PRICING */
+.mera .price-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; max-inline-size: 820px; margin: 48px auto 0; }
+.mera .price-card { background: var(--surface-solid); border: 1px solid var(--line); border-radius: 20px; padding: 32px; position: relative; transition: transform 0.2s var(--ease), border-color 0.2s; }
+.mera .price-card.popular { border-color: var(--primary); box-shadow: 0 0 60px -20px var(--glow); }
+.mera .price-badge { position: absolute; inset-block-start: -12px; inset-inline-start: 32px; font-family: var(--mono); font-size: 10.5px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; padding: 5px 12px; border-radius: 100px; background: var(--primary); color: var(--on-primary); }
+.mera .price-name { font-family: var(--mono); font-size: 12.5px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--sub); }
+.mera .price-amt { font-family: var(--display); font-weight: var(--display-weight); font-size: 52px; line-height: 1; margin-block-start: 14px; }
+.mera .price-amt small { font-family: var(--sans); font-size: 16px; font-weight: 500; color: var(--sub); }
+.mera .price-usdt { font-family: var(--mono); font-size: 12px; color: var(--primary); margin-block-start: 8px; }
+.mera .price-feats { list-style: none; margin-block: 24px; display: flex; flex-direction: column; gap: 12px; }
+.mera .price-feats li { display: flex; gap: 11px; font-size: 14.5px; color: var(--sub); }
+.mera .price-feats li .ck { color: var(--primary); flex-shrink: 0; }
+
+/* TELEGRAM band */
+.mera .tg-band { background: var(--bg2); border-block: 1px solid var(--line-soft); }
+.mera .tg-inner { display: flex; align-items: center; justify-content: space-between; gap: 30px; padding-block: 56px; flex-wrap: wrap; }
+.mera .tg-stat { font-family: var(--mono); font-weight: 700; font-size: 56px; color: var(--primary); line-height: 1; }
+
+/* FOOTER */
+.mera .nx-foot { padding-block: 64px 50px; border-block-start: 1px solid var(--line-soft); }
+.mera .foot-grid { display: flex; justify-content: space-between; gap: 40px; flex-wrap: wrap; }
+.mera .foot-links { display: flex; gap: 60px; flex-wrap: wrap; }
+.mera .foot-col h4 { font-size: 13px; color: var(--mute); text-transform: uppercase; letter-spacing: 0.1em; font-family: var(--mono); margin-block-end: 14px; font-weight: 500; }
+.mera .foot-col a { display: block; color: var(--sub); font-size: 14.5px; margin-block-end: 9px; transition: color 0.2s; }
+.mera .foot-col a:hover { color: var(--text); }
+.mera .disclaimer { margin-block-start: 44px; padding-block-start: 26px; border-block-start: 1px solid var(--line-soft); font-size: 12.5px; color: var(--mute); line-height: 1.6; max-inline-size: 76ch; }
+
+/* LANGUE switch */
+.mera .lang-switch { display: flex; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
+.mera .lang-switch a { border: none; cursor: pointer; font-family: var(--mono); font-size: 11px; font-weight: 600; letter-spacing: 0.06em; padding: 7px 11px; background: transparent; color: var(--sub); transition: all 0.2s; }
+.mera .lang-switch a[data-active="1"] { background: var(--primary); color: var(--on-primary); }
+
+/* GLOBE + atmosphère */
+.mera .globe-wrap { position: absolute; inset-block-start: 50%; inset-inline-start: 50%; transform: translate(-50%, -50%); z-index: 1; }
+[dir="rtl"] .mera .globe-wrap { transform: translate(50%, -50%); }
+.mera .atmo { position: absolute; inset-block-start: 50%; inset-inline-start: 50%; inline-size: 388px; block-size: 388px; transform: translate(-50%, -50%); border-radius: 50%; background: radial-gradient(circle, color-mix(in oklch, var(--primary) 24%, transparent) 0%, transparent 62%); filter: blur(16px); }
+.mera .globe { position: relative; inline-size: 300px; block-size: 300px; border-radius: 50%; overflow: hidden; background: radial-gradient(circle at 36% 30%, color-mix(in oklch, var(--primary) 26%, var(--surface-solid)), var(--bg2) 72%); box-shadow: inset -28px -26px 72px rgba(0, 0, 0, 0.78), inset 18px 16px 52px color-mix(in oklch, var(--primary) 20%, transparent), 0 0 92px -14px var(--glow); }
+.mera .globe::before { content: ""; position: absolute; inset: 0; border-radius: 50%; opacity: 0.55; background-image: repeating-linear-gradient(0deg, transparent 0 26px, color-mix(in oklch, var(--primary) 45%, transparent) 26px 27px), repeating-linear-gradient(90deg, transparent 0 26px, color-mix(in oklch, var(--primary) 45%, transparent) 26px 27px); background-size: 100% 100%, 56px 100%; animation: mera-globespin 16s linear infinite; -webkit-mask-image: radial-gradient(circle at 50% 50%, #000 56%, transparent 80%); mask-image: radial-gradient(circle at 50% 50%, #000 56%, transparent 80%); }
+.mera .globe::after { content: ""; position: absolute; inset: 0; border-radius: 50%; background: radial-gradient(circle at 32% 26%, rgba(255, 255, 255, 0.16), transparent 44%); }
+@keyframes mera-globespin { to { background-position: 0 0, -56px 0; } }
+
+/* Pluie de chiffres */
+.mera .data-rain { position: absolute; inset: -16% -26%; z-index: 0; overflow: hidden; pointer-events: none; -webkit-mask-image: radial-gradient(58% 64% at 55% 45%, #000, transparent 82%); mask-image: radial-gradient(58% 64% at 55% 45%, #000, transparent 82%); }
+.mera .data-col { position: absolute; inset-block-start: 0; display: flex; flex-direction: column; gap: 9px; opacity: 0.26; font-family: var(--mono); font-size: 12px; line-height: 1.5; white-space: nowrap; color: color-mix(in oklch, var(--primary) 55%, var(--mute)); animation-name: mera-datafall; animation-timing-function: linear; animation-iteration-count: infinite; }
+.mera .data-col .u { color: color-mix(in oklch, var(--buy) 72%, transparent); }
+.mera .data-col .d { color: color-mix(in oklch, var(--sell) 72%, transparent); }
+@keyframes mera-datafall { from { transform: translateY(-55%); } to { transform: translateY(55%); } }
+
+/* RTL / arabe */
+[dir="rtl"] .mera { --display: var(--font-noto-arabic), sans-serif; }
+[dir="rtl"] .mera .brand .word, [dir="rtl"] .mera .hero h1 { font-family: var(--sans); }
+
+@media (max-width: 900px) {
+  .mera .hero-inner, .mera .steps, .mera .score-feature, .mera .price-grid { grid-template-columns: 1fr; }
+  .mera .scene { block-size: 360px; order: -1; }
+  .mera .nav-links { display: none; }
+  .mera .steps-sticky { position: relative; inset-block-start: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .mera .marquee-track { animation: none; }
+  .mera .globe::before { animation: none; }
+  .mera .data-col { animation: none; }
+  .mera .reveal { opacity: 1; transform: none; }
+}

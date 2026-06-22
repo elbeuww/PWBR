@@ -430,6 +430,35 @@
     ]
   },
   "landing": {
+    "nav": {
+      "how": "How it works",
+      "score": "The score",
+      "pricing": "Pricing",
+      "telegram": "Telegram",
+      "login": "Log in",
+      "start": "Get started"
+    },
+    "hero": {
+      "eyebrow": "Analysis & signals platform · MENA",
+      "cta1": "Get started",
+      "cta2": "How it works",
+      "trust1Value": "5",
+      "trust1Label": "Markets covered",
+      "trust2Value": "24/7",
+      "trust2Label": "Markets analysed",
+      "trust3Value": "AR · EN · FR",
+      "trust3Label": "Trilingual"
+    },
+    "footer": {
+      "tag": "NEXA · Analysis & signals, explained simply.",
+      "col1": "Product",
+      "col2": "Learn",
+      "col2_1": "Free courses",
+      "col2_2": "What is a signal?",
+      "col2_3": "Manage your risk",
+      "col3": "Language",
+      "disclaimer": "Strictly educational content. NEXA does not provide personalised investment advice and promises no gains. Trading carries a risk of loss, sometimes exceeding the capital committed when using leverage. Past performance and backtest-measured rates do not guarantee future results. The status of crypto-assets varies by jurisdiction — check the rules that apply in your country before any payment."
+    },
     "how": {
       "eyebrow": "How it works",
       "title": "Three steps, zero jargon",
