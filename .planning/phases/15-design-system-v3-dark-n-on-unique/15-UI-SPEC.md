@@ -21,8 +21,7 @@ created: 2026-06-22
 | Tool | shadcn (already initialized) |
 | Preset | `radix-nova` — `components.json` present (`apps/web/components.json`), `baseColor: neutral`, `cssVariables: true`, `prefix: ""` |
 | Component library | Radix UI (`radix-ui` package) via shadcn `ui/` (20 components already in `apps/web/src/components/ui`) |
-| Icon library | lucide-react |
-| Font | Display: Archivo 800 · Body/UI: Space Grotesk · Mono/numeric: JetBrains Mono · Accent: Chakra Petch · Arabic: Noto Sans Arabic (all self-hosted via `next/font/local`, `lib/fonts.ts`) |
+| Font | Display: Archivo (`--font-display`) · Body/UI: Space Grotesk (`--font-sans`) · Mono/numeric: JetBrains Mono (`--font-mono`) · Accent: Chakra Petch · Arabic: Noto Sans Arabic (all self-hosted via `next/font/local`, `lib/fonts.ts`, each loaded at weights 400 + 600 only) |
 | Styling | Tailwind v4 CSS-first (no `tailwind.config`), 3-layer token system in `src/styles/globals.css` (primitive → semantic → component) |
 | Theme strategy | `next-themes` class strategy, migrating to `forcedTheme="dark"`; `.dark` selector retained (CandleChart + sonner observe it) but `:root` carries the frozen GREEN values so it cannot flip |
 
@@ -54,19 +53,25 @@ Exceptions:
 
 ## Typography
 
-Single frozen dark theme. 4 sizes / 2 weights for the platform UI (shadcn surfaces). Display uses Archivo 800 (locked).
+Single frozen dark theme. The platform UI text runs on **one family — Space Grotesk** (`--font-sans`) at **2 weights: 400 + 600**. Display is a **separate family — Archivo** (`--font-display`), used only for titles/wordmark.
 
-| Role | Size | Weight | Line Height |
-|------|------|--------|-------------|
-| Body | 16px | 400 (regular) | 1.5 |
-| Label / meta | 14px | 600 (semibold) | 1.4 |
-| Heading | 20px | 600 (semibold) | 1.2 |
-| Display | 28px+ (clamp on landing up to 76px) | 800 (Archivo, `--display-weight: 800`) | 1.0–1.2 |
+**Weights UI = 2 (400 regular + 600 semibold), comptés sur la famille texte Space Grotesk uniquement.** Archivo est une famille display indépendante (police distincte, pas une graisse de Space Grotesk) ; son rendu display sort donc du comptage des weights UI. Verrouillé sur le codebase : `lib/fonts.ts` ne charge Archivo, Space Grotesk, JetBrains Mono, Chakra Petch et Noto Sans Arabic **qu'en 400 + 600** (aucun fichier 800). Le `--display-weight: 800` du landing (`nexa-landing.css`) est donc un gras synthétique appliqué par-dessus la face Archivo 600, pas une troisième graisse chargée. Aucune famille UI n'expose plus de 2 graisses réelles.
+
+| Role | Family | Size | Weight | Line Height |
+|------|--------|------|--------|-------------|
+| Body | Space Grotesk (`--font-sans`) | 16px | 400 (regular) | 1.5 |
+| Label / meta | Space Grotesk (`--font-sans`) | 14px | 600 (semibold) | 1.4 |
+| Heading | Space Grotesk (`--font-sans`) | 20px | 600 (semibold) | 1.2 |
+| Display | Archivo (`--font-display`, famille distincte) | 28px+ (clamp on landing up to 76px) | display — `--display-weight: 800` (faux-bold sur la face Archivo 600) | 1.0–1.2 |
+
+Familles (toutes self-hostées, `next/font/local`, `lib/fonts.ts`, 400 + 600 chacune) :
+- **Texte / UI** = Space Grotesk via `--font-sans` (résolu en `@theme inline`), fallback `system-ui`. Seule famille qui porte le budget de 2 graisses UI.
+- **Display** = Archivo via `--font-display` (famille indépendante du texte ; titres, wordmark `Logo.tsx`). Hors comptage des weights UI.
+- **Numeric / tabular trading** = JetBrains Mono via `--font-mono`.
+- **Accent technique** = Chakra Petch via `--font-accent`, usage ponctuel.
+- **Arabic** (`:lang(ar)`) = Noto Sans Arabic, `line-height: 1.6` (diacritics) — déjà dans `globals.css`, à préserver (THEME-04).
 
 Rules:
-- Body family = Space Grotesk via `--font-sans` (resolved in `@theme inline`), fallback `system-ui`.
-- Numeric / tabular trading values = JetBrains Mono (`--font-mono`).
-- Arabic (`:lang(ar)`) = Noto Sans Arabic, `line-height: 1.6` (diacritics) — already in `globals.css`, must be preserved (THEME-04).
 - Display uppercase + tracking from `.nxl` is landing-scoped; platform headings stay sentence-case unless a reskinned surface opts into the display treatment in Phase 16.
 
 ---
