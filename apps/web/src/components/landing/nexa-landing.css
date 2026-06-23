@@ -1,6 +1,7 @@
 /*
  * nxl.css — vitrine NEXA animée (port fidèle de la maquette, design borhane).
- * Sombre premium. Thèmes Green/Volt via .nxl[data-theme]. TOUT est scopé sous
+ * Sombre premium. Thème GREEN unique du DS v3 via .nxl[data-theme="green"] (la
+ * branche volt et son toggle ont été retirés en Phase 16). TOUT est scopé sous
  * `.nxl` pour ne JAMAIS fuiter dans le reste de l'app (qui garde globals.css).
  */
 
@@ -36,27 +37,6 @@
     radial-gradient(50% 50% at 15% 70%, oklch(0.4 0.08 160 / 0.22), transparent 70%);
 }
 
-/* VOLT / DEGEN */
-.nxl[data-theme="volt"] {
-  --bg: #08080f;
-  --bg2: #0c0c16;
-  --surface: rgba(255, 255, 255, 0.04);
-  --surface-solid: #12121d;
-  --line: rgba(255, 255, 255, 0.11);
-  --line-soft: rgba(255, 255, 255, 0.06);
-  --text: #f2f3ff;
-  --sub: rgba(214, 216, 244, 0.64);
-  --mute: rgba(214, 216, 244, 0.4);
-  --primary: oklch(0.88 0.2 128);
-  --on-primary: #0a1400;
-  --glow: oklch(0.88 0.2 128 / 0.55);
-  --display: var(--font-chakra-petch), sans-serif;
-  --display-weight: 700;
-  --head-track: 0;
-  --hero-aura: radial-gradient(55% 50% at 74% 26%, oklch(0.55 0.2 128 / 0.22), transparent 70%),
-    radial-gradient(55% 55% at 18% 70%, oklch(0.5 0.22 300 / 0.28), transparent 70%);
-}
-
 .nxl { background: var(--bg); color: var(--text); font-family: var(--sans); line-height: 1.5; -webkit-font-smoothing: antialiased; min-block-size: 100svh; }
 .nxl *, .nxl *::before, .nxl *::after { box-sizing: border-box; }
 .nxl a { color: inherit; text-decoration: none; }
@@ -80,9 +60,7 @@
 .nxl .brand .word { font-family: var(--display); font-weight: var(--display-weight); font-size: 21px; letter-spacing: 0.02em; color: var(--text); }
 .nxl .brand .word b { color: var(--primary); font-weight: inherit; }
 .nxl .mark-tile { inline-size: 30px; block-size: 30px; border-radius: 8px; background: var(--primary); display: flex; align-items: center; justify-content: center; box-shadow: 0 0 22px -4px var(--glow); }
-.nxl[data-theme="volt"] .mark-tile { border-radius: 0; inline-size: 14px; block-size: 30px; }
 .nxl .mark-tile svg { stroke: var(--bg); }
-.nxl[data-theme="volt"] .mark-tile svg { display: none; }
 
 /* buttons */
 .nxl .btn { display: inline-flex; align-items: center; gap: 9px; cursor: pointer; border: none; font-family: var(--sans); font-weight: 600; font-size: 15px; padding: 13px 22px; border-radius: 11px; transition: transform 0.15s var(--ease), box-shadow 0.2s, background 0.2s; }
@@ -91,11 +69,6 @@
 .nxl .btn-ghost { background: var(--surface); color: var(--text); border: 1px solid var(--line); }
 .nxl .btn-ghost:hover { transform: translateY(-2px); border-color: var(--primary); }
 .nxl .btn-sm { padding: 10px 17px; font-size: 14px; }
-
-/* theme toggle (flottant) */
-.nxl .nxl-theme-toggle { position: fixed; inset-inline-end: 22px; inset-block-end: 22px; z-index: 95; display: flex; gap: 3px; padding: 5px; border-radius: 100px; background: color-mix(in oklch, var(--bg) 70%, transparent); backdrop-filter: blur(12px); border: 1px solid var(--line); box-shadow: 0 10px 40px -12px rgba(0, 0, 0, 0.6); }
-.nxl .nxl-theme-toggle button { border: none; cursor: pointer; font-family: var(--mono); font-size: 11px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; padding: 8px 14px; border-radius: 100px; background: transparent; color: var(--sub); transition: all 0.2s; }
-.nxl .nxl-theme-toggle button[data-active="1"] { background: var(--primary); color: var(--on-primary); }
 
 /* HERO */
 .nxl .hero { position: relative; min-block-size: 100svh; display: flex; align-items: center; padding-block: 120px 80px; overflow: hidden; }

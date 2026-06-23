@@ -8,7 +8,8 @@ import { NexaLandingEffects } from './NexaLandingEffects'
  *
  * Rendu RSC du markup sombre premium (nav, hero globe + data-rain + cartes, marquee,
  * étapes sticky, jauge, carte démo tilt, pricing, Telegram, footer), scopé sous
- * `.nxl` (nxl.css). Texte 100% i18n next-intl (fr/en/ar). Animations = NexaLandingEffects
+ * `.nxl` (nxl.css). Thème GREEN unique du DS v3 (data-theme="green" figé, plus de
+ * toggle Green/Volt — Phase 16). Texte 100% i18n next-intl (fr/en/ar). Animations = NexaLandingEffects
  * (vanilla, reduced-motion). Marque NEXA, aucune promesse de gain, % jamais inventé
  * (rings colorés par RISQUE, jauge = score d'exemple, pas un taux de réussite).
  */
@@ -55,7 +56,7 @@ export async function NexaLanding() {
   const langs: Array<[string, string]> = [['fr', 'FR'], ['en', 'EN'], ['ar', 'AR']]
 
   return (
-    <div className="nxl" data-theme="volt">
+    <div className="nxl" data-theme="green">
       <NexaLandingEffects />
       <div className="nxl-progress" aria-hidden />
 
@@ -79,12 +80,6 @@ export async function NexaLanding() {
           <Link className="btn btn-primary btn-sm" href="/signup">{tNav('start')}</Link>
         </div>
       </nav>
-
-      {/* THEME TOGGLE */}
-      <div className="nxl-theme-toggle" aria-label="Green / Volt">{/* i18n-ignore noms de thème (identité couleur) */}
-        <button type="button" data-theme="green" data-active="0">Green</button>{/* i18n-ignore */}
-        <button type="button" data-theme="volt" data-active="1">Volt</button>{/* i18n-ignore */}
-      </div>
 
       {/* HERO */}
       <header className="hero" id="top">

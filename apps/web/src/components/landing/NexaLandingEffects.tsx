@@ -5,9 +5,10 @@ import { useEffect } from 'react'
 /**
  * NexaLandingEffects — port vanilla de landing.js (design borhane) en composant client.
  *
- * Anime la vitrine `.nxl` : thème Green/Volt (persisté), data-rain, parallaxe de
- * scène, tilt 3D, reveal au scroll + compteurs + jauge, barre de progression, nav
- * scrolled. TOUT est gardé reduced-motion. AUCUNE lib (D-05). Le texte/i18n est
+ * Anime la vitrine `.nxl` : data-rain, parallaxe de scène, tilt 3D, reveal au scroll
+ * + compteurs + jauge, barre de progression, nav scrolled. Thème GREEN unique figé
+ * (plus de toggle/persistance — Phase 16). TOUT est gardé reduced-motion. AUCUNE lib
+ * (D-05). Le texte/i18n est
  * rendu côté serveur (next-intl) — ce composant ne touche QUE le comportement.
  */
 const RAIN_POOL = [
@@ -21,23 +22,6 @@ export function NexaLandingEffects() {
     if (!root) return
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches
     const cleanups: Array<() => void> = []
-
-    // ── Thème Green / Volt (persisté) ──
-    const setTheme = (t: string) => {
-      root.setAttribute('data-theme', t)
-      try { localStorage.setItem('nexa-landing-theme', t) } catch { /* ignore */ }
-      root.querySelectorAll<HTMLElement>('.nxl-theme-toggle button').forEach((b) => {
-        b.setAttribute('data-active', b.dataset.theme === t ? '1' : '0')
-      })
-    }
-    let savedTheme = 'volt'
-    try { savedTheme = localStorage.getItem('nexa-landing-theme') || 'volt' } catch { /* ignore */ }
-    setTheme(savedTheme)
-    root.querySelectorAll<HTMLElement>('.nxl-theme-toggle button').forEach((b) => {
-      const handler = () => setTheme(b.dataset.theme || 'volt')
-      b.addEventListener('click', handler)
-      cleanups.push(() => b.removeEventListener('click', handler))
-    })
 
     // ── data-rain ──
     if (!reduce) {
