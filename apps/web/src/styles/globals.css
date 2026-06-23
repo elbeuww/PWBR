@@ -369,3 +369,62 @@
     }
   }
 }
+
+/*
+ * Data-rain Tier-2 (primitive components/ui/data-rain.tsx, Phase 16 D-06/D-14).
+ *
+ * Voile ambiant LÉGER pour surfaces calmes (auth, empty states, en-tête membre) —
+ * JAMAIS au-dessus de données denses. Couleurs liées à la SEULE couche token via
+ * color-mix : haussier = --signal-bullish, baissier = --signal-bearish, neutre =
+ * --muted-tertiary. AUCUN littéral, AUCUNE var landing (--buy/--sell).
+ *
+ * Double-garde reduced-motion (D-14) : keyframes UNIQUEMENT sous
+ * `@media (prefers-reduced-motion: no-preference)`. Sous reduced-motion les colonnes
+ * sont rendues (composition préservée) mais figées. transform only → composé GPU.
+ * Masque radial pour fondre les bords. Propriétés logiques → RTL-safe.
+ */
+.nxl-data-rain {
+  position: absolute;
+  inset: -16% -26%;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+  -webkit-mask-image: radial-gradient(58% 64% at 55% 45%, black, transparent 82%);
+  mask-image: radial-gradient(58% 64% at 55% 45%, black, transparent 82%);
+}
+
+.nxl-data-rain .nxl-data-col {
+  position: absolute;
+  inset-block-start: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 12px;
+  line-height: 1.5;
+  white-space: nowrap;
+  color: color-mix(in oklch, var(--primary) 55%, var(--muted-tertiary));
+  /* Figée par défaut (reduced-motion / fallback) — ambiance préservée. */
+  animation-name: none;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+
+.nxl-data-rain .nxl-data-col .u {
+  color: color-mix(in oklch, var(--signal-bullish) 72%, transparent);
+}
+
+.nxl-data-rain .nxl-data-col .d {
+  color: color-mix(in oklch, var(--signal-bearish) 72%, transparent);
+}
+
+@keyframes nxl-datafall {
+  from { transform: translateY(-55%); }
+  to { transform: translateY(55%); }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .nxl-data-rain .nxl-data-col {
+    animation-name: nxl-datafall;
+  }
+}
