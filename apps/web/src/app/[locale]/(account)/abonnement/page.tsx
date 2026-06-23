@@ -57,7 +57,9 @@ export default async function AbonnementPage({ params }: AbonnementPageProps) {
       <ExpiryBanner currentPeriodEnd={sub?.current_period_end ?? null} />
       <header className="mb-8">
         <h1 className="font-heading text-2xl font-semibold">{t('planTitle')}</h1>
-        <p className="mt-1 text-muted-foreground">{t('usdtNote')}</p>
+        {/* Accent Tier 2 discret (filet token --primary) — surface dense : pas de voile ambiant. */}
+        <div className="mt-2 h-px w-16 bg-primary/60" aria-hidden="true" />
+        <p className="mt-3 text-muted-foreground">{t('usdtNote')}</p>
       </header>
 
       <QueryProvider>

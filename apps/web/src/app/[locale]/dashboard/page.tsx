@@ -41,13 +41,20 @@ export default async function DashboardPage() {
 
   return (
     <main className="mx-auto max-w-3xl px-4 py-10 text-start">
-      <header className="mb-8 flex items-center justify-between">
-        <h1 className="text-2xl font-semibold">{t('title')}</h1>
-        <form action={signOut}>
-          <button type="submit" className="rounded-md px-3 py-1.5">
-            {t('signOut')}
-          </button>
-        </form>
+      <header className="mb-8">
+        <div className="flex items-center justify-between">
+          <h1 className="text-2xl font-semibold">{t('title')}</h1>
+          <form action={signOut}>
+            <button
+              type="submit"
+              className="rounded-md border px-3 py-1.5 text-sm hover:bg-muted"
+            >
+              {t('signOut')}
+            </button>
+          </form>
+        </div>
+        {/* Accent Tier 2 discret (filet token --primary) — surface dense : pas de voile ambiant. */}
+        <div className="mt-2 h-px w-16 bg-primary/60" aria-hidden="true" />
       </header>
 
       <p className="mb-6 text-muted-foreground">{t('connectedAs', { email: user.email ?? '' })}</p>
@@ -55,7 +62,7 @@ export default async function DashboardPage() {
       <section>
         <h2 className="text-lg font-medium">{t('instrumentsTitle')}</h2>
         {instrumentsError ? (
-          <p className="text-red-600">{instrumentsError}</p>
+          <p className="text-destructive">{instrumentsError}</p>
         ) : instruments.length === 0 ? (
           <p>{t('instrumentsEmpty')}</p>
         ) : (
