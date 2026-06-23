@@ -17,7 +17,7 @@ Requirements de ce milestone. Chacun est mappé à une phase de la roadmap (voir
 
 ### Reskin transversal des pages existantes (RESKIN)
 
-- [ ] **RESKIN-01**: La vitrine publique (accueil, tarifs, méthodologie, légal) est au DS dark néon, trilingue AR/EN/FR.
+- [x] **RESKIN-01**: La vitrine publique (accueil, tarifs, méthodologie, légal) est au DS dark néon, trilingue AR/EN/FR.
 - [ ] **RESKIN-02**: L'auth (login/signup) et l'espace compte/abonnement sont au DS dark néon.
 - [ ] **RESKIN-03**: L'espace membre (liste signaux + détail trade + chart lightweight-charts) est au DS dark néon, gating RLS préservé.
 - [ ] **RESKIN-04**: L'Académie (index + article + cours/leçon) est au DS dark néon, RTL et fallback FR préservés.
@@ -94,7 +94,7 @@ Exclusions explicites de ce milestone, avec raison.
 | THEME-03 | Phase 15 — Design system v3 « dark néon unique » | Complete |
 | THEME-04 | Phase 15 — Design system v3 « dark néon unique » | Complete |
 | THEME-05 | Phase 15 — Design system v3 « dark néon unique » | Complete |
-| RESKIN-01 | Phase 16 — Reskin transversal de toutes les pages | Pending |
+| RESKIN-01 | Phase 16 — Reskin transversal de toutes les pages | Complete |
 | RESKIN-02 | Phase 16 — Reskin transversal de toutes les pages | Pending |
 | RESKIN-03 | Phase 16 — Reskin transversal de toutes les pages | Pending |
 | RESKIN-04 | Phase 16 — Reskin transversal de toutes les pages | Pending |

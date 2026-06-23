@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v3.0
 milestone_name: Plateforme complète sous identité dark néon NEXA
 status: executing
-last_updated: "2026-06-23T01:59:35.400Z"
+last_updated: "2026-06-23T02:10:30.975Z"
 last_activity: 2026-06-23
 progress:
   total_phases: 12
   completed_phases: 3
   total_plans: 24
-  completed_plans: 19
-  percent: 79
+  completed_plans: 20
+  percent: 83
 ---
 
 # Project State
@@ -31,7 +31,7 @@ See: .planning/PROJECT.md (mis à jour 2026-06-20 après clôture v2.0)
 
 Milestone: v3.0 — Plateforme complète sous identité dark néon NEXA (7 phases, 15-21)
 Phase: 16 (reskin-transversal-de-toutes-les-pages) — EXECUTING
-Plan: 2 of 4
+Plan: 3 of 4
 Status: Ready to execute
 Last activity: 2026-06-23
 
@@ -110,6 +110,7 @@ ressources externes non provisionnables en session de développement.
 | Phase 15 P03 | ~6min | 3 tasks | 9 files |
 | Phase 15 P03 | 6min | 3 tasks | 9 files |
 | Phase 16 P01 | ~20min | 2 tasks | 7 files |
+| Phase 16 P02 | ~12min | 2 tasks | 6 files |
 
 ## Roadmap v2.0 (9 phases)
 
@@ -456,6 +457,14 @@ ressources externes non provisionnables en session de développement.
 - **D-16-01-E** : RESKIN-01..06 laissés **Pending** dans REQUIREMENTS.md — plan 01 = Wave-0 (garde-fous), il ne DÉLIVRE pas le reskin. Les requirements sont satisfaits par les plans 02 (RESKIN-01), 03 (RESKIN-02/03/06), 04 (RESKIN-04/05). Marquage prématuré annulé.
 - **Commits 16-01** : 3792693 (Task 1 — theme-scan étendu + 3 scans structurels), 2808648 (Task 2 — primitives glow + data-rain tokenisées).
 
+### Decisions exécution (Plan 16-02 — reskin Tier 1 vitrine + réconciliation landing green-only, RESKIN-01)
+
+- **D-16-02-A** : landing réconciliée green-only — `NexaLanding.tsx` `data-theme="green"` figé + bloc toggle supprimé ; `NexaLandingEffects.tsx` logique de thème entièrement retirée (data-rain/parallaxe/tilt/reveal/progress PRÉSERVÉS, theme-agnostic) ; `nexa-landing.css` bloc volt + overrides volt `.mark-tile` + CSS toggle supprimés, branche `green` seule vivante (D-01/D-02/D-03). `volt-orphan-free` GREEN.
+- **D-16-02-B** : Tier 1 vitrine appliqué — `tarifs` carte Standard 9$/mois (vedette) `border-primary/40` + `glowClass('soft')` (box-shadow `var(--glow)`, jamais ring — C-3/D-08) + CTA primaire glow ; `<Disclaimer />` ajouté ; `méthodologie`/`légal` filet d'accent `bg-primary/60`. 3 surfaces token-pure (grep raw-palette = 0).
+- **D-16-02-C** : `Eyebrow` (composant partagé) NON modifié — son défaut `tone=purple` utilise `text-[var(--accent-brand)]` (var tokenisée, passe theme-scan). Les pages consomment le composant, pas le littéral → grep d'acceptance = 0. Toucher le défaut déborderait sur des surfaces hors plan 02.
+- **D-16-02-D** : `theme-scan` Test 2 reste RED MAIS uniquement sur `(admin)/page.tsx`, `(admin)/sante/page.tsx` (`bg-emerald/amber-500`), `dashboard/page.tsx` (`text-red-600`) — buckets admin/dashboard des plans 16-03/16-04, jamais touchés ici. no-perf-claims/no-mera-brand/rtl-logical-props GREEN, typecheck 0 erreur, lint:i18n exit 0.
+- **Commits 16-02** : b731968 (Task 1 — landing green-only, orphelins volt supprimés), 5bd2f36 (Task 2 — accent néon Tier 1 tarifs/méthodologie/légal).
+
 ### Open todos / research flags (v2.0)
 
 - **Phase 4 (research flag) :** TronGrid endpoint `walletsolidity`, parsing logs TRC-20, normalisation hex↔base58 — doc TS peu dense, recherche de phase recommandée.
@@ -482,7 +491,7 @@ ressources externes non provisionnables en session de développement.
 
 ## Session Continuity
 
-**Last session:** 2026-06-23T01:59:11.833Z
+**Last session:** 2026-06-23T02:09:06.652Z
 
 **Last session (archive):** 2026-06-19T03:41:29.665Z
 
