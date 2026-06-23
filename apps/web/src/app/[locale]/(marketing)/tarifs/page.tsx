@@ -23,6 +23,8 @@ import {
 } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Eyebrow } from '@/components/nexa/Eyebrow'
+import { Disclaimer } from '@/components/Disclaimer'
+import { glowClass } from '@/components/ui/glow'
 
 export default async function PricingPage({
   params,
@@ -39,8 +41,9 @@ export default async function PricingPage({
       <h1 className="mt-2 font-display text-2xl font-semibold">{t('title')}</h1>
 
       <div className="mt-8 grid gap-6 md:grid-cols-2">
-        {/* Offre Standard — 9 $/mois (D-11) */}
-        <Card className="transition-shadow hover:shadow-md">
+        {/* Offre Standard — 9 $/mois (D-11). Carte vedette Tier 1 : bordure marque
+            + glow néon tokenisé (box-shadow var(--glow), jamais un ring — C-3/D-08). */}
+        <Card className={`border-primary/40 transition-shadow ${glowClass('soft')}`}>
           <CardHeader>
             <CardTitle className="text-base">{t('plan1Title')}</CardTitle>
             <CardDescription>{t('plan1Usdt')}</CardDescription>
@@ -51,7 +54,8 @@ export default async function PricingPage({
             </p>
           </CardContent>
           <CardFooter>
-            <Button asChild className="w-full">
+            {/* CTA primaire vedette : glow néon Tier 1 (box-shadow tokenisé). */}
+            <Button asChild className={`w-full ${glowClass('soft')}`}>
               <Link href="/signup">{t('cta')}</Link>
             </Button>
           </CardFooter>
@@ -79,6 +83,11 @@ export default async function PricingPage({
             </Button>
           </CardFooter>
         </Card>
+      </div>
+
+      {/* Disclaimer LEGAL-01 — source unique, jamais de copie inline. */}
+      <div className="mt-12 border-t border-border pt-6">
+        <Disclaimer />
       </div>
     </main>
   )

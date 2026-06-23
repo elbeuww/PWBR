@@ -39,6 +39,8 @@ export default async function MethodologyPage({
     <main className="mx-auto max-w-prose px-4 py-16 text-start md:px-6">
       <Eyebrow>{t('eyebrow')}</Eyebrow>
       <h1 className="mt-2 font-display text-2xl font-semibold">{t('title')}</h1>
+      {/* Filet d'accent néon vitrine Tier 1 (couche token --primary, pas de littéral). */}
+      <div className="mt-3 h-px w-16 bg-primary/60" aria-hidden />
       <p className="mt-4 text-base text-muted-foreground">{t('intro')}</p>
 
       <div className="mt-10 space-y-8">
