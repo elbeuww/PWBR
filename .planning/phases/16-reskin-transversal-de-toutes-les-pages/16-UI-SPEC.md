@@ -1,10 +1,11 @@
 ---
 phase: 16
 slug: reskin-transversal-de-toutes-les-pages
-status: draft
+status: approved
 shadcn_initialized: true
 preset: radix-nova (baseColor neutral, cssVariables, lucide, rsc)
 created: 2026-06-23
+reviewed_at: 2026-06-23
 ---
 
 # Phase 16 — UI Design Contract
@@ -65,6 +66,8 @@ Inherited verbatim from Phase 15. UI text = **Space Grotesk** (`--font-sans`) at
 | Display | Archivo (`--font-display`, distinct family) | 28px+ (clamp on landing) | `--display-weight: 800` (faux-bold over Archivo 600) | 1.0–1.2 |
 | Numeric / tabular trading | JetBrains Mono (`--font-mono`) | inherits row size | 400/600 | 1.4 |
 | Arabic (`:lang(ar)`) | Noto Sans Arabic | inherits | 400/600 | 1.6 (diacritics) |
+
+> **Weight scope (checker FLAG, D4 clarification):** the two operational UI weights are **400 + 600** (Space Grotesk, JetBrains Mono, Noto Sans Arabic). `--display-weight: 800` applies **exclusively to Archivo** (isolated display family — titles/wordmark only) and is **never** used on Space Grotesk or body/UI text. The system is therefore 2 operational weights + 1 display-only weight on a distinct family, not a 3-weight UI scale.
 
 Rules (tier-aware, D-07):
 - **Gradient-green titles are landing-only.** App-tier headings (Tier 2/3) use **flat tokens** (`text-foreground` / `text-primary` accent), never the gradient title treatment.
