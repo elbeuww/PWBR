@@ -15,6 +15,7 @@
 import { useTranslations } from 'next-intl'
 import { Link } from '../../i18n/navigation'
 import { Card, CardContent, CardHeader } from '../ui/card'
+import { glowClass } from '../ui/glow'
 import { ScoreRing, type ScoreRisk } from '../nexa/ScoreRing'
 import { formatRelativeAge } from '../../lib/signals/format'
 import type { SignalRow } from '../../lib/signals/queries'
@@ -73,7 +74,11 @@ export function SignalCard({ signal, locale }: SignalCardProps) {
       className="group block rounded-xl outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
       aria-label={t('cardAction')}
     >
-      <Card className="h-full transition-shadow group-hover:ring-foreground/20 group-focus-visible:ring-foreground/20">
+      {/* Accent Tier 2 readability-first : glow discret sur la CARTE uniquement
+          (box-shadow var(--glow), jamais un ring). Aucun voile ambiant sur surface dense. */}
+      <Card
+        className={`h-full transition-shadow ${glowClass('soft')} group-hover:ring-foreground/20 group-focus-visible:ring-foreground/20`}
+      >
         <CardHeader>
           <div className="flex items-center justify-between gap-2">
             <span className="font-mono text-sm font-semibold">{signal.instruments.symbol}</span>

@@ -25,6 +25,7 @@ import { SignalsDisclaimerBanner } from '../../../../../components/signals/Signa
 import { CandleChartLazy } from '../../../../../components/signals/CandleChartLazy'
 import { Eyebrow } from '../../../../../components/nexa/Eyebrow'
 import { ScoreRing, type ScoreRisk } from '../../../../../components/nexa/ScoreRing'
+import { glowClass } from '@/components/ui/glow'
 
 /**
  * Mappe le niveau de risque DB (low/medium/high/extreme) vers la palette ScoreRing
@@ -169,8 +170,11 @@ export default async function SignalDetailPage({ params }: SignalDetailPageProps
 
       <SignalsDisclaimerBanner />
 
-      {/* En-tête NEXA : Eyebrow + symbole/direction + ScoreRing large (score = risque). */}
-      <header className="mt-6 flex flex-wrap items-center justify-between gap-4 rounded-xl border border-border bg-card p-6">
+      {/* En-tête NEXA : Eyebrow + symbole/direction + ScoreRing large (score = risque).
+          Accent Tier 2 readability-first : glow discret sur la carte d'en-tête seulement. */}
+      <header
+        className={`mt-6 flex flex-wrap items-center justify-between gap-4 rounded-xl border border-border bg-card p-6 ${glowClass('soft')}`}
+      >
         <div className="flex flex-col gap-2">
           <Eyebrow>{t('planTitle')}</Eyebrow>
           <h1 className="font-heading text-2xl font-semibold">
