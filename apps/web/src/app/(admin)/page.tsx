@@ -53,8 +53,8 @@ function worstColor(a: FreshnessColor, b: FreshnessColor): FreshnessColor {
 // Feux de fraîcheur tokenisés (Tier 3 sober, swap law) : statut sémantique, jamais
 // palette brute. green→signal-bullish, amber→risk-moderate, red→destructive.
 const DOT_CLASS: Record<FreshnessColor, string> = {
-  green: 'bg-[--signal-bullish]',
-  amber: 'bg-[--risk-moderate]',
+  green: 'bg-[var(--signal-bullish)]',
+  amber: 'bg-[var(--risk-moderate)]',
   red: 'bg-destructive',
 }
 

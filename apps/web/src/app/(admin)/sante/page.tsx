@@ -64,8 +64,8 @@ interface SourceFreshness {
 // Feux de fraîcheur tokenisés (Tier 3 sober, swap law) : statut sémantique, jamais
 // palette brute. green→signal-bullish, amber→risk-moderate, red→destructive.
 const DOT_CLASS: Record<FreshnessColor, string> = {
-  green: 'bg-[--signal-bullish]',
-  amber: 'bg-[--risk-moderate]',
+  green: 'bg-[var(--signal-bullish)]',
+  amber: 'bg-[var(--risk-moderate)]',
   red: 'bg-destructive',
 }
 
@@ -216,7 +216,7 @@ export default async function AdminHealthPage() {
                   </TableCell>
                   <TableCell>
                     {j.status === 'success' ? (
-                      <Badge className="border-[--signal-bullish]/30 bg-[--signal-bullish]/10 text-[--signal-bullish]">
+                      <Badge className="border-[var(--signal-bullish)]/30 bg-[var(--signal-bullish)]/10 text-[var(--signal-bullish)]">
                         {t('health.statusOk')}
                       </Badge>
                     ) : j.status === 'error' ? (
