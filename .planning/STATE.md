@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v3.0
 milestone_name: Plateforme complète sous identité dark néon NEXA
 status: executing
-last_updated: "2026-06-23T02:10:30.975Z"
+last_updated: "2026-06-23T02:21:15.910Z"
 last_activity: 2026-06-23
 progress:
   total_phases: 12
   completed_phases: 3
   total_plans: 24
-  completed_plans: 20
-  percent: 83
+  completed_plans: 21
+  percent: 88
 ---
 
 # Project State
@@ -31,7 +31,7 @@ See: .planning/PROJECT.md (mis à jour 2026-06-20 après clôture v2.0)
 
 Milestone: v3.0 — Plateforme complète sous identité dark néon NEXA (7 phases, 15-21)
 Phase: 16 (reskin-transversal-de-toutes-les-pages) — EXECUTING
-Plan: 3 of 4
+Plan: 4 of 4
 Status: Ready to execute
 Last activity: 2026-06-23
 
@@ -111,6 +111,7 @@ ressources externes non provisionnables en session de développement.
 | Phase 15 P03 | 6min | 3 tasks | 9 files |
 | Phase 16 P01 | ~20min | 2 tasks | 7 files |
 | Phase 16 P02 | ~12min | 2 tasks | 6 files |
+| Phase 16 P03 | ~10min | 2 tasks | 8 files |
 
 ## Roadmap v2.0 (9 phases)
 
@@ -465,6 +466,14 @@ ressources externes non provisionnables en session de développement.
 - **D-16-02-D** : `theme-scan` Test 2 reste RED MAIS uniquement sur `(admin)/page.tsx`, `(admin)/sante/page.tsx` (`bg-emerald/amber-500`), `dashboard/page.tsx` (`text-red-600`) — buckets admin/dashboard des plans 16-03/16-04, jamais touchés ici. no-perf-claims/no-mera-brand/rtl-logical-props GREEN, typecheck 0 erreur, lint:i18n exit 0.
 - **Commits 16-02** : b731968 (Task 1 — landing green-only, orphelins volt supprimés), 5bd2f36 (Task 2 — accent néon Tier 1 tarifs/méthodologie/légal).
 
+### Decisions exécution (Plan 16-03 — reskin Tier 2 app auth/compte/membre/funnel, RESKIN-02/03/06)
+
+- **D-16-03-A** : auth (login/signup) Tier 2 calme — swap `text-[var(--accent-brand)]` → `text-primary` ; glow discret `glowClass('soft')` sur le CTA submit (box-shadow `var(--glow)`, jamais ring) ; data-rain ambiant (`<DataRain />`, reduced-motion double-gardé) sur auth UNIQUEMENT. dashboard residual offender corrigé `text-red-600` → `text-destructive`.
+- **D-16-03-B** : surfaces denses/funnel non-auth (dashboard, abonnement, paiement-bientot, affiliation) → accent Tier 2 = filet token `--primary` (`h-px w-16 bg-primary/60`), PAS de data-rain (réservé aux surfaces calmes, D-05/D-14). Accent présent partout (anti « tokenisé mais fade », C-6).
+- **D-16-03-C** : membre dense readability-first (D-05) — glow discret sur CARTES seulement : `SignalCard` (la carte) + en-tête de la route `signaux/[id]`. `SignalList`/`FilterBar`/`SignalDetail`/`signaux/page.tsx` étaient DÉJÀ token-purs (zéro littéral) → laissés intacts (un glow sur listes/tables violerait D-05). Déviation au files_modified, conforme C-6/D-05.
+- **D-16-03-D** : invariants gated préservés — `rls-unchanged` GREEN, fetch `createClient`/`fetchActiveSignals`/anti-IDOR byte-identiques ; `lwc-recolor-intact` GREEN + CandleChart diff VIDE (D-11 verbatim) ; aucun service_role ; `SignalList` importe légitimement `lib/supabase/client` pour Realtime (pattern D-13 pré-existant, hors scope rls-unchanged). theme-scan Test 2 reste RED uniquement sur les offenders admin (plan 16-04). typecheck 0 erreur, lint:i18n exit 0.
+- **Commits 16-03** : e94fa2d (Task 1 — auth+compte+funnel Tier 2), fda34b6 (Task 2 — membre dense readability-first glow cartes).
+
 ### Open todos / research flags (v2.0)
 
 - **Phase 4 (research flag) :** TronGrid endpoint `walletsolidity`, parsing logs TRC-20, normalisation hex↔base58 — doc TS peu dense, recherche de phase recommandée.
@@ -491,7 +500,7 @@ ressources externes non provisionnables en session de développement.
 
 ## Session Continuity
 
-**Last session:** 2026-06-23T02:09:06.652Z
+**Last session:** 2026-06-23T02:20:49.089Z
 
 **Last session (archive):** 2026-06-19T03:41:29.665Z
 

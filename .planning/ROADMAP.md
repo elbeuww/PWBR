@@ -156,7 +156,7 @@ Détail complet archivé : `.planning/milestones/v2.0-ROADMAP.md`.
 **Plans** : 4 plans (2 vagues)
 - [x] 16-01-PLAN.md — Wave-0 gardes : extension theme-scan (FOUNDATION_FILES + FORBIDDEN_PALETTE) + 3 scans structurels (rls-unchanged / lwc-recolor-intact / volt-orphan-free) + extraction primitives glow + data-rain tokenisées (RESKIN-01..06)
 - [x] 16-02-PLAN.md — Vitrine Tier 1 + réconciliation landing volt→green : nettoyage orphelins + tarifs/méthodologie/légal token-pure plein néon (RESKIN-01)
-- [ ] 16-03-PLAN.md — App Tier 2 : auth/compte/membre/funnel token-pure glow discret, fetch RLS + CandleChart intacts, data-rain calme uniquement (RESKIN-02/03/06)
+- [x] 16-03-PLAN.md — App Tier 2 : auth/compte/membre/funnel token-pure glow discret, fetch RLS + CandleChart intacts, data-rain calme uniquement (RESKIN-02/03/06)
 - [ ] 16-04-PLAN.md — Académie Tier 2 (RTL + fallback FR) + Admin Tier 3 sobre (offenders résiduels tokenisés, service_role admin-only) (RESKIN-04/05)
 **UI hint** : yes
 **Notes** : Reskin = swap de tokens + primitifs du DS v3, jamais migration du fetch RLS vers le client (Anti-Pattern). CandleChart recoloré via l'API JS lwc. Conserver `data-testid`/rôles ARIA pour les specs E2E (phase 21). Patterns établis (recherche légère). Découpage par tier/route group (fichiers disjoints → vague 2 parallélisable) ; vague 1 = gardes + primitives gate toutes les surfaces.
@@ -241,7 +241,7 @@ Détail complet archivé : `.planning/milestones/v2.0-ROADMAP.md`.
 | 13. Backtest catalogue de patterns | v2.1 | 0/? | ⏸️ Paused | - |
 | 14. Track record affiché & boucle prod | v2.1 | 0/? | ⏸️ Paused | - |
 | 15. Design system v3 « dark néon unique » | v3.0 | 3/3 | Complete    | 2026-06-22 |
-| 16. Reskin transversal de toutes les pages | v3.0 | 2/4 | In Progress|  |
+| 16. Reskin transversal de toutes les pages | v3.0 | 3/4 | In Progress|  |
 | 17. Fondation DB scalable | v3.0 | 0/? | Not started | - |
 | 18. Seed de données réalistes à l'échelle | v3.0 | 0/? | Not started | - |
 | 19. Dashboard utilisateur | v3.0 | 0/? | Not started | - |
