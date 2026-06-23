@@ -18,6 +18,7 @@ import Image from 'next/image'
 import { Link } from '../../i18n/navigation'
 import { Card } from '../ui/card'
 import { Badge } from '../ui/badge'
+import { glowClass } from '../ui/glow'
 
 interface ContentCardProps {
   href: string
@@ -53,7 +54,10 @@ export async function ContentCard({
       href={href}
       className="group block rounded-xl outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
     >
-      <Card className="h-full transition-shadow group-hover:ring-foreground/20 group-focus-visible:ring-foreground/20">
+      {/* Accent Tier 2 discret (C-6/D-04) : glow néon sur la CARTE de contenu
+          (box-shadow var(--glow), jamais un ring). Readability-first : aucun voile,
+          aucun gradient de titre, aucun voile ambiant sur la liste. */}
+      <Card className={`h-full transition-shadow ${glowClass('soft')} group-hover:ring-foreground/20 group-focus-visible:ring-foreground/20`}>
         <div className="relative aspect-video w-full overflow-hidden">
           <Image
             src={cover}
