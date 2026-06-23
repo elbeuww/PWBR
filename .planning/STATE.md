@@ -30,10 +30,18 @@ See: .planning/PROJECT.md (mis à jour 2026-06-20 après clôture v2.0)
 ## Current Position
 
 Milestone: v3.0 — Plateforme complète sous identité dark néon NEXA (7 phases, 15-21)
-Phase: 16 (reskin-transversal-de-toutes-les-pages) — EXECUTING
-Plan: 4 of 4 (all plans executed)
-Status: Phase complete — ready for verification
-Last activity: 2026-06-23 — Completed 16-04-PLAN.md (Académie Tier 2 + admin résiduel Tier 3 sober ; theme-scan Test 2 GREEN)
+Phase: 16 (reskin-transversal-de-toutes-les-pages) — AWAITING HUMAN UAT
+Plan: 4 of 4 (all plans executed + verified)
+Status: Verification = human_needed (4/4 must-haves verified, 0 blocker). Phase NON marquée complete — attend validation humaine.
+Last activity: 2026-06-23 — Exécution phase 16 terminée : 4 plans, code review (CR-01 blocker corrigé commit 60d3d0e), vérif goal 4/4, tests 616 pass / typecheck 0.
+
+### ▶ REPRISE Phase 16 (point de reprise)
+- Tous les gates verts ; CR-01 (Tailwind v4 `bg-[var(--token)]`) corrigé.
+- 5 items de test visuel/runtime persistés dans `16-HUMAN-UAT.md` (landing green-only, pastilles admin, police h1, data-rain auth, glow tarifs/SignalCards).
+- **Action attendue** : tester les 5 items dans le navigateur, puis :
+  - « approuvé » → marquer phase complete : `gsd-sdk query phase.complete 16` + commit ROADMAP/STATE/REQUIREMENTS/VERIFICATION, puis offer_next.
+  - problèmes → `/gsd:plan-phase 16 --gaps` (gap-closure).
+- Dette préexistante hors scope notée dans 16-REVIEW.md : même syntaxe `bg-[--token]` cassée dans signaux/page.tsx, affiliation/page.tsx, affiliation/payouts, file/page.tsx, affiliation/dashboard, TrackRecordView.tsx (non touchés par phase 16) ; WR-04 `font-heading` non déclaré (dette phase 04).
 
 ## Deferred Items
 
