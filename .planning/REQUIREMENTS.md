@@ -20,8 +20,8 @@ Requirements de ce milestone. Chacun est mappé à une phase de la roadmap (voir
 - [x] **RESKIN-01**: La vitrine publique (accueil, tarifs, méthodologie, légal) est au DS dark néon, trilingue AR/EN/FR.
 - [x] **RESKIN-02**: L'auth (login/signup) et l'espace compte/abonnement sont au DS dark néon.
 - [x] **RESKIN-03**: L'espace membre (liste signaux + détail trade + chart lightweight-charts) est au DS dark néon, gating RLS préservé.
-- [ ] **RESKIN-04**: L'Académie (index + article + cours/leçon) est au DS dark néon, RTL et fallback FR préservés.
-- [ ] **RESKIN-05**: Le back-office `/admin` est au DS dark néon.
+- [x] **RESKIN-04**: L'Académie (index + article + cours/leçon) est au DS dark néon, RTL et fallback FR préservés.
+- [x] **RESKIN-05**: Le back-office `/admin` est au DS dark néon.
 - [x] **RESKIN-06**: Les pages de paiement/funnel (paiement, paiement-bientot) sont au DS dark néon.
 
 ### Dashboard utilisateur (UDASH)
@@ -97,8 +97,8 @@ Exclusions explicites de ce milestone, avec raison.
 | RESKIN-01 | Phase 16 — Reskin transversal de toutes les pages | Complete |
 | RESKIN-02 | Phase 16 — Reskin transversal de toutes les pages | Complete |
 | RESKIN-03 | Phase 16 — Reskin transversal de toutes les pages | Complete |
-| RESKIN-04 | Phase 16 — Reskin transversal de toutes les pages | Pending |
-| RESKIN-05 | Phase 16 — Reskin transversal de toutes les pages | Pending |
+| RESKIN-04 | Phase 16 — Reskin transversal de toutes les pages | Complete |
+| RESKIN-05 | Phase 16 — Reskin transversal de toutes les pages | Complete |
 | RESKIN-06 | Phase 16 — Reskin transversal de toutes les pages | Complete |
 | SCALE-01 | Phase 17 — Fondation DB scalable | Pending |
 | SCALE-02 | Phase 17 — Fondation DB scalable | Pending |

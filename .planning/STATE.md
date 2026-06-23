@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v3.0
 milestone_name: Plateforme complète sous identité dark néon NEXA
-status: executing
-last_updated: "2026-06-23T02:21:15.910Z"
+status: verifying
+last_updated: "2026-06-23T02:29:00.198Z"
 last_activity: 2026-06-23
 progress:
   total_phases: 12
-  completed_phases: 3
+  completed_phases: 4
   total_plans: 24
-  completed_plans: 21
-  percent: 88
+  completed_plans: 22
+  percent: 92
 ---
 
 # Project State
@@ -31,9 +31,9 @@ See: .planning/PROJECT.md (mis à jour 2026-06-20 après clôture v2.0)
 
 Milestone: v3.0 — Plateforme complète sous identité dark néon NEXA (7 phases, 15-21)
 Phase: 16 (reskin-transversal-de-toutes-les-pages) — EXECUTING
-Plan: 4 of 4
-Status: Ready to execute
-Last activity: 2026-06-23
+Plan: 4 of 4 (all plans executed)
+Status: Phase complete — ready for verification
+Last activity: 2026-06-23 — Completed 16-04-PLAN.md (Académie Tier 2 + admin résiduel Tier 3 sober ; theme-scan Test 2 GREEN)
 
 ## Deferred Items
 
@@ -112,6 +112,7 @@ ressources externes non provisionnables en session de développement.
 | Phase 16 P01 | ~20min | 2 tasks | 7 files |
 | Phase 16 P02 | ~12min | 2 tasks | 6 files |
 | Phase 16 P03 | ~10min | 2 tasks | 8 files |
+| Phase 16 P04 | ~6min | 2 tasks | 5 files |
 
 ## Roadmap v2.0 (9 phases)
 
@@ -474,6 +475,15 @@ ressources externes non provisionnables en session de développement.
 - **D-16-03-D** : invariants gated préservés — `rls-unchanged` GREEN, fetch `createClient`/`fetchActiveSignals`/anti-IDOR byte-identiques ; `lwc-recolor-intact` GREEN + CandleChart diff VIDE (D-11 verbatim) ; aucun service_role ; `SignalList` importe légitimement `lib/supabase/client` pour Realtime (pattern D-13 pré-existant, hors scope rls-unchanged). theme-scan Test 2 reste RED uniquement sur les offenders admin (plan 16-04). typecheck 0 erreur, lint:i18n exit 0.
 - **Commits 16-03** : e94fa2d (Task 1 — auth+compte+funnel Tier 2), fda34b6 (Task 2 — membre dense readability-first glow cartes).
 
+### Decisions exécution (Plan 16-04 — reskin Académie Tier 2 + admin résiduel Tier 3 sober, RESKIN-04/05)
+
+- **D-16-04-A** : les 3 pages Académie (index/[slug]/[slug]/[lesson]) + FallbackBanner + Callout étaient DÉJÀ token-pures (zéro littéral, propriétés logiques, FR fallback intact). Unique travail Tier 2 net-new = accent discret = `glowClass('soft')` sur la CARTE de contenu (`ContentCard`), miroir de SignalCard. Aucun glow sur listes/TOC/prose (readability-first, D-05/D-07). 5/6 fichiers Académie laissés intacts (frontière de scope).
+- **D-16-04-B** : `(admin)/page.tsx` tokenisé EN PLUS des files_modified du plan — il portait le MÊME offender DOT_CLASS (`bg-emerald-500`/`bg-amber-500`) que sante et figure dans FOUNDATION_FILES. Le critical_constraint exige theme-scan Test 2 GREEN → fix appliqué (Rule 2/3). Sans lui, Test 2 serait resté RED.
+- **D-16-04-C** : status dots admin (sante + admin/page) → `bg-[--signal-bullish]` (sain), `bg-[--risk-moderate]` (limite), `bg-destructive` (périmé) — statut sémantique tokenisé. Tier 3 sober respecté : couleur de fond de pastille, PAS un glow/aura/animation. Zéro `var(--glow)` sur l'admin (grep vérifié).
+- **D-16-04-D** : 3 offenders de propriété physique corrigés en logique (membres `ml-2`→`ms-2`, affilies `text-right`→`text-end` ×2) par cohérence RTL (action du plan). signaux/[id] déjà logique → non touché.
+- **D-16-04-E** : service_role admin-only intégralement préservé — `createAdminServiceClient()` + tous les fetch byte-identiques sur les 5 fichiers admin (diff = className/markup seul). Import admin-service présent dans 5 pages admin, nulle part ailleurs (C-2). **theme-scan Test 2 désormais GREEN** (clôture du reskin transversal). typecheck 0 erreur, lint:i18n exit 0.
+- **Commits 16-04** : ab8821b (Task 1 — glow Académie ContentCard Tier 2), c0c0ce7 (Task 2 — admin résiduel Tier 3 sober).
+
 ### Open todos / research flags (v2.0)
 
 - **Phase 4 (research flag) :** TronGrid endpoint `walletsolidity`, parsing logs TRC-20, normalisation hex↔base58 — doc TS peu dense, recherche de phase recommandée.
@@ -500,7 +510,7 @@ ressources externes non provisionnables en session de développement.
 
 ## Session Continuity
 
-**Last session:** 2026-06-23T02:20:49.089Z
+**Last session:** 2026-06-23T02:29:00.189Z
 
 **Last session (archive):** 2026-06-19T03:41:29.665Z
 

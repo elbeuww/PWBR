@@ -37,7 +37,7 @@ Détail complet archivé : `.planning/milestones/v2.0-ROADMAP.md`.
 ### v3.0 — Plateforme complète sous identité dark néon NEXA (Phases 15-21)
 
 - [x] **Phase 15: Design system v3 « dark néon unique »** — Promotion de la couche sémantique `.nxl` (landing) en DS global dark unique, `forcedTheme="dark"`, retrait du toggle clair, décision green vs volt, contraste WCAG AA, no-FOUC + RTL préservés. (THEME) (completed 2026-06-22)
-- [ ] **Phase 16: Reskin transversal de toutes les pages** — Vitrine, légal, auth, compte/abonnement, espace membre signaux/détail+chart, paiement/funnel, Académie, admin repeints sur le DS v3, RLS/i18n/disclaimers/no-perf-claims/no-mera-brand préservés. (RESKIN)
+- [x] **Phase 16: Reskin transversal de toutes les pages** — Vitrine, légal, auth, compte/abonnement, espace membre signaux/détail+chart, paiement/funnel, Académie, admin repeints sur le DS v3, RLS/i18n/disclaimers/no-perf-claims/no-mera-brand préservés. (RESKIN) (completed 2026-06-23)
 - [ ] **Phase 17: Fondation DB scalable (perf avant charge)** — Migration `0017` : wrap RLS `(select …)` + index sur colonnes de policy, index composites keyset alignés `ORDER BY`, infra matviews KPIs (unique index + wrapper `is_superadmin()`), Broadcast vs `postgres_changes`, migrations non bloquantes `CONCURRENTLY`. (SCALE perf)
 - [ ] **Phase 18: Seed de données réalistes à l'échelle** — `seed.ts` faker déterministe, idempotent, FK-cohérent (~10k users + signaux/paiements/affiliés/outcomes), labels `backtest`/`démo` (aucun chiffre de perf fabriqué), RLS re-testée depuis client anon. (SEED)
 - [ ] **Phase 19: Dashboard utilisateur** — Groupe `(dash)` : vue d'ensemble, signaux suivis/historique keyset, watchlist `user_followed_setups` (revue IDOR), abonnement + ExpiryBanner, affiliation intégrée, paramètres — démontrable sur données seedées. (UDASH)
@@ -157,7 +157,7 @@ Détail complet archivé : `.planning/milestones/v2.0-ROADMAP.md`.
 - [x] 16-01-PLAN.md — Wave-0 gardes : extension theme-scan (FOUNDATION_FILES + FORBIDDEN_PALETTE) + 3 scans structurels (rls-unchanged / lwc-recolor-intact / volt-orphan-free) + extraction primitives glow + data-rain tokenisées (RESKIN-01..06)
 - [x] 16-02-PLAN.md — Vitrine Tier 1 + réconciliation landing volt→green : nettoyage orphelins + tarifs/méthodologie/légal token-pure plein néon (RESKIN-01)
 - [x] 16-03-PLAN.md — App Tier 2 : auth/compte/membre/funnel token-pure glow discret, fetch RLS + CandleChart intacts, data-rain calme uniquement (RESKIN-02/03/06)
-- [ ] 16-04-PLAN.md — Académie Tier 2 (RTL + fallback FR) + Admin Tier 3 sobre (offenders résiduels tokenisés, service_role admin-only) (RESKIN-04/05)
+- [x] 16-04-PLAN.md — Académie Tier 2 (RTL + fallback FR) + Admin Tier 3 sobre (offenders résiduels tokenisés, service_role admin-only) (RESKIN-04/05)
 **UI hint** : yes
 **Notes** : Reskin = swap de tokens + primitifs du DS v3, jamais migration du fetch RLS vers le client (Anti-Pattern). CandleChart recoloré via l'API JS lwc. Conserver `data-testid`/rôles ARIA pour les specs E2E (phase 21). Patterns établis (recherche légère). Découpage par tier/route group (fichiers disjoints → vague 2 parallélisable) ; vague 1 = gardes + primitives gate toutes les surfaces.
 
@@ -241,7 +241,7 @@ Détail complet archivé : `.planning/milestones/v2.0-ROADMAP.md`.
 | 13. Backtest catalogue de patterns | v2.1 | 0/? | ⏸️ Paused | - |
 | 14. Track record affiché & boucle prod | v2.1 | 0/? | ⏸️ Paused | - |
 | 15. Design system v3 « dark néon unique » | v3.0 | 3/3 | Complete    | 2026-06-22 |
-| 16. Reskin transversal de toutes les pages | v3.0 | 3/4 | In Progress|  |
+| 16. Reskin transversal de toutes les pages | v3.0 | 4/4 | Complete   | 2026-06-23 |
 | 17. Fondation DB scalable | v3.0 | 0/? | Not started | - |
 | 18. Seed de données réalistes à l'échelle | v3.0 | 0/? | Not started | - |
 | 19. Dashboard utilisateur | v3.0 | 0/? | Not started | - |
