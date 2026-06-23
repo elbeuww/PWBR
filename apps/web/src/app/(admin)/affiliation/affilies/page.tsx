@@ -114,7 +114,7 @@ export default async function AdminAffiliatesPerfPage() {
             <TableHeader>
               <TableRow>
                 <TableHead>{t('affiliates.colEmail')}</TableHead>
-                <TableHead className="text-right">{t('affiliates.colReferrals')}</TableHead>
+                <TableHead className="text-end">{t('affiliates.colReferrals')}</TableHead>
                 <TableHead>{t('affiliates.colDue')}</TableHead>
                 <TableHead>{t('affiliates.colPaid')}</TableHead>
               </TableRow>
@@ -125,7 +125,7 @@ export default async function AdminAffiliatesPerfPage() {
                   <TableCell className="font-medium">
                     <bdi>{r.email}</bdi>
                   </TableCell>
-                  <TableCell className="text-right">
+                  <TableCell className="text-end">
                     <bdi>{referralFmt.format(r.referralCount)}</bdi>
                   </TableCell>
                   <TableCell>

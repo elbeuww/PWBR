@@ -61,9 +61,11 @@ interface SourceFreshness {
   lastTs: string | null
 }
 
+// Feux de fraîcheur tokenisés (Tier 3 sober, swap law) : statut sémantique, jamais
+// palette brute. green→signal-bullish, amber→risk-moderate, red→destructive.
 const DOT_CLASS: Record<FreshnessColor, string> = {
-  green: 'bg-emerald-500',
-  amber: 'bg-amber-500',
+  green: 'bg-[--signal-bullish]',
+  amber: 'bg-[--risk-moderate]',
   red: 'bg-destructive',
 }
 

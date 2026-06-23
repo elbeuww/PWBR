@@ -203,7 +203,7 @@ export default async function AdminMembersPage({
                     ) : (
                       '—'
                     )}
-                    <span className="ml-2 text-xs text-muted-foreground">
+                    <span className="ms-2 text-xs text-muted-foreground">
                       {fmtDate(m.lastPaymentAt)}
                     </span>
                   </TableCell>
