@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v3.0
 milestone_name: Plateforme complète sous identité dark néon NEXA
 status: executing
-last_updated: "2026-06-23T01:44:40.986Z"
-last_activity: 2026-06-23 -- Phase 16 planning complete
+last_updated: "2026-06-23T01:59:35.400Z"
+last_activity: 2026-06-23
 progress:
   total_phases: 12
   completed_phases: 3
   total_plans: 24
-  completed_plans: 18
-  percent: 75
+  completed_plans: 19
+  percent: 79
 ---
 
 # Project State
@@ -23,17 +23,17 @@ progress:
 See: .planning/PROJECT.md (mis à jour 2026-06-20 après clôture v2.0)
 
 **Core value:** Produire, pour chaque opportunité, une analyse fiable et explicable — vulgarisée pour un public non technique — avec un % de réussite TOUJOURS mesuré, jamais inventé : c'est le socle de confiance qui fait payer l'abonnement.
-**Current focus:** Phase 15 — design-system-v3-dark-n-on-unique
+**Current focus:** Phase 16 — reskin-transversal-de-toutes-les-pages
 **Mode:** interactive (MVP vertical)
 **Granularity:** fine
 
 ## Current Position
 
 Milestone: v3.0 — Plateforme complète sous identité dark néon NEXA (7 phases, 15-21)
-Phase: 16
-Plan: Not started
+Phase: 16 (reskin-transversal-de-toutes-les-pages) — EXECUTING
+Plan: 2 of 4
 Status: Ready to execute
-Last activity: 2026-06-23 -- Phase 16 planning complete
+Last activity: 2026-06-23
 
 ## Deferred Items
 
@@ -109,6 +109,7 @@ ressources externes non provisionnables en session de développement.
 | Phase 15 P02 | ~8min | 3 tasks | 7 files |
 | Phase 15 P03 | ~6min | 3 tasks | 9 files |
 | Phase 15 P03 | 6min | 3 tasks | 9 files |
+| Phase 16 P01 | ~20min | 2 tasks | 7 files |
 
 ## Roadmap v2.0 (9 phases)
 
@@ -446,6 +447,15 @@ ressources externes non provisionnables en session de développement.
 - **D-15-02-C (out of scope, deferred)** : `theme-scan.test.ts` (gate RED de 15-01) reste RED — ses fichiers fautifs (`LanguageSwitcher.tsx` `ring-[#2563EB]` + utilitaires palette brute des pages admin/affiliation) sont la **surface de reskin Phase 16** (RESKIN-01..06), hors `files_modified` de 15-02. Loggé `deferred-items.md`. La suite de vérif propre au plan (contrast-aa, design-tokens, rtl-logical-props, theme-parity) est 100 % verte.
 - **Commits 15-02** : b9ff5b5 (Task 1 — :root/.dark frozen GREEN), 09e4112 (Task 2 — forcedTheme=dark + delete ThemeToggle), 5bd8f14 (Task 3 — purge i18n theme + parity inversée).
 
+### Decisions exécution (Plan 16-01 — Wave-0 garde-fous reskin + primitives néon)
+
+- **D-16-01-A** : `volt-orphan-free.test.ts` est RED contre l'arbre courant — la landing (`NexaLanding.tsx`/`nexa-landing.css`/`NexaLandingEffects.tsx`, rendue live via `(marketing)/page.tsx`) porte ENCORE `data-theme="volt"`/`nxl-theme-toggle`/`nexa-landing-theme`. C'est l'état TDD attendu (comme theme-scan Test 2) : la garde mesure la migration de la landing en wave 2. SANITY GREEN. L'acceptance « 3 scans GREEN » supposait à tort la landing déjà nettoyée.
+- **D-16-01-B** : `theme-scan` Test 2 RED liste les offenders RÉELS : `sante` + `admin/page` (`bg-emerald-500`/`bg-amber-500` standalone) + `dashboard` (`text-red-600`). PAS `login` (déjà tokenisé, zéro offender — reste en FOUNDATION_FILES). `rls-unchanged` + `lwc-recolor-intact` GREEN (arbre conforme).
+- **D-16-01-C** : `rls-unchanged.test.ts` strippe les commentaires avant scan (les pages member/account documentent « aucun service_role » en prose, ce n'est pas une infraction) ; allowlist littérale des 2 Server Actions pré-existants ; scans 100 % node:fs (zéro import `@/`).
+- **D-16-01-D** : primitives Tier-2 token-only. `ui/glow.tsx` = box-shadow `var(--glow)` (recettes `.btn-primary`/`.mark-tile`), jamais `ring-*` (D-08/C-3). `ui/data-rain.tsx` = voile ambiant léger, colonnes `--signal-bullish`/`--signal-bearish` via `color-mix`, CSS `.nxl-data-rain` dans globals.css double-gardé `prefers-reduced-motion` (D-14). NON câblées (waves 2 les appliquent). tsc 0 erreur.
+- **D-16-01-E** : RESKIN-01..06 laissés **Pending** dans REQUIREMENTS.md — plan 01 = Wave-0 (garde-fous), il ne DÉLIVRE pas le reskin. Les requirements sont satisfaits par les plans 02 (RESKIN-01), 03 (RESKIN-02/03/06), 04 (RESKIN-04/05). Marquage prématuré annulé.
+- **Commits 16-01** : 3792693 (Task 1 — theme-scan étendu + 3 scans structurels), 2808648 (Task 2 — primitives glow + data-rain tokenisées).
+
 ### Open todos / research flags (v2.0)
 
 - **Phase 4 (research flag) :** TronGrid endpoint `walletsolidity`, parsing logs TRC-20, normalisation hex↔base58 — doc TS peu dense, recherche de phase recommandée.
@@ -472,7 +482,7 @@ ressources externes non provisionnables en session de développement.
 
 ## Session Continuity
 
-**Last session:** 2026-06-23T00:48:26.581Z
+**Last session:** 2026-06-23T01:59:11.833Z
 
 **Last session (archive):** 2026-06-19T03:41:29.665Z
 
