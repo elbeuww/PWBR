@@ -28,7 +28,12 @@ import path from 'node:path'
 // __dirname = apps/web/src/styles/__tests__ → racine src = ../../
 const SRC_ROOT = path.resolve(__dirname, '../../')
 
-// Les 9 fichiers fondation (chemins relatifs depuis src/), 15-PATTERNS.md.
+// Fichiers fondation (chemins relatifs depuis src/).
+// — Bloc 1 : les 9 surfaces fondation Phase 15 (15-PATTERNS.md).
+// — Bloc 2 : surfaces résiduelles touchées par les waves 2 du reskin (Phase 16,
+//   16-PLAN.md task 1). `sante` est déjà présent ci-dessus. Le scan Test 2 est
+//   donc RED sur les offenders résiduels (dashboard:58 text-red-600,
+//   sante:65-66 bg-emerald-500/bg-amber-500) tant que wave 2 ne les a pas tokenisés.
 const FOUNDATION_FILES = [
   'components/LanguageSwitcher.tsx',
   'app/[locale]/affiliation/dashboard/page.tsx',
@@ -39,6 +44,12 @@ const FOUNDATION_FILES = [
   'app/(admin)/affiliation/payouts/page.tsx',
   'app/(admin)/file/page.tsx',
   'components/track-record/TrackRecordView.tsx',
+  // Phase 16 — surfaces wave-2 (résiduel-offender + à tokeniser).
+  'app/[locale]/dashboard/page.tsx',
+  'app/[locale]/(auth)/login/page.tsx',
+  'app/(admin)/membres/page.tsx',
+  'app/(admin)/signaux/[id]/page.tsx',
+  'app/(admin)/affiliation/affilies/page.tsx',
 ] as const
 
 // Focus-ring bleu institutionnel hardcodé — interdit (D-07).
@@ -59,6 +70,11 @@ const FORBIDDEN_PALETTE: { token: string; re: RegExp }[] = [
   { token: 'border-emerald-600/30', re: /border-emerald-600\/30/ },
   { token: 'border-red-600/30', re: /border-red-600\/30/ },
   { token: 'border-amber-600/30', re: /border-amber-600\/30/ },
+  // Phase 16 — palette brute supplémentaire des surfaces wave-2 (16-PLAN.md task 1).
+  // (text-emerald-400 est déjà couvert plus haut — non redupliqué.)
+  { token: 'text-red-600', re: /text-red-600\b/ },
+  { token: 'bg-emerald-500 (standalone)', re: /bg-emerald-500(?!\/)\b/ },
+  { token: 'bg-amber-500 (standalone)', re: /bg-amber-500(?!\/)\b/ },
 ]
 
 /** Lecture stricte d'un fichier fondation : un chemin manquant ÉCHOUE explicitement. */
@@ -149,6 +165,10 @@ describe('THEME-02 / D-08 : scan anti-bespoke + anti-collision', () => {
       'border-red-600/30 bg-red-500/10 text-red-700 dark:text-red-400',
       'bg-red-500',
       'border-amber-600/30 bg-amber-500/10',
+      // Phase 16 — tokens wave-2 plantés (détecteur non trivial).
+      'text-red-600',
+      'bg-emerald-500',
+      'bg-amber-500',
     ]
     const joined = fixture.join(' ')
     // Le focus-ring interdit DOIT matcher.
