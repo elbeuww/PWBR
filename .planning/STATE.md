@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v3.0
 milestone_name: Plateforme complète sous identité dark néon NEXA
-status: verifying
+status: ready_to_plan
 last_updated: "2026-06-23T02:29:00.198Z"
 last_activity: 2026-06-23
 progress:
   total_phases: 12
-  completed_phases: 4
+  completed_phases: 5
   total_plans: 24
   completed_plans: 22
-  percent: 92
+  percent: 42
 ---
 
 # Project State
@@ -30,10 +30,10 @@ See: .planning/PROJECT.md (mis à jour 2026-06-20 après clôture v2.0)
 ## Current Position
 
 Milestone: v3.0 — Plateforme complète sous identité dark néon NEXA (7 phases, 15-21)
-Phase: 16 (reskin-transversal-de-toutes-les-pages) — AWAITING HUMAN UAT
-Plan: 4 of 4 (all plans executed + verified)
-Status: Verification = human_needed (4/4 must-haves verified, 0 blocker). Phase NON marquée complete — attend validation humaine.
-Last activity: 2026-06-23 — Exécution phase 16 terminée : 4 plans, code review (CR-01 blocker corrigé commit 60d3d0e), vérif goal 4/4, tests 616 pass / typecheck 0.
+Phase: 17
+Plan: Not started
+Status: Ready to plan
+Last activity: 2026-06-24
 
 ### ▶ REPRISE Phase 16 (point de reprise)
 - Tous les gates verts ; CR-01 (Tailwind v4 `bg-[var(--token)]`) corrigé.

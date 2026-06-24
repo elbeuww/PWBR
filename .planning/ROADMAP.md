@@ -241,7 +241,7 @@ Détail complet archivé : `.planning/milestones/v2.0-ROADMAP.md`.
 | 13. Backtest catalogue de patterns | v2.1 | 0/? | ⏸️ Paused | - |
 | 14. Track record affiché & boucle prod | v2.1 | 0/? | ⏸️ Paused | - |
 | 15. Design system v3 « dark néon unique » | v3.0 | 3/3 | Complete    | 2026-06-22 |
-| 16. Reskin transversal de toutes les pages | v3.0 | 4/4 | Complete   | 2026-06-23 |
+| 16. Reskin transversal de toutes les pages | v3.0 | 4/4 | Complete    | 2026-06-24 |
 | 17. Fondation DB scalable | v3.0 | 0/? | Not started | - |
 | 18. Seed de données réalistes à l'échelle | v3.0 | 0/? | Not started | - |
 | 19. Dashboard utilisateur | v3.0 | 0/? | Not started | - |

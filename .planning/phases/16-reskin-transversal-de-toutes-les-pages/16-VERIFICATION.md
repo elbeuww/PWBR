@@ -1,8 +1,8 @@
 ---
 phase: 16-reskin-transversal-de-toutes-les-pages
-verified: 2026-06-23T12:00:00Z
-status: human_needed
-score: 4/4 must-haves verified
+verified: 2026-06-24T00:00:00Z
+status: verified
+score: 4/4 must-haves verified + 5/5 human UAT passed (2026-06-24)
 overrides_applied: 0
 human_verification:
   - test: "Vérifier visuellement que la landing affiche bien la palette green DS v3 (sans toggle volt)"
