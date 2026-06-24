@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v3.0
 milestone_name: Plateforme complète sous identité dark néon NEXA
-status: ready_to_plan
-last_updated: "2026-06-23T02:29:00.198Z"
-last_activity: 2026-06-23
+status: planning
+last_updated: "2026-06-24T21:04:08.220Z"
+last_activity: 2026-06-24
 progress:
   total_phases: 12
-  completed_phases: 5
+  completed_phases: 4
   total_plans: 24
   completed_plans: 22
-  percent: 42
+  percent: 92
 ---
 
 # Project State
@@ -36,6 +36,7 @@ Status: Ready to plan
 Last activity: 2026-06-24
 
 ### ▶ REPRISE Phase 16 (point de reprise)
+
 - Tous les gates verts ; CR-01 (Tailwind v4 `bg-[var(--token)]`) corrigé.
 - 5 items de test visuel/runtime persistés dans `16-HUMAN-UAT.md` (landing green-only, pastilles admin, police h1, data-rain auth, glow tarifs/SignalCards).
 - **Action attendue** : tester les 5 items dans le navigateur, puis :
@@ -518,7 +519,7 @@ ressources externes non provisionnables en session de développement.
 
 ## Session Continuity
 
-**Last session:** 2026-06-23T02:29:00.189Z
+**Last session:** 2026-06-24T21:04:08.211Z
 
 **Last session (archive):** 2026-06-19T03:41:29.665Z
 
