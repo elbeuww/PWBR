@@ -51,16 +51,16 @@ fonctionne et conserve la barrière sécurité (un non-abonné ne reçoit AUCUN 
    - [ ] Vérifier qu'**aucun** event Broadcast n'est reçu (la policy RLS `realtime.messages`
      `(select has_active_subscription())` bloque le canal privé pour les non-abonnés).
 
-### Résultat (à remplir par le fondateur)
+### Résultat (rempli en UAT — voir 17-UAT.md)
 
 ```
-Date :
-Testé par :
-1. Abonné reçoit le badge en direct :        [ ] OK  [ ] KO  — notes :
-2. Shape payload.payload.record confirmé :   [ ] OK  [ ] KO  — notes :
-3. UPDATE retire la carte en direct :        [ ] OK  [ ] KO  — notes :
-4. Non-abonné ne reçoit aucun event :        [ ] OK  [ ] KO  — notes :
+Date : 2026-06-25
+Testé par : fondateur (session navigateur réelle, compte uat-abonne@nexa.test)
+1. Abonné reçoit le badge en direct :        [x] OK  [ ] KO  — INSERT live → badge « nouveaux signaux » apparu sans refresh
+2. Shape payload.payload.record confirmé :   [x] OK  [ ] KO  — prouvé fonctionnellement par le gate 3 (UPDATE lit record.status)
+3. UPDATE retire la carte en direct :        [x] OK  [ ] KO  — status→invalidated → carte disparue en direct
+4. Non-abonné ne reçoit aucun event :        [x] OK  [ ] KO  — incognito → redirigé /fr/login (surface inaccessible, canal jamais monté)
 ```
 
-> Si tous OK → SCALE-05 (Broadcast) pleinement validé en runtime.
-> Si KO → décrire le gate en échec pour gap-closure ciblée.
+> ✅ Tous OK → SCALE-05 (Broadcast) pleinement validé en runtime. Gate 7 levé.
+> Détail des 5 checks UAT (dont Cold-Start) dans `17-UAT.md`.
