@@ -29,6 +29,7 @@ import { createClient } from '@supabase/supabase-js'
 import type { Database } from '@app/supabase'
 import { SEED_VERSION } from './seed/config'
 import { purge } from './seed/purge'
+import { seedUsers } from './seed/users'
 
 const SCRIPT_DIR = dirname(fileURLToPath(import.meta.url))
 const ENV_PATH = resolve(SCRIPT_DIR, '../.env') // apps/jobs/.env
@@ -65,8 +66,12 @@ async function main(): Promise<void> {
   console.log('① purge (source=demo, ordre FK inverse)…')
   await purge(client)
 
-  // ─── Étapes câblées dans les Tasks suivants (ne PAS inventer ici) ────────────
-  // 2. const users = await seedUsers(client)                  // Task 2
+  // 2. Users : auth.admin.createUser borné → profiles role/source='demo'.
+  console.log('② users (auth.admin.createUser borné, faker déterministe)…')
+  const users = await seedUsers(client)
+  console.log(`   ${users.length} users démo créés.`)
+
+  // ─── Étapes câblées en Task 3 (ne PAS inventer ici) ──────────────────────────
   // 3. const subscriptions = await seedSubscriptions(client, users)  // Task 3
   // 4. const paymentCount = await seedPayments(client, subscriptions) // Task 3
   // ─── Plan 18-03 (non câblé ici) ──────────────────────────────────────────────
