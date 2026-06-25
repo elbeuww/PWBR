@@ -39,7 +39,8 @@ Détail complet archivé : `.planning/milestones/v2.0-ROADMAP.md`.
 - [x] **Phase 15: Design system v3 « dark néon unique »** — Promotion de la couche sémantique `.nxl` (landing) en DS global dark unique, `forcedTheme="dark"`, retrait du toggle clair, décision green vs volt, contraste WCAG AA, no-FOUC + RTL préservés. (THEME) (completed 2026-06-22)
 - [x] **Phase 16: Reskin transversal de toutes les pages** — Vitrine, légal, auth, compte/abonnement, espace membre signaux/détail+chart, paiement/funnel, Académie, admin repeints sur le DS v3, RLS/i18n/disclaimers/no-perf-claims/no-mera-brand préservés. (RESKIN)
  (completed 2026-06-23)
-- [x] **Phase 17: Fondation DB scalable (perf avant charge)** — Migration `0017` : wrap RLS `(select …)` + index sur colonnes de policy, index composites keyset alignés `ORDER BY`, infra matviews KPIs (unique index + wrapper `is_superadmin()`), Broadcast vs `postgres_changes`, migrations non bloquantes `CONCURRENTLY`. (SCALE perf) (completed 2026-06-25)
+- [x] **Phase 17: Fondation DB scalable (perf avant charge)** — Migration `0017` : wrap RLS `(select …)` + index sur colonnes de policy, index composites keyset alignés `ORDER BY`, infra matviews KPIs (unique index + wrapper `is_superadmin()`), Broadcast vs `postgres_changes`, migrations non bloquantes `CONCURRENTLY`. (SCALE perf)
+ (completed 2026-06-25)
 - [ ] **Phase 18: Seed de données réalistes à l'échelle** — `seed.ts` faker déterministe, idempotent, FK-cohérent (~10k users + signaux/paiements/affiliés/outcomes), labels `backtest`/`démo` (aucun chiffre de perf fabriqué), RLS re-testée depuis client anon. (SEED)
 - [ ] **Phase 19: Dashboard utilisateur** — Groupe `(dash)` : vue d'ensemble, signaux suivis/historique keyset, watchlist `user_followed_setups` (revue IDOR), abonnement + ExpiryBanner, affiliation intégrée, paramètres — démontrable sur données seedées. (UDASH)
 - [ ] **Phase 20: Dashboard superadmin (cockpit 4 axes)** — Acquisition/Revenus(MRR mesuré)/Ops/Conformité, tables virtualisées filtrables/paginées, gating `is_superadmin()` (404 discret), matviews phase 17, jamais service_role côté pages. (ADASH)
@@ -185,7 +186,10 @@ Détail complet archivé : `.planning/milestones/v2.0-ROADMAP.md`.
   1. Un script `seed.ts` (faker `faker.seed()` déterministe, locales fr/en/ar) peuple la DB avec ~10k utilisateurs + signaux/paiements/affiliés/outcomes **FK-cohérents** ; un re-run est idempotent (N stable, pas d'accumulation).
   2. Toutes les données seedées sont labellisées (`backtest`/`démo`) et respectent « % toujours mesuré, jamais inventé » (VITR-03) : aucun chiffre de performance fabriqué — un scan/test le prouve.
   3. La RLS est re-testée **depuis un client anon** (pas service_role) sur les données seedées : non-abonné lit 0 ligne de signaux, isolation cross-user prouvée à l'échelle.
-**Plans** : TBD
+**Plans** : 3 plans (3 vagues)
+- [ ] 18-01-PLAN.md — Fondation + Wave 0 : migration 0018 (colonne `source` 8 tables) + apply LIVE via MCP + types regen + tests no-perf-seed-claims/seed-rls + config seed (SEED-02/SEED-03)
+- [ ] 18-02-PLAN.md — Seed core : orchestrateur + purge idempotente (WHERE source='demo' ordre FK inverse) + users (createUser borné) + subscriptions/payments étalés (SEED-01)
+- [ ] 18-03-PLAN.md — Signaux (outcomes bruts) + affiliation (commissions via RPC) + refresh mv_mrr + tests idempotence/RLS cross-user (SEED-01/02/03)
 **Notes** : Adresse Pitfall #5 (seed non FK-cohérent / sous-dimensionné → audit faussement vert). `@faker-js/faker` en devDep, via `tsx`. Prix MRR seedé = 9 $ standard / 3 $ découverte (PROJECT.md) à confirmer pour la cohérence du MRR superadmin. Pas d'API/paiement réel.
 
 ### Phase 19: Dashboard utilisateur
