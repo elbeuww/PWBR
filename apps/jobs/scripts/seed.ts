@@ -30,6 +30,8 @@ import type { Database } from '@app/supabase'
 import { SEED_VERSION } from './seed/config'
 import { purge } from './seed/purge'
 import { seedUsers } from './seed/users'
+import { seedSubscriptions } from './seed/subscriptions'
+import { seedPayments } from './seed/payments'
 
 const SCRIPT_DIR = dirname(fileURLToPath(import.meta.url))
 const ENV_PATH = resolve(SCRIPT_DIR, '../.env') // apps/jobs/.env
@@ -71,16 +73,24 @@ async function main(): Promise<void> {
   const users = await seedUsers(client)
   console.log(`   ${users.length} users démo créés.`)
 
-  // ─── Étapes câblées en Task 3 (ne PAS inventer ici) ──────────────────────────
-  // 3. const subscriptions = await seedSubscriptions(client, users)  // Task 3
-  // 4. const paymentCount = await seedPayments(client, subscriptions) // Task 3
+  // 3. Subscriptions : status/plan/period étalés (MRR/churn mesurables).
+  console.log('③ subscriptions (status/plan/period étalés)…')
+  const subscriptions = await seedSubscriptions(client, users)
+  console.log(`   ${subscriptions.length} subscriptions payantes (active/expired) créées.`)
+
+  // 4. Payments : verified atomiques, verified_at étalé sur ~12 mois.
+  console.log('④ payments (verified, amount_atomic bigint, verified_at étalé)…')
+  const paymentCount = await seedPayments(client, subscriptions)
+  console.log(`   ${paymentCount} payments démo créés.`)
+
   // ─── Plan 18-03 (non câblé ici) ──────────────────────────────────────────────
   // await seedSignals(client, users)        // analyses → trade_setups → prediction_outcomes
   // await seedAffiliation(client, users)     // affiliates → referrals → commissions → payouts
   // await seedMarket(client)                 // candles / snapshots / job_runs / telegram volume
   // await refreshMvMrr(client)               // REFRESH MATERIALIZED VIEW CONCURRENTLY mv_mrr
 
-  console.log('\n✅ purge terminée. (users/subscriptions/payments câblés en Task 2-3)\n')
+  console.log('\n✅ seed core terminé (users + subscriptions + payments).')
+  console.log('   (signaux / affiliation / market / refresh mv_mrr → Plan 18-03)\n')
 }
 
 main().catch((e) => fail((e as Error).message))
