@@ -173,7 +173,7 @@ Détail complet archivé : `.planning/milestones/v2.0-ROADMAP.md`.
   4. Les migrations à l'échelle sont non bloquantes (`CREATE INDEX CONCURRENTLY` hors transaction, gestion de l'état INVALID) et les flux temps réel à fort volume utilisent **Broadcast** plutôt que `postgres_changes`.
 **Plans** : 3 plans (2 vagues)
 - [x] 17-01-PLAN.md — 0017 authoring : wrap RLS `(select …)` toutes policies + matview MRR (wrapper `is_superadmin()` + refresh) + trigger Broadcast + policy `realtime.messages` + Partie B index CONCURRENTLY/script de gate documentés (SCALE-01/02/03/05) — checkpoint A1 (définition MRR)
-- [ ] 17-02-PLAN.md — Client + Wave-0 : réécriture `SignalList` postgres_changes→canal privé Broadcast + test anon `mrr-gating` (SCALE-05/03)
+- [x] 17-02-PLAN.md — Client + Wave-0 : réécriture `SignalList` postgres_changes→canal privé Broadcast + test anon `mrr-gating` (SCALE-05/03)
 - [ ] 17-03-PLAN.md — [BLOQUANT] Apply LIVE via MCP : apply_migration (Partie A) + execute_sql per-statement (Partie B CONCURRENTLY) + gen-types/reconcile + get_advisors/EXPLAIN/REFRESH/INVALID + tests RLS (SCALE-04 + validation 01/02/03/05)
 **Notes** : Arête dure : perf DB AVANT exposition à l'échelle (fix RLS/index = gain >100×, le plus rentable). Migration `0017`. Adresse Pitfalls #2 (perf RLS) et #4 (Realtime saturation / migration bloquante). SCALE-06 (audit chiffré) est en phase 21, une fois le seed en place. Research flag : seuils OFFSET→keyset et `postgres_changes`→Broadcast à confirmer par `EXPLAIN ANALYZE` post-seed.
 
@@ -246,7 +246,7 @@ Détail complet archivé : `.planning/milestones/v2.0-ROADMAP.md`.
 | 14. Track record affiché & boucle prod | v2.1 | 0/? | ⏸️ Paused | - |
 | 15. Design system v3 « dark néon unique » | v3.0 | 3/3 | Complete    | 2026-06-22 |
 | 16. Reskin transversal de toutes les pages | v3.0 | 4/4 | Complete    | 2026-06-24 |
-| 17. Fondation DB scalable | v3.0 | 1/3 | In Progress|  |
+| 17. Fondation DB scalable | v3.0 | 2/3 | In Progress|  |
 | 18. Seed de données réalistes à l'échelle | v3.0 | 0/? | Not started | - |
 | 19. Dashboard utilisateur | v3.0 | 0/? | Not started | - |
 | 20. Dashboard superadmin (cockpit 4 axes) | v3.0 | 0/? | Not started | - |
