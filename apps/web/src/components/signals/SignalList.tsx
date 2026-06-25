@@ -4,19 +4,26 @@
  * SignalList — overlay client de la liste : react-query (repli) + canal Realtime
  * (Plan 03-02 Task 3 ; MEMB-05, D-13/14/16).
  *
- * SÉCURITÉ (T-03-RT) : la lecture navigateur passe par createClient() de
- * @/lib/supabase/client (= createBrowserSupabaseClient) qui PORTE la session via
- * cookies → la RLS has_active_subscription() filtre les events postgres_changes
- * (un non-abonné ne reçoit rien). La clé service côté front est interdite.
+ * SÉCURITÉ (T-03-RT / T-17-BC-CLI) : la lecture navigateur passe par createClient()
+ * de @/lib/supabase/client (= createBrowserSupabaseClient) qui PORTE la session via
+ * cookies → realtime.setAuth() injecte ce JWT dans le socket Realtime, et la policy
+ * RLS sur realtime.messages (has_active_subscription(), migration 0017) filtre QUI
+ * peut écouter le canal privé (un non-abonné ne reçoit rien). La clé service côté
+ * front est interdite.
  *
- * Realtime (dépend de la migration 0011, Wave 1) :
- *  - INSERT (filter status=eq.active) → incrémente un compteur « nouveaux » (D-13).
+ * Realtime via Broadcast from Database (D-04 / SCALE-05, migration 0017) :
+ *  - Canal PRIVÉ 'topic:new-signals' (config.private) alimenté par le trigger
+ *    broadcast_trade_setup_changes() côté DB — fan-out global, pas de filtrage RLS
+ *    par-message-par-subscriber (goulot postgres_changes à 10k évité, Pitfall 8).
+ *  - event INSERT → incrémente un compteur « nouveaux » (D-13).
  *    L'insertion réelle N'A LIEU qu'au clic du badge (anti-reflow).
- *  - UPDATE SANS filtre de statut (Pitfall 4) → si p.new.status !== 'active',
- *    retire la carte en direct (D-14).
+ *  - event UPDATE (Pitfall 4) → si payload.payload.record.status !== 'active',
+ *    retire la carte en direct (D-14). ATTENTION shape Broadcast :
+ *    payload.payload.record (PAS payload.new comme en postgres_changes, A4).
  *  - subscribe : si l'état n'atteint pas SUBSCRIBED → repli refetch react-query
  *    (refetchInterval) + note discrète signals.realtimeLost (D-16).
- *  - cleanup : removeChannel au démontage.
+ *  - cleanup : removeChannel au démontage (robuste si le canal est créé dans la
+ *    promesse setAuth() — variable mutable + flag d'annulation).
  *
  * Le contenu reste lecture seule ; aucune écriture ; aucune clé service privilégiée.
  */
@@ -71,22 +78,28 @@ export function SignalList({ initialData, filters, locale }: SignalListProps) {
   refetchRef.current = refetch
 
   useEffect(() => {
-    const channel = supabase
-      .channel('signals-active')
-      .on(
-        'postgres_changes',
-        { event: 'INSERT', schema: 'public', table: 'trade_setups', filter: 'status=eq.active' },
-        () => {
+    // Le canal privé exige realtime.setAuth() (Realtime Authorization) AVANT
+    // l'abonnement → mise en place async. On garde la référence du canal dans une
+    // variable mutable + un flag d'annulation pour que le cleanup retire bien le
+    // canal même s'il est créé après le démontage (race promesse/unmount).
+    let channel: ReturnType<typeof supabase.channel> | null = null
+    let cancelled = false
+
+    async function setupBroadcast() {
+      // Injecte le JWT de session dans le socket Realtime (requis canal privé).
+      await supabase.realtime.setAuth()
+      if (cancelled) return
+
+      channel = supabase
+        .channel('topic:new-signals', { config: { private: true } })
+        .on('broadcast', { event: 'INSERT' }, () => {
           // D-13 : on signale un nouveau, on n'insère PAS directement (anti-reflow).
           setNewCount((c) => c + 1)
-        },
-      )
-      .on(
-        'postgres_changes',
-        // Pitfall 4 : pas de filtre de statut → on capte la transition active→non-active.
-        { event: 'UPDATE', schema: 'public', table: 'trade_setups' },
-        (payload) => {
-          const next = payload.new as { id?: string; status?: string }
+        })
+        .on('broadcast', { event: 'UPDATE' }, (payload) => {
+          // Pitfall 4 / A4 : shape Broadcast = payload.payload.record (PAS payload.new).
+          // Pas de filtre de statut → on capte la transition active→non-active.
+          const next = payload.payload?.record as { id?: string; status?: string }
           if (next?.id && next.status && next.status !== 'active') {
             setRemovedIds((prev) => {
               const updated = new Set(prev)
@@ -94,22 +107,27 @@ export function SignalList({ initialData, filters, locale }: SignalListProps) {
               return updated
             })
           }
-        },
-      )
-      .subscribe((status) => {
-        // D-16 / WR-01 : ne basculer en repli QUE sur un échec réel. Les états
-        // transitoires ('SUBSCRIBING') ne sont PAS une perte de connexion — sinon
-        // une fausse alerte "connexion perdue" apparaît à chaque montage.
-        if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT' || status === 'CLOSED') {
-          setRealtimeLost(true)
-        } else if (status === 'SUBSCRIBED') {
-          setRealtimeLost(false)
-        }
-        // 'SUBSCRIBING' (et autres états intermédiaires) → connexion en cours, no-op.
-      })
+        })
+        .subscribe((status) => {
+          // D-16 / WR-01 : ne basculer en repli QUE sur un échec réel. Les états
+          // transitoires ('SUBSCRIBING') ne sont PAS une perte de connexion — sinon
+          // une fausse alerte "connexion perdue" apparaît à chaque montage.
+          if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT' || status === 'CLOSED') {
+            setRealtimeLost(true)
+          } else if (status === 'SUBSCRIBED') {
+            setRealtimeLost(false)
+          }
+          // 'SUBSCRIBING' (et autres états intermédiaires) → connexion en cours, no-op.
+        })
+    }
+
+    void setupBroadcast()
 
     return () => {
-      supabase.removeChannel(channel)
+      cancelled = true
+      if (channel) {
+        supabase.removeChannel(channel)
+      }
     }
   }, [supabase])
 
