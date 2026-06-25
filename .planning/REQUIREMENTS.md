@@ -54,7 +54,7 @@ Requirements de ce milestone. Chacun est mappé à une phase de la roadmap (voir
 
 ### Données seedées réalistes (SEED)
 
-- [ ] **SEED-01**: Un script de **seed idempotent** peuple la DB avec des données **FK-cohérentes** (~10k utilisateurs + signaux/paiements/affiliés/outcomes), via faker déterministe.
+- [x] **SEED-01**: Un script de **seed idempotent** peuple la DB avec des données **FK-cohérentes** (~10k utilisateurs + signaux/paiements/affiliés/outcomes), via faker déterministe.
 - [ ] **SEED-02**: Les données seedées sont **labellisées** (`backtest`/`démo`) et respectent « % toujours mesuré, jamais inventé » (aucun chiffre de performance fabriqué).
 - [ ] **SEED-03**: La RLS est **re-testée depuis un client anon** sur les données seedées (pas service_role) — isolation prouvée à l'échelle.
 
@@ -105,7 +105,7 @@ Exclusions explicites de ce milestone, avec raison.
 | SCALE-03 | Phase 17 — Fondation DB scalable | Complete |
 | SCALE-04 | Phase 17 — Fondation DB scalable | Pending |
 | SCALE-05 | Phase 17 — Fondation DB scalable | Complete |
-| SEED-01 | Phase 18 — Seed de données réalistes à l'échelle | Pending |
+| SEED-01 | Phase 18 — Seed de données réalistes à l'échelle | Complete |
 | SEED-02 | Phase 18 — Seed de données réalistes à l'échelle | Pending |
 | SEED-03 | Phase 18 — Seed de données réalistes à l'échelle | Pending |
 | UDASH-01 | Phase 19 — Dashboard utilisateur | Pending |

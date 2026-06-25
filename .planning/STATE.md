@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v3.0
 milestone_name: Plateforme complète sous identité dark néon NEXA
 status: executing
-last_updated: "2026-06-25T16:29:27.124Z"
+last_updated: "2026-06-25T16:42:15.305Z"
 last_activity: 2026-06-25
 progress:
   total_phases: 12
   completed_phases: 5
   total_plans: 30
-  completed_plans: 26
-  percent: 87
+  completed_plans: 27
+  percent: 90
 ---
 
 # Project State
@@ -31,7 +31,7 @@ See: .planning/PROJECT.md (mis à jour 2026-06-20 après clôture v2.0)
 
 Milestone: v3.0 — Plateforme complète sous identité dark néon NEXA (7 phases, 15-21)
 Phase: 18 (seed-de-donnees-realistes-a-l-echelle) — EXECUTING
-Plan: 2 of 3
+Plan: 3 of 3
 Status: Ready to execute
 Last activity: 2026-06-25
 
@@ -134,6 +134,7 @@ ressources externes non provisionnables en session de développement.
 | Phase 17 P01 | ~20min | 4 tasks | 1 files |
 | Phase 17 P02 | ~10min | 2 tasks | 2 files |
 | Phase 18 P01 | ~35min | 3 tasks | 7 files |
+| Phase 18 P02 | 15min | 3 tasks | 6 files |
 
 ## Roadmap v2.0 (9 phases)
 
@@ -532,6 +533,15 @@ ressources externes non provisionnables en session de développement.
 - **D-18-01-E (SEED-03, T-18-02)** : `seed-rls.test.ts` (packages/supabase/.../__tests__) calque EXACTEMENT `affiliate-rls.test.ts` : `HAS_ENV`, `adminClient()`, `signUpAndGetClient()`, `describe.skipIf(!HAS_ENV)`, `afterAll` deleteUser. 2 assertions lues TOUJOURS via client **anon** (jamais service_role) : (a) non-abonné lit 0 `trade_setups` ; (b) user A ne lit aucun `payments` de B (payment de B seedé via service_role : source='demo', amount_atomic string, status='verified'). SKIP propre sans `.env.test`.
 - **Commits 18-01** : 493acee (T1 — migration 0018 + faker devDep + config seed), 949111a (T2 — apply LIVE MCP + régen types, owned orchestrateur), 71533cf (T3 — tests Wave 0 no-perf-seed-claims + seed-rls). `no-perf-seed-claims` 4 passed ; `seed-rls` 2 skipped propre ; `pnpm typecheck` 0 erreur.
 
+### Decisions exécution (Plan 18-02 — seed core : orchestrateur + purge + users + subscriptions + payments, SEED-01)
+
+- **D-18-02-A (Pitfall 4 / T-18-09)** : `users.ts` borne `auth.admin.createUser` via un **pLimit maison** (file de promesses, concurrence 5) — `p-limit` absent du workspace, bornage sans nouvelle dépendance, conforme à la discipline `p-limit` du projet. Emails `seed-{i}@demo.nexa.invalid` (RFC 2606, T-18-06) + `user_metadata.seed:true` ; faker multi-locale `ar/fr/en` + `base` fallback, chaque instance `seed(FAKER_SEED)` ; UPDATE profiles `role`/`source='demo'`/`created_at` étalé luxon (anti Pitfall 1 keyset).
+- **D-18-02-B (chaîne déterministe)** : `seedUsers` retourne `SeededUser[]` (id, role, locale, index, createdAt) ; `subscriptions`/`payments` consomment cette sortie ; l'ordre par `index` garantit la reproductibilité au re-seed.
+- **D-18-02-C (purge D-06 / T-18-05)** : `purge.ts` = `delete().eq('source','demo')` sur 8 tables en **ordre FK inverse** (commissions → affiliates → prediction_outcomes → trade_setups → analyses → payments → subscriptions → profiles), AUCUN truncate, puis `auth.admin.listUsers` paginé + `deleteUser` filtré domaine `demo.nexa.invalid` (auth.users sans colonne source). Sûre à vide.
+- **D-18-02-D (D-03/D-04)** : `subscriptions.ts` status déterministe par index (active 37 % / expired 18 % / canceled 5 % / leads 40 % sans subscription), plan standard ~75 % / discovery ~25 %, `current_period_end` étalé luxon (actifs futur dont J-3/J-1 pour ExpiryBanner P19, expirés 1-6 mois passés = churn). `payments.ts` `verified`, `amount_atomic = PRICE_ATOMIC[plan].toString()` (bigint ×10^6, jamais float — T-18-08), `expected = amount`, `tx_hash = demo-{userIndex}-{n}` (UNIQUE global 0012, idempotent car purge en tête), `verified_at` étalé ~12 mois UTC, renouvellements 1-N (MRR/LTV). Aucun MRR/% stocké → émerge de `mv_mrr`.
+- **D-18-02-E (verify)** : `pnpm typecheck` vert ; `pnpm test -- no-perf-seed-claims` 4 passed (5 fichiers seed sans champ de perf) ; suite complète 621 passed / 6 skipped (0 régression). Type-correction des scripts seed confirmée via tsconfig temporaire `include scripts/seed/**` = 0 erreur (le `tsc -b` exclut `scripts/`). **AUCUN seed live lancé** (UAT Manual-Only). Erreur tsc pré-existante hors scope : `freeze-nile-fixture.ts:103` (TS2769).
+- **Commits 18-02** : b7a9c1a (T1 — seed.ts orchestrateur fail-fast + purge.ts D-06), 4bbd018 (T2 — users.ts createUser borné faker déterministe), 3cfe072 (T3 — subscriptions.ts + payments.ts MRR/churn étalés).
+
 ### Open todos / research flags (v2.0)
 
 - **Phase 4 (research flag) :** TronGrid endpoint `walletsolidity`, parsing logs TRC-20, normalisation hex↔base58 — doc TS peu dense, recherche de phase recommandée.
@@ -558,7 +568,7 @@ ressources externes non provisionnables en session de développement.
 
 ## Session Continuity
 
-**Last session:** 2026-06-25T14:13:33.626Z
+**Last session:** 2026-06-25T16:41:29.499Z
 
 **Last session (archive):** 2026-06-19T03:41:29.665Z
 
