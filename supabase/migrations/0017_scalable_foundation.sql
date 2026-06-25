@@ -336,3 +336,76 @@ create policy "broadcast: abonnés actifs écoutent new-signals"
 -- (execute_sql sur pg_publication_tables) :
 --   alter publication supabase_realtime drop table public.trade_setups;
 --   alter table public.trade_setups replica identity default;
+
+-- ═════════════════════════════════════════════════════════════════════════════
+-- PARTIE B — CONCURRENTLY HORS TRANSACTION
+-- ⚠️ NE PAS dans apply_migration — Pitfall 1, erreur 25001
+--    « CREATE INDEX CONCURRENTLY cannot run inside a transaction block ».
+-- Exécuter via MCP execute_sql UN STATEMENT À LA FOIS (plan 17-03), JAMAIS groupés.
+-- Après CHAQUE statement : vérifier indisvalid (script de gate ci-dessous). Si INVALID
+-- → drop index concurrently if exists <name> puis relancer.
+-- Avant CHAQUE create : confirmer LIVE qu'aucun index dédié ne couvre déjà la colonne
+-- (FK auto-index ? Assumption A5) — ne pas dupliquer ; get_advisors(performance) rattrape
+-- les manquants. Le sens DESC DOIT matcher l'ORDER BY réel des listes Phase 19/20
+-- (Open Question 3) ; l'EXPLAIN du gate valide l'absence de nœud Sort.
+-- ═════════════════════════════════════════════════════════════════════════════
+--
+-- 1. UNIQUE matview — requis pour REFRESH MATERIALIZED VIEW CONCURRENTLY (D-02).
+--    DOIT être créé AVANT le premier refresh concurrent de refresh_mv_mrr().
+-- create unique index concurrently mv_mrr_month_idx on public.mv_mrr (month);
+--
+-- 2. Keyset feed signaux « plus récents » (D-03/SCALE-02).
+--    trade_setups_score_idx (0006 L.86-87) = (opportunity_score desc, created_at desc),
+--    SANS id en tiebreaker → ajouter le composite keyset dédié.
+-- create index concurrently trade_setups_keyset_idx on public.trade_setups (created_at desc, id desc);
+--
+-- 3. Keyset liste users (D-03/SCALE-02).
+-- create index concurrently profiles_keyset_idx on public.profiles (created_at desc, id desc);
+--
+-- 4. Keyset liste paiements (D-03/SCALE-02).
+--    payments_status_created_idx (0012 L.82-83) = (status, created_at desc), SANS id.
+-- create index concurrently payments_keyset_idx on public.payments (created_at desc, id desc);
+--
+-- 5. Colonne de policy payments.user_id (D-01/SCALE-01, Assumption A5) — si non couverte
+--    par un index dédié (la FK n'auto-indexe PAS la colonne référençante en Postgres).
+-- create index concurrently payments_user_id_idx on public.payments (user_id);
+--
+-- 6. Colonne de policy subscriptions.user_id (D-01/SCALE-01) — subscriptions_active_idx
+--    (0009 L.55-56) = (user_id, status, current_period_end) couvre DÉJÀ user_id en tête :
+--    confirmer LIVE qu'un index dédié n'est PAS nécessaire (préfixe d'index composite
+--    suffit pour les égalités user_id) avant de créer celui-ci ; ne pas dupliquer.
+-- create index concurrently subscriptions_user_id_idx on public.subscriptions (user_id);
+
+-- ═════════════════════════════════════════════════════════════════════════════
+-- SCRIPT DE GATE RÉUTILISABLE (via MCP execute_sql, plan 17-03)
+-- ═════════════════════════════════════════════════════════════════════════════
+--
+-- (a) DÉTECTION DES INDEX INVALID (après chaque CREATE CONCURRENTLY — Pitfall 2).
+--     Un CONCURRENTLY interrompu laisse un index indisvalid=false (pas de rollback
+--     propre) qui bloque la recréation du même nom et n'est pas utilisé par le planner.
+-- select c.relname as index_name, t.relname as table_name
+-- from pg_index i
+-- join pg_class c on c.oid = i.indexrelid
+-- join pg_class t on t.oid = i.indrelid
+-- where not i.indisvalid and c.relnamespace = 'public'::regnamespace;
+--     Remédiation (hors tx également), puis relancer le CREATE INDEX CONCURRENTLY :
+-- drop index concurrently if exists mv_mrr_month_idx;
+-- drop index concurrently if exists trade_setups_keyset_idx;
+-- drop index concurrently if exists profiles_keyset_idx;
+-- drop index concurrently if exists payments_keyset_idx;
+-- drop index concurrently if exists payments_user_id_idx;
+-- drop index concurrently if exists subscriptions_user_id_idx;
+--
+-- (b) EXPLAIN GABARIT PAR LISTE KEYSET (D-03/SCALE-02) — attendu : « Index Scan »,
+--     PAS « Seq Scan » + « Sort ». Adapter l'ORDER BY au câblage curseur réel (Phase 19/20).
+-- explain select * from public.trade_setups order by created_at desc, id desc limit 20;
+-- explain select * from public.profiles     order by created_at desc, id desc limit 20;
+-- explain select * from public.payments     order by created_at desc, id desc limit 20;
+--
+-- (c) GATE MATVIEW (D-02) — le REFRESH CONCURRENTLY exige mv_mrr_month_idx (UNIQUE) :
+-- refresh materialized view concurrently public.mv_mrr;
+--
+-- (d) GATE ADVISORS (D-01/D-05) — via MCP get_advisors :
+--     get_advisors(performance) → 0 auth_rls_initplan (critère d'arrêt D-01).
+--     get_advisors(security)    → pas de NOUVELLE alerte (les 2 WARN security-definer
+--     helpers is_superadmin/has_active_subscription restent EXPECTED, cf. STATE D-01-01-D).
