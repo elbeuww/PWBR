@@ -33,6 +33,7 @@ import { seedUsers } from './seed/users'
 import { seedSubscriptions } from './seed/subscriptions'
 import { seedPayments } from './seed/payments'
 import { seedSignals } from './seed/signals'
+import { seedAffiliation } from './seed/affiliation'
 
 const SCRIPT_DIR = dirname(fileURLToPath(import.meta.url))
 const ENV_PATH = resolve(SCRIPT_DIR, '../.env') // apps/jobs/.env
@@ -91,12 +92,39 @@ async function main(): Promise<void> {
     `   ${signals.analyses} analyses, ${signals.setups} setups, ${signals.outcomes} outcomes bruts.`,
   )
 
-  // ─── Plan 18-03 (suite — câblé dans Task 2) ──────────────────────────────────
-  // await seedAffiliation(client, users)     // affiliates → referrals → commissions → payouts
-  // await refreshMvMrr(client)               // REFRESH MATERIALIZED VIEW CONCURRENTLY mv_mrr
+  // 6. Affiliation : affiliates → codes → referrals (longue traîne) → commissions
+  //    via RPC compute_affiliate_commissions (jamais de calcul JS — D-05) → payouts.
+  console.log('⑥ affiliation (affiliates/codes/referrals + commissions via RPC)…')
+  const affiliation = await seedAffiliation(client, users)
+  console.log(
+    `   ${affiliation.affiliates} affiliés, ${affiliation.referrals} referrals, ` +
+      `${affiliation.commissionRows} commissions (RPC), ${affiliation.payouts} payouts.`,
+  )
 
-  console.log('\n✅ seed terminé (users + subscriptions + payments + signaux).')
-  console.log('   (affiliation / refresh mv_mrr → Task 2)\n')
+  // 7. EN DERNIER : refresh de la matview MRR (service_role — Pitfall 5). Sans ce
+  //    refresh, mv_mrr reste vide malgré les payments seedés (MRR mesuré = vide).
+  //    Le REFRESH CONCURRENTLY exige l'index unique mv_mrr_month_idx (0017 Partie B,
+  //    posé CONCURRENTLY hors transaction). S'il est absent LIVE, on NE masque PAS
+  //    l'erreur : on logge un avertissement explicite invitant à le créer.
+  console.log('⑦ refresh_mv_mrr (service_role, EN DERNIER — MRR mesuré)…')
+  // refresh_mv_mrr est revoke pour public/anon/authenticated (0017) → absent des
+  // types PostgREST générés ; appel via cast (service_role bypass le grant).
+  const { error: refreshErr } = await (
+    client.rpc as unknown as (fn: string) => Promise<{ error: { message: string } | null }>
+  )('refresh_mv_mrr')
+  if (refreshErr) {
+    console.warn(
+      `\n⚠️  refresh_mv_mrr a échoué : ${refreshErr.message}\n` +
+        "   Vérifier que l'index UNIQUE mv_mrr_month_idx existe LIVE (0017 Partie B,\n" +
+        '   `create unique index concurrently mv_mrr_month_idx on public.mv_mrr (month)`).\n' +
+        '   Sans cet index, REFRESH MATERIALIZED VIEW CONCURRENTLY est impossible.\n',
+    )
+  } else {
+    console.log('   mv_mrr rafraîchie (MRR mesuré non vide).')
+  }
+
+  console.log('\n✅ seed complet terminé (users + subs + payments + signaux + affiliation).')
+  console.log('   MRR rafraîchi ; commissions calculées par le RPC.\n')
 }
 
 main().catch((e) => fail((e as Error).message))
