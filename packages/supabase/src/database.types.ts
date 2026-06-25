@@ -25,6 +25,7 @@ export type Database = {
           schema_version: string
           session: string
           snapshot: Json
+          source: string
           style: string
         }
         Insert: {
@@ -37,6 +38,7 @@ export type Database = {
           schema_version: string
           session: string
           snapshot: Json
+          source?: string
           style: string
         }
         Update: {
@@ -49,6 +51,7 @@ export type Database = {
           schema_version?: string
           session?: string
           snapshot?: Json
+          source?: string
           style?: string
         }
         Relationships: [
@@ -322,6 +325,7 @@ export type Database = {
           reject_reason: string | null
           reservation_expires_at: string | null
           screenshot_url: string | null
+          source: string
           status: string
           tx_hash: string
           user_id: string
@@ -337,6 +341,7 @@ export type Database = {
           reject_reason?: string | null
           reservation_expires_at?: string | null
           screenshot_url?: string | null
+          source?: string
           status?: string
           tx_hash: string
           user_id: string
@@ -352,6 +357,7 @@ export type Database = {
           reject_reason?: string | null
           reservation_expires_at?: string | null
           screenshot_url?: string | null
+          source?: string
           status?: string
           tx_hash?: string
           user_id?: string
@@ -374,6 +380,7 @@ export type Database = {
           realized_r: number
           resolved_at: string
           setup_id: string
+          source: string
         }
         Insert: {
           candle_count?: number | null
@@ -381,6 +388,7 @@ export type Database = {
           realized_r: number
           resolved_at?: string
           setup_id: string
+          source?: string
         }
         Update: {
           candle_count?: number | null
@@ -388,6 +396,7 @@ export type Database = {
           realized_r?: number
           resolved_at?: string
           setup_id?: string
+          source?: string
         }
         Relationships: [
           {
@@ -405,18 +414,21 @@ export type Database = {
           email: string
           id: string
           role: string
+          source: string
         }
         Insert: {
           created_at?: string
           email: string
           id: string
           role?: string
+          source?: string
         }
         Update: {
           created_at?: string
           email?: string
           id?: string
           role?: string
+          source?: string
         }
         Relationships: []
       }
@@ -473,6 +485,7 @@ export type Database = {
           current_period_end: string | null
           id: string
           plan: string
+          source: string
           status: string
           user_id: string
         }
@@ -481,6 +494,7 @@ export type Database = {
           current_period_end?: string | null
           id?: string
           plan?: string
+          source?: string
           status?: string
           user_id: string
         }
@@ -489,6 +503,7 @@ export type Database = {
           current_period_end?: string | null
           id?: string
           plan?: string
+          source?: string
           status?: string
           user_id?: string
         }
@@ -552,6 +567,7 @@ export type Database = {
           risk_reward: number
           session: string
           session_day: string
+          source: string
           status: string
           stop_loss: number
           style: string
@@ -572,6 +588,7 @@ export type Database = {
           risk_reward: number
           session: string
           session_day: string
+          source?: string
           status?: string
           stop_loss: number
           style: string
@@ -592,6 +609,7 @@ export type Database = {
           risk_reward?: number
           session?: string
           session_day?: string
+          source?: string
           status?: string
           stop_loss?: number
           style?: string
@@ -619,16 +637,19 @@ export type Database = {
         Row: {
           created_at: string
           id: string
+          source: string
           user_id: string
         }
         Insert: {
           created_at?: string
           id?: string
+          source?: string
           user_id: string
         }
         Update: {
           created_at?: string
           id?: string
+          source?: string
           user_id?: string
         }
         Relationships: [
@@ -753,6 +774,7 @@ export type Database = {
           period: string
           rate_bps: number
           referral_id: string | null
+          source: string
           status: string
         }
         Insert: {
@@ -765,6 +787,7 @@ export type Database = {
           period: string
           rate_bps: number
           referral_id?: string | null
+          source?: string
           status?: string
         }
         Update: {
@@ -777,6 +800,7 @@ export type Database = {
           period?: string
           rate_bps?: number
           referral_id?: string | null
+          source?: string
           status?: string
         }
         Relationships: [
