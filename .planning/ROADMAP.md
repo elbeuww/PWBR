@@ -41,7 +41,7 @@ Détail complet archivé : `.planning/milestones/v2.0-ROADMAP.md`.
  (completed 2026-06-23)
 - [x] **Phase 17: Fondation DB scalable (perf avant charge)** — Migration `0017` : wrap RLS `(select …)` + index sur colonnes de policy, index composites keyset alignés `ORDER BY`, infra matviews KPIs (unique index + wrapper `is_superadmin()`), Broadcast vs `postgres_changes`, migrations non bloquantes `CONCURRENTLY`. (SCALE perf)
  (completed 2026-06-25)
-- [ ] **Phase 18: Seed de données réalistes à l'échelle** — `seed.ts` faker déterministe, idempotent, FK-cohérent (~10k users + signaux/paiements/affiliés/outcomes), labels `backtest`/`démo` (aucun chiffre de perf fabriqué), RLS re-testée depuis client anon. (SEED)
+- [x] **Phase 18: Seed de données réalistes à l'échelle** — `seed.ts` faker déterministe, idempotent, FK-cohérent (~10k users + signaux/paiements/affiliés/outcomes), labels `backtest`/`démo` (aucun chiffre de perf fabriqué), RLS re-testée depuis client anon. (SEED) (completed 2026-06-25)
 - [ ] **Phase 19: Dashboard utilisateur** — Groupe `(dash)` : vue d'ensemble, signaux suivis/historique keyset, watchlist `user_followed_setups` (revue IDOR), abonnement + ExpiryBanner, affiliation intégrée, paramètres — démontrable sur données seedées. (UDASH)
 - [ ] **Phase 20: Dashboard superadmin (cockpit 4 axes)** — Acquisition/Revenus(MRR mesuré)/Ops/Conformité, tables virtualisées filtrables/paginées, gating `is_superadmin()` (404 discret), matviews phase 17, jamais service_role côté pages. (ADASH)
 - [ ] **Phase 21: Tests E2E + audit de scalabilité** — Playwright des flux principaux + isolation RLS/gating prouvée, audit DB `EXPLAIN ANALYZE` + `get_advisors` + `pg_stat_statements` sur les requêtes clés à ~10k (validation keyset/index/matviews). (E2E + SCALE-06)
@@ -189,7 +189,7 @@ Détail complet archivé : `.planning/milestones/v2.0-ROADMAP.md`.
 **Plans** : 3 plans (3 vagues)
 - [x] 18-01-PLAN.md — Fondation + Wave 0 : migration 0018 (colonne `source` 8 tables) + apply LIVE via MCP + types regen + tests no-perf-seed-claims/seed-rls + config seed (SEED-02/SEED-03)
 - [x] 18-02-PLAN.md — Seed core : orchestrateur + purge idempotente (WHERE source='demo' ordre FK inverse) + users (createUser borné) + subscriptions/payments étalés (SEED-01)
-- [ ] 18-03-PLAN.md — Signaux (outcomes bruts) + affiliation (commissions via RPC) + refresh mv_mrr + tests idempotence/RLS cross-user (SEED-01/02/03)
+- [x] 18-03-PLAN.md — Signaux (outcomes bruts) + affiliation (commissions via RPC) + refresh mv_mrr + tests idempotence/RLS cross-user (SEED-01/02/03)
 **Notes** : Adresse Pitfall #5 (seed non FK-cohérent / sous-dimensionné → audit faussement vert). `@faker-js/faker` en devDep, via `tsx`. Prix MRR seedé = 9 $ standard / 3 $ découverte (PROJECT.md) à confirmer pour la cohérence du MRR superadmin. Pas d'API/paiement réel.
 
 ### Phase 19: Dashboard utilisateur
@@ -251,7 +251,7 @@ Détail complet archivé : `.planning/milestones/v2.0-ROADMAP.md`.
 | 15. Design system v3 « dark néon unique » | v3.0 | 3/3 | Complete    | 2026-06-22 |
 | 16. Reskin transversal de toutes les pages | v3.0 | 4/4 | Complete    | 2026-06-24 |
 | 17. Fondation DB scalable | v3.0 | 3/3 | Complete   | 2026-06-25 |
-| 18. Seed de données réalistes à l'échelle | v3.0 | 2/3 | In Progress|  |
+| 18. Seed de données réalistes à l'échelle | v3.0 | 3/3 | Complete   | 2026-06-25 |
 | 19. Dashboard utilisateur | v3.0 | 0/? | Not started | - |
 | 20. Dashboard superadmin (cockpit 4 axes) | v3.0 | 0/? | Not started | - |
 | 21. Tests E2E + audit de scalabilité | v3.0 | 0/? | Not started | - |
