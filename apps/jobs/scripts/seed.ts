@@ -32,6 +32,7 @@ import { purge } from './seed/purge'
 import { seedUsers } from './seed/users'
 import { seedSubscriptions } from './seed/subscriptions'
 import { seedPayments } from './seed/payments'
+import { seedSignals } from './seed/signals'
 
 const SCRIPT_DIR = dirname(fileURLToPath(import.meta.url))
 const ENV_PATH = resolve(SCRIPT_DIR, '../.env') // apps/jobs/.env
@@ -83,14 +84,19 @@ async function main(): Promise<void> {
   const paymentCount = await seedPayments(client, subscriptions)
   console.log(`   ${paymentCount} payments démo créés.`)
 
-  // ─── Plan 18-03 (non câblé ici) ──────────────────────────────────────────────
-  // await seedSignals(client, users)        // analyses → trade_setups → prediction_outcomes
+  // 5. Signaux : analyses → trade_setups → prediction_outcomes (outcomes BRUTS, D-02).
+  console.log('⑤ signaux (analyses → trade_setups → prediction_outcomes bruts)…')
+  const signals = await seedSignals(client, users)
+  console.log(
+    `   ${signals.analyses} analyses, ${signals.setups} setups, ${signals.outcomes} outcomes bruts.`,
+  )
+
+  // ─── Plan 18-03 (suite — câblé dans Task 2) ──────────────────────────────────
   // await seedAffiliation(client, users)     // affiliates → referrals → commissions → payouts
-  // await seedMarket(client)                 // candles / snapshots / job_runs / telegram volume
   // await refreshMvMrr(client)               // REFRESH MATERIALIZED VIEW CONCURRENTLY mv_mrr
 
-  console.log('\n✅ seed core terminé (users + subscriptions + payments).')
-  console.log('   (signaux / affiliation / market / refresh mv_mrr → Plan 18-03)\n')
+  console.log('\n✅ seed terminé (users + subscriptions + payments + signaux).')
+  console.log('   (affiliation / refresh mv_mrr → Task 2)\n')
 }
 
 main().catch((e) => fail((e as Error).message))
