@@ -287,3 +287,52 @@ end;
 $$;
 
 revoke execute on function public.refresh_mv_mrr() from public, anon, authenticated;
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- SECTION 3 — Broadcast from Database : trigger + policy realtime.messages (D-04, SCALE-05)
+-- Remplace le flux postgres_changes de 0011 (badge « N nouveaux signaux ») par Broadcast :
+-- 1 change × chaque subscriber = goulot mono-thread + WAL alourdi à 10k (Pitfall 8) →
+-- un trigger DB pousse UNE FOIS sur un topic FIXE partagé, fan-out servi par realtime.messages.
+--
+-- Open Question 2 tranchée : topic FIXE 'topic:new-signals' (fan-out global du badge,
+-- pas par-record) + canal PRIVÉ (Realtime Authorization via RLS sur realtime.messages).
+--
+-- Parité sécurité (Pitfall 4) : la policy realtime.messages réplique la barrière abonné de
+-- l'ancien filtre RLS postgres_changes → un non-abonné ne reçoit AUCUN event. Le wrap
+-- (select has_active_subscription()) est cohérent avec la Section 1.
+-- ─────────────────────────────────────────────────────────────────────────────
+create or replace function public.broadcast_trade_setup_changes()
+  returns trigger
+  security definer
+  language plpgsql
+  set search_path = public                                               -- figé (Pitfall 6), miroir 0008 L.34
+as $$
+begin
+  perform realtime.broadcast_changes(
+    'topic:new-signals',          -- topic FIXE partagé (fan-out global, Open Question 2)
+    tg_op, tg_op, tg_table_name, tg_table_schema, new, old
+  );
+  return null;
+end;
+$$;
+
+create trigger trg_trade_setups_broadcast
+  after insert or update on public.trade_setups
+  for each row execute function public.broadcast_trade_setup_changes();
+
+-- Realtime Authorization : qui peut écouter le canal privé (RLS sur realtime.messages).
+-- Restreint aux abonnés actifs = parité avec le filtre postgres_changes retiré (T-17-BC).
+create policy "broadcast: abonnés actifs écoutent new-signals"
+  on realtime.messages
+  for select to authenticated
+  using ((select public.has_active_subscription()));
+
+-- ⚠️ RÉÉVALUATION REPLICA IDENTITY FULL + publication (D-04) — NE PAS EXÉCUTER ICI.
+-- Une fois sur Broadcast, REPLICA IDENTITY FULL (0011 L.37) et l'appartenance de
+-- trade_setups à la publication supabase_realtime (0011 L.44-55) deviennent superflus
+-- pour CE flux (Broadcast lit realtime.messages, pas le WAL postgres_changes). MAIS :
+-- vérifier LIVE (Assumption A3) qu'AUCUN autre consommateur postgres_changes n'en dépend
+-- AVANT de retirer. Statements à exécuter SEULEMENT au plan 17-03, APRÈS cette vérif
+-- (execute_sql sur pg_publication_tables) :
+--   alter publication supabase_realtime drop table public.trade_setups;
+--   alter table public.trade_setups replica identity default;
