@@ -39,7 +39,7 @@ Détail complet archivé : `.planning/milestones/v2.0-ROADMAP.md`.
 - [x] **Phase 15: Design system v3 « dark néon unique »** — Promotion de la couche sémantique `.nxl` (landing) en DS global dark unique, `forcedTheme="dark"`, retrait du toggle clair, décision green vs volt, contraste WCAG AA, no-FOUC + RTL préservés. (THEME) (completed 2026-06-22)
 - [x] **Phase 16: Reskin transversal de toutes les pages** — Vitrine, légal, auth, compte/abonnement, espace membre signaux/détail+chart, paiement/funnel, Académie, admin repeints sur le DS v3, RLS/i18n/disclaimers/no-perf-claims/no-mera-brand préservés. (RESKIN)
  (completed 2026-06-23)
-- [ ] **Phase 17: Fondation DB scalable (perf avant charge)** — Migration `0017` : wrap RLS `(select …)` + index sur colonnes de policy, index composites keyset alignés `ORDER BY`, infra matviews KPIs (unique index + wrapper `is_superadmin()`), Broadcast vs `postgres_changes`, migrations non bloquantes `CONCURRENTLY`. (SCALE perf)
+- [x] **Phase 17: Fondation DB scalable (perf avant charge)** — Migration `0017` : wrap RLS `(select …)` + index sur colonnes de policy, index composites keyset alignés `ORDER BY`, infra matviews KPIs (unique index + wrapper `is_superadmin()`), Broadcast vs `postgres_changes`, migrations non bloquantes `CONCURRENTLY`. (SCALE perf) (completed 2026-06-25)
 - [ ] **Phase 18: Seed de données réalistes à l'échelle** — `seed.ts` faker déterministe, idempotent, FK-cohérent (~10k users + signaux/paiements/affiliés/outcomes), labels `backtest`/`démo` (aucun chiffre de perf fabriqué), RLS re-testée depuis client anon. (SEED)
 - [ ] **Phase 19: Dashboard utilisateur** — Groupe `(dash)` : vue d'ensemble, signaux suivis/historique keyset, watchlist `user_followed_setups` (revue IDOR), abonnement + ExpiryBanner, affiliation intégrée, paramètres — démontrable sur données seedées. (UDASH)
 - [ ] **Phase 20: Dashboard superadmin (cockpit 4 axes)** — Acquisition/Revenus(MRR mesuré)/Ops/Conformité, tables virtualisées filtrables/paginées, gating `is_superadmin()` (404 discret), matviews phase 17, jamais service_role côté pages. (ADASH)
@@ -174,7 +174,7 @@ Détail complet archivé : `.planning/milestones/v2.0-ROADMAP.md`.
 **Plans** : 3 plans (2 vagues)
 - [x] 17-01-PLAN.md — 0017 authoring : wrap RLS `(select …)` toutes policies + matview MRR (wrapper `is_superadmin()` + refresh) + trigger Broadcast + policy `realtime.messages` + Partie B index CONCURRENTLY/script de gate documentés (SCALE-01/02/03/05) — checkpoint A1 (définition MRR)
 - [x] 17-02-PLAN.md — Client + Wave-0 : réécriture `SignalList` postgres_changes→canal privé Broadcast + test anon `mrr-gating` (SCALE-05/03)
-- [ ] 17-03-PLAN.md — [BLOQUANT] Apply LIVE via MCP : apply_migration (Partie A) + execute_sql per-statement (Partie B CONCURRENTLY) + gen-types/reconcile + get_advisors/EXPLAIN/REFRESH/INVALID + tests RLS (SCALE-04 + validation 01/02/03/05)
+- [x] 17-03-PLAN.md — [BLOQUANT] Apply LIVE via MCP : apply_migration (Partie A) + execute_sql per-statement (Partie B CONCURRENTLY) + gen-types/reconcile + get_advisors/EXPLAIN/REFRESH/INVALID + tests RLS (SCALE-04 + validation 01/02/03/05)
 **Notes** : Arête dure : perf DB AVANT exposition à l'échelle (fix RLS/index = gain >100×, le plus rentable). Migration `0017`. Adresse Pitfalls #2 (perf RLS) et #4 (Realtime saturation / migration bloquante). SCALE-06 (audit chiffré) est en phase 21, une fois le seed en place. Research flag : seuils OFFSET→keyset et `postgres_changes`→Broadcast à confirmer par `EXPLAIN ANALYZE` post-seed.
 
 ### Phase 18: Seed de données réalistes à l'échelle
@@ -246,7 +246,7 @@ Détail complet archivé : `.planning/milestones/v2.0-ROADMAP.md`.
 | 14. Track record affiché & boucle prod | v2.1 | 0/? | ⏸️ Paused | - |
 | 15. Design system v3 « dark néon unique » | v3.0 | 3/3 | Complete    | 2026-06-22 |
 | 16. Reskin transversal de toutes les pages | v3.0 | 4/4 | Complete    | 2026-06-24 |
-| 17. Fondation DB scalable | v3.0 | 2/3 | In Progress|  |
+| 17. Fondation DB scalable | v3.0 | 3/3 | Complete   | 2026-06-25 |
 | 18. Seed de données réalistes à l'échelle | v3.0 | 0/? | Not started | - |
 | 19. Dashboard utilisateur | v3.0 | 0/? | Not started | - |
 | 20. Dashboard superadmin (cockpit 4 axes) | v3.0 | 0/? | Not started | - |

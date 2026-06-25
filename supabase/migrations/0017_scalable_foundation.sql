@@ -272,6 +272,11 @@ $$;
 revoke execute on function public.get_mrr() from public, anon;           -- miroir 0008 L.46
 grant execute on function public.get_mrr() to authenticated;             -- miroir 0008 L.47
 
+-- T-17-MV (Info Disclosure) : Supabase grant SELECT par défaut anon/authenticated sur
+-- les objets public → la matview serait lisible via PostgREST (advisor materialized_view_in_api),
+-- contournant get_mrr(). On RÉVOQUE l'accès direct ; la seule lecture passe par get_mrr() gated.
+revoke all on public.mv_mrr from anon, authenticated;
+
 -- Refresh sans verrou de lecture (exige le UNIQUE index mv_mrr_month_idx de la Partie B).
 -- Lockée service_role : revoke à TOUS les rôles client (seul service_role bypass — miroir 0016 L.362).
 -- L'ordonnanceur du refresh (pg_cron/Edge/job) est HORS scope P17 (Open Question 1).
@@ -315,6 +320,11 @@ begin
   return null;
 end;
 $$;
+
+-- T-17-BC (Info Disclosure / surface RPC) : une fonction de trigger ne doit jamais être
+-- appelable en RPC (advisor anon/authenticated_security_definer_function_executable).
+-- Convention repo (migration 0002 revoke_execute_trigger_functions) → révoquer execute.
+revoke execute on function public.broadcast_trade_setup_changes() from public, anon, authenticated;
 
 create trigger trg_trade_setups_broadcast
   after insert or update on public.trade_setups

@@ -30,10 +30,19 @@ See: .planning/PROJECT.md (mis à jour 2026-06-20 après clôture v2.0)
 ## Current Position
 
 Milestone: v3.0 — Plateforme complète sous identité dark néon NEXA (7 phases, 15-21)
-Phase: 17 (fondation-db-scalable-perf-avant-charge) — EXECUTING
-Plan: 3 of 3
-Status: Ready to execute
+Phase: 17 (fondation-db-scalable-perf-avant-charge) — AWAITING HUMAN UAT (Broadcast live)
+Plan: 3 of 3 — TOUS exécutés (17-01, 17-02, 17-03)
+Status: Migration 0017 appliquée LIVE ; gates auto 1-6 PASS ; gate 7 (Broadcast) Manual-Only en attente
 Last activity: 2026-06-25
+
+### ▶ REPRISE Phase 17 (point de reprise)
+
+- 0017 appliquée LIVE via MCP (apply_migration Partie A + 5 index CONCURRENTLY, 0 INVALID).
+- Gates D-05 auto **PASS** : advisors perf 0 `auth_rls_initplan` ; advisors security 0 nouvelle alerte (2 fuites fermées : mv_mrr exposée + trigger fn en RPC) ; EXPLAIN keyset Index Scan ; REFRESH CONCURRENTLY mv_mrr OK ; typecheck vert ; 617 tests verts (mrr-gating assertif).
+- **Action attendue** : exécuter le gate Broadcast Manual-Only de `17-HUMAN-UAT.md` (badge live abonné / shape payload A4 / non-abonné silencieux), puis :
+  - « approuvé » → `gsd-sdk query phase.complete 17` + commit tracking, puis offer_next (Phase 18).
+  - problème → `/gsd:plan-phase 17 --gaps` (gap-closure ciblée sur le gate en échec).
+- Note : ordonnanceur `refresh_mv_mrr()` (pg_cron/Edge/job) hors scope P17 (Open Question 1) ; SCALE-06 (audit chiffré) déféré Phase 21.
 
 ### ▶ REPRISE Phase 16 (point de reprise)
 

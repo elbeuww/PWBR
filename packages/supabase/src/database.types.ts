@@ -876,6 +876,17 @@ export type Database = {
           },
         ]
       }
+      mv_mrr: {
+        // Phase 17 (0017) — matview de référence MRR « cash encaissé par mois »
+        // (checkpoint A1, option B). revenue_atomic = bigint Postgres -> string
+        // (PostgREST, comme les autres *_atomic). NE PAS regénérer sans ré-appliquer.
+        Row: {
+          month: string | null
+          payments_count: number | null
+          revenue_atomic: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       affiliate_rate_bps: {
@@ -905,6 +916,16 @@ export type Database = {
       }
       has_active_subscription: { Args: never; Returns: boolean }
       is_superadmin: { Args: never; Returns: boolean }
+      get_mrr: {
+        // Phase 17 (0017) — lecture gated de mv_mrr (SECURITY DEFINER, is_superadmin()).
+        // setof public.mv_mrr -> tableau du Row mv_mrr (revenue_atomic string).
+        Args: never
+        Returns: {
+          month: string | null
+          payments_count: number | null
+          revenue_atomic: string | null
+        }[]
+      }
     }
     Enums: {
       [_ in never]: never
@@ -1127,3 +1148,7 @@ export type CommissionUpdate = Database['public']['Tables']['commissions']['Upda
 export type PayoutRow = Database['public']['Tables']['payouts']['Row']
 export type PayoutInsert = Database['public']['Tables']['payouts']['Insert']
 export type AffiliateDashboardRow = Database['public']['Views']['affiliate_dashboard']['Row']
+
+// Phase 17 — fondation DB scalable (0017) — matview de référence MRR « cash encaissé »
+// gated via get_mrr() (D-02/SCALE-03). revenue_atomic string (bigint -> PostgREST).
+export type MvMrrRow = Database['public']['Views']['mv_mrr']['Row']
