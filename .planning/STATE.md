@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v3.0
 milestone_name: Plateforme complète sous identité dark néon NEXA
 status: executing
-last_updated: "2026-06-25T16:10:14.702Z"
-last_activity: 2026-06-25 -- Phase 18 planning complete
+last_updated: "2026-06-25T16:29:27.124Z"
+last_activity: 2026-06-25
 progress:
   total_phases: 12
   completed_phases: 5
   total_plans: 30
-  completed_plans: 25
-  percent: 83
+  completed_plans: 26
+  percent: 87
 ---
 
 # Project State
@@ -23,17 +23,17 @@ progress:
 See: .planning/PROJECT.md (mis à jour 2026-06-20 après clôture v2.0)
 
 **Core value:** Produire, pour chaque opportunité, une analyse fiable et explicable — vulgarisée pour un public non technique — avec un % de réussite TOUJOURS mesuré, jamais inventé : c'est le socle de confiance qui fait payer l'abonnement.
-**Current focus:** Phase 17 — fondation-db-scalable-perf-avant-charge
+**Current focus:** Phase 18 — seed-de-donnees-realistes-a-l-echelle
 **Mode:** interactive (MVP vertical)
 **Granularity:** fine
 
 ## Current Position
 
 Milestone: v3.0 — Plateforme complète sous identité dark néon NEXA (7 phases, 15-21)
-Phase: 17 (fondation-db-scalable-perf-avant-charge) — AWAITING HUMAN UAT (Broadcast live)
-Plan: 3 of 3 — TOUS exécutés (17-01, 17-02, 17-03)
+Phase: 18 (seed-de-donnees-realistes-a-l-echelle) — EXECUTING
+Plan: 2 of 3
 Status: Ready to execute
-Last activity: 2026-06-25 -- Phase 18 planning complete
+Last activity: 2026-06-25
 
 ### ▶ REPRISE Phase 17 (point de reprise)
 
@@ -133,6 +133,7 @@ ressources externes non provisionnables en session de développement.
 | Phase 16 P04 | ~6min | 2 tasks | 5 files |
 | Phase 17 P01 | ~20min | 4 tasks | 1 files |
 | Phase 17 P02 | ~10min | 2 tasks | 2 files |
+| Phase 18 P01 | ~35min | 3 tasks | 7 files |
 
 ## Roadmap v2.0 (9 phases)
 
@@ -521,6 +522,15 @@ ressources externes non provisionnables en session de développement.
 - **D-17-02-ASYNC** : `setAuth()` async + abonnement canal privé → useEffect encapsule le setup dans une fonction async ; cleanup via variable `channel` mutable + flag `cancelled` (race promesse/unmount gérée, `removeChannel` fiable).
 - **D-17-02-SKIP (Rule 3)** : `mrr-gating.test.ts` (Wave-0, miroir Vitest de `signals-rls.spec.ts`, client anon nu JAMAIS service_role) skip statiquement si env absent ET skip **dynamiquement sur PGRST202** (get_mrr absent du cache de schéma = 0017 pas LIVE). `.env.test` étant présent, sans cette garde le test échouait (fonction introuvable) et cassait la suite → fix nécessaire au critère « suite non régressée ». Assertions (error null + 0 ligne) intactes ; deviendra assertif une fois 0017 LIVE (17-04). Aucun GREEN fabriqué.
 - **Commits 17-02** : a1c4dda (T1 — SignalList canal privé Broadcast), 889eb5d (T2 — Wave-0 mrr-gating.test.ts). `pnpm test` 616 passed | 5 skipped | 0 failed ; `pnpm typecheck` 0 erreur.
+
+### Decisions exécution (Plan 18-01 — fondation + Wave 0, colonne source + tests RLS/no-perf, SEED-02/03)
+
+- **D-18-01-A (D-01)** : migration `0018_seed_source_column.sql` ajoute `source text not null default 'live' check (source in ('live','demo','backtest'))` sur les **8 tables seedées** (profiles, subscriptions, payments, analyses, trade_setups, prediction_outcomes, affiliates, commissions). `default 'live'` rend les lignes existantes `live` (future-proof). Périmètre minimal : tables volume (candles/snapshots/job_runs) et filles cascadées (affiliate_codes/referrals/payouts) NON colonnées en P18.
+- **D-18-01-B (T-18-01)** : `source` est un **LABEL de provenance, JAMAIS un gate de lecture** — 0018 ne crée/modifie AUCUNE policy RLS, aucun `using (source=…)`. Appliquée LIVE via MCP `apply_migration` (Partie A) ; 3 index partiels `create index concurrently … WHERE source='demo'` (analyses/trade_setups/payments) via `execute_sql` per-statement, `indisvalid=true` confirmé. `get_advisors(security)` post-0018 = **0 nouvelle alerte RLS** (2 WARN security-definer pré-existants tolérés EXPECTED BY DESIGN).
+- **D-18-01-C (Pitfall 6 types)** : `database.types.ts` régénéré via MCP `generate_typescript_types` puis **ré-édité À LA MAIN** (convention repo, PAS `gen types --linked`) : `source` dans Row/Insert/Update des 8 tables, override `*_atomic` string et alias maison préservés. `pnpm typecheck` vert.
+- **D-18-01-D (SEED-02)** : `no-perf-seed-claims.test.ts` (apps/web/test) scanne `apps/jobs/scripts/seed/**` via `node:fs` (zéro DB, toujours CI-exécutable). `FORBIDDEN_SEED_FIELDS = /win_?rate|success_?rate|winRatePct|expectancy|hardcoded.*%/i`, whitelist `realized_r/outcome/amount_atomic/rate_bps`. Test de contrôle non-trivial : un `win_rate: 0.9` planté EST détecté (anti vacuous-green). seed/ ne contenant que `config.ts` → 0 offender (vert toléré, garde armée pour Waves ≥ 1).
+- **D-18-01-E (SEED-03, T-18-02)** : `seed-rls.test.ts` (packages/supabase/.../__tests__) calque EXACTEMENT `affiliate-rls.test.ts` : `HAS_ENV`, `adminClient()`, `signUpAndGetClient()`, `describe.skipIf(!HAS_ENV)`, `afterAll` deleteUser. 2 assertions lues TOUJOURS via client **anon** (jamais service_role) : (a) non-abonné lit 0 `trade_setups` ; (b) user A ne lit aucun `payments` de B (payment de B seedé via service_role : source='demo', amount_atomic string, status='verified'). SKIP propre sans `.env.test`.
+- **Commits 18-01** : 493acee (T1 — migration 0018 + faker devDep + config seed), 949111a (T2 — apply LIVE MCP + régen types, owned orchestrateur), 71533cf (T3 — tests Wave 0 no-perf-seed-claims + seed-rls). `no-perf-seed-claims` 4 passed ; `seed-rls` 2 skipped propre ; `pnpm typecheck` 0 erreur.
 
 ### Open todos / research flags (v2.0)
 
