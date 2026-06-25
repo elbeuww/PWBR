@@ -225,3 +225,65 @@ create policy "payouts: superadmin voit tout"
   on public.payouts
   for select to authenticated
   using ((select public.is_superadmin()));
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- SECTION 2 — Matview de référence MRR + wrapper gated + refresh (D-02, SCALE-03)
+-- Infra réutilisable prouvée sur 1 matview (mv_mrr). Les matviews N'ONT PAS de RLS :
+-- la lecture est OBLIGATOIREMENT gardée par un wrapper SECURITY DEFINER gated
+-- is_superadmin() ; AUCUN GRANT SELECT direct sur la matview.
+--
+-- ⚠️ DÉFINITION MÉTIER VERROUILLÉE (checkpoint A1, décision fondateur — Option B) :
+--    « cash encaissé par mois », PAS un MRR récurrent dédupliqué.
+--    MRR(mois) = Σ payments.amount_atomic WHERE status='verified'
+--                GROUP BY date_trunc('month', verified_at).
+--    - Source de vérité = amount_atomic (montant constaté on-chain), PAS expected_amount_atomic.
+--    - Période = mois de verified_at (date d'encaissement), PAS current_period_end.
+--    - Plans inclus = les DEUX (discovery ET standard) ; aucun filtre par plan.
+--    - PAS de déduplication : plusieurs paiements verified d'un même user dans le mois
+--      s'additionnent (comportement voulu — mesure du cash réel encaissé).
+--
+-- Note types : month = date (PostgREST string), revenue_atomic = bigint → override
+-- string en TS (database.types.ts édité main, comme les autres *_atomic).
+-- ⚠️ Le UNIQUE index requis pour REFRESH CONCURRENTLY (mv_mrr_month_idx) est posé en
+--    PARTIE B (CONCURRENTLY hors tx). Il DOIT exister avant le premier refresh concurrent.
+-- ─────────────────────────────────────────────────────────────────────────────
+create materialized view public.mv_mrr as
+  select
+    date_trunc('month', p.verified_at)::date as month,                    -- mois d'encaissement (A1)
+    count(*)                                 as payments_count,           -- nb de paiements verified du mois
+    coalesce(sum(p.amount_atomic), 0)::bigint as revenue_atomic           -- cash encaissé (constaté on-chain), string en TS
+  from public.payments p
+  where p.status = 'verified'
+    and p.verified_at is not null
+  group by date_trunc('month', p.verified_at);
+
+-- Lecture gated (matview sans RLS) — calque EXACT du contrat is_superadmin() (0008 L.29-47).
+-- La garde where (select is_superadmin()) renvoie 0 ligne à un non-superadmin (pas d'erreur).
+create function public.get_mrr()
+  returns setof public.mv_mrr
+  language sql
+  stable
+  security definer
+  set search_path = public                                               -- figé (Pitfall 6 / function_search_path_mutable)
+as $$
+  select * from public.mv_mrr where (select public.is_superadmin());
+$$;
+
+revoke execute on function public.get_mrr() from public, anon;           -- miroir 0008 L.46
+grant execute on function public.get_mrr() to authenticated;             -- miroir 0008 L.47
+
+-- Refresh sans verrou de lecture (exige le UNIQUE index mv_mrr_month_idx de la Partie B).
+-- Lockée service_role : revoke à TOUS les rôles client (seul service_role bypass — miroir 0016 L.362).
+-- L'ordonnanceur du refresh (pg_cron/Edge/job) est HORS scope P17 (Open Question 1).
+create function public.refresh_mv_mrr()
+  returns void
+  language plpgsql
+  security definer
+  set search_path = public
+as $$
+begin
+  refresh materialized view concurrently public.mv_mrr;
+end;
+$$;
+
+revoke execute on function public.refresh_mv_mrr() from public, anon, authenticated;
