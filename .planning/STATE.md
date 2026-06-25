@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v3.0
 milestone_name: Plateforme complète sous identité dark néon NEXA
-status: executing
-last_updated: "2026-06-25T00:41:41.119Z"
+status: Migration 0017 appliquée LIVE ; gates auto 1-6 PASS ; gate 7 (Broadcast) Manual-Only en attente
+last_updated: "2026-06-25T14:13:33.634Z"
 last_activity: 2026-06-25
 progress:
   total_phases: 12
-  completed_phases: 4
+  completed_phases: 5
   total_plans: 27
-  completed_plans: 24
-  percent: 89
+  completed_plans: 25
+  percent: 93
 ---
 
 # Project State
@@ -548,7 +548,7 @@ ressources externes non provisionnables en session de développement.
 
 ## Session Continuity
 
-**Last session:** 2026-06-25T00:41:28.138Z
+**Last session:** 2026-06-25T14:13:33.626Z
 
 **Last session (archive):** 2026-06-19T03:41:29.665Z
 
