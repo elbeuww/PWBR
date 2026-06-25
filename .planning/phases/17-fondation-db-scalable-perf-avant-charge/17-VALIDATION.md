@@ -45,7 +45,7 @@ validated: 2026-06-25
 | Req | Wave | Behavior | Threat Ref | Secure Behavior | Test Type | Automated Command | File Exists | Status |
 |-----|------|----------|------------|-----------------|-----------|-------------------|-------------|--------|
 | SCALE-01 | post-migration | `get_advisors(performance)` = 0 `auth_rls_initplan` | T-17-RLS | Wrap `(select …)` préserve isolation | LIVE/MCP | `get_advisors(type=performance)` | ⚠️ gate manuel | ⚠️ PASS (gate 1, 17-03) |
-| SCALE-01 | post-migration | Non-abonné lit 0 ligne après wrap (pas de régression) | T-17-RLS | RLS non contournable | E2E anon-client | `apps/web/tests/signals-rls.spec.ts` (+ `gating-rls.test.ts`) | ✅ existant | ✅ green |
+| SCALE-01 | post-migration | Non-abonné lit 0 ligne après wrap (pas de régression) | T-17-RLS | RLS non contournable | E2E anon-client | `apps/web/tests/signals-rls.spec.ts` (+ `packages/supabase/__tests__/gating-rls.test.ts`) | ✅ existant | ✅ green |
 | SCALE-02 | post-migration | `EXPLAIN` liste cible = Index Scan (pas Seq Scan + Sort) | — | N/A | LIVE/MCP | `execute_sql("EXPLAIN <keyset>")` | ⚠️ gate manuel | ⚠️ PASS (gate 3, 17-03 ; trade_setups prouvé `enable_seqscan=off`) |
 | SCALE-03 | post-migration | `REFRESH MATERIALIZED VIEW CONCURRENTLY mv_mrr` réussit | T-17-MV | unique index requis | LIVE/MCP | `execute_sql` refresh | ⚠️ gate manuel | ⚠️ PASS (gate 4, 17-03) |
 | SCALE-03 | unit | `get_mrr()` interdit hors superadmin | T-17-MV | Wrapper SECURITY DEFINER gated | unit RLS anon | `pnpm test` (`apps/web/tests/mrr-gating.test.ts`) | ✅ existant | ✅ green (assertif post-0017 LIVE) |
@@ -102,3 +102,5 @@ validated: 2026-06-25
 | E2E manuel UAT (PASS) | 1 (SCALE-05 Broadcast, Gate 7) |
 
 **Verdict : VALIDATED (PARTIAL).** Aucun gap automatisable détecté — tout comportement automatisable a un test vert. Les 4 gates restants exigent une connexion DB LIVE via MCP (advisors / `EXPLAIN` / `REFRESH CONCURRENTLY` / `pg_index.indisvalid`) et sont non-automatisables en Vitest CI : classés manual-only justifiés et **tous PASS** au gate D-05 (17-03). SCALE-05 (Broadcast runtime) validé en UAT navigateur réel. Aucun spawn `gsd-nyquist-auditor` requis (rien à générer).
+
+**Re-vérification 2026-06-25 (audit indépendant).** Cross-reference fichiers de test confirmé : les 3 fichiers référencés existent physiquement — `apps/web/tests/mrr-gating.test.ts` (Vitest, SCALE-03), `apps/web/tests/signals-rls.spec.ts` (Playwright, SCALE-01 UX+données), `packages/supabase/__tests__/gating-rls.test.ts` (intégration RLS ACCESS-02/03/04, renfort SCALE-01). Nature confirmée : tests à *green conditionnel* (SKIP/RED hors env `.env.test` + migrations LIVE), cohérent avec la classification manual/LIVE-gated. Correction de traçabilité : chemin de `gating-rls.test.ts` explicité dans la map (était sans préfixe, laissait supposer `apps/web/tests/`). Verdict inchangé : 0 gap automatisable, `nyquist_compliant: true`.
