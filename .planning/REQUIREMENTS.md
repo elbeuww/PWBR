@@ -45,11 +45,11 @@ Requirements de ce milestone. Chacun est mappé à une phase de la roadmap (voir
 
 ### Robustesse & scalabilité DB (SCALE)
 
-- [ ] **SCALE-01**: Les policies RLS sont optimisées (wrap `(select …)`) et **indexées sur les colonnes de policy** (gain >100× à l'échelle).
-- [ ] **SCALE-02**: Les listes longues (signaux, utilisateurs, paiements) utilisent une **pagination par curseur (keyset)** avec index composites alignés `ORDER BY`.
-- [ ] **SCALE-03**: Les KPIs superadmin s'appuient sur des **vues matérialisées** (unique index, `REFRESH CONCURRENTLY`) gated `is_superadmin()`.
+- [x] **SCALE-01**: Les policies RLS sont optimisées (wrap `(select …)`) et **indexées sur les colonnes de policy** (gain >100× à l'échelle).
+- [x] **SCALE-02**: Les listes longues (signaux, utilisateurs, paiements) utilisent une **pagination par curseur (keyset)** avec index composites alignés `ORDER BY`.
+- [x] **SCALE-03**: Les KPIs superadmin s'appuient sur des **vues matérialisées** (unique index, `REFRESH CONCURRENTLY`) gated `is_superadmin()`.
 - [ ] **SCALE-04**: Les migrations à l'échelle sont **non bloquantes** (`CREATE INDEX CONCURRENTLY`, gestion de l'état INVALID).
-- [ ] **SCALE-05**: Les flux temps réel à fort volume utilisent **Broadcast** plutôt que `postgres_changes`.
+- [x] **SCALE-05**: Les flux temps réel à fort volume utilisent **Broadcast** plutôt que `postgres_changes`.
 - [ ] **SCALE-06**: Un **audit DB** (`EXPLAIN ANALYZE` + `get_advisors` + `pg_stat_statements`) valide les requêtes clés sur données seedées ~10k.
 
 ### Données seedées réalistes (SEED)
@@ -100,11 +100,11 @@ Exclusions explicites de ce milestone, avec raison.
 | RESKIN-04 | Phase 16 — Reskin transversal de toutes les pages | Complete |
 | RESKIN-05 | Phase 16 — Reskin transversal de toutes les pages | Complete |
 | RESKIN-06 | Phase 16 — Reskin transversal de toutes les pages | Complete |
-| SCALE-01 | Phase 17 — Fondation DB scalable | Pending |
-| SCALE-02 | Phase 17 — Fondation DB scalable | Pending |
-| SCALE-03 | Phase 17 — Fondation DB scalable | Pending |
+| SCALE-01 | Phase 17 — Fondation DB scalable | Complete |
+| SCALE-02 | Phase 17 — Fondation DB scalable | Complete |
+| SCALE-03 | Phase 17 — Fondation DB scalable | Complete |
 | SCALE-04 | Phase 17 — Fondation DB scalable | Pending |
-| SCALE-05 | Phase 17 — Fondation DB scalable | Pending |
+| SCALE-05 | Phase 17 — Fondation DB scalable | Complete |
 | SEED-01 | Phase 18 — Seed de données réalistes à l'échelle | Pending |
 | SEED-02 | Phase 18 — Seed de données réalistes à l'échelle | Pending |
 | SEED-03 | Phase 18 — Seed de données réalistes à l'échelle | Pending |

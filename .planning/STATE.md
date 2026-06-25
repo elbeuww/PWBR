@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v3.0
 milestone_name: Plateforme complète sous identité dark néon NEXA
-status: planning
-last_updated: "2026-06-24T21:04:08.220Z"
-last_activity: 2026-06-24
+status: executing
+last_updated: "2026-06-25T00:36:05.673Z"
+last_activity: 2026-06-25
 progress:
   total_phases: 12
   completed_phases: 4
-  total_plans: 24
-  completed_plans: 22
-  percent: 92
+  total_plans: 27
+  completed_plans: 23
+  percent: 85
 ---
 
 # Project State
@@ -23,17 +23,17 @@ progress:
 See: .planning/PROJECT.md (mis à jour 2026-06-20 après clôture v2.0)
 
 **Core value:** Produire, pour chaque opportunité, une analyse fiable et explicable — vulgarisée pour un public non technique — avec un % de réussite TOUJOURS mesuré, jamais inventé : c'est le socle de confiance qui fait payer l'abonnement.
-**Current focus:** Phase 16 — reskin-transversal-de-toutes-les-pages
+**Current focus:** Phase 17 — fondation-db-scalable-perf-avant-charge
 **Mode:** interactive (MVP vertical)
 **Granularity:** fine
 
 ## Current Position
 
 Milestone: v3.0 — Plateforme complète sous identité dark néon NEXA (7 phases, 15-21)
-Phase: 17
-Plan: Not started
-Status: Ready to plan
-Last activity: 2026-06-24
+Phase: 17 (fondation-db-scalable-perf-avant-charge) — EXECUTING
+Plan: 2 of 3
+Status: Ready to execute
+Last activity: 2026-06-25
 
 ### ▶ REPRISE Phase 16 (point de reprise)
 
@@ -122,6 +122,7 @@ ressources externes non provisionnables en session de développement.
 | Phase 16 P02 | ~12min | 2 tasks | 6 files |
 | Phase 16 P03 | ~10min | 2 tasks | 8 files |
 | Phase 16 P04 | ~6min | 2 tasks | 5 files |
+| Phase 17 P01 | ~20min | 4 tasks | 1 files |
 
 ## Roadmap v2.0 (9 phases)
 
@@ -493,6 +494,17 @@ ressources externes non provisionnables en session de développement.
 - **D-16-04-E** : service_role admin-only intégralement préservé — `createAdminServiceClient()` + tous les fetch byte-identiques sur les 5 fichiers admin (diff = className/markup seul). Import admin-service présent dans 5 pages admin, nulle part ailleurs (C-2). **theme-scan Test 2 désormais GREEN** (clôture du reskin transversal). typecheck 0 erreur, lint:i18n exit 0.
 - **Commits 16-04** : ab8821b (Task 1 — glow Académie ContentCard Tier 2), c0c0ce7 (Task 2 — admin résiduel Tier 3 sober).
 
+### Decisions exécution (Plan 17-01 — fondation DB scalable, migration 0017 AUTHORING, SCALE-01/02/03/05)
+
+- **D-17-01-A1 (checkpoint résolu)** : `mv_mrr` = **cash encaissé** (Option B, décision fondateur) — `sum(payments.amount_atomic) WHERE status='verified' GROUP BY date_trunc('month', verified_at)`. Source de vérité = `amount_atomic` (constaté on-chain, PAS `expected_amount_atomic`) ; période = mois de `verified_at` (PAS `current_period_end`) ; les 2 plans (discovery+standard) ; **PAS de déduplication** (plusieurs paiements verified/mois d'un même user s'additionnent — vue cash encaissé, pas un MRR récurrent dédupé, comportement voulu).
+- **D-17-01-WRAP** : 21 expressions de policy RLS réécrites en wrap `(select ...)` InitPlan par drop/recreate par NOM EXACT (profiles ×2, trade_setups, analyses, candles, payments ×3, subscriptions ×2, 6 tables affiliation). `prediction_outcomes` (`using (true)`) laissée telle quelle (rien à wrapper — advisor vérifié au gate 17-03).
+- **D-17-01-PROFILES (Rule 2)** : `"profiles: modifier le sien"` (0001 L.24, hors inventaire du plan) aussi wrappée `id = (select auth.uid())` pour atteindre le critère d'arrêt D-01 (`get_advisors(performance)` vert COMPLET sur TOUTES les policies).
+- **D-17-01-MV** : `get_mrr()` SECURITY DEFINER `stable` gated `where (select is_superadmin())` + revoke public/anon + grant authenticated (aucun GRANT SELECT direct — les matviews n'ont pas de RLS). `refresh_mv_mrr()` SECURITY DEFINER `REFRESH ... CONCURRENTLY`, revoke public/anon/**authenticated** (service_role bypass uniquement). Ordonnanceur du refresh = hors scope P17 (Open Question 1).
+- **D-17-01-BCAST** : trigger `trg_trade_setups_broadcast` (after insert/update) → `broadcast_trade_setup_changes()` → `realtime.broadcast_changes('topic:new-signals', ...)` (topic FIXE + canal privé) ; policy `realtime.messages` répliquant `(select has_active_subscription())` (parité abonné vs filtre postgres_changes retiré).
+- **D-17-01-PUBLI (A3)** : retrait `alter publication supabase_realtime drop table trade_setups` + `replica identity default` **différé au plan 17-03** (commenté), à exécuter SEULEMENT après vérif LIVE `pg_publication_tables` qu'aucun autre consommateur postgres_changes n'en dépend.
+- **D-17-01-PARTB** : 6 `CREATE INDEX CONCURRENTLY` documentés en commentaire (mv_mrr_month_idx UNIQUE + 3 keyset `(created_at desc, id desc)` + 2 colonnes de policy) + script de gate (détection indisvalid, drop concurrently, EXPLAIN gabarit, REFRESH, get_advisors). **NE PAS dans apply_migration** (Pitfall 1 / 25001) → `execute_sql` per-statement au plan 17-03. **AUCUNE application LIVE dans ce plan** (authoring uniquement).
+- **Commits 17-01** : 4d49832 (T1 — wrap RLS), 188d69d (T2 — matview MRR + get_mrr + refresh), 443dd41 (T3 — Broadcast trigger + policy realtime.messages), 166aadd (T4 — Partie B index CONCURRENTLY + script de gate).
+
 ### Open todos / research flags (v2.0)
 
 - **Phase 4 (research flag) :** TronGrid endpoint `walletsolidity`, parsing logs TRC-20, normalisation hex↔base58 — doc TS peu dense, recherche de phase recommandée.
@@ -519,7 +531,7 @@ ressources externes non provisionnables en session de développement.
 
 ## Session Continuity
 
-**Last session:** 2026-06-24T21:04:08.211Z
+**Last session:** 2026-06-25T00:36:05.662Z
 
 **Last session (archive):** 2026-06-19T03:41:29.665Z
 
