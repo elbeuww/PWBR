@@ -266,7 +266,7 @@ Détail complet archivé : `.planning/milestones/v2.0-ROADMAP.md`.
 | 17. Fondation DB scalable | v3.0 | 3/3 | Complete   | 2026-06-25 |
 | 18. Seed de données réalistes à l'échelle | v3.0 | 3/3 | Complete   | 2026-06-25 |
 | 19. Dashboard utilisateur | v3.0 | 7/7 | Complete    | 2026-06-26 |
-| 20. Dashboard superadmin (cockpit 4 axes) | v3.0 | 3/6 | In Progress|  |
+| 20. Dashboard superadmin (cockpit 4 axes) | v3.0 | 4/6 | In Progress|  |
 | 21. Tests E2E + audit de scalabilité | v3.0 | 0/? | Not started | - |
 
 **v2.0 : 9/9 phases complètes, 37/37 plans, 41/41 requirements couverts.**
