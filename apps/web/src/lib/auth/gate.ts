@@ -72,6 +72,23 @@ async function authedClient(): Promise<{
     redirect({ href: { pathname: '/login', query: { returnTo: path } }, locale })
   }
 
+  // Branche suspension (D-17) — COUCHE UX complémentaire, PAS la barrière réelle.
+  // La vraie barrière données est la RLS : has_active_subscription() étendu
+  // `and not suspended` (0021) → un compte suspendu lit déjà 0 ligne. Ici on
+  // déconnecte proactivement pour ne pas laisser une session suspendue errer
+  // sur une UI vide. Lecture calquée sur requireRole (profiles après getUser).
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('suspended')
+    .eq('id', user.id)
+    .single()
+
+  if (profile?.suspended === true) {
+    await supabase.auth.signOut()
+    const locale = await getLocale()
+    redirect({ href: { pathname: '/login', query: { suspended: '1' } }, locale })
+  }
+
   return { user: user as User, supabase }
 }
 
