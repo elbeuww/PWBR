@@ -202,8 +202,8 @@ Détail complet archivé : `.planning/milestones/v2.0-ROADMAP.md`.
   3. Le membre gère son abonnement (statut, expiration, alerte J-3/J-1 via `ExpiryBanner`) et voit son tableau d'affiliation intégré (abonnés ramenés, revenus **mesurés** sur seed, aucun chiffre inventé).
   4. Le membre accède à ses paramètres de compte ; toutes les listes restent gated par la RLS, jamais par le gate UX seul.
 **Plans** : 7 plans (3 vagues)
-- [ ] 19-01-PLAN.md — Fondation données : migration 0020 `user_followed_setups` + RLS anti-IDOR + index keyset CONCURRENTLY + push LIVE + types + test anon (UDASH-03, UDASH-02)
-- [ ] 19-02-PLAN.md — Shell `(dash)` : layout `requireUser` + ExpiryBanner câblé (WIRING-01) + DashShell sidebar/bottom-nav sans glow + namespace i18n `dash` complet fr/en/ar (UDASH-04)
+- [x] 19-01-PLAN.md — Fondation données : migration 0020 `user_followed_setups` + RLS anti-IDOR + index keyset CONCURRENTLY + push LIVE + types + test anon (UDASH-03, UDASH-02)
+- [x] 19-02-PLAN.md — Shell `(dash)` : layout `requireUser` + ExpiryBanner câblé (WIRING-01) + DashShell sidebar/bottom-nav sans glow + namespace i18n `dash` complet fr/en/ar (UDASH-04)
 - [ ] 19-03-PLAN.md — Helper keyset `cursor.ts` + `lib/watchlist/queries` (source unique keyset + followed-ids) + `searchParams` cursor/tab (UDASH-02)
 - [ ] 19-04-PLAN.md — Overview cockpit (ordre D-08, no-perf) + abonnement réhébergé + AffiliateSummaryCard conditionnelle no-PII + garde no-perf étendue (UDASH-01, UDASH-05)
 - [ ] 19-05-PLAN.md — Paramètres (compte/langue/notifications UI/abonnement/déconnexion) + changement mdp `updateUser` + remplacement stub `/dashboard` (UDASH-06)
@@ -259,7 +259,7 @@ Détail complet archivé : `.planning/milestones/v2.0-ROADMAP.md`.
 | 16. Reskin transversal de toutes les pages | v3.0 | 4/4 | Complete    | 2026-06-24 |
 | 17. Fondation DB scalable | v3.0 | 3/3 | Complete   | 2026-06-25 |
 | 18. Seed de données réalistes à l'échelle | v3.0 | 3/3 | Complete   | 2026-06-25 |
-| 19. Dashboard utilisateur | v3.0 | 0/7 | Not started | - |
+| 19. Dashboard utilisateur | v3.0 | 2/7 | In Progress|  |
 | 20. Dashboard superadmin (cockpit 4 axes) | v3.0 | 0/? | Not started | - |
 | 21. Tests E2E + audit de scalabilité | v3.0 | 0/? | Not started | - |
 
