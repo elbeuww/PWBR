@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v3.0
 milestone_name: Plateforme complète sous identité dark néon NEXA
-status: planning
-last_updated: "2026-06-26T18:29:08.670Z"
+status: executing
+last_updated: "2026-06-26T19:56:37.955Z"
 last_activity: 2026-06-26
 progress:
   total_phases: 12
   completed_phases: 7
-  total_plans: 37
-  completed_plans: 35
-  percent: 95
+  total_plans: 43
+  completed_plans: 36
+  percent: 84
 ---
 
 # Project State
@@ -23,18 +23,19 @@ progress:
 See: .planning/PROJECT.md (mis à jour 2026-06-20 après clôture v2.0)
 
 **Core value:** Produire, pour chaque opportunité, une analyse fiable et explicable — vulgarisée pour un public non technique — avec un % de réussite TOUJOURS mesuré, jamais inventé : c'est le socle de confiance qui fait payer l'abonnement.
-**Current focus:** Phase 19 — dashboard-utilisateur
+**Current focus:** Phase 20 — dashboard-superadmin-cockpit-4-axes
 **Mode:** interactive (MVP vertical)
 **Granularity:** fine
 
 ## Current Position
 
 Milestone: v3.0 — Plateforme complète sous identité dark néon NEXA (7 phases, 15-21)
-Phase: 20
-Plan: Not started
-Status: Ready to plan
-Last activity: 2026-06-26
+Phase: 20 (dashboard-superadmin-cockpit-4-axes) — EXECUTING
+Plan: 2 of 6
+Status: Executing Phase 20 (20-01 livré, vague 1 garde-fous)
+Last activity: 2026-06-26 -- 20-01 exécuté (garde-fous Wave 0)
 
+- **20-01 exécuté (2026-06-26)** : garde-fous Wave 0 du cockpit superadmin (ADASH-02/04/07). Helper `lib/admin/searchParams.ts` (`AdminUsersParamsSchema` status/source/q/cursor, safeParse champ-par-champ anti-injection T-20-02, test 9/9 GREEN, commit `e8e8349`). Contrat RLS deux-rôles `apps/web/test/admin-rls.test.ts` (161 l., 8 RPC figés `get_mrr`/`get_acquisition_funnel`/`get_churn`/`get_plan_mix`/`grant_subscription_time`/`suspend_account`/`unsuspend_account`/`admin_mark_commission_paid` + `admin_audit_log` + 6 tables, RED until 0021, commit `08bad19`). 3 scans étendus au groupe `(admin)` (commit `97498b6`) : `rls-unchanged` RED (13 fichiers service_role hérités, éteint 20-04+20-06), `no-perf-claims`/`no-perf-seed-claims` GREEN gardes armées. **D-20-01-A** : `(admin)` est un groupe RACINE `app/(admin)/` (hors `[locale]`) → `groupBaseDir()` + `listPages` couvre aussi `actions.ts`. **D-20-01-B** : les 2 scans perf sont GREEN (surface Phase 8 déjà honnête), pas RED comme prédit — gardes armées pour le reskin 20-05. Typecheck workspace exit 0. **Reste vague 1+ : 20-02** (migration 0021 → éteint admin-rls).
 - **19-06 exécuté (2026-06-26)** : `WatchlistToggle` (étoile optimiste anti-IDOR, UDASH-03) — écriture `user_followed_setups` via anon-client navigateur (RLS `auth.uid()`), insert minimal `{ setup_id }` SANS colonne propriétaire (`default auth.uid()` + `with check`), toggle optimiste react-query (flip immédiat, rollback+toast). Câblée en SIBLING hors du `<Link>` sur `SignalCard` + en-tête `SignalDetail` ; `fetchFollowedSetupIds` 1× par page membre → prop `followed`. Commits e502e90/189b1f5/afb63fd/1d94e71. **D-19-06-A** : logique optimiste extraite en helper pur `buildWatchlistToggle` testé en Node (env vitest sans jsdom). **D-19-06-B/C (Rule 1)** : mock du toggle dans `SignalDetail.test` + `QueryProvider` ajouté à la page détail (useMutation exige un QueryClient). Vitest 223/223, typecheck vert. **Reste : 19-07** (dernier plan, vague 3).
 - **19-05 exécuté (2026-06-26)** : écran Paramètres `/dashboard/parametres` (UDASH-06) — Compte (email + PasswordChangeForm via `supabase.auth.updateUser`), Langue (LanguageSwitcher, pas de toggle thème D-11), Notifications (UI seules localStorage, aucune delivery D-12), lien abonnement, déconnexion. Commits 156e66e/5e1a1cb. **D-19-05-A** : page placée sous `(dash)/dashboard/parametres/` (URL `/dashboard/parametres`) pour matcher la nav DashShell 19-02. **D-19-05-B** : Task 3 (stub `/dashboard`) ABANDONNÉE — déjà supprimée par 19-04 (D-19-04-A), recréation casserait le build. Reste vague 3 : **19-06/07**.
 
@@ -153,6 +154,7 @@ ressources externes non provisionnables en session de développement.
 | Phase 19 P05 | ~12min | 2 tasks | 5 files |
 | Phase 19 P06 | ~18min | 3 tasks | 8 files |
 | Phase 19 P07 | 20min | 3 tasks | 7 files |
+| Phase 20 P01 | 12min | 3 tasks | 6 files |
 
 ## Roadmap v2.0 (9 phases)
 
@@ -594,7 +596,7 @@ ressources externes non provisionnables en session de développement.
 
 ## Session Continuity
 
-**Last session:** 2026-06-26T18:29:08.661Z
+**Last session:** 2026-06-26T19:56:37.946Z
 
 **Last session (archive):** 2026-06-19T03:41:29.665Z
 
