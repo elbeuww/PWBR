@@ -74,8 +74,9 @@ async function HistoriqueContent({ cursor, locale }: { cursor?: string; locale: 
 
   // renewal (état 4) : 0 ligne ET pas d'abonnement actif → abonné expiré (D-03).
   if (data.length === 0) {
-    const { data: hasActive } = await supabase.rpc('has_active_subscription')
-    if (!hasActive) {
+    const { data: hasActive, error: rpcError } = await supabase.rpc('has_active_subscription')
+    // On RPC error, fall through to empty state — better UX than false renewal banner.
+    if (!rpcError && hasActive === false) {
       return (
         <section className="mt-6 rounded-xl bg-[var(--card)] p-8 ring-1 ring-[var(--border)]">
           <h2 className="text-lg font-semibold">{t('renewal.title')}</h2>
