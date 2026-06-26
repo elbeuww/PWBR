@@ -7,9 +7,9 @@
  * DIVERGENCE CLÉ vs la route membre [locale]/(member)/signaux/[id] (décision résolue 3) :
  * la route membre lit via le client anon + cookies + filtre par statut actif + RLS abonné
  * (anti-IDOR T-03-IDOR) → un setup expiré/invalidé y donne notFound(). L'admin doit voir
- * N'IMPORTE QUEL setup : on lit via createAdminServiceClient() (service_role, server-only)
- * SANS aucun filtre de statut. Le gate (layout) EST la frontière d'accès, pas un filtre
- * par-ligne (T-08-08 : lecture cross-statut intentionnelle).
+ * N'IMPORTE QUEL setup : on lit via le client ANON (createClient) — la policy 0021
+ * `trade_setups` superadmin (is_superadmin()) débloque la lecture cross-statut sous RLS
+ * SANS filtre par-ligne. Le gate (layout) EST la frontière d'accès (T-08-08, T-20-03).
  *
  * notFound() (404) UNIQUEMENT quand la ligne est réellement absente. Erreur de requête →
  * throw server-side (loggé) ; le client voit l'error boundary Next, jamais le message brut (M-05).
@@ -17,7 +17,7 @@
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { getTranslations } from 'next-intl/server'
-import { createAdminServiceClient } from '@/lib/supabase/admin-service'
+import { createClient } from '@/lib/supabase/server'
 
 function fmtDateTime(iso: string | null): string {
   if (!iso) return '—'
@@ -34,7 +34,7 @@ export default async function AdminSignalDetailPage({
   const { id } = await params
   const t = await getTranslations('admin')
 
-  const client = createAdminServiceClient()
+  const client = await createClient()
   const { data, error } = await client
     .from('trade_setups')
     .select('*, instruments!inner(canonical_symbol)')

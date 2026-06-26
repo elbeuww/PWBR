@@ -2,10 +2,9 @@
  * (admin)/affiliation/affilies — vue affiliés + performances (ADMIN-03, part 1).
  *
  * RSC, mono-FR, HORS [locale]. Layout (admin) → garde superadmin (404 non-superadmin) ; aucun
- * pré-gate de rôle dans cette page (pas de mutation). Lecture service_role LOCAL des TABLES DE BASE
- * (affiliates/referrals/commissions) — JAMAIS la vue agrégée par-utilisateur (security_invoker=true +
- * auth.uid()-scoped → VIDE sous service_role, RESEARCH A3 / décision 4). Agrégation par affilié en JS :
- * nb filleuls + commissions dues/payées.
+ * pré-gate de rôle dans cette page (pas de mutation). Lecture ANON-CLIENT (threat T-20-03) des
+ * TABLES DE BASE (affiliates/referrals/commissions) — gated superadmin par RLS (0016/0017) ;
+ * un non-superadmin lit 0 ligne. Agrégation par affilié en JS : nb filleuls + commissions dues/payées.
  *
  * Montants en <bdi> + formatAtomic (BigInt ×10⁶, CR-02 : coercion atomique via BigInt uniquement,
  * jamais de conversion vers le type flottant natif sur un montant atomique).
@@ -21,7 +20,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import { createAdminServiceClient } from '@/lib/supabase/admin-service'
+import { createClient } from '@/lib/supabase/server'
 
 const PAYOUTS_HREF = '/admin/affiliation/payouts'
 
@@ -35,7 +34,7 @@ interface AffiliatePerfRow {
 }
 
 async function loadAffiliatePerfs(): Promise<AffiliatePerfRow[]> {
-  const client = createAdminServiceClient()
+  const client = await createClient()
   // Agrégat depuis les TABLES DE BASE (A3) — referrals(count) = compteur PostgREST,
   // commissions(amount_atomic, status) = lignes brutes sommées par statut en JS.
   const { data, error } = await client

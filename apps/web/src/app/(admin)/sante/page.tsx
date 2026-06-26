@@ -2,8 +2,9 @@
  * (admin)/sante — santé jobs & données (ADMIN-04, D-06/D-07/D-08).
  *
  * RSC, mono-FR, HORS [locale]. Le layout (admin) applique déjà le gate superadmin
- * (404 non-superadmin, T-08-10) : AUCUN guard inline dupliqué. Lecture service_role
- * LOCAL server-only (T-08-11).
+ * (404 non-superadmin, T-08-10) : AUCUN guard inline dupliqué. Lecture ANON-CLIENT
+ * (threat T-20-03) : la policy 0021 `candles` débloque v_data_freshness sous RLS ;
+ * un non-superadmin lit 0 ligne (feu rouge honnête, jamais service_role bundlé).
  *
  * Feux de fraîcheur par source (D-06) :
  *  - candles : booléen is_stale LU de v_data_freshness (la vue gère week-end FX/DST) +
@@ -24,7 +25,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import { createAdminServiceClient } from '@/lib/supabase/admin-service'
+import { createClient } from '@/lib/supabase/server'
 import {
   candleColor,
   ageColor,
@@ -88,7 +89,7 @@ interface HealthData {
 }
 
 async function loadHealth(): Promise<HealthData> {
-  const client = createAdminServiceClient()
+  const client = await createClient()
   const now = Date.now()
 
   // candles : is_stale LU de la vue (jamais re-dérivé) + worst-of sur toutes les lignes.

@@ -2,8 +2,8 @@
  * (admin)/affiliation — file de revue des candidatures affiliées (AFF-01, D-06/D-07/D-08).
  *
  * RSC, mono-FR, HORS [locale]. Layout (admin) → requireRole('superadmin') (404 non-superadmin).
- * Lecture service_role LOCAL (listPendingApplications via createAdminServiceClient ; AUCUNE policy
- * select front sur affiliate_applications hors superadmin). Affiche status='pending'.
+ * Lecture ANON-CLIENT (threat T-20-03) : la policy select superadmin sur affiliate_applications
+ * (0016/0017) débloque la lecture sous RLS ; un non-superadmin lit 0 ligne. Affiche status='pending'.
  *
  * Actions (D-08) : approuver (promotion + code vanity, D-07) / rejeter+motif requis — via
  * ApplicationRowActions (service_role re-validé). Badge ambre « En attente » (jamais vert/rouge,
@@ -20,7 +20,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import { createAdminServiceClient } from '@/lib/supabase/admin-service'
+import { createClient } from '@/lib/supabase/server'
 import { ApplicationRowActions } from '@/components/admin/ApplicationRowActions'
 
 interface QueueRow {
@@ -34,7 +34,7 @@ interface QueueRow {
 }
 
 async function loadQueue(): Promise<QueueRow[]> {
-  const client = createAdminServiceClient()
+  const client = await createClient()
   const rows = await listPendingApplications(client)
   return rows.map((a) => ({
     applicationId: a.id,

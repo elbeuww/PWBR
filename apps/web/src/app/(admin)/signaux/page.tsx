@@ -4,7 +4,8 @@
  * RSC, mono-FR, HORS [locale]. Le gate superadmin du layout (admin) protège déjà
  * → 404 pour non-superadmin (T-04-ADMIN-ELEV) : AUCUN re-guard inline dupliqué ici.
  *
- * Lecture via service_role LOCAL (RSC server-only, jamais bundle ; build casse si bundlé).
+ * Lecture ANON-CLIENT (threat T-20-03) : les policies 0021 `trade_setups`/`telegram_posts`
+ * superadmin débloquent la lecture sous RLS ; un non-superadmin lit 0 ligne. LECTURE SEULE.
  * Croisement Telegram 2-états (D-03, Pitfall 3) : pas de FK entre telegram_posts et
  * trade_setups. Un setup est « Poste » SSI une ligne telegram_posts existe avec
  * dedupe_key === 'notable:' + setup.id. Les non-publications ne sont PAS persistées →
@@ -25,7 +26,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import { createAdminServiceClient } from '@/lib/supabase/admin-service'
+import { createClient } from '@/lib/supabase/server'
 import { postedSetupIdSet, telegramStatusFor, type TelegramStatus } from '@/lib/admin/signals'
 
 interface SignalView {
@@ -45,7 +46,7 @@ function fmtDateTime(iso: string | null): string {
 }
 
 async function loadSignals(): Promise<SignalView[]> {
-  const client = createAdminServiceClient()
+  const client = await createClient()
 
   const { data: setups, error } = await client
     .from('trade_setups')

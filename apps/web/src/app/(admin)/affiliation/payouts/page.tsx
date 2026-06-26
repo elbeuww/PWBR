@@ -2,9 +2,10 @@
  * (admin)/affiliation/payouts — vue payout des commissions affiliées (AFF-04, D-15).
  *
  * RSC, mono-FR, HORS [locale]. Layout (admin) → requireRole('superadmin') (404 non-superadmin).
- * Lecture service_role LOCAL (commissions status='due' + email affilié via affiliates→profiles ;
- * AUCUNE policy select front hors superadmin). Le superadmin marque payé (tx_hash + montant + date)
- * via PayoutRowAction (RPC mark_commission_paid atomique, anti double-payout DB).
+ * Lecture ANON-CLIENT (threat T-20-03) : commissions status='due'/'paid' + email affilié via
+ * affiliates→profiles, gated superadmin par RLS (0016/0017) ; un non-superadmin lit 0 ligne. Le
+ * superadmin marque payé (tx_hash + montant + date) via PayoutRowAction (RPC admin_mark_commission_paid
+ * gated, anti double-payout DB).
  *
  * Montants en <bdi> + formatAtomic (BigInt ×10⁶, CR-02). Badge ambre « À payer » (jamais vert/rouge,
  * D-04). Lien tx_hash → TronScan target=_blank rel="noopener noreferrer" (anti reverse-tabnabbing).
@@ -20,7 +21,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import { createAdminServiceClient } from '@/lib/supabase/admin-service'
+import { createClient } from '@/lib/supabase/server'
 import { PayoutRowAction } from '@/components/admin/PayoutRowAction'
 
 const TRONSCAN_TX = 'https://tronscan.org/#/transaction/'
@@ -37,7 +38,7 @@ interface PayoutRow {
 }
 
 async function loadCommissions(): Promise<PayoutRow[]> {
-  const client = createAdminServiceClient()
+  const client = await createClient()
   const { data, error } = await client
     .from('commissions')
     .select(
