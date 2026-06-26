@@ -38,6 +38,8 @@ interface MemberView {
   lastPaymentAmountAtomic: string | null
   lastPaymentAt: string | null
   lastPaymentId: string | null
+  /** D-17 : pilote l'affichage Suspendre vs Réactiver de MemberRowActions. */
+  suspended: boolean
 }
 
 /** Statut effectif : active si non-échu, expired si échu, inactive sinon. */
@@ -59,7 +61,7 @@ async function loadMembers(statusFilter: string | null, emailFilter: string | nu
   // Abonnements + email du profil (service_role bypass RLS).
   const { data: subs, error } = await client
     .from('subscriptions')
-    .select('user_id, status, plan, current_period_end, profiles!inner(email)')
+    .select('user_id, status, plan, current_period_end, profiles!inner(email, suspended)')
     .order('current_period_end', { ascending: true, nullsFirst: false })
   if (error) throw new Error(`loadMembers subscriptions: ${error.message}`)
 
@@ -84,7 +86,7 @@ async function loadMembers(statusFilter: string | null, emailFilter: string | nu
   }
 
   let rows: MemberView[] = (subs ?? []).map((s) => {
-    const profile = s.profiles as unknown as { email: string }
+    const profile = s.profiles as unknown as { email: string; suspended: boolean | null }
     const last = lastPaymentByUser.get(s.user_id)
     return {
       userId: s.user_id,
@@ -95,6 +97,7 @@ async function loadMembers(statusFilter: string | null, emailFilter: string | nu
       lastPaymentAmountAtomic: last?.amount ?? null,
       lastPaymentAt: last?.at ?? null,
       lastPaymentId: last?.id ?? null,
+      suspended: profile?.suspended === true,
     }
   })
 
@@ -208,11 +211,7 @@ export default async function AdminMembersPage({
                     </span>
                   </TableCell>
                   <TableCell>
-                    <MemberRowActions
-                      userId={m.userId}
-                      lastPaymentId={m.lastPaymentId}
-                      currentPlan={m.plan}
-                    />
+                    <MemberRowActions userId={m.userId} suspended={m.suspended} />
                   </TableCell>
                 </TableRow>
               ))}

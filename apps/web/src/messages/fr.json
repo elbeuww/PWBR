@@ -149,8 +149,35 @@
       "actionActivate": "Activer / Prolonger",
       "actionChangePlan": "Changer de plan",
       "actionRevoke": "Révoquer / Suspendre",
+      "actionGrant": "Offrir du temps gratuit",
+      "actionSuspend": "Suspendre",
+      "actionReactivate": "Réactiver",
       "emptyHeading": "Aucun membre pour ce filtre",
       "emptyBody": "Ajuste le filtre de statut ou la recherche par email."
+    },
+    "grantDialog": {
+      "title": "Offrir du temps gratuit",
+      "durationLabel": "Durée à offrir",
+      "period7": "7 jours",
+      "period1m": "1 mois",
+      "period3m": "3 mois",
+      "effect": "Le compte sera prolongé de {duration} à partir de sa date d'expiration actuelle (ou d'aujourd'hui s'il est déjà expiré). Action tracée.",
+      "confirm": "Confirmer la prolongation",
+      "cancel": "Annuler"
+    },
+    "suspendDialog": {
+      "title": "Suspendre ce compte ?",
+      "body": "L'utilisateur sera réellement bloqué (lecture 0 ligne via RLS) jusqu'à réactivation. Action réversible et tracée.",
+      "reasonLabel": "Motif de la suspension",
+      "reasonPlaceholder": "Explique brièvement la raison de la suspension",
+      "confirm": "Suspendre",
+      "cancel": "Annuler"
+    },
+    "reactivateDialog": {
+      "title": "Réactiver ce compte ?",
+      "body": "L'accès de l'utilisateur sera rétabli immédiatement. Action tracée.",
+      "confirm": "Réactiver",
+      "cancel": "Annuler"
     },
     "queue": {
       "colExpected": "Montant attendu",
