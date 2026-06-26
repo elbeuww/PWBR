@@ -575,6 +575,7 @@
     "overview": {
       "title": "Personal cockpit",
       "subscriptionStatus": "Subscription status",
+      "activeUntil": "Subscription active — access until {date}",
       "latestSignals": "Latest signals",
       "shortcuts": "Shortcuts"
     },

@@ -575,6 +575,7 @@
     "overview": {
       "title": "لوحة القيادة الشخصية",
       "subscriptionStatus": "حالة الاشتراك",
+      "activeUntil": "الاشتراك نشط — الوصول حتى {date}",
       "latestSignals": "أحدث الإشارات",
       "shortcuts": "اختصارات"
     },

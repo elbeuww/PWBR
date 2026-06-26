@@ -770,6 +770,7 @@
     "overview": {
       "title": "Cockpit personnel",
       "subscriptionStatus": "Statut de l'abonnement",
+      "activeUntil": "Abonnement actif — accès jusqu'au {date}",
       "latestSignals": "Derniers signaux",
       "shortcuts": "Raccourcis"
     },
