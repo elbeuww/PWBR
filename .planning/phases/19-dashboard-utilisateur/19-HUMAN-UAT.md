@@ -26,7 +26,7 @@ result: [pending]
 
 ### 4. Plan keyset → Index Scan
 expected: `EXPLAIN` sur la requête `user_followed_setups ⋈ trade_setups` keyset (via MCP `execute_sql` sur la DB distante, seed à l'échelle) montre un **Index Scan** sur l'index keyset 0020 — pas de Seq Scan.
-result: [pending]
+result: [partial — vérifié MCP 2026-06-26] Index `user_followed_setups_keyset_idx` présent, `indisvalid=true`, def exacte `(user_id, created_at DESC, id DESC)` = ORDER BY. Table VIDE (0 lignes — 1re table d'écriture front du milestone, pas de seed). EXPLAIN actuel : `Bitmap Index Scan on user_followed_setups_keyset_idx` (scope user_id) + `Sort` — comportement attendu sur table minuscule (estimation ~0 ligne → Bitmap+Sort moins cher qu'Index Scan ordonné). À l'échelle (user avec nombreux suivis + LIMIT 21) le planner bascule sur `Index Scan ... no Sort`. **Reste à confirmer** après seed-à-l'échelle ou usage réel. Pas de régression : l'index est correct et déjà utilisé pour le scope.
 
 ### 5. WatchlistToggle : flip optimiste + rollback
 expected: Dans le navigateur, cliquer l'étoile sur `SignalCard` / `SignalDetail` bascule l'état immédiatement (optimiste) ; en cas d'échec réseau l'état revient en arrière (rollback) avec `toast.error`. L'étoile est un sibling du `<Link>` (pas de navigation parasite au clic).
