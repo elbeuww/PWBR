@@ -45,7 +45,8 @@ const FOUNDATION_FILES = [
   'app/(admin)/file/page.tsx',
   'components/track-record/TrackRecordView.tsx',
   // Phase 16 — surfaces wave-2 (résiduel-offender + à tokeniser).
-  'app/[locale]/dashboard/page.tsx',
+  // Phase 19 (D-19-04-A) : overview déplacé sous (dash)/dashboard/, ancien stub supprimé.
+  'app/[locale]/(dash)/dashboard/page.tsx',
   'app/[locale]/(auth)/login/page.tsx',
   'app/(admin)/membres/page.tsx',
   'app/(admin)/signaux/[id]/page.tsx',
