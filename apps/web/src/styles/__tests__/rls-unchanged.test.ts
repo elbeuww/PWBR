@@ -49,6 +49,14 @@ function groupBaseDir(group: string): string {
 const ALLOWLIST = [
   'app/[locale]/affiliation/actions.ts',
   'app/[locale]/(auth)/actions.ts',
+  // D-13 (Phase 4) : chemin d'ENTRÉE DE L'ARGENT. Server Action de paiement USDT qui
+  // crée un client service_role LOCALEMENT (jamais le barrel) pour reserveOffset /
+  // activateForPayment / armement anti-replay du tx_hash. Les tables `payments`/
+  // `subscriptions` n'ont AUCUNE policy d'écriture anon (frontière producteur-unique,
+  // T-04-SVCCLIENT) → service_role obligatoire, JAMAIS bundlé côté client ('server-only').
+  // Pré-existant (commit Phase 4), exposé par l'extension du scan aux actions.ts (20-01),
+  // de la même catégorie que les 2 Server Actions ci-dessus. NON convertible en anon.
+  'app/[locale]/(account)/abonnement/actions.ts',
   // DEFERRED-0022 : service_role conservé jusqu'à la migration 0022 (RPC gated
   // paiements + affiliation) — décision phase 20 Option B. Ces 2 actions muteraient
   // des tables sans policy d'écriture anon (payments / affiliate_*), donc aucun RPC
