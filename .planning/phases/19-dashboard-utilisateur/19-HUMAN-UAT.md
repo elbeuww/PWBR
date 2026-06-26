@@ -8,13 +8,13 @@ updated: 2026-06-26T00:00:00Z
 
 ## Current Test
 
-1. Vue d'ensemble (cockpit) en live — en attente du retour utilisateur
+2. ExpiryBanner J-3/J-1 — en attente du retour utilisateur
 
 ## Tests
 
 ### 1. Vue d'ensemble (cockpit) en live
 expected: Connecté avec un compte abonné actif et une DB seedée, `/dashboard` rend le cockpit personnel (UDASH-01) avec des données réelles — pas de claims de performance (equity/P&L/ROI absents), carte affiliation visible uniquement si affilié.
-result: [issue→fixed, re-test attendu] Crash runtime au 1er test : `No QueryClient set` dans `WatchlistToggle` (useMutation) rendu par `SignalCard` sur l'overview. Cause : 19-04 a écrit l'overview avant que 19-06 ne câble le toggle react-query dans SignalCard ; la page n'avait pas de `QueryProvider`. Bug d'intégration cross-plan invisible aux tests (aucun test ne rend le vrai overview+SignalCard+toggle). **Corrigé** commit `5c7d80a` : `QueryProvider` autour de la grille + `fetchFollowedSetupIds` (état initial étoiles, 1 requête RLS). typecheck 0, 639 tests verts. Audit : seul l'overview manquait le provider (détail signaux + liste OK, KeysetList server-rendered). → recharger `/dashboard` pour confirmer.
+result: [PASS] Crash initial `No QueryClient set` (WatchlistToggle/useMutation dans SignalCard sans QueryProvider sur l'overview — 19-04 écrit avant le câblage 19-06). **Corrigé** `5c7d80a` : QueryProvider autour de la grille + fetchFollowedSetupIds (1 requête RLS). Re-test utilisateur 2026-06-26 : overview rend sans crash, cockpit conforme. ✅
 
 ### 2. ExpiryBanner à J-3 / J-1
 expected: Avec un abonnement proche de l'expiration (≤3 jours) en DB, l'`ExpiryBanner` s'affiche en tête du shell `(dash)` avec le CTA de renouvellement (résout WIRING-01).
@@ -39,9 +39,9 @@ result: [pending]
 ## Summary
 
 total: 6
-passed: 0
+passed: 1
 issues: 0
-pending: 6
+pending: 5
 skipped: 0
 blocked: 0
 
