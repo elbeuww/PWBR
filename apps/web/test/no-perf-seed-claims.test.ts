@@ -106,3 +106,64 @@ describe('no-perf-seed-claims : aucun champ de % de perf dans le code seed (SEED
     ).toEqual([])
   })
 })
+
+// ──────────────────────────────────────────────────────────────────────────
+// Volet C — surface OVERVIEW du dashboard utilisateur (dash) (UDASH-01, D-09 /
+// VITR-03). L'overview « cockpit » NE DOIT exposer AUCUN chiffre de performance
+// fabriqué : ni equity curve, ni P&L, ni ROI, ni pourcentage chiffré non issu d'un
+// `applyThreshold` (track record mesuré). On scanne statiquement les fichiers source
+// de l'overview (dash)/dashboard/page.tsx et de la carte d'affiliation montée dessus.
+// Les revenus d'affiliation MESURÉS (formatAtomic) ne sont pas une allégation de perf
+// de trade → ils n'utilisent jamais un `%` chiffré ici.
+// ──────────────────────────────────────────────────────────────────────────
+
+// apps/web/test/ → apps/web/src
+const WEB_SRC = path.resolve(__dirname, '../src')
+const DASH_UI_FILES = [
+  path.join(WEB_SRC, 'app/[locale]/(dash)/dashboard/page.tsx'),
+  path.join(WEB_SRC, 'components/dash/AffiliateSummaryCard.tsx'),
+]
+
+// Termes de performance FABRIQUÉE interdits sur l'overview (dash). On vise les
+// signatures de faux dashboards : courbe d'equity, P&L/PnL, ROI, ou un pourcentage
+// signé chiffré (« +12% ») — jamais légitime hors track record mesuré (applyThreshold).
+const FORBIDDEN_PERF_UI = /\bequity\b|equity\s+curve|P&L|PnL|\bROI\b|[+-]\s*\d+(?:\.\d+)?\s*%/i
+
+function detectPerfUi(value: string): boolean {
+  return FORBIDDEN_PERF_UI.test(value)
+}
+
+describe('no-perf-overview-claims : aucun chiffre de perf fabriqué sur l’overview (dash) (D-09)', () => {
+  it('le détecteur attrape une allégation plantée (+12% / equity curve) — non trivial', () => {
+    // Anti vacuous-green : prouve que le scan échouerait si l'overview affichait une perf.
+    expect(detectPerfUi('Performance : +12% ce mois')).toBe(true)
+    expect(detectPerfUi('equity curve')).toBe(true)
+    expect(detectPerfUi('ROI: 8.4')).toBe(true)
+    expect(detectPerfUi('P&L cumulé')).toBe(true)
+  })
+
+  it('autorise le texte légitime de l’overview (revenus mesurés, pas de % chiffré)', () => {
+    expect(detectPerfUi('revenus mesurés via formatAtomic')).toBe(false)
+    expect(detectPerfUi('aucun pourcentage de performance fabriqué')).toBe(false)
+    expect(detectPerfUi('Statut de l’abonnement')).toBe(false)
+  })
+
+  it('l’overview (dash) et la carte d’affiliation n’exposent aucun chiffre de perf', () => {
+    const offenders: string[] = []
+    for (const file of DASH_UI_FILES) {
+      if (!existsSync(file)) continue
+      const content = readFileSync(file, 'utf8')
+      const lines = content.split(/\r?\n/)
+      lines.forEach((line, idx) => {
+        if (detectPerfUi(line)) {
+          const rel = path.relative(WEB_SRC, file)
+          offenders.push(`${rel}:${idx + 1} → "${line.trim()}"`)
+        }
+      })
+    }
+    expect(
+      offenders,
+      `Chiffre de performance fabriqué détecté sur l'overview (dash) :\n${offenders.join('\n')}`,
+    ).toEqual([])
+  })
+})
