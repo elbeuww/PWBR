@@ -138,8 +138,23 @@ describe('admin-rls : barrière deux-rôles du cockpit superadmin (ADASH-07 / T-
 
   it('(3) RPC d’écriture en rôle member → exception forbidden (+ admin_audit_log)', async () => {
     if (!envReady) return
+    // Args par signature RPC (préfixe `p_` autoritatif — plan 20-02 / RESEARCH / threat-model).
+    // Chaque appel DOIT matcher la signature pour ATTEINDRE la garde `is_superadmin()` et
+    // lever `forbidden`, au lieu d'échouer en amont sur PGRST202 (signature introuvable).
+    // La garde est en TÊTE de chaque fonction → le member n'atteint jamais le corps métier
+    // (p_commission_id peut être un uuid de profil : forbidden précède toute lecture FK).
+    const writeArgs: Record<(typeof WRITE_RPCS)[number], Record<string, unknown>> = {
+      grant_subscription_time: { p_user_id: superId, p_interval: '1 month' },
+      suspend_account: { p_user_id: superId, p_reason: 'rls-contract-test' },
+      unsuspend_account: { p_user_id: superId },
+      admin_mark_commission_paid: {
+        p_commission_id: superId,
+        p_tx_hash: 'rls-contract-test',
+        p_amount_atomic: 1,
+      },
+    }
     for (const rpc of WRITE_RPCS) {
-      const { error } = await memberClient.rpc(rpc, { target_user_id: superId })
+      const { error } = await memberClient.rpc(rpc, writeArgs[rpc])
       // Contrat : chaque écriture vérifie is_superadmin() et journalise admin_audit_log ;
       // en rôle member elle DOIT lever `forbidden`.
       expect(error, `${rpc} doit refuser le member`).not.toBeNull()
@@ -151,7 +166,10 @@ describe('admin-rls : barrière deux-rôles du cockpit superadmin (ADASH-07 / T-
     if (!envReady) return
     // Le superadmin suspend le member ; via RLS, le member suspendu perd la lecture.
     // RED until 0021 : suspend_account n'existe pas encore.
-    const { error } = await memberClient.rpc('suspend_account', { target_user_id: memberId })
+    const { error } = await memberClient.rpc('suspend_account', {
+      p_user_id: memberId,
+      p_reason: 'rls-contract-test',
+    })
     expect(error, 'suspend_account doit exister (0021) et refuser le member').not.toBeNull()
     const { data: setups } = await memberClient.from('trade_setups').select('id').limit(1)
     const { data: analyses } = await memberClient.from('analyses').select('id').limit(1)
