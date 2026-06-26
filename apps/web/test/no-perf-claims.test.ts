@@ -33,6 +33,13 @@ import ar from '../src/messages/ar.json'
 // Namespaces marketing (existants) + namespaces composant Phase 11 (BRAND-04).
 // Les namespaces composant peuvent être absents du JSON tant que la copy n'est pas
 // posée : le scan est tolérant (collectStrings(undefined) === []).
+// Phase 20 (ADASH-07, threat T-20-04) : on étend le scan au namespace `admin`. La
+// copy du cockpit superadmin (KPI MRR/churn/plan-mix, libellés) ne doit JAMAIS
+// contenir un `%` littéral ni un chiffre de perf fabriqué — les KPI MESURÉS sont
+// rendus par composant (applyThreshold/formatAtomic), jamais codés en dur dans l'i18n.
+// Le scan est tolérant : `admin` absent → collectStrings(undefined) === [].
+//   EXTINCTION : reste vert tant que la copy admin demeure honnête ; FAIL dès que le
+//   reskin du cockpit (plan 20-05) introduirait un % chiffré dans une chaîne i18n.
 const SCANNED_NAMESPACES = [
   'home',
   'pricing',
@@ -42,6 +49,7 @@ const SCANNED_NAMESPACES = [
   'scoreRing',
   'baseline',
   'confidenceStat',
+  'admin',
 ] as const
 const LOCALES = { fr, en, ar } as const
 

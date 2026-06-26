@@ -26,9 +26,23 @@ import path from 'node:path'
 // __dirname = apps/web/src/styles/__tests__ → racine src = ../../
 const SRC_ROOT = path.resolve(__dirname, '../../')
 const APP_LOCALE = path.resolve(SRC_ROOT, 'app/[locale]')
+const APP_ROOT = path.resolve(SRC_ROOT, 'app') // le groupe (admin) vit hors de [locale]
 
-// Groupes de routes NON-admin scannés (chemins relatifs à app/[locale]/).
-const SCANNED_GROUPS = ['(member)', '(account)', '(marketing)', '(auth)'] as const
+// Groupes de routes scannés. (member)/(account)/(marketing)/(auth) vivent sous
+// app/[locale]/ ; (admin) est un groupe racine (app/(admin)/), SANS préfixe locale.
+//
+// Phase 20 (ADASH-07, threat T-20-03) : on étend le scan au groupe (admin). Le cockpit
+// superadmin doit lire en anon-client + RLS `is_superadmin()` — JAMAIS service_role
+// bundlé côté page/action. RED PAR CONCEPTION en Wave 0 : les pages/actions admin
+// héritées (Phase 8) importent encore service_role.
+//   EXTINCTION → VERT : retrait de service_role des actions admin (plan 20-04) puis des
+//   pages admin (plan 20-06). Tant que l'une au moins l'utilise, ce scan reste ROUGE.
+const SCANNED_GROUPS = ['(member)', '(account)', '(marketing)', '(auth)', '(admin)'] as const
+
+/** Base de résolution d'un groupe : (admin) à la racine app/, les autres sous [locale]. */
+function groupBaseDir(group: string): string {
+  return group === '(admin)' ? APP_ROOT : APP_LOCALE
+}
 
 // Allowlist : Server Actions pré-existants autorisés à utiliser service_role (D-13).
 // Chemins relatifs à src/ — seuls les NOUVEAUX imports de page non-admin doivent échouer.
@@ -57,7 +71,12 @@ function stripComments(src: string): string {
     .replace(/(^|[^:])\/\/[^\n]*/g, '$1') // lignes // … (épargne les `://` d'URL)
 }
 
-/** Liste récursive des page.tsx / layout.tsx sous un dossier. */
+/**
+ * Liste récursive des fichiers scannés sous un dossier : `page.tsx` / `layout.tsx`
+ * ET les Server Actions `actions.ts` (le cockpit admin mute via actions — ADASH-07
+ * exige qu'elles soient couvertes au même titre que les pages). Les `actions.ts`
+ * pré-existants des groupes non-admin restent gérés par l'ALLOWLIST.
+ */
 function listPages(dir: string): string[] {
   const out: string[] = []
   if (!existsSync(dir)) return out
@@ -66,7 +85,7 @@ function listPages(dir: string): string[] {
     const st = statSync(full)
     if (st.isDirectory()) {
       out.push(...listPages(full))
-    } else if (entry === 'page.tsx' || entry === 'layout.tsx') {
+    } else if (entry === 'page.tsx' || entry === 'layout.tsx' || entry === 'actions.ts') {
       out.push(full)
     }
   }
@@ -83,7 +102,7 @@ describe('Phase 16 / T-16-01 : la barrière RLS anon reste intacte (pages non-ad
   it('aucune page member/account/marketing/auth n’importe service_role ni le client browser pour une lecture gated', () => {
     const offenders: string[] = []
     for (const group of SCANNED_GROUPS) {
-      const groupDir = path.join(APP_LOCALE, group)
+      const groupDir = path.join(groupBaseDir(group), group)
       for (const file of listPages(groupDir)) {
         if (isAllowlisted(file)) continue
         const src = stripComments(readFileSync(file, 'utf-8'))

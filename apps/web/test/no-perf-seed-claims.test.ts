@@ -167,3 +167,55 @@ describe('no-perf-overview-claims : aucun chiffre de perf fabriqué sur l’over
     ).toEqual([])
   })
 })
+
+// ──────────────────────────────────────────────────────────────────────────
+// Volet D — surface OVERVIEW du cockpit SUPERADMIN (admin) (Plan 20-01, Task 3 ;
+// ADASH-07, D-09 / VITR-03 / threat T-20-04). Le cockpit 4 axes (Acquisition /
+// Revenus(MRR mesuré) / Ops / Conformité) NE DOIT exposer AUCUN chiffre de perf
+// FABRIQUÉ : ni equity curve, ni P&L, ni ROI, ni pourcentage signé chiffré. Le MRR
+// et les agrégats sont MESURÉS via RPC (matviews P17) — jamais un % codé en dur.
+//   EXTINCTION : reste vert tant que le cockpit demeure honnête ; FAIL si le reskin
+//   du cockpit (plan 20-05) introduit une signature de faux dashboard. Les
+//   sous-composants `_components/AxisSummary*.tsx` rejoindront ce tableau dès création.
+// ──────────────────────────────────────────────────────────────────────────
+
+const ADMIN_UI_FILES = [path.join(WEB_SRC, 'app/(admin)/page.tsx')]
+
+// Même détecteur que le volet C (signatures de faux dashboards), appliqué au cockpit.
+const FORBIDDEN_PERF_UI_ADMIN = FORBIDDEN_PERF_UI
+
+function detectPerfUiAdmin(value: string): boolean {
+  return FORBIDDEN_PERF_UI_ADMIN.test(value)
+}
+
+describe('no-perf-admin-cockpit : aucun chiffre de perf fabriqué sur le cockpit (admin) (ADASH-07)', () => {
+  it('le détecteur attrape une allégation plantée (+12% / equity / ROI) — non trivial', () => {
+    expect(detectPerfUiAdmin('MRR +18% ce mois')).toBe(true)
+    expect(detectPerfUiAdmin('equity curve superadmin')).toBe(true)
+    expect(detectPerfUiAdmin('ROI global : 7.2')).toBe(true)
+  })
+
+  it('autorise le texte légitime du cockpit (MRR mesuré, pas de % chiffré)', () => {
+    expect(detectPerfUiAdmin('MRR mesuré via get_mrr (matview)')).toBe(false)
+    expect(detectPerfUiAdmin('Axe Conformité')).toBe(false)
+  })
+
+  it('le cockpit (admin)/page.tsx n’expose aucun chiffre de perf fabriqué', () => {
+    const offenders: string[] = []
+    for (const file of ADMIN_UI_FILES) {
+      if (!existsSync(file)) continue
+      const content = readFileSync(file, 'utf8')
+      const lines = content.split(/\r?\n/)
+      lines.forEach((line, idx) => {
+        if (detectPerfUiAdmin(line)) {
+          const rel = path.relative(WEB_SRC, file)
+          offenders.push(`${rel}:${idx + 1} → "${line.trim()}"`)
+        }
+      })
+    }
+    expect(
+      offenders,
+      `Chiffre de performance fabriqué détecté sur le cockpit (admin) :\n${offenders.join('\n')}`,
+    ).toEqual([])
+  })
+})
