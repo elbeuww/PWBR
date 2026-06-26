@@ -26,11 +26,11 @@ Requirements de ce milestone. Chacun est mappé à une phase de la roadmap (voir
 
 ### Dashboard utilisateur (UDASH)
 
-- [ ] **UDASH-01**: Le membre accède à un dashboard `(dash)` avec une **vue d'ensemble** (état d'abonnement, derniers signaux, raccourcis).
+- [x] **UDASH-01**: Le membre accède à un dashboard `(dash)` avec une **vue d'ensemble** (état d'abonnement, derniers signaux, raccourcis).
 - [x] **UDASH-02**: Le membre consulte ses **signaux suivis et son historique**, paginés (keyset).
 - [ ] **UDASH-03**: Le membre **ajoute/retire un signal à sa watchlist** (`user_followed_setups`, écriture scopée à son propre compte, anti-IDOR).
 - [x] **UDASH-04**: Le membre **gère son abonnement** (statut, expiration, alerte J-3/J-1 via `ExpiryBanner`).
-- [ ] **UDASH-05**: Le membre voit son **tableau d'affiliation** (abonnés ramenés, revenus mesurés) intégré au dashboard.
+- [x] **UDASH-05**: Le membre voit son **tableau d'affiliation** (abonnés ramenés, revenus mesurés) intégré au dashboard.
 - [ ] **UDASH-06**: Le membre accède à ses **paramètres de compte**.
 
 ### Dashboard superadmin (ADASH)
@@ -108,11 +108,11 @@ Exclusions explicites de ce milestone, avec raison.
 | SEED-01 | Phase 18 — Seed de données réalistes à l'échelle | Complete |
 | SEED-02 | Phase 18 — Seed de données réalistes à l'échelle | Complete |
 | SEED-03 | Phase 18 — Seed de données réalistes à l'échelle | Complete |
-| UDASH-01 | Phase 19 — Dashboard utilisateur | Pending |
+| UDASH-01 | Phase 19 — Dashboard utilisateur | Complete |
 | UDASH-02 | Phase 19 — Dashboard utilisateur | Complete |
 | UDASH-03 | Phase 19 — Dashboard utilisateur | Pending |
 | UDASH-04 | Phase 19 — Dashboard utilisateur | Complete |
-| UDASH-05 | Phase 19 — Dashboard utilisateur | Pending |
+| UDASH-05 | Phase 19 — Dashboard utilisateur | Complete |
 | UDASH-06 | Phase 19 — Dashboard utilisateur | Pending |
 | ADASH-01 | Phase 20 — Dashboard superadmin (cockpit 4 axes) | Pending |
 | ADASH-02 | Phase 20 — Dashboard superadmin (cockpit 4 axes) | Pending |

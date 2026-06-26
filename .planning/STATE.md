@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v3.0
 milestone_name: Plateforme complète sous identité dark néon NEXA
 status: executing
-last_updated: "2026-06-26T13:44:53.715Z"
+last_updated: "2026-06-26T13:59:34.645Z"
 last_activity: 2026-06-26
 progress:
   total_phases: 12
   completed_phases: 6
   total_plans: 37
-  completed_plans: 31
-  percent: 84
+  completed_plans: 32
+  percent: 86
 ---
 
 # Project State
@@ -31,7 +31,7 @@ See: .planning/PROJECT.md (mis à jour 2026-06-20 après clôture v2.0)
 
 Milestone: v3.0 — Plateforme complète sous identité dark néon NEXA (7 phases, 15-21)
 Phase: 19 (dashboard-utilisateur) — EXECUTING
-Plan: 3 of 7
+Plan: 4 of 7
 Status: Ready to execute
 Last activity: 2026-06-26
 
@@ -41,6 +41,7 @@ Last activity: 2026-06-26
 - **Repris** : migration 0020 `user_followed_setups` LIVE (apply_migration), index keyset CONCURRENTLY valide, EXPLAIN keyset prouvé (forcé, table vide), types régénérés + alias, advisors verts, typecheck vert, suite 621✓/13 skip. SUMMARY écrit.
 - Déviation D-19-01-A : `default (select auth.uid())` → `default auth.uid()` (subquery interdite en DEFAULT).
 - **Action attendue** : enchaîner vague 1 → **19-02**, puis vague 2 (19-03/04/05), vague 3 (19-06/07). `/gsd:execute-phase 19` reprend automatiquement (19-01 a son SUMMARY).
+- **19-04 exécuté (2026-06-26)** : overview cockpit `/dashboard` (ordre D-08, zéro perf fabriquée), AffiliateSummaryCard conditionnelle no-PII, abonnement réhébergé `/dashboard/abonnement`, no-perf étendu (détecteur UI non trivial). Commits a19a063/ea3c295/ec22dd3. **D-19-04-A** : overview placé sous `(dash)/dashboard/page.tsx` (la nav DashShell 19-02 est figée sur `/dashboard/*` ; `(dash)/page.tsx` aurait collisionné avec `(marketing)`/racine) → ancien placeholder `[locale]/dashboard/page.tsx` SUPPRIMÉ (conflit de routes). Conséquence : la tâche « remplacement stub `/dashboard` » prévue en 19-05 est déjà faite ; 19-05 ne livre plus que les Paramètres. Reste vague 2 : **19-05** (paramètres), puis vague 3 (19-06/07).
 
 ### ▶ REPRISE Phase 17 (point de reprise)
 
@@ -145,6 +146,7 @@ ressources externes non provisionnables en session de développement.
 | Phase 18 P03 | ~5min | 3 tasks | 4 files |
 | Phase 19 P02 | ~5min | 3 tasks | 6 files |
 | Phase 19 P03 | ~12min | 3 tasks | 4 files |
+| Phase 19 P04 | ~14min | 3 tasks | 7 files |
 
 ## Roadmap v2.0 (9 phases)
 
@@ -552,6 +554,14 @@ ressources externes non provisionnables en session de développement.
 - **D-18-02-E (verify)** : `pnpm typecheck` vert ; `pnpm test -- no-perf-seed-claims` 4 passed (5 fichiers seed sans champ de perf) ; suite complète 621 passed / 6 skipped (0 régression). Type-correction des scripts seed confirmée via tsconfig temporaire `include scripts/seed/**` = 0 erreur (le `tsc -b` exclut `scripts/`). **AUCUN seed live lancé** (UAT Manual-Only). Erreur tsc pré-existante hors scope : `freeze-nile-fixture.ts:103` (TS2769).
 - **Commits 18-02** : b7a9c1a (T1 — seed.ts orchestrateur fail-fast + purge.ts D-06), 4bbd018 (T2 — users.ts createUser borné faker déterministe), 3cfe072 (T3 — subscriptions.ts + payments.ts MRR/churn étalés).
 
+### Decisions exécution (Plan 19-04 — overview cockpit + affiliation conditionnelle + abonnement réhébergé, UDASH-01/05)
+
+- **D-19-04-A (déviation chemin, Rule 3 — blocage build)** : un route group `(dash)` n'ajoute rien à l'URL → les chemins `(dash)/page.tsx` / `(dash)/abonnement/page.tsx` du plan collisionneraient avec `(marketing)`/racine et ne matcheraient PAS la nav DashShell FIGÉE en 19-02 (`/dashboard/*`). Overview placé à `(dash)/dashboard/page.tsx` (URL `/dashboard`, landing post-login), abonnement à `(dash)/dashboard/abonnement/page.tsx`. Ancien placeholder `[locale]/dashboard/page.tsx` (listing instruments, hors shell) SUPPRIMÉ (conflit de routes parallèles Next) — la gate `requireUser` du layout `(dash)` le remplace. **Conséquence** : la tâche « remplacement stub `/dashboard` » prévue en 19-05 est déjà faite ; 19-05 ne livre plus que les Paramètres.
+- **D-19-04-B** : overview monte `SignalCard` SANS QueryProvider/SignalList (ni Realtime ni react-query sur la vue d'ensemble) — 3-4 cartes statiques RSC ; le live reste sur la surface signaux pleine. Satisfait « montage, pas clone » (D-02) tout en gardant l'overview léger.
+- **D-19-04-C** : carte affiliation rendue conditionnellement via lecture `profiles.role` + `return null` (jamais le gate de rôle redirigeant, T-19-15) ; lit la vue `affiliate_dashboard` (agrégats no-PII, T-19-13) ; montants `formatAtomic(BigInt(...))` jamais Number (T-19-16). État renouvellement (D-03) si abo expiré, CTA `/tarifs`.
+- **D-19-04-D** : clé i18n `overview.activeUntil` ({date}) ajoutée à parité stricte fr/en/ar (sans terme interdit, parité dash 4/4 verte) ; empty/error des 3-4 signaux réutilisent le namespace `signals`. Garde `no-perf-seed-claims` étendue à l'overview (volet C, détecteur UI non trivial — injection `+12%` → scan échoue, prouvé).
+- **Commits 19-04** : a19a063 (T1 — AffiliateSummaryCard), ea3c295 (T2 — overview + abonnement + suppression placeholder + i18n), ec22dd3 (T3 — no-perf étendu). typecheck vert, 11/11 tests (no-perf + parité dash), lint:i18n exit 0.
+
 ### Open todos / research flags (v2.0)
 
 - **Phase 4 (research flag) :** TronGrid endpoint `walletsolidity`, parsing logs TRC-20, normalisation hex↔base58 — doc TS peu dense, recherche de phase recommandée.
@@ -600,7 +610,9 @@ ressources externes non provisionnables en session de développement.
 
 **Last session (archive):** 2026-06-14 — Completed 02-03-PLAN.md (4 commits : 38c1894 tarifs 9$/3$ + paiement-bientot + funnel signup→paiement-bientot, 86e7001 home bénéfice-first + proof slot masqué, 49ac57e RED no-perf-claims, fa8a5d0 GREEN glob vitest). Cœur conversion de la vitrine livré : home VITR-01, tarifs VITR-02 (USDT TRC-20, D-10/D-11/D-12), funnel honnête D-09, garde no-perf-claims VITR-03/D-08. 15 tests verts, tsc/lint:i18n OK, invariant auth P1 intact. **Phase 02 COMPLETE (3/3 plans).** Stopped at : Plan 02-03 terminé.
 
-**Next action:** Phase 10 — Plan 10-03 (tokens OKLCH). Migrer `globals.css` des HEX de marque obsolètes (#1E5FBF/#03d87f/#63279b) vers la palette OKLCH NEXA (`--nexa-green-500` etc.), `@theme inline` = var() only, repointer `--font-latin`/`--font-arabic` vers les 5 nouvelles variables `--font-*` exposées en 10-02. Cible GREEN : `design-tokens.test.ts` (4 assertions, 3 actuellement RED). 10-02 COMPLETE (b5efb9b/863dd7c) : 5 polices NEXA self-hostées, `fonts.test.ts` GREEN 5/5, `no-cdn-fonts.spec.ts` GREEN runtime. `rtl-logical-props.test.ts` + `no-flash.spec.ts` = gardes de non-régression à préserver.
+**Next action:** Phase 19 — Plan 19-05 (Paramètres : compte/langue/notifications UI + changement mdp `updateUser` + déconnexion, UDASH-06). NB : le « remplacement du stub `/dashboard` » de 19-05 est DÉJÀ fait en 19-04 (D-19-04-A — placeholder supprimé, overview en place). Reste vague 3 : 19-06 (watchlist write anti-IDOR) + 19-07 (suivis/historique keyset). 19-04 COMPLETE (a19a063/ea3c295/ec22dd3) : overview cockpit D-08 no-perf + AffiliateSummaryCard conditionnelle no-PII + abonnement réhébergé.
+
+**Next action (archive):** Phase 10 — Plan 10-03 (tokens OKLCH). Migrer `globals.css` des HEX de marque obsolètes (#1E5FBF/#03d87f/#63279b) vers la palette OKLCH NEXA (`--nexa-green-500` etc.), `@theme inline` = var() only, repointer `--font-latin`/`--font-arabic` vers les 5 nouvelles variables `--font-*` exposées en 10-02. Cible GREEN : `design-tokens.test.ts` (4 assertions, 3 actuellement RED). 10-02 COMPLETE (b5efb9b/863dd7c) : 5 polices NEXA self-hostées, `fonts.test.ts` GREEN 5/5, `no-cdn-fonts.spec.ts` GREEN runtime. `rtl-logical-props.test.ts` + `no-flash.spec.ts` = gardes de non-régression à préserver.
 
 **Next action (archive):** Milestone v2.1 — roadmap créée (5 phases, 10-14). Lancer la planification de **Phase 10 (Fondation design system NEXA, DESIGN-01..04)** via `/gsd-execute-phase 10`. Axe design (P10-11) parallélisable contre routine+backtest (P12-13). Research flags à lever au planning : P12 (réseau Remote *.supabase.co, Open Q A1) et P13 (figer le catalogue de patterns — décision fondateur Borhane). Dette héritée v2.0 traitée : WIRING-01/ExpiryBanner → Phase 11 (UI-07). Hors scope v2.1 : LEGAL-02, PAY-AUTO, AFF-AUTO, ENGINE-API.
 
