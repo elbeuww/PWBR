@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v3.0
 milestone_name: Plateforme complète sous identité dark néon NEXA
 status: executing
-last_updated: "2026-06-26T13:59:34.645Z"
+last_updated: "2026-06-26T14:11:56.550Z"
 last_activity: 2026-06-26
 progress:
   total_phases: 12
   completed_phases: 6
   total_plans: 37
-  completed_plans: 32
-  percent: 86
+  completed_plans: 34
+  percent: 92
 ---
 
 # Project State
@@ -31,9 +31,11 @@ See: .planning/PROJECT.md (mis à jour 2026-06-20 après clôture v2.0)
 
 Milestone: v3.0 — Plateforme complète sous identité dark néon NEXA (7 phases, 15-21)
 Phase: 19 (dashboard-utilisateur) — EXECUTING
-Plan: 4 of 7
+Plan: 6 of 7
 Status: Ready to execute
 Last activity: 2026-06-26
+
+- **19-05 exécuté (2026-06-26)** : écran Paramètres `/dashboard/parametres` (UDASH-06) — Compte (email + PasswordChangeForm via `supabase.auth.updateUser`), Langue (LanguageSwitcher, pas de toggle thème D-11), Notifications (UI seules localStorage, aucune delivery D-12), lien abonnement, déconnexion. Commits 156e66e/5e1a1cb. **D-19-05-A** : page placée sous `(dash)/dashboard/parametres/` (URL `/dashboard/parametres`) pour matcher la nav DashShell 19-02. **D-19-05-B** : Task 3 (stub `/dashboard`) ABANDONNÉE — déjà supprimée par 19-04 (D-19-04-A), recréation casserait le build. Reste vague 3 : **19-06/07**.
 
 ### ▶ REPRISE Phase 19 (point de reprise)
 
@@ -147,6 +149,7 @@ ressources externes non provisionnables en session de développement.
 | Phase 19 P02 | ~5min | 3 tasks | 6 files |
 | Phase 19 P03 | ~12min | 3 tasks | 4 files |
 | Phase 19 P04 | ~14min | 3 tasks | 7 files |
+| Phase 19 P05 | ~12min | 2 tasks | 5 files |
 
 ## Roadmap v2.0 (9 phases)
 
@@ -588,7 +591,7 @@ ressources externes non provisionnables en session de développement.
 
 ## Session Continuity
 
-**Last session:** 2026-06-26T13:44:53.706Z
+**Last session:** 2026-06-26T14:11:42.483Z
 
 **Last session (archive):** 2026-06-19T03:41:29.665Z
 

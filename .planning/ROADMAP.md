@@ -206,7 +206,7 @@ Détail complet archivé : `.planning/milestones/v2.0-ROADMAP.md`.
 - [x] 19-02-PLAN.md — Shell `(dash)` : layout `requireUser` + ExpiryBanner câblé (WIRING-01) + DashShell sidebar/bottom-nav sans glow + namespace i18n `dash` complet fr/en/ar (UDASH-04)
 - [x] 19-03-PLAN.md — Helper keyset `cursor.ts` + `lib/watchlist/queries` (source unique keyset + followed-ids) + `searchParams` cursor/tab (UDASH-02)
 - [x] 19-04-PLAN.md — Overview cockpit (ordre D-08, no-perf) + abonnement réhébergé + AffiliateSummaryCard conditionnelle no-PII + garde no-perf étendue (UDASH-01, UDASH-05)
-- [ ] 19-05-PLAN.md — Paramètres (compte/langue/notifications UI/abonnement/déconnexion) + changement mdp `updateUser` + remplacement stub `/dashboard` (UDASH-06)
+- [x] 19-05-PLAN.md — Paramètres (compte/langue/notifications UI/abonnement/déconnexion) + changement mdp `updateUser` + remplacement stub `/dashboard` (UDASH-06)
 - [ ] 19-06-PLAN.md — Watchlist write : WatchlistToggle optimiste anti-IDOR + câblage SignalCard/SignalDetail + followed-ids dans pages membre (UDASH-03)
 - [ ] 19-07-PLAN.md — Suivis + Historique keyset (4 états dont renewal) + KeysetList + route watchlist→Suivis (UDASH-02)
 **UI hint** : yes
@@ -259,7 +259,7 @@ Détail complet archivé : `.planning/milestones/v2.0-ROADMAP.md`.
 | 16. Reskin transversal de toutes les pages | v3.0 | 4/4 | Complete    | 2026-06-24 |
 | 17. Fondation DB scalable | v3.0 | 3/3 | Complete   | 2026-06-25 |
 | 18. Seed de données réalistes à l'échelle | v3.0 | 3/3 | Complete   | 2026-06-25 |
-| 19. Dashboard utilisateur | v3.0 | 4/7 | In Progress|  |
+| 19. Dashboard utilisateur | v3.0 | 5/7 | In Progress|  |
 | 20. Dashboard superadmin (cockpit 4 axes) | v3.0 | 0/? | Not started | - |
 | 21. Tests E2E + audit de scalabilité | v3.0 | 0/? | Not started | - |
 

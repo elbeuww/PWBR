@@ -31,7 +31,7 @@ Requirements de ce milestone. Chacun est mappé à une phase de la roadmap (voir
 - [ ] **UDASH-03**: Le membre **ajoute/retire un signal à sa watchlist** (`user_followed_setups`, écriture scopée à son propre compte, anti-IDOR).
 - [x] **UDASH-04**: Le membre **gère son abonnement** (statut, expiration, alerte J-3/J-1 via `ExpiryBanner`).
 - [x] **UDASH-05**: Le membre voit son **tableau d'affiliation** (abonnés ramenés, revenus mesurés) intégré au dashboard.
-- [ ] **UDASH-06**: Le membre accède à ses **paramètres de compte**.
+- [x] **UDASH-06**: Le membre accède à ses **paramètres de compte**.
 
 ### Dashboard superadmin (ADASH)
 
@@ -113,7 +113,7 @@ Exclusions explicites de ce milestone, avec raison.
 | UDASH-03 | Phase 19 — Dashboard utilisateur | Pending |
 | UDASH-04 | Phase 19 — Dashboard utilisateur | Complete |
 | UDASH-05 | Phase 19 — Dashboard utilisateur | Complete |
-| UDASH-06 | Phase 19 — Dashboard utilisateur | Pending |
+| UDASH-06 | Phase 19 — Dashboard utilisateur | Complete |
 | ADASH-01 | Phase 20 — Dashboard superadmin (cockpit 4 axes) | Pending |
 | ADASH-02 | Phase 20 — Dashboard superadmin (cockpit 4 axes) | Pending |
 | ADASH-03 | Phase 20 — Dashboard superadmin (cockpit 4 axes) | Pending |
