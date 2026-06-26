@@ -8,7 +8,7 @@ updated: 2026-06-26T00:00:00Z
 
 ## Current Test
 
-5. WatchlistToggle : flip optimiste + rollback — en attente du retour utilisateur
+[UAT terminée — 4/4 tests navigateur passés, items 4 (partial) et 6 (deferred) restants]
 
 ## Tests
 
@@ -30,7 +30,7 @@ result: [partial — vérifié MCP 2026-06-26] Index `user_followed_setups_keyse
 
 ### 5. WatchlistToggle : flip optimiste + rollback
 expected: Dans le navigateur, cliquer l'étoile sur `SignalCard` / `SignalDetail` bascule l'état immédiatement (optimiste) ; en cas d'échec réseau l'état revient en arrière (rollback) avec `toast.error`. L'étoile est un sibling du `<Link>` (pas de navigation parasite au clic).
-result: [pending]
+result: [PASS] Re-test utilisateur 2026-06-26 : (a) flip optimiste immédiat ✅ ; (b) clic étoile ne navigue pas (sibling du Link) ✅ ; (c) persistance après reload + apparition dans /dashboard/suivis (anti-IDOR live : écriture user_followed_setups via client anon RLS, scope auth.uid()) ✅. (d) rollback couvert par test unitaire `buildWatchlistToggle`. **Retour UX** : étoile repositionnée coin haut → **bas-droite** de la carte (commit `859d10c`, end/bottom RTL-safe, hit-area 44px préservée). ✅
 
 ### 6. Test anti-IDOR vert avec credentials
 expected: Avec `.env.test` (URL + clés Supabase de test) renseigné, `user-followed-rls.test.ts` ne skip plus et passe : l'insert avec `user_id` usurpé est rejeté par la RLS (erreur non-null).
@@ -39,9 +39,9 @@ result: [pending]
 ## Summary
 
 total: 6
-passed: 3
+passed: 4
 issues: 0
-pending: 3
+pending: 2
 skipped: 0
 blocked: 0
 
