@@ -239,7 +239,12 @@ Détail complet archivé : `.planning/milestones/v2.0-ROADMAP.md`.
   1. Des specs Playwright couvrent les flux principaux : auth, navigation membre, dashboard utilisateur, gestion d'abonnement, gating admin.
   2. Les tests RLS/gating prouvent l'isolation : non-abonné → 0 ligne de signaux, non-superadmin → 404 discret, isolation cross-user.
   3. Un audit DB (`EXPLAIN ANALYZE` + `get_advisors` + `pg_stat_statements`) sur les requêtes clés à ~10k valide les index/keyset/matviews : index scans (pas de seq scan + tri), advisors verts, pas de policy RLS réévaluée par ligne.
-**Plans** : TBD
+**Plans** : 5 plans (3 vagues)
+- [ ] 21-01-PLAN.md — Infra E2E multi-roles : fixtures deterministes + seed-fixtures idempotent + setup-project storageState + config par role + webServer CI (Wave 0)
+- [ ] 21-02-PLAN.md — Specs E2E dashboard utilisateur Phase 19 (groupe (dash), role abonne) — E2E-01
+- [ ] 21-03-PLAN.md — Specs E2E cockpit superadmin Phase 20 (11 items 20-UAT) + isolation 404/tarifs — E2E-01/E2E-02
+- [ ] 21-04-PLAN.md — Pipeline CI GitHub Actions bloquant (lint+typecheck+vitest+e2e) + secrets — D-09
+- [ ] 21-05-PLAN.md — Audit DB chiffre SCALE-06 (EXPLAIN ANALYZE + advisors delta + InitPlan + medianes) vers 21-AUDIT.md
 **UI hint** : yes
 **Notes** : Clôture v3.0. Pas de test de charge réel (k6/artillery hors scope) — la scalabilité = conception (phase 17) + audit chiffré (ici). Research flag : seuils chiffrés de bascule à mesurer une fois le seed en place (compute Supabase non profilé).
 
@@ -267,7 +272,7 @@ Détail complet archivé : `.planning/milestones/v2.0-ROADMAP.md`.
 | 18. Seed de données réalistes à l'échelle | v3.0 | 3/3 | Complete   | 2026-06-25 |
 | 19. Dashboard utilisateur | v3.0 | 7/7 | Complete    | 2026-06-26 |
 | 20. Dashboard superadmin (cockpit 4 axes) | v3.0 | 6/6 | Complete   | 2026-06-26 |
-| 21. Tests E2E + audit de scalabilité | v3.0 | 0/? | Not started | - |
+| 21. Tests E2E + audit de scalabilité | v3.0 | 0/5 | Planned | - |
 
 **v2.0 : 9/9 phases complètes, 37/37 plans, 41/41 requirements couverts.**
 **v2.1 : 2/5 phases livrées (10-11), 12-14 en pause ; 28/28 requirements mappés.**
