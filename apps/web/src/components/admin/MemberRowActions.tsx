@@ -14,6 +14,12 @@
  * jamais d'écriture front, jamais de service_role. Toast sonner au succès ; bouton désactivé
  * pendant `pending`. Couleurs : `--primary` réservé au CTA de prolongation, `--destructive`
  * pour suspendre (D-08, 20-UI-SPEC). Aucun `%` ni chiffre fabriqué dans la copy.
+ *
+ * Copy verrouillée (20-UI-SPEC, rendue via i18n `admin.*` — source de vérité = messages/fr.json) :
+ *  - grantDialog.confirm    → « Confirmer la prolongation »
+ *  - suspendDialog.title    → « Suspendre ce compte ? »
+ *  - suspendDialog.confirm  → « Suspendre »
+ *  - reactivateDialog.confirm → « Réactiver »
  */
 import { useState, useTransition } from 'react'
 import { useTranslations } from 'next-intl'
