@@ -357,20 +357,20 @@ La barre D-06.3 (« temps de requête borné ») n'a pas de baseline pré-exista
 | A4 | Le routeur expose une route cockpit type `/admin/cockpit` | Code Examples E2E-02 | Vérifier les vrais chemins dans les SUMMARY Phase 20 avant d'écrire les specs |
 | A5 | « Confirm email » OFF persiste sur le projet cloud | Pitfall 3 | Si réactivé, tous les signups E2E cassent |
 
-## Open Questions
+## Open Questions (RESOLVED)
 
 1. **Local vs cloud en CI ?**
    - What we know : repo câblé cloud (`.env.test`), specs existantes créent des comptes sur le cloud.
    - What's unclear : la pollution concurrente PR-parallèles est-elle acceptable ?
-   - Recommandation : cloud + préfixe d'isolation pour P1 ; noter dette « migrer vers `supabase start` local si flaky ».
+   - RESOLVED : cloud + préfixe d'isolation (`e2e-fixture-*@nexa-e2e.invalid`) retenu — implémenté en 21-01 ; dette « migrer vers `supabase start` local si flaky » notée.
 
 2. **Routes exactes des dashboards 19/20 ?**
    - What we know : groupes `(dash)` et `(admin)`, cockpit 4 axes, `20-UAT.md` liste 11 scénarios.
    - What's unclear : chemins URL littéraux (ex. `/admin/cockpit` vs `/admin`).
-   - Recommandation : le planner lit `19-*-SUMMARY.md` + `20-*-SUMMARY.md` + `20-UAT.md` pour figer les URLs avant d'écrire les specs.
+   - RESOLVED : routes figées dans les plans 21-02 (`/fr/dashboard/*`) et 21-03 (`/admin`, `/admin/membres`, `/admin/file`, `/admin/affiliation/payouts`, `/admin/sante`, `/admin/signaux`) après lecture des SUMMARY 19/20 + `20-UAT.md`.
 
 3. **pg_stat_statements activé ?**
-   - Recommandation : 1er pas de l'audit = `select 1 from pg_extension where extname='pg_stat_statements'` via MCP ; sinon fallback EXPLAIN.
+   - RESOLVED : 1er pas de l'audit (21-05 Task 1) = `select 1 from pg_extension where extname='pg_stat_statements'` via MCP ; fallback EXPLAIN documenté si absent.
 
 ## Environment Availability
 
