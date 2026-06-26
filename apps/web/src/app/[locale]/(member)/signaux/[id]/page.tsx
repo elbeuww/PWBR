@@ -21,6 +21,8 @@ import { setRequestLocale, getTranslations } from 'next-intl/server'
 import { Link } from '../../../../../i18n/navigation'
 import { createClient } from '../../../../../lib/supabase/server'
 import { SignalDetail, type TradeSetupDetail } from '../../../../../components/signals/SignalDetail'
+import { QueryProvider } from '../../../../../components/providers/QueryProvider'
+import { fetchFollowedSetupIds } from '../../../../../lib/watchlist/queries'
 import { SignalsDisclaimerBanner } from '../../../../../components/signals/SignalsDisclaimerBanner'
 import { CandleChartLazy } from '../../../../../components/signals/CandleChartLazy'
 import { Eyebrow } from '../../../../../components/nexa/Eyebrow'
@@ -152,6 +154,11 @@ export default async function SignalDetailPage({ params }: SignalDetailPageProps
 
   const takeProfits = (payload.take_profits ?? []).map((tp) => tp.price)
 
+  // État initial de l'étoile : une seule requête RLS-scopée. Échec → Set vide
+  // (dégradation gracieuse, étoile non remplie ; le toggle reste fonctionnel).
+  const followedIds = await fetchFollowedSetupIds(supabase)
+  const followed = followedIds.has(id)
+
   // ScoreRing large (couleur = risque, D-12). Label traduit fourni (RSC-safe).
   const scoreRisk = mapRiskToScoreRisk(detail.risk_level)
   const scoreLabel = tScore('ariaTemplate', {
@@ -203,7 +210,11 @@ export default async function SignalDetailPage({ params }: SignalDetailPageProps
         </section>
       ) : null}
 
-      <SignalDetail setup={detail} locale={locale} />
+      {/* QueryProvider : l'étoile watchlist (WatchlistToggle dans l'en-tête de
+          SignalDetail) utilise react-query useMutation → exige un QueryClient. */}
+      <QueryProvider>
+        <SignalDetail setup={detail} locale={locale} followed={followed} />
+      </QueryProvider>
     </main>
   )
 }

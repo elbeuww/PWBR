@@ -41,14 +41,23 @@ interface SignalListProps {
   initialData: SignalRow[]
   filters: SignalsParams
   locale: string
+  /**
+   * setup_id suivis par l'utilisateur (état initial des étoiles, 19-06). Tableau
+   * (sérialisable RSC→client) → reconstruit en Set. Une seule requête côté page,
+   * jamais N+1. Les signaux apparus en direct (refetch/realtime) ne sont pas dans
+   * ce set → étoile non remplie par défaut (correct : un nouveau signal n'est pas suivi).
+   */
+  followedIds?: string[]
 }
 
 const REFETCH_FALLBACK_MS = 60_000 // repli D-16 si Realtime tombe
 
-export function SignalList({ initialData, filters, locale }: SignalListProps) {
+export function SignalList({ initialData, filters, locale, followedIds }: SignalListProps) {
   const t = useTranslations('signals')
   // Un client navigateur unique par montage (porte la session pour la RLS Realtime).
   const supabase = useMemo(() => createClient(), [])
+  // Set des suivis (état initial des étoiles) — reconstruit une fois depuis la prop.
+  const followedSet = useMemo(() => new Set(followedIds ?? []), [followedIds])
 
   // Repli D-16 : refetch périodique activé seulement si le canal ne SUBSCRIBE pas.
   const [realtimeLost, setRealtimeLost] = useState(false)
@@ -160,7 +169,12 @@ export function SignalList({ initialData, filters, locale }: SignalListProps) {
       ) : (
         <div className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
           {visible.map((signal) => (
-            <SignalCard key={signal.id} signal={signal} locale={locale} />
+            <SignalCard
+              key={signal.id}
+              signal={signal}
+              locale={locale}
+              followed={followedSet.has(signal.id)}
+            />
           ))}
         </div>
       )}
