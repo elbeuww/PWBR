@@ -53,7 +53,10 @@ export async function AffiliateSummaryCard() {
 
   const subscribers = data.active_referrals ?? 0
   // formatAtomic(BigInt(...)) — JAMAIS Number (perte de précision > 2^53, T-19-16).
-  const revenue = `${formatAtomic(BigInt(data.revenue_total_atomic ?? '0'))} ${unit}`
+  // `|| '0'` couvre null, undefined ET '' (string vide), contrairement à `?? '0'` qui
+  // ne couvre pas '' — BigInt('') lancerait SyntaxError.
+  const rawAtomic = data.revenue_total_atomic || '0'
+  const revenue = `${formatAtomic(BigInt(rawAtomic))} ${unit}`
 
   return (
     <Card>
