@@ -71,3 +71,57 @@ export function serializeSignalsParams(params: SignalsParams): URLSearchParams {
   if (params.sort && params.sort !== 'score') qs.set('sort', params.sort)
   return qs
 }
+
+// ──────────────────────────────────────────────────────────────────────────
+// Surface watchlist (Plan 19-03, Task 2 ; UDASH-02) — schéma frère.
+//
+// La watchlist (suivis/historique) ne partage AUCUN filtre avec les signaux ;
+// on isole donc son schéma plutôt que de polluer SignalsParamsSchema. Deux
+// params seulement :
+//   - `tab`    : onglet whitelisté (suivis | historique), défaut suivis. Comme
+//                `style`/`risk`, une valeur hors enum n'atteint JAMAIS la requête
+//                (anti-injection T-19-09) — elle retombe sur le défaut.
+//   - `cursor` : jeton keyset OPAQUE (cf. lib/keyset/cursor.ts). Validé non-vide
+//                seulement : le décodage réel (base64url → tuple) se fait via
+//                `decodeCursor`, et le tuple est passé à `.or()` PARAMÉTRÉ
+//                PostgREST, jamais concaténé en SQL. Un curseur corrompu → null
+//                (première page) côté decodeCursor, jamais throw, jamais injection.
+//
+// Décision (Claude's Discretion tranchée, RESEARCH) : réutiliser le pattern
+// maison safeParse champ par champ — NE PAS ajouter `nuqs`.
+// ──────────────────────────────────────────────────────────────────────────
+
+const TabEnum = z.enum(['suivis', 'historique']) // onglet watchlist (défaut appliqué ci-dessous)
+
+export const WatchlistParamsSchema = z.object({
+  tab: TabEnum.default('suivis'),
+  cursor: z.string().min(1).optional(),
+})
+
+export type WatchlistParams = z.infer<typeof WatchlistParamsSchema>
+
+/**
+ * Parse des searchParams bruts en params watchlist. Champ par champ via
+ * `.safeParse` : un `tab` hors whitelist retombe sur `suivis`, un `cursor`
+ * vide/absent → undefined. Jamais de throw, jamais de valeur brute propagée.
+ */
+export function parseWatchlistParams(raw: RawParams): WatchlistParams {
+  const tabResult = TabEnum.safeParse(firstString(raw.tab))
+  const cursorResult = z.string().min(1).safeParse(firstString(raw.cursor))
+
+  return {
+    tab: tabResult.success ? tabResult.data : 'suivis',
+    cursor: cursorResult.success ? cursorResult.data : undefined,
+  }
+}
+
+/**
+ * Sérialise des params watchlist en URLSearchParams. Omet l'onglet par défaut
+ * (suivis) et le curseur absent → URL propre, round-trip stable.
+ */
+export function serializeWatchlistParams(params: WatchlistParams): URLSearchParams {
+  const qs = new URLSearchParams()
+  if (params.tab && params.tab !== 'suivis') qs.set('tab', params.tab)
+  if (params.cursor) qs.set('cursor', params.cursor)
+  return qs
+}
