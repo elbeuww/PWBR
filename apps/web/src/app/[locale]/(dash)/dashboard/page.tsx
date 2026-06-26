@@ -20,7 +20,9 @@ import { Link } from '@/i18n/navigation'
 import { requireUser } from '@/lib/auth/gate'
 import { createClient } from '@/lib/supabase/server'
 import { fetchActiveSignals } from '@/lib/signals/queries'
+import { fetchFollowedSetupIds } from '@/lib/watchlist/queries'
 import { SignalCard } from '@/components/signals/SignalCard'
+import { QueryProvider } from '@/components/providers/QueryProvider'
 import { AffiliateSummaryCard } from '@/components/dash/AffiliateSummaryCard'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 
@@ -60,6 +62,10 @@ export default async function DashOverviewPage({ params }: OverviewPageProps) {
     sort: 'recent',
   })
   const latestSignals = signals.slice(0, 4)
+
+  // État initial des étoiles : UNE seule requête RLS-scopée (jamais N+1). Échec → Set
+  // vide (dégradation gracieuse). Identique au pipeline de la liste signaux (19-06).
+  const followedSet = await fetchFollowedSetupIds(supabase)
 
   return (
     <main className="mx-auto max-w-screen-lg px-4 py-8 text-start md:px-6">
@@ -108,11 +114,18 @@ export default async function DashOverviewPage({ params }: OverviewPageProps) {
             </p>
           </div>
         ) : (
-          <div className="mt-3 grid grid-cols-1 gap-6 md:grid-cols-2">
-            {latestSignals.map((signal) => (
-              <SignalCard key={signal.id} signal={signal} locale={locale} />
-            ))}
-          </div>
+          <QueryProvider>
+            <div className="mt-3 grid grid-cols-1 gap-6 md:grid-cols-2">
+              {latestSignals.map((signal) => (
+                <SignalCard
+                  key={signal.id}
+                  signal={signal}
+                  locale={locale}
+                  followed={followedSet.has(signal.id)}
+                />
+              ))}
+            </div>
+          </QueryProvider>
         )}
       </section>
 
