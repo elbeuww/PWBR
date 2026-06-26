@@ -8,7 +8,7 @@ updated: 2026-06-26T00:00:00Z
 
 ## Current Test
 
-3. Abonné expiré → 0 ligne + état renewal — en attente du retour utilisateur
+5. WatchlistToggle : flip optimiste + rollback — en attente du retour utilisateur
 
 ## Tests
 
@@ -22,7 +22,7 @@ result: [PASS] Compte de test `uat-abonne@nexa.test` basculé à J-2 via MCP (r�
 
 ### 3. Abonné expiré → 0 ligne + état renewal
 expected: Connecté avec un compte expiré, les surfaces Suivis et Historique lisent 0 ligne (barrière RLS `has_active_subscription()` + `!inner`) et affichent l'état **renewal** (« Renouveler »), pas l'état empty. Anti-IDOR live confirmé.
-result: [pending]
+result: [PASS] Compte de test basculé en expiré via MCP (period_end passé, réversible). Re-test utilisateur 2026-06-26 : (a) overview → carte renouvellement ; (b) /dashboard/suivis + /historique → état **renewal** (pas « vide ») — confirme le fix WR-01 (has_active_subscription false ⇒ renewal) ; (c) /signaux (member) redirige vers les prix d'abonnement → gate `requireActiveSub` intact (D-03 : (dash) requireUser laisse entrer, (member) bloque). Date d'origine 2026-07-25 restaurée. ✅
 
 ### 4. Plan keyset → Index Scan
 expected: `EXPLAIN` sur la requête `user_followed_setups ⋈ trade_setups` keyset (via MCP `execute_sql` sur la DB distante, seed à l'échelle) montre un **Index Scan** sur l'index keyset 0020 — pas de Seq Scan.
@@ -39,9 +39,9 @@ result: [pending]
 ## Summary
 
 total: 6
-passed: 2
+passed: 3
 issues: 0
-pending: 4
+pending: 3
 skipped: 0
 blocked: 0
 
