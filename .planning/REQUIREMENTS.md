@@ -35,13 +35,13 @@ Requirements de ce milestone. Chacun est mappé à une phase de la roadmap (voir
 
 ### Dashboard superadmin (ADASH)
 
-- [ ] **ADASH-01**: Le superadmin voit un cockpit d'**acquisition** (funnel inscriptions, performance affiliés).
-- [ ] **ADASH-02**: Le superadmin voit les **revenus** (MRR, churn, mix de plans) — chiffres **mesurés** sur données seedées, jamais inventés.
-- [ ] **ADASH-03**: Le superadmin voit la **santé opérationnelle** (jobs `job_runs`, fraîcheur `v_data_freshness`, file de paiements).
-- [ ] **ADASH-04**: Le superadmin **gère les utilisateurs** (table virtualisée, filtrable/paginée, état d'abonnement).
-- [ ] **ADASH-05**: Le superadmin **gère les paiements et affiliés** (files, payouts manuels).
+- [x] **ADASH-01**: Le superadmin voit un cockpit d'**acquisition** (funnel inscriptions, performance affiliés).
+- [x] **ADASH-02**: Le superadmin voit les **revenus** (MRR, churn, mix de plans) — chiffres **mesurés** sur données seedées, jamais inventés.
+- [x] **ADASH-03**: Le superadmin voit la **santé opérationnelle** (jobs `job_runs`, fraîcheur `v_data_freshness`, file de paiements).
+- [x] **ADASH-04**: Le superadmin **gère les utilisateurs** (table virtualisée, filtrable/paginée, état d'abonnement).
+- [x] **ADASH-05**: Le superadmin **gère les paiements et affiliés** (files, payouts manuels).
 - [ ] **ADASH-06**: Le superadmin voit l'**état de conformité** (gate `LEGAL_REVIEW_DONE`).
-- [ ] **ADASH-07**: Toutes les pages superadmin sont **gated `is_superadmin()`** (404 discret sinon), sans aucune fuite cross-tenant (jamais service_role côté pages).
+- [x] **ADASH-07**: Toutes les pages superadmin sont **gated `is_superadmin()`** (404 discret sinon), sans aucune fuite cross-tenant (jamais service_role côté pages).
 
 ### Robustesse & scalabilité DB (SCALE)
 
@@ -114,13 +114,13 @@ Exclusions explicites de ce milestone, avec raison.
 | UDASH-04 | Phase 19 — Dashboard utilisateur | Complete |
 | UDASH-05 | Phase 19 — Dashboard utilisateur | Complete |
 | UDASH-06 | Phase 19 — Dashboard utilisateur | Complete |
-| ADASH-01 | Phase 20 — Dashboard superadmin (cockpit 4 axes) | Pending |
-| ADASH-02 | Phase 20 — Dashboard superadmin (cockpit 4 axes) | Pending |
-| ADASH-03 | Phase 20 — Dashboard superadmin (cockpit 4 axes) | Pending |
-| ADASH-04 | Phase 20 — Dashboard superadmin (cockpit 4 axes) | Pending |
-| ADASH-05 | Phase 20 — Dashboard superadmin (cockpit 4 axes) | Pending |
+| ADASH-01 | Phase 20 — Dashboard superadmin (cockpit 4 axes) | Complete |
+| ADASH-02 | Phase 20 — Dashboard superadmin (cockpit 4 axes) | Complete |
+| ADASH-03 | Phase 20 — Dashboard superadmin (cockpit 4 axes) | Complete |
+| ADASH-04 | Phase 20 — Dashboard superadmin (cockpit 4 axes) | Complete |
+| ADASH-05 | Phase 20 — Dashboard superadmin (cockpit 4 axes) | Complete |
 | ADASH-06 | Phase 20 — Dashboard superadmin (cockpit 4 axes) | Pending |
-| ADASH-07 | Phase 20 — Dashboard superadmin (cockpit 4 axes) | Pending |
+| ADASH-07 | Phase 20 — Dashboard superadmin (cockpit 4 axes) | Complete |
 | E2E-01 | Phase 21 — Tests E2E + audit de scalabilité | Pending |
 | E2E-02 | Phase 21 — Tests E2E + audit de scalabilité | Pending |
 | SCALE-06 | Phase 21 — Tests E2E + audit de scalabilité | Pending |
