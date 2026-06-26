@@ -141,8 +141,9 @@ export function SignalCard({ signal, locale, followed = false }: SignalCardProps
       </Link>
 
       {/* Étoile watchlist : îlot client autonome, FRÈRE du <Link> (hors de son JSX).
-          Positionnée au coin end/top, hit-area ≥44px assurée par WatchlistToggle. */}
-      <span className="absolute end-2 top-2 z-10">
+          Positionnée au coin end/bottom (bas-droite, RTL-safe via end-),
+          hit-area ≥44px assurée par WatchlistToggle. */}
+      <span className="absolute bottom-2 end-2 z-10">
         <WatchlistToggle setupId={signal.id} initialFollowed={followed} />
       </span>
     </div>
