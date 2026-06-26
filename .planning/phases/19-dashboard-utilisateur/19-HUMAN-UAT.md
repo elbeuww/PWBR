@@ -8,7 +8,7 @@ updated: 2026-06-26T00:00:00Z
 
 ## Current Test
 
-2. ExpiryBanner J-3/J-1 — en attente du retour utilisateur
+3. Abonné expiré → 0 ligne + état renewal — en attente du retour utilisateur
 
 ## Tests
 
@@ -18,7 +18,7 @@ result: [PASS] Crash initial `No QueryClient set` (WatchlistToggle/useMutation d
 
 ### 2. ExpiryBanner à J-3 / J-1
 expected: Avec un abonnement proche de l'expiration (≤3 jours) en DB, l'`ExpiryBanner` s'affiche en tête du shell `(dash)` avec le CTA de renouvellement (résout WIRING-01).
-result: [pending]
+result: [PASS] Compte de test `uat-abonne@nexa.test` basculé à J-2 via MCP (réversible). Re-test utilisateur 2026-06-26 : bandeau d'avertissement « 2 jours » en tête du shell `(dash)` + CTA Renouveler. WIRING-01 confirmée en runtime. ✅ (date d'origine 2026-07-25 restaurée en fin d'UAT).
 
 ### 3. Abonné expiré → 0 ligne + état renewal
 expected: Connecté avec un compte expiré, les surfaces Suivis et Historique lisent 0 ligne (barrière RLS `has_active_subscription()` + `!inner`) et affichent l'état **renewal** (« Renouveler »), pas l'état empty. Anti-IDOR live confirmé.
@@ -39,9 +39,9 @@ result: [pending]
 ## Summary
 
 total: 6
-passed: 1
+passed: 2
 issues: 0
-pending: 5
+pending: 4
 skipped: 0
 blocked: 0
 
