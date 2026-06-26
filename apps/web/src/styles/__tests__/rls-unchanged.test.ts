@@ -49,6 +49,15 @@ function groupBaseDir(group: string): string {
 const ALLOWLIST = [
   'app/[locale]/affiliation/actions.ts',
   'app/[locale]/(auth)/actions.ts',
+  // DEFERRED-0022 : service_role conservé jusqu'à la migration 0022 (RPC gated
+  // paiements + affiliation) — décision phase 20 Option B. Ces 2 actions muteraient
+  // des tables sans policy d'écriture anon (payments / affiliate_*), donc aucun RPC
+  // gated `authenticated` n'existe encore. À retirer de l'allowlist quand 0022 livre
+  // admin_activate_payment/admin_reject_payment/admin_adjust_plan +
+  // admin_approve_application/admin_reject_application et que les 2 fichiers passent
+  // en anon-client. Voir .planning/todos/pending/.
+  'app/(admin)/file/actions.ts',
+  'app/(admin)/affiliation/actions.ts',
 ] as const
 
 // Infractions interdites sur une page non-admin.
