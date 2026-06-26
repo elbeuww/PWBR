@@ -386,18 +386,18 @@ const { error } = await supabase.auth.updateUser({ password: newPassword })
 | A4 | PostgREST `.or(...and(...))` traduit correctement le tuple-compare keyset | Pattern 3/Pitfall 4 | Moyen — valider l'EXPLAIN + l'absence de trous entre pages sur seed |
 | A5 | Aucune lib (nuqs/react-table/react-virtual) n'est nécessaire | Alternatives | Faible — réévaluable si volumétrie d'une vue explose |
 
-## Open Questions
+## Open Questions (RESOLVED)
 
-1. **Tiebreaker keyset de `user_followed_setups`** (PK composite sans `id`)
+> Tranchées en planification (Phase 19). Résolutions inline ci-dessous.
+
+1. **Tiebreaker keyset de `user_followed_setups`** (PK composite sans `id`) — **RESOLVED** : colonne `id uuid` dédiée tranchée en 19-01 T1 (helper keyset générique cross-table).
    - Connu : keyset exige un ordre total stable `(created_at, tiebreaker)`.
    - Inconnu : `id` dédié vs `setup_id`.
    - Recommandation : `setup_id` (unique par user, zéro colonne ajoutée) sauf si le helper keyset doit rester générique cross-table → alors `id uuid`.
-2. **RLS sur join embarqué pour l'abonné expiré (A2)**
+2. **RLS sur join embarqué pour l'abonné expiré (A2)** — **RESOLVED** : géré comme risque accepté avec gate Manual-Only (cf. `19-VALIDATION.md`) + fallback documenté (menaces T-19-11/T-19-26) — test live abonné expiré → 0 ligne attendu ; sinon filtre serveur explicite + état « renouvelle ».
    - Connu : RLS `trade_setups` = `has_active_subscription()`.
-   - Inconnu : comportement exact PostgREST `!inner` + RLS embarquée pour un expiré.
-   - Recommandation : test live abonné expiré → 0 ligne attendu ; sinon ajouter un filtre serveur explicite + état « renouvelle ».
-3. **Redirection des anciennes routes** (`/dashboard`, `(member)/signaux`, `(account)/abonnement`) vs conservation (D-02, discrétion planner)
-   - Recommandation : rediriger `/dashboard` → `(dash)` ; conserver `(member)`/`(account)` comme surfaces réutilisées montées dans le shell, ou rediriger vers les onglets `(dash)`. Trancher au plan selon l'effort de re-câblage du gate (le shell `(dash)` est `requireUser`, alors que `(member)` est `requireActiveSub` — attention : ne pas affaiblir le gate des signaux en les déplaçant).
+   - Inconnu (résiduel, validé live) : comportement exact PostgREST `!inner` + RLS embarquée pour un expiré.
+3. **Redirection des anciennes routes** (`/dashboard`, `(member)/signaux`, `(account)/abonnement`) vs conservation — **RESOLVED** : rediriger `/dashboard` → `(dash)` (19-05 T3), router watchlist → Suivis (19-07 T3), conserver `(member)`/`(account)` comme surfaces réutilisées montées dans le shell. Gate `(dash)` reste `requireUser`, gate `(member)` `requireActiveSub` non affaibli.
 
 ## Environment Availability
 
