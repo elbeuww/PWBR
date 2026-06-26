@@ -40,7 +40,7 @@ Requirements de ce milestone. Chacun est mappé à une phase de la roadmap (voir
 - [x] **ADASH-03**: Le superadmin voit la **santé opérationnelle** (jobs `job_runs`, fraîcheur `v_data_freshness`, file de paiements).
 - [x] **ADASH-04**: Le superadmin **gère les utilisateurs** (table virtualisée, filtrable/paginée, état d'abonnement).
 - [x] **ADASH-05**: Le superadmin **gère les paiements et affiliés** (files, payouts manuels).
-- [ ] **ADASH-06**: Le superadmin voit l'**état de conformité** (gate `LEGAL_REVIEW_DONE`).
+- [x] **ADASH-06**: Le superadmin voit l'**état de conformité** (gate `LEGAL_REVIEW_DONE`).
 - [x] **ADASH-07**: Toutes les pages superadmin sont **gated `is_superadmin()`** (404 discret sinon), sans aucune fuite cross-tenant (jamais service_role côté pages).
 
 ### Robustesse & scalabilité DB (SCALE)
@@ -119,7 +119,7 @@ Exclusions explicites de ce milestone, avec raison.
 | ADASH-03 | Phase 20 — Dashboard superadmin (cockpit 4 axes) | Complete |
 | ADASH-04 | Phase 20 — Dashboard superadmin (cockpit 4 axes) | Complete |
 | ADASH-05 | Phase 20 — Dashboard superadmin (cockpit 4 axes) | Complete |
-| ADASH-06 | Phase 20 — Dashboard superadmin (cockpit 4 axes) | Pending |
+| ADASH-06 | Phase 20 — Dashboard superadmin (cockpit 4 axes) | Complete |
 | ADASH-07 | Phase 20 — Dashboard superadmin (cockpit 4 axes) | Complete |
 | E2E-01 | Phase 21 — Tests E2E + audit de scalabilité | Pending |
 | E2E-02 | Phase 21 — Tests E2E + audit de scalabilité | Pending |

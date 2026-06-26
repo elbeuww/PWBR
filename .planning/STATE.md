@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v3.0
 milestone_name: Plateforme complète sous identité dark néon NEXA
 status: executing
-last_updated: "2026-06-26T20:27:19.242Z"
+last_updated: "2026-06-26T20:56:35.739Z"
 last_activity: 2026-06-26
 progress:
   total_phases: 12
   completed_phases: 7
   total_plans: 43
-  completed_plans: 39
-  percent: 91
+  completed_plans: 41
+  percent: 95
 ---
 
 # Project State
@@ -31,10 +31,11 @@ See: .planning/PROJECT.md (mis à jour 2026-06-20 après clôture v2.0)
 
 Milestone: v3.0 — Plateforme complète sous identité dark néon NEXA (7 phases, 15-21)
 Phase: 20 (dashboard-superadmin-cockpit-4-axes) — EXECUTING
-Plan: 5 of 6
-Status: Ready to execute
+Plan: 6 of 6
+Status: Ready to execute (dernier plan : 20-06)
 Last activity: 2026-06-26
 
+- **20-05 exécuté (2026-06-26)** : home `(admin)/page.tsx` transformée en **cockpit superadmin 4 sections** sur **anon-client** (ADASH-01/02/03/06), ordre verrouillé Revenus → Ops → Acquisition → Conformité (D-07). 4 cartes d'axe RSC `_components/AxisSummary{Revenus,Ops,Acquisition,Conformite}.tsx` : chacune KPI MESURÉ + ligne de provenance « Mesuré · N = … · période · source » (nombres rendus, jamais i18n) + lien « Voir le détail ». `Revenus` : MRR « Cash encaissé / mois » (formatAtomic via `getMrr`), churn via `applyThreshold` (Intl percent runtime → **0 caractère pour-cent en dur**), plan-mix. `Ops` : feux freshness/jobs tokenisés (`--signal-bullish`/`--risk-moderate`/`--destructive`) + file de validation → `/admin/sante`+`/admin/file`. `Acquisition` : agrégat funnel par étape → `/admin/affiliation/affilies`. `Conformité` : feu `isLegalReviewDone()` + version + date (D-18, read-only, rouge par défaut sûr). `page.tsx` : `createAdminServiceClient` → `createClient()` anon (T-20-03, plus aucune référence admin-service), KPI via wrappers gated 20-03 chargés en parallèle, agrégats Ops dégradant gracieusement sous RLS (0 ligne → feu rouge honnête). `AdminSidebar` regroupée sous 4 en-têtes d'axe, **URLs détail inchangées** (A5). `no-perf-seed-claims.ADMIN_UI_FILES` étendu aux 4 cartes → **scans no-perf VERTS 15/15** (extinction gardes 20-01). **D-20-05-A** : churn sans `%` littéral (applyThreshold + Intl percent). **D-20-05-B** : Conformité sans drill-down (aucune route détail), version/date via env `LEGAL_REVIEW_VERSION/DATE` (« — » si absentes). **D-20-05-C** : loadOps tolère RLS (pas de throw). typecheck exit 0. Commits `7ec9b44`/`81bb835`/`f37663e`. **Note scope** : `rls-unchanged.test.ts` reste RED par conception (extinction au 20-06, pages détail). **Reste : 20-06** (dernier plan, bascule pages détail + 0022).
 - **20-04 exécuté (2026-06-26)** : bascule PARTIELLE des écritures admin sur les RPC `SECURITY DEFINER` gated de 0021 (anon-client, audit DB) + dialogs membres. **Convertis (zéro service_role)** : `membres/actions.ts` → `grantSubscriptionTime`/`suspendAccount`/`unsuspendAccount` via `grant_subscription_time`/`suspend_account`/`unsuspend_account` (whitelist `PERIODS` T-20-10, `fail()` opaque T-20-16) ; `payouts/actions.ts` → `payCommission` via `admin_mark_commission_paid` (TX_HASH/ATOMIC + garde `Number.isSafeInteger` CR-02). Chaque action : `requireRole('superadmin')` (re-gate POST) PUIS `.rpc()` gated sur `createClient()` anon — la garde `is_superadmin()` DANS le RPC reste la barrière réelle. `MemberRowActions` : Dialog « Offrir du temps gratuit » (presets 7j/1m/3m, CTA « Confirmer la prolongation »), AlertDialog destructif « Suspendre ce compte ? » (motif requis, CTA rouge `bg-destructive`), « Réactiver » selon `suspended` ; toasts sonner, bouton désactivé pendant `pending`, aucun chiffre fabriqué (libellé durée, pas de date calculée). `membres/page.tsx` charge `profiles.suspended` (prop) — lecture service_role inchangée (déférée 20-06). i18n FR `grantDialog`/`suspendDialog`/`reactivateDialog`. **D-20-04-A (Option B — defer)** : `file/actions.ts` + `affiliation/actions.ts` CONSERVENT `createAdminServiceClient` — 0021 ne fournit aucun RPC gated `authenticated` pour leurs écritures (tables `payments`/`affiliate_*` sans policy write anon) ; bascule = runtime cassé, suppression = pages live cassées. Allowlist `rls-unchanged.test.ts` (commentaire `DEFERRED-0022`) + todo `.planning/todos/pending/0022-rpc-gated-paiements-affiliation.md`. Scan re-run : ne flague plus que les **6 pages détail (admin)** (job 20-06), PAS les 2 actions déférées. typecheck exit 0 ; suite admin 67/67 vert. Commits `3b34323`/`99e488c`/`a2baaef`/`844d56c`. **ADASH-04/05/07 PARTIELS** — retrait COMPLET de service_role côté (admin) = **0022 + 20-06**. **Reste : 20-05/06**.
 - **20-03 exécuté (2026-06-26)** : couche d'accès données du cockpit sur **anon-client** (ADASH-01/02/04/07), interface-first avant les pages 20-05/06. 3 modules : (1) `lib/admin/queries.ts` — `fetchAdminUsers(params)` keyset `(created_at desc, id desc)` + sentinelle `PAGE_SIZE(50)+1` → `{ rows, nextCursor }`, filtres serveur `source`/`q`(.ilike)/`status` (jointure subscriptions, `!inner` active/expired, `.is(null)` none), `sanitizeCursor` (ISO+UUID) copié verbatim de watchlist AVANT `.or()` (T-20-13) ; `createClient` anon, zéro `admin-service`. (2) `lib/admin/kpis.ts` — wrappers typés `getMrr`/`getAcquisitionFunnel`/`getChurn`/`getPlanMix` via `.rpc(get_*)` gated (0 ligne non-superadmin, jamais throw), `formatMrr` honnête « cash encaissé / mois » via `formatAtomic` (D-13), aucun `.from('mv_mrr')` (T-20-14, assertion source testée). (3) `lib/auth/gate.ts` — branche suspension dans `authedClient` : lecture `profiles.suspended` après `getUser()`, `suspended` → `signOut()` + `redirect('/login?suspended=1')` (couche UX sur barrière RLS 0021, T-20-11), signatures publiques inchangées. **D-20-03-A** : `status=none` via filtre top-level `.is('subscriptions', null)` sur embed nullable (cast de forme borné, relation absente de l'union colonne générée — aucun `any`). **D-20-03-B** : `getMrr` retourne le mois le plus récent (reduce max sur `month` ISO, get_mrr sans ordre garanti). Tests : sanitize 9/9, kpis 11/11, suite admin 62/62, typecheck exit 0. Commits `02286a7`/`ca12a22`/`8eb1682`. **Déviation Rule 3** : `pnpm --filter web test/typecheck` inexistants → vérif via `pnpm vitest run <path>` + `pnpm typecheck` racine. **Reste vague 4+ : 20-04..06**.
 - **20-02 exécuté (2026-06-26)** : migration **0021_admin_cockpit LIVE** (`apply_migration`, jamais `db push`) — fondation données/sécurité du cockpit (ADASH-01..05/07). 5 couches : (A) policies SELECT « superadmin voit tout » wrap InitPlan sur profiles/telegram_posts/candles/trade_setups/analyses ; (B) `admin_audit_log` (SELECT gated, aucune policy écriture — miroir 0016) ; (C) `profiles.suspended/suspended_at/suspended_reason` + `has_active_subscription()` étendu `and not suspended` (suspension = barrière RLS unique, D-17) ; (D) 4 RPC écriture SECURITY DEFINER gated+audit atomique (`grant_subscription_time`/`suspend_account`/`unsuspend_account`/`admin_mark_commission_paid`) ; (E) 3 wrappers KPI gated (`get_acquisition_funnel`/`get_churn`/`get_plan_mix`). Commit migration `aca2ff8` ; types+test `0000813`. **D-20-02-A** : 3 KPI gardés **à-la-volée** (EXPLAIN sain seed 1028 profils ; funnel 6.6ms ; keyset profiles = Index Scan) — pas de matview (D-10). Advisors : **0 `auth_rls_initplan`** (wrap tenu) ; aucune nouvelle fuite réelle (l'ERROR security_definer_view = `pattern_stats` préexistant 0014 ; WARN executable = même pattern accepté que `get_mrr` 0017). **D-20-02-B** : test `admin-rls.test.ts` aligné `target_*` → `p_user_id`/`p_commission_id` (préfixe `p_` autoritatif) → 5/5 GREEN contre DB live, typecheck exit 0. 3 déviations Task 1 honnêtes : `create or replace` has_active_subscription (drop casse policies dépendantes), args DEFAULT wrappers KPI (PGRST202 sans), garde get_churn en sous-requête externe. **Reste vague 2+ : 20-03..06**.
@@ -161,6 +162,7 @@ ressources externes non provisionnables en session de développement.
 | Phase 20 P02 | ~25min | 2 tasks | 3 files |
 | Phase 20 P03 | ~15min | 3 tasks | 5 files |
 | Phase 20 P04 | ~40min | 2 tasks | 7 files |
+| Phase 20 P05 | ~20min | 3 tasks | 7 files |
 
 ## Roadmap v2.0 (9 phases)
 
@@ -602,7 +604,7 @@ ressources externes non provisionnables en session de développement.
 
 ## Session Continuity
 
-**Last session:** 2026-06-26T20:27:19.230Z
+**Last session:** 2026-06-26T20:56:35.728Z
 
 **Last session (archive):** 2026-06-19T03:41:29.665Z
 
