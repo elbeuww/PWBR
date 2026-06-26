@@ -56,6 +56,10 @@ const NAV_ITEMS: readonly NavItem[] = [
  */
 function isActive(pathname: string, href: string): boolean {
   if (href === '/dashboard') return pathname === href
+  // Historique is a sub-view of Suivis (D-19-02-A) — treat as active when on either.
+  if (href === '/dashboard/suivis') {
+    return pathname === href || pathname.startsWith(`${href}/`) || pathname === '/dashboard/historique'
+  }
   return pathname === href || pathname.startsWith(`${href}/`)
 }
 
