@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v3.0
 milestone_name: Plateforme complète sous identité dark néon NEXA
 status: executing
-last_updated: "2026-06-26T20:16:23.000Z"
+last_updated: "2026-06-26T20:27:19.242Z"
 last_activity: 2026-06-26
 progress:
   total_phases: 12
   completed_phases: 7
   total_plans: 43
-  completed_plans: 37
-  percent: 86
+  completed_plans: 38
+  percent: 88
 ---
 
 # Project State
@@ -31,10 +31,11 @@ See: .planning/PROJECT.md (mis à jour 2026-06-20 après clôture v2.0)
 
 Milestone: v3.0 — Plateforme complète sous identité dark néon NEXA (7 phases, 15-21)
 Phase: 20 (dashboard-superadmin-cockpit-4-axes) — EXECUTING
-Plan: 3 of 6
-Status: Executing Phase 20 (20-02 livré, vague 2 — fondation DB/sécurité LIVE)
-Last activity: 2026-06-26 -- 20-02 exécuté (migration 0021 LIVE)
+Plan: 4 of 6
+Status: Ready to execute
+Last activity: 2026-06-26
 
+- **20-03 exécuté (2026-06-26)** : couche d'accès données du cockpit sur **anon-client** (ADASH-01/02/04/07), interface-first avant les pages 20-05/06. 3 modules : (1) `lib/admin/queries.ts` — `fetchAdminUsers(params)` keyset `(created_at desc, id desc)` + sentinelle `PAGE_SIZE(50)+1` → `{ rows, nextCursor }`, filtres serveur `source`/`q`(.ilike)/`status` (jointure subscriptions, `!inner` active/expired, `.is(null)` none), `sanitizeCursor` (ISO+UUID) copié verbatim de watchlist AVANT `.or()` (T-20-13) ; `createClient` anon, zéro `admin-service`. (2) `lib/admin/kpis.ts` — wrappers typés `getMrr`/`getAcquisitionFunnel`/`getChurn`/`getPlanMix` via `.rpc(get_*)` gated (0 ligne non-superadmin, jamais throw), `formatMrr` honnête « cash encaissé / mois » via `formatAtomic` (D-13), aucun `.from('mv_mrr')` (T-20-14, assertion source testée). (3) `lib/auth/gate.ts` — branche suspension dans `authedClient` : lecture `profiles.suspended` après `getUser()`, `suspended` → `signOut()` + `redirect('/login?suspended=1')` (couche UX sur barrière RLS 0021, T-20-11), signatures publiques inchangées. **D-20-03-A** : `status=none` via filtre top-level `.is('subscriptions', null)` sur embed nullable (cast de forme borné, relation absente de l'union colonne générée — aucun `any`). **D-20-03-B** : `getMrr` retourne le mois le plus récent (reduce max sur `month` ISO, get_mrr sans ordre garanti). Tests : sanitize 9/9, kpis 11/11, suite admin 62/62, typecheck exit 0. Commits `02286a7`/`ca12a22`/`8eb1682`. **Déviation Rule 3** : `pnpm --filter web test/typecheck` inexistants → vérif via `pnpm vitest run <path>` + `pnpm typecheck` racine. **Reste vague 4+ : 20-04..06**.
 - **20-02 exécuté (2026-06-26)** : migration **0021_admin_cockpit LIVE** (`apply_migration`, jamais `db push`) — fondation données/sécurité du cockpit (ADASH-01..05/07). 5 couches : (A) policies SELECT « superadmin voit tout » wrap InitPlan sur profiles/telegram_posts/candles/trade_setups/analyses ; (B) `admin_audit_log` (SELECT gated, aucune policy écriture — miroir 0016) ; (C) `profiles.suspended/suspended_at/suspended_reason` + `has_active_subscription()` étendu `and not suspended` (suspension = barrière RLS unique, D-17) ; (D) 4 RPC écriture SECURITY DEFINER gated+audit atomique (`grant_subscription_time`/`suspend_account`/`unsuspend_account`/`admin_mark_commission_paid`) ; (E) 3 wrappers KPI gated (`get_acquisition_funnel`/`get_churn`/`get_plan_mix`). Commit migration `aca2ff8` ; types+test `0000813`. **D-20-02-A** : 3 KPI gardés **à-la-volée** (EXPLAIN sain seed 1028 profils ; funnel 6.6ms ; keyset profiles = Index Scan) — pas de matview (D-10). Advisors : **0 `auth_rls_initplan`** (wrap tenu) ; aucune nouvelle fuite réelle (l'ERROR security_definer_view = `pattern_stats` préexistant 0014 ; WARN executable = même pattern accepté que `get_mrr` 0017). **D-20-02-B** : test `admin-rls.test.ts` aligné `target_*` → `p_user_id`/`p_commission_id` (préfixe `p_` autoritatif) → 5/5 GREEN contre DB live, typecheck exit 0. 3 déviations Task 1 honnêtes : `create or replace` has_active_subscription (drop casse policies dépendantes), args DEFAULT wrappers KPI (PGRST202 sans), garde get_churn en sous-requête externe. **Reste vague 2+ : 20-03..06**.
 - **20-01 exécuté (2026-06-26)** : garde-fous Wave 0 du cockpit superadmin (ADASH-02/04/07). Helper `lib/admin/searchParams.ts` (`AdminUsersParamsSchema` status/source/q/cursor, safeParse champ-par-champ anti-injection T-20-02, test 9/9 GREEN, commit `e8e8349`). Contrat RLS deux-rôles `apps/web/test/admin-rls.test.ts` (161 l., 8 RPC figés `get_mrr`/`get_acquisition_funnel`/`get_churn`/`get_plan_mix`/`grant_subscription_time`/`suspend_account`/`unsuspend_account`/`admin_mark_commission_paid` + `admin_audit_log` + 6 tables, RED until 0021, commit `08bad19`). 3 scans étendus au groupe `(admin)` (commit `97498b6`) : `rls-unchanged` RED (13 fichiers service_role hérités, éteint 20-04+20-06), `no-perf-claims`/`no-perf-seed-claims` GREEN gardes armées. **D-20-01-A** : `(admin)` est un groupe RACINE `app/(admin)/` (hors `[locale]`) → `groupBaseDir()` + `listPages` couvre aussi `actions.ts`. **D-20-01-B** : les 2 scans perf sont GREEN (surface Phase 8 déjà honnête), pas RED comme prédit — gardes armées pour le reskin 20-05. Typecheck workspace exit 0. **Reste vague 1+ : 20-02** (migration 0021 → éteint admin-rls).
 - **19-06 exécuté (2026-06-26)** : `WatchlistToggle` (étoile optimiste anti-IDOR, UDASH-03) — écriture `user_followed_setups` via anon-client navigateur (RLS `auth.uid()`), insert minimal `{ setup_id }` SANS colonne propriétaire (`default auth.uid()` + `with check`), toggle optimiste react-query (flip immédiat, rollback+toast). Câblée en SIBLING hors du `<Link>` sur `SignalCard` + en-tête `SignalDetail` ; `fetchFollowedSetupIds` 1× par page membre → prop `followed`. Commits e502e90/189b1f5/afb63fd/1d94e71. **D-19-06-A** : logique optimiste extraite en helper pur `buildWatchlistToggle` testé en Node (env vitest sans jsdom). **D-19-06-B/C (Rule 1)** : mock du toggle dans `SignalDetail.test` + `QueryProvider` ajouté à la page détail (useMutation exige un QueryClient). Vitest 223/223, typecheck vert. **Reste : 19-07** (dernier plan, vague 3).
@@ -157,6 +158,7 @@ ressources externes non provisionnables en session de développement.
 | Phase 19 P07 | 20min | 3 tasks | 7 files |
 | Phase 20 P01 | 12min | 3 tasks | 6 files |
 | Phase 20 P02 | ~25min | 2 tasks | 3 files |
+| Phase 20 P03 | ~15min | 3 tasks | 5 files |
 
 ## Roadmap v2.0 (9 phases)
 
@@ -598,7 +600,7 @@ ressources externes non provisionnables en session de développement.
 
 ## Session Continuity
 
-**Last session:** 2026-06-26T20:14:43.977Z
+**Last session:** 2026-06-26T20:27:19.230Z
 
 **Last session (archive):** 2026-06-19T03:41:29.665Z
 
