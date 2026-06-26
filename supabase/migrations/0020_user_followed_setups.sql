@@ -2,7 +2,8 @@
 -- 1re ÉCRITURE FRONT MEMBRE du milestone : l'user suit/dé-suit des trade_setups.
 -- La RLS with-check scopée `auth.uid()` EST la barrière anti-IDOR
 -- (V4 Access Control prioritaire) — `user_id` n'est JAMAIS reçu du client (default
--- (select auth.uid())). Couvre UDASH-03 (watchlist + revue IDOR) et UDASH-02
+-- auth.uid() ; subquery interdite en DEFAULT, le wrap (select …) reste sur les policies).
+-- Couvre UDASH-03 (watchlist + revue IDOR) et UDASH-02
 -- (index keyset pour pagination des suivis/historique).
 --
 -- CONVENTION REPO (CRITIQUE) : appliquée via MCP `apply_migration` (canal 0006/0008/
@@ -33,7 +34,7 @@
 --
 -- STRIDE :
 --   T-19-01 (Tampering/Elevation, IDOR) : with-check scopée auth.uid()
---           + default (select auth.uid()) ; insert usurpé (user_id d'autrui) rejeté
+--           + default auth.uid() ; insert usurpé (user_id d'autrui) rejeté
 --           (erreur 42501). Prouvé par anon-client (user-followed-rls.test.ts).
 --   T-19-02 (Info Disclosure) : using scopée auth.uid() ; B ne lit
 --           pas la watchlist de A.
@@ -45,7 +46,7 @@
 
 create table public.user_followed_setups (
   id         uuid        not null default gen_random_uuid(),                       -- tiebreaker keyset dédié
-  user_id    uuid        not null default (select auth.uid()) references auth.users(id) on delete cascade,
+  user_id    uuid        not null default auth.uid() references auth.users(id) on delete cascade,
   setup_id   uuid        not null references public.trade_setups(id) on delete cascade,
   created_at timestamptz not null default now(),
   primary key (user_id, setup_id),          -- idempotence : un seul follow par couple (user, setup)

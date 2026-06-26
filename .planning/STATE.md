@@ -3,8 +3,8 @@ gsd_state_version: 1.0
 milestone: v3.0
 milestone_name: Plateforme complète sous identité dark néon NEXA
 status: executing
-last_updated: "2026-06-26T02:49:05.191Z"
-last_activity: 2026-06-26 -- Phase 19 planning complete
+last_updated: "2026-06-26T02:53:27.628Z"
+last_activity: 2026-06-26 -- Phase 19 execution started
 progress:
   total_phases: 12
   completed_phases: 6
@@ -23,17 +23,24 @@ progress:
 See: .planning/PROJECT.md (mis à jour 2026-06-20 après clôture v2.0)
 
 **Core value:** Produire, pour chaque opportunité, une analyse fiable et explicable — vulgarisée pour un public non technique — avec un % de réussite TOUJOURS mesuré, jamais inventé : c'est le socle de confiance qui fait payer l'abonnement.
-**Current focus:** Phase 18 — seed-de-donnees-realistes-a-l-echelle
+**Current focus:** Phase 19 — dashboard-utilisateur
 **Mode:** interactive (MVP vertical)
 **Granularity:** fine
 
 ## Current Position
 
 Milestone: v3.0 — Plateforme complète sous identité dark néon NEXA (7 phases, 15-21)
-Phase: 18 (seed-de-donnees-realistes-a-l-echelle) — EXECUTING
-Plan: 3 of 3
-Status: Ready to execute
-Last activity: 2026-06-26 -- Phase 19 planning complete
+Phase: 19 (dashboard-utilisateur) — EXECUTING
+Plan: 19-01 ✅ DONE — next 19-02 (vague 1)
+Status: Executing Phase 19 (repris après crash PC)
+Last activity: 2026-06-26 -- 19-01 complété (reprise post-crash : Task 2+3)
+
+### ▶ REPRISE Phase 19 (point de reprise)
+
+- Crash PC pendant l'exécution. 19-01 Task 1 était commitée (`89818d2`), Task 2 [BLOCKING] non faite.
+- **Repris** : migration 0020 `user_followed_setups` LIVE (apply_migration), index keyset CONCURRENTLY valide, EXPLAIN keyset prouvé (forcé, table vide), types régénérés + alias, advisors verts, typecheck vert, suite 621✓/13 skip. SUMMARY écrit.
+- Déviation D-19-01-A : `default (select auth.uid())` → `default auth.uid()` (subquery interdite en DEFAULT).
+- **Action attendue** : enchaîner vague 1 → **19-02**, puis vague 2 (19-03/04/05), vague 3 (19-06/07). `/gsd:execute-phase 19` reprend automatiquement (19-01 a son SUMMARY).
 
 ### ▶ REPRISE Phase 17 (point de reprise)
 

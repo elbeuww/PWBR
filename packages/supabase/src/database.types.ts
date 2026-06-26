@@ -855,6 +855,35 @@ export type Database = {
           },
         ]
       }
+      user_followed_setups: {
+        Row: {
+          created_at: string
+          id: string
+          setup_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          setup_id: string
+          user_id?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          setup_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_followed_setups_setup_id_fkey"
+            columns: ["setup_id"]
+            isOneToOne: false
+            referencedRelation: "trade_setups"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       affiliate_dashboard: {
@@ -1176,3 +1205,9 @@ export type AffiliateDashboardRow = Database['public']['Views']['affiliate_dashb
 // Phase 17 — fondation DB scalable (0017) — matview de référence MRR « cash encaissé »
 // gated via get_mrr() (D-02/SCALE-03). revenue_atomic string (bigint -> PostgREST).
 export type MvMrrRow = Database['public']['Views']['mv_mrr']['Row']
+
+// Phase 19 — watchlist membre (UDASH-03, migration 0020) — alias maison.
+// `user_id` jamais reçu du client (default auth.uid()) ; RLS with-check = barrière anti-IDOR.
+export type UserFollowedSetupRow = Database['public']['Tables']['user_followed_setups']['Row']
+export type UserFollowedSetupInsert = Database['public']['Tables']['user_followed_setups']['Insert']
+export type UserFollowedSetupUpdate = Database['public']['Tables']['user_followed_setups']['Update']
