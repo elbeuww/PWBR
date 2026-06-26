@@ -60,8 +60,8 @@ Requirements de ce milestone. Chacun est mappé à une phase de la roadmap (voir
 
 ### Tests fonctionnels (E2E)
 
-- [ ] **E2E-01**: Les flux principaux (auth, navigation membre, dashboard utilisateur, abonnement, gating admin) sont couverts par des tests **Playwright**.
-- [ ] **E2E-02**: Les tests RLS/gating prouvent l'**isolation** (non-abonné → 0 ligne, non-superadmin → 404, cross-user).
+- [x] **E2E-01**: Les flux principaux (auth, navigation membre, dashboard utilisateur, abonnement, gating admin) sont couverts par des tests **Playwright**.
+- [x] **E2E-02**: Les tests RLS/gating prouvent l'**isolation** (non-abonné → 0 ligne, non-superadmin → 404, cross-user).
 
 ## Reporté de v2.1 (milestone en pause — repris à la reprise du moteur live)
 
@@ -121,8 +121,8 @@ Exclusions explicites de ce milestone, avec raison.
 | ADASH-05 | Phase 20 — Dashboard superadmin (cockpit 4 axes) | Complete |
 | ADASH-06 | Phase 20 — Dashboard superadmin (cockpit 4 axes) | Complete |
 | ADASH-07 | Phase 20 — Dashboard superadmin (cockpit 4 axes) | Complete |
-| E2E-01 | Phase 21 — Tests E2E + audit de scalabilité | Pending |
-| E2E-02 | Phase 21 — Tests E2E + audit de scalabilité | Pending |
+| E2E-01 | Phase 21 — Tests E2E + audit de scalabilité | Complete |
+| E2E-02 | Phase 21 — Tests E2E + audit de scalabilité | Complete |
 | SCALE-06 | Phase 21 — Tests E2E + audit de scalabilité | Pending |
 
 **Couverture :** 35/35 requirements v1 mappés, aucun orphelin, aucun doublon.
