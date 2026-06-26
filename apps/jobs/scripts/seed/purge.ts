@@ -22,10 +22,32 @@
  * (deleteUser) referme la boucle (auth.users n'a pas de colonne source).
  */
 import type { SupabaseClient } from '@supabase/supabase-js'
+import pRetry from 'p-retry'
 import type { Database } from '@app/supabase'
 import { SEED_SOURCE, DEMO_EMAIL_DOMAIN } from './config'
 
 type Client = SupabaseClient<Database>
+
+/** Pool de promesses borné (p-limit maison — p-limit absent du workspace, miroir users.ts). */
+function createLimiter(concurrency: number) {
+  let active = 0
+  const queue: Array<() => void> = []
+  const next = () => {
+    active -= 1
+    const run = queue.shift()
+    if (run) run()
+  }
+  return function limit<T>(fn: () => Promise<T>): Promise<T> {
+    return new Promise<T>((resolvePromise, rejectPromise) => {
+      const run = () => {
+        active += 1
+        fn().then(resolvePromise, rejectPromise).finally(next)
+      }
+      if (active < concurrency) run()
+      else queue.push(run)
+    })
+  }
+}
 
 /**
  * Tables colonnées `source`, dans l'ordre de SUPPRESSION (enfants → parents).
@@ -63,35 +85,50 @@ export async function purge(client: Client): Promise<void> {
 }
 
 /**
- * Liste paginée des users auth, filtre le domaine démo, deleteUser un par un.
- * `auth.admin.listUsers` pagine par défaut (perPage borné) — on boucle jusqu'à
- * épuisement. Aucune erreur si 0 user démo (boucle vide).
+ * Purge les users démo de `auth.users`. En DEUX temps pour la robustesse :
+ *   1. COLLECTE paginée des ids démo (lecture pure, SANS suppression → pagination
+ *      stable : supprimer pendant qu'on pagine décale les pages et saute des users).
+ *   2. SUPPRESSION bornée + résiliente (p-retry backoff exponentiel → un timeout
+ *      réseau transitoire `fetch failed` ne tue plus tout le seed ; pLimit borne la
+ *      charge sur l'API Auth). Sûre à vide : 0 user démo → boucles vides, no-op.
  */
 async function purgeDemoAuthUsers(client: Client): Promise<void> {
   const suffix = `@${DEMO_EMAIL_DOMAIN}`
   const perPage = 1000
-  let page = 1
 
-  for (;;) {
-    const { data, error } = await client.auth.admin.listUsers({ page, perPage })
+  // 1. Collecte (lecture seule, pagination stable). listUsers retryé (transitoire).
+  const demoUserIds: string[] = []
+  for (let page = 1; ; page += 1) {
+    const { data, error } = await pRetry(
+      () => client.auth.admin.listUsers({ page, perPage }),
+      { retries: 3 },
+    )
     if (error) {
       throw new Error(`purge auth.users (listUsers page ${page}): ${error.message}`)
     }
-
     const users = data?.users ?? []
     if (users.length === 0) break
-
     for (const user of users) {
-      const email = user.email ?? ''
-      if (!email.endsWith(suffix)) continue
-      const { error: delErr } = await client.auth.admin.deleteUser(user.id)
-      if (delErr) {
-        throw new Error(`purge auth.users (deleteUser ${email}): ${delErr.message}`)
-      }
+      if ((user.email ?? '').endsWith(suffix)) demoUserIds.push(user.id)
     }
-
-    // Dernière page atteinte (lot incomplet) → stop.
-    if (users.length < perPage) break
-    page += 1
+    if (users.length < perPage) break // dernière page (lot incomplet)
   }
+
+  // 2. Suppression bornée + résiliente (retry sur fetch failed / 5xx transitoires).
+  const limit = createLimiter(5)
+  await Promise.all(
+    demoUserIds.map((userId) =>
+      limit(() =>
+        pRetry(
+          async () => {
+            const { error: delErr } = await client.auth.admin.deleteUser(userId)
+            if (delErr) throw new Error(delErr.message)
+          },
+          { retries: 5 },
+        ).catch((e: unknown) => {
+          throw new Error(`purge auth.users (deleteUser ${userId}): ${(e as Error).message}`)
+        }),
+      ),
+    ),
+  )
 }
