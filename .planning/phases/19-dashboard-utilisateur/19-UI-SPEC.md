@@ -36,13 +36,12 @@ created: 2026-06-26
 
 ## Spacing Scale
 
-Tailwind v4 CSS-first, base unit 4px (`--spacing(n)` = n×4px). Declared values (all multiples of 4):
+Tailwind v4 CSS-first, base unit 4px (`--spacing(n)` = n×4px). Declared standard set `{4, 8, 16, 24, 32, 48, 64}` (all multiples of 4):
 
 | Token | Value | Usage |
 |-------|-------|-------|
 | xs | 4px | Icon gaps, badge inline padding, card title↔description gap (`gap-1`) |
 | sm | 8px | Compact element spacing, chip groups |
-| (card-sm) | 12px | Compact card internal spacing (`Card data-size="sm"`, `[--card-spacing:--spacing(3)]`) |
 | md | 16px | Default card internal spacing (`[--card-spacing:--spacing(4)]`), default element gap |
 | lg | 24px | Section padding, gap between overview blocks, page content top padding (`pt-6`) |
 | xl | 32px | Layout gaps between major dashboard regions |
@@ -52,6 +51,7 @@ Tailwind v4 CSS-first, base unit 4px (`--spacing(n)` = n×4px). Declared values 
 Content max-width: `max-w-screen-xl`, horizontal gutters `px-4 md:px-6 lg:px-8` (matches existing member surface, ExpiryBanner).
 
 Exceptions:
+- **12px** — DS v3 compact card token (`Card data-size="sm"`, `[--card-spacing:--spacing(3)]`), already shipped in Phase 10/16. Not a new value — brownfield reuse of an existing DS token, outside the declared standard set.
 - **44px** minimum touch target for the watchlist star toggle and every bottom-nav item on mobile (multiple of 4, a11y tap-size). Icon-only controls keep a ≥44px hit area even when the glyph is smaller.
 
 ---
@@ -83,7 +83,7 @@ Two weights only. Four sizes. Line-heights from existing DS v3 components.
 | Destructive | `--destructive` `oklch(0.68 0.2 24)` real red | Sign-out affordance styling only (see copywriting) |
 
 **Accent (brand green) reserved for — explicit list:**
-1. Primary CTA buttons (e.g. « Renouveler l'abonnement », « Enregistrer »).
+1. Primary CTA buttons (e.g. « Renouveler l'abonnement », « Enregistrer les préférences »).
 2. Active nav item indicator in sidebar / bottom-nav (subtle fill/underline — NO glow, D-01).
 3. Focus ring (`--ring` = brand green) on interactive elements.
 4. Active (filled) state of the watchlist star toggle.
@@ -105,14 +105,14 @@ Canonical FR below (i18n parity required for AR/EN/FR — next-intl, strict key 
 | Element | Copy (FR canonical) |
 |---------|------|
 | Primary CTA (overview, expired) | « Renouveler l'abonnement » → parcours paiement `/tarifs` (reuse ExpiryBanner CTA pattern) |
-| Primary CTA (settings) | « Enregistrer » (préférences langue / notifications) |
+| Primary CTA (settings) | « Enregistrer les préférences » (langue / notifications) |
 | Watchlist toggle | Icône étoile (lucide `Star`), pas de libellé. `aria-label` : « Ajouter à ma watchlist » / « Retirer de ma watchlist » (toggle) |
 | Empty — Suivis (ouverts) | Titre : « Aucun signal suivi » · Corps : « Ajoutez un signal à votre watchlist en touchant l'étoile depuis la liste ou le détail d'un trade. » |
 | Empty — Historique (clôturés) | Titre : « Aucun signal clôturé » · Corps : « Vos signaux suivis apparaîtront ici une fois clôturés, avec leur issue. » |
 | Renewal state (abonné expiré) | Titre : « Votre abonnement a expiré » · Corps : « Renouvelez pour réaccéder à vos signaux et à votre watchlist. » + CTA « Renouveler l'abonnement ». (Onglets signaux/watchlist : la RLS renvoie 0 ligne — barrière réelle, jamais le gate UX seul, D-03.) |
 | Affiliation summary (si affilié) | Carte résumé : « X abonnés ramenés · Y revenus mesurés » + lien « Voir mon tableau d'affiliation » → `affiliation/dashboard`. Affichée uniquement si `requireRole('affiliate')` (D-10). |
 | Error state | Titre : « Impossible de charger vos données » · Corps : « Vérifiez votre connexion et réessayez. » + action « Réessayer ». |
-| Destructive confirmation | **Aucune action destructive nécessitant une modale en Phase 19.** Retrait watchlist = toggle optimiste réversible (D-06, pas de confirmation). Déconnexion = action réversible (re-login) → bouton direct « Se déconnecter », sans modale. (Si le planner ajoute une confirmation de déconnexion : titre « Se déconnecter ? », confirmer « Se déconnecter », annuler « Annuler ».) |
+| Destructive confirmation | **Aucune action destructive nécessitant une modale en Phase 19.** Retrait watchlist = toggle optimiste réversible (D-06, pas de confirmation). Déconnexion = action réversible (re-login) → bouton direct « Se déconnecter », sans modale. (Si le planner ajoute une confirmation de déconnexion : titre « Se déconnecter ? », confirmer « Se déconnecter », annuler « Garder la session ».) |
 
 `<Disclaimer />` systématique (PROJECT.md) reste rendu sur les surfaces signaux remontées — ne pas le retirer en agrégeant.
 
