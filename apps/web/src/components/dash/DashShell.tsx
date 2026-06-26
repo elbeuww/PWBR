@@ -71,7 +71,7 @@ export function DashShell({ children }: { children: React.ReactNode }) {
     <div className="flex min-h-screen bg-[var(--background)]">
       {/* Sidebar persistante (desktop). */}
       <aside className="hidden w-60 shrink-0 border-e border-[var(--border)] bg-[var(--card)] md:flex md:flex-col">
-        <nav aria-label={t('overview')} className="flex flex-col gap-1 p-4">
+        <nav aria-label={t('sidebarLabel')} className="flex flex-col gap-1 p-4">
           {NAV_ITEMS.map(({ key, href, Icon }) => {
             const active = isActive(pathname, href)
             return (
@@ -102,7 +102,7 @@ export function DashShell({ children }: { children: React.ReactNode }) {
 
       {/* Bottom-nav fixe (mobile). */}
       <nav
-        aria-label={t('overview')}
+        aria-label={t('bottomLabel')}
         className="fixed inset-inline-0 bottom-0 z-20 flex items-stretch border-t border-[var(--border)] bg-[var(--card)] md:hidden"
       >
         {NAV_ITEMS.map(({ key, href, Icon }) => {

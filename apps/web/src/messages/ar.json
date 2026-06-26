@@ -570,7 +570,9 @@
       "watchlist": "قائمة المتابعة",
       "abonnement": "الاشتراك",
       "affiliation": "الإحالة",
-      "parametres": "الإعدادات"
+      "parametres": "الإعدادات",
+      "sidebarLabel": "التنقل الرئيسي",
+      "bottomLabel": "التنقل السريع"
     },
     "overview": {
       "title": "لوحة القيادة الشخصية",

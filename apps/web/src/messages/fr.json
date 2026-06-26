@@ -765,7 +765,9 @@
       "watchlist": "Watchlist",
       "abonnement": "Abonnement",
       "affiliation": "Affiliation",
-      "parametres": "Paramètres"
+      "parametres": "Paramètres",
+      "sidebarLabel": "Navigation principale",
+      "bottomLabel": "Navigation rapide"
     },
     "overview": {
       "title": "Cockpit personnel",

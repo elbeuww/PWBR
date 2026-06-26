@@ -570,7 +570,9 @@
       "watchlist": "Watchlist",
       "abonnement": "Subscription",
       "affiliation": "Affiliation",
-      "parametres": "Settings"
+      "parametres": "Settings",
+      "sidebarLabel": "Primary navigation",
+      "bottomLabel": "Quick navigation"
     },
     "overview": {
       "title": "Personal cockpit",
