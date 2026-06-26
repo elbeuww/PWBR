@@ -19,6 +19,8 @@ dist/
 test-results/
 playwright-report/
 coverage/
+# Storage states Playwright — cookies de session impersonnables (V3 ASVS), JAMAIS commités
+playwright/.auth/
 
 # OS
 .DS_Store
