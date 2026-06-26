@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v3.0
 milestone_name: Plateforme complète sous identité dark néon NEXA
-status: verifying
+status: ready_to_plan
 last_updated: "2026-06-26T14:48:54.628Z"
 last_activity: 2026-06-26
 progress:
   total_phases: 12
-  completed_phases: 7
+  completed_phases: 8
   total_plans: 37
   completed_plans: 35
-  percent: 95
+  percent: 67
 ---
 
 # Project State
@@ -30,9 +30,9 @@ See: .planning/PROJECT.md (mis à jour 2026-06-20 après clôture v2.0)
 ## Current Position
 
 Milestone: v3.0 — Plateforme complète sous identité dark néon NEXA (7 phases, 15-21)
-Phase: 19 (dashboard-utilisateur) — EXECUTING
-Plan: 7 of 7
-Status: Phase complete — ready for verification
+Phase: 20
+Plan: Not started
+Status: Ready to plan
 Last activity: 2026-06-26
 
 - **19-06 exécuté (2026-06-26)** : `WatchlistToggle` (étoile optimiste anti-IDOR, UDASH-03) — écriture `user_followed_setups` via anon-client navigateur (RLS `auth.uid()`), insert minimal `{ setup_id }` SANS colonne propriétaire (`default auth.uid()` + `with check`), toggle optimiste react-query (flip immédiat, rollback+toast). Câblée en SIBLING hors du `<Link>` sur `SignalCard` + en-tête `SignalDetail` ; `fetchFollowedSetupIds` 1× par page membre → prop `followed`. Commits e502e90/189b1f5/afb63fd/1d94e71. **D-19-06-A** : logique optimiste extraite en helper pur `buildWatchlistToggle` testé en Node (env vitest sans jsdom). **D-19-06-B/C (Rule 1)** : mock du toggle dans `SignalDetail.test` + `QueryProvider` ajouté à la page détail (useMutation exige un QueryClient). Vitest 223/223, typecheck vert. **Reste : 19-07** (dernier plan, vague 3).
