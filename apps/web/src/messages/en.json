@@ -619,6 +619,9 @@
       "passwordUpdateError": "Could not update the password. Please try again.",
       "language": "Language",
       "notifications": "Notifications",
+      "notificationsHint": "Display preferences only — no email or notification is sent yet.",
+      "notifyNewSignals": "New signals",
+      "notifyExpiry": "Subscription expiry reminder",
       "manageSubscription": "Manage subscription",
       "signOut": "Sign out",
       "savePreferences": "Save preferences"

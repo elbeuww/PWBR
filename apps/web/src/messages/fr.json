@@ -814,6 +814,9 @@
       "passwordUpdateError": "Impossible de mettre à jour le mot de passe. Réessayez.",
       "language": "Langue",
       "notifications": "Notifications",
+      "notificationsHint": "Préférences d'affichage uniquement — aucun e-mail ni notification n'est encore envoyé.",
+      "notifyNewSignals": "Nouveaux signaux",
+      "notifyExpiry": "Rappel d'expiration de l'abonnement",
       "manageSubscription": "Gérer l'abonnement",
       "signOut": "Se déconnecter",
       "savePreferences": "Enregistrer les préférences"

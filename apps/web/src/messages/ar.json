@@ -619,6 +619,9 @@
       "passwordUpdateError": "تعذّر تحديث كلمة المرور. حاول مرة أخرى.",
       "language": "اللغة",
       "notifications": "الإشعارات",
+      "notificationsHint": "تفضيلات العرض فقط — لا يتم إرسال أي بريد إلكتروني أو إشعار بعد.",
+      "notifyNewSignals": "إشارات جديدة",
+      "notifyExpiry": "تذكير بانتهاء الاشتراك",
       "manageSubscription": "إدارة الاشتراك",
       "signOut": "تسجيل الخروج",
       "savePreferences": "حفظ التفضيلات"
