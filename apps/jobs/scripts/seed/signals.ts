@@ -97,6 +97,23 @@ async function readInstrumentIds(client: Client): Promise<string[]> {
 }
 
 /**
+ * Lit les tuples (instrument_id, style, session, session_day) des setups DÉJÀ 'active'
+ * en base (lecture POST-purge → uniquement source='live'). L'index unique partiel
+ * trade_setups_versionkey_idx est GLOBAL (non filtré par source) : un setup demo 'active'
+ * ne doit pas collisionner avec un setup live 'active'. Pré-charge le Set de dédup.
+ */
+async function readActiveSetupKeys(client: Client): Promise<Set<string>> {
+  const { data, error } = await client
+    .from('trade_setups')
+    .select('instrument_id, style, session, session_day')
+    .eq('status', 'active')
+  if (error) throw new Error(`seed signals: read active setups: ${error.message}`)
+  const keys = new Set<string>()
+  for (const r of data ?? []) keys.add(`${r.instrument_id}|${r.style}|${r.session}|${r.session_day}`)
+  return keys
+}
+
+/**
  * Seede analyses → trade_setups → prediction_outcomes (outcomes BRUTS). FK-cohérent,
  * source='demo'. Instruments RÉUTILISÉS (lus, jamais insérés). Retourne un récap de
  * volumétrie pour le log de l'orchestrateur.
@@ -150,11 +167,24 @@ export async function seedSignals(
     if (m < 4) return 'expired'
     return 'invalidated'
   }
+  // Invariant métier (index unique partiel trade_setups_versionkey_idx, 0006) : un SEUL
+  // setup 'active' par (instrument_id, style, session, session_day). Le générateur pioche
+  // par modulo → des actifs retombent sur le même slot ; le 1er reste actif, les suivants
+  // basculent 'expired' (réaliste : le slot est déjà pris). Déterministe → re-run stable.
+  // Pré-chargé avec les tuples live déjà 'active' (index global, non source-scoped).
+  const activeKeys = await readActiveSetupKeys(client)
   for (let i = 0; i < setupTarget; i += 1) {
     const createdAt = spreadCreatedAt(f, setupTarget, i)
-    const status = statusOf(i)
+    let status = statusOf(i)
     const style = STYLES[i % STYLES.length]
     const session = SESSIONS[i % SESSIONS.length]
+    const instrumentId = instrumentIds[i % instrumentIds.length]
+    const sessionDay = createdAt.toISODate() as string
+    if (status === 'active') {
+      const key = `${instrumentId}|${style}|${session}|${sessionDay}`
+      if (activeKeys.has(key)) status = 'expired'
+      else activeKeys.add(key)
+    }
     const direction = DIRECTIONS[i % DIRECTIONS.length]
     const entry = Number(f.number.float({ min: 1, max: 50000, fractionDigits: 4 }))
     const slDelta = Number(f.number.float({ min: 0.5, max: 5, fractionDigits: 4 }))
@@ -162,10 +192,10 @@ export async function seedSignals(
     const tp = direction === 'long' ? entry * (1 + (slDelta * 2) / 100) : entry * (1 - (slDelta * 2) / 100)
     setupRows.push({
       analysis_id: analysisIds[i % analysisIds.length],
-      instrument_id: instrumentIds[i % instrumentIds.length],
+      instrument_id: instrumentId,
       style,
       session,
-      session_day: createdAt.toISODate() as string,
+      session_day: sessionDay,
       direction,
       opportunity_score: f.number.int({ min: 40, max: 99 }),
       risk_level: RISK_LEVELS[i % RISK_LEVELS.length],
