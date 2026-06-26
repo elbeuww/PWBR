@@ -42,7 +42,7 @@ Détail complet archivé : `.planning/milestones/v2.0-ROADMAP.md`.
 - [x] **Phase 17: Fondation DB scalable (perf avant charge)** — Migration `0017` : wrap RLS `(select …)` + index sur colonnes de policy, index composites keyset alignés `ORDER BY`, infra matviews KPIs (unique index + wrapper `is_superadmin()`), Broadcast vs `postgres_changes`, migrations non bloquantes `CONCURRENTLY`. (SCALE perf)
  (completed 2026-06-25)
 - [x] **Phase 18: Seed de données réalistes à l'échelle** — `seed.ts` faker déterministe, idempotent, FK-cohérent (~10k users + signaux/paiements/affiliés/outcomes), labels `backtest`/`démo` (aucun chiffre de perf fabriqué), RLS re-testée depuis client anon. (SEED) (completed 2026-06-25)
-- [ ] **Phase 19: Dashboard utilisateur** — Groupe `(dash)` : vue d'ensemble, signaux suivis/historique keyset, watchlist `user_followed_setups` (revue IDOR), abonnement + ExpiryBanner, affiliation intégrée, paramètres — démontrable sur données seedées. (UDASH)
+- [x] **Phase 19: Dashboard utilisateur** — Groupe `(dash)` : vue d'ensemble, signaux suivis/historique keyset, watchlist `user_followed_setups` (revue IDOR), abonnement + ExpiryBanner, affiliation intégrée, paramètres — démontrable sur données seedées. (UDASH) (completed 2026-06-26)
 - [ ] **Phase 20: Dashboard superadmin (cockpit 4 axes)** — Acquisition/Revenus(MRR mesuré)/Ops/Conformité, tables virtualisées filtrables/paginées, gating `is_superadmin()` (404 discret), matviews phase 17, jamais service_role côté pages. (ADASH)
 - [ ] **Phase 21: Tests E2E + audit de scalabilité** — Playwright des flux principaux + isolation RLS/gating prouvée, audit DB `EXPLAIN ANALYZE` + `get_advisors` + `pg_stat_statements` sur les requêtes clés à ~10k (validation keyset/index/matviews). (E2E + SCALE-06)
 
@@ -208,7 +208,7 @@ Détail complet archivé : `.planning/milestones/v2.0-ROADMAP.md`.
 - [x] 19-04-PLAN.md — Overview cockpit (ordre D-08, no-perf) + abonnement réhébergé + AffiliateSummaryCard conditionnelle no-PII + garde no-perf étendue (UDASH-01, UDASH-05)
 - [x] 19-05-PLAN.md — Paramètres (compte/langue/notifications UI/abonnement/déconnexion) + changement mdp `updateUser` + remplacement stub `/dashboard` (UDASH-06)
 - [x] 19-06-PLAN.md — Watchlist write : WatchlistToggle optimiste anti-IDOR + câblage SignalCard/SignalDetail + followed-ids dans pages membre (UDASH-03)
-- [ ] 19-07-PLAN.md — Suivis + Historique keyset (4 états dont renewal) + KeysetList + route watchlist→Suivis (UDASH-02)
+- [x] 19-07-PLAN.md — Suivis + Historique keyset (4 états dont renewal) + KeysetList + route watchlist→Suivis (UDASH-02)
 **UI hint** : yes
 **Notes** : `/dashboard` actuel = stub (liste `instruments`) → remplacer. Onglets membre = agrégation de surfaces existantes (signaux, abonnement, affiliation) — ne pas réimplémenter. Watchlist = **seule écriture front membre** du milestone (1re policy insert/delete scopée `auth.uid()` → revue IDOR). Décision libs tranchée : **aucune nouvelle dépendance** (pas de react-table/react-virtual/nuqs — réutiliser react-query/zod/sonner/lucide + pattern URL-state maison), keyset via helper `cursor.ts`. Anti-feature : pas d'equity curve/P&L/ROI (chiffre non mesuré + promesse implicite, VITR-03).
 
@@ -259,7 +259,7 @@ Détail complet archivé : `.planning/milestones/v2.0-ROADMAP.md`.
 | 16. Reskin transversal de toutes les pages | v3.0 | 4/4 | Complete    | 2026-06-24 |
 | 17. Fondation DB scalable | v3.0 | 3/3 | Complete   | 2026-06-25 |
 | 18. Seed de données réalistes à l'échelle | v3.0 | 3/3 | Complete   | 2026-06-25 |
-| 19. Dashboard utilisateur | v3.0 | 6/7 | In Progress|  |
+| 19. Dashboard utilisateur | v3.0 | 7/7 | Complete   | 2026-06-26 |
 | 20. Dashboard superadmin (cockpit 4 axes) | v3.0 | 0/? | Not started | - |
 | 21. Tests E2E + audit de scalabilité | v3.0 | 0/? | Not started | - |
 

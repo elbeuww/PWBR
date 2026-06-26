@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v3.0
 milestone_name: Plateforme complète sous identité dark néon NEXA
-status: executing
-last_updated: "2026-06-26T14:33:04.174Z"
+status: verifying
+last_updated: "2026-06-26T14:48:54.628Z"
 last_activity: 2026-06-26
 progress:
   total_phases: 12
-  completed_phases: 6
+  completed_phases: 7
   total_plans: 37
-  completed_plans: 34
-  percent: 92
+  completed_plans: 35
+  percent: 95
 ---
 
 # Project State
@@ -32,7 +32,7 @@ See: .planning/PROJECT.md (mis à jour 2026-06-20 après clôture v2.0)
 Milestone: v3.0 — Plateforme complète sous identité dark néon NEXA (7 phases, 15-21)
 Phase: 19 (dashboard-utilisateur) — EXECUTING
 Plan: 7 of 7
-Status: Ready to execute
+Status: Phase complete — ready for verification
 Last activity: 2026-06-26
 
 - **19-06 exécuté (2026-06-26)** : `WatchlistToggle` (étoile optimiste anti-IDOR, UDASH-03) — écriture `user_followed_setups` via anon-client navigateur (RLS `auth.uid()`), insert minimal `{ setup_id }` SANS colonne propriétaire (`default auth.uid()` + `with check`), toggle optimiste react-query (flip immédiat, rollback+toast). Câblée en SIBLING hors du `<Link>` sur `SignalCard` + en-tête `SignalDetail` ; `fetchFollowedSetupIds` 1× par page membre → prop `followed`. Commits e502e90/189b1f5/afb63fd/1d94e71. **D-19-06-A** : logique optimiste extraite en helper pur `buildWatchlistToggle` testé en Node (env vitest sans jsdom). **D-19-06-B/C (Rule 1)** : mock du toggle dans `SignalDetail.test` + `QueryProvider` ajouté à la page détail (useMutation exige un QueryClient). Vitest 223/223, typecheck vert. **Reste : 19-07** (dernier plan, vague 3).
@@ -152,6 +152,7 @@ ressources externes non provisionnables en session de développement.
 | Phase 19 P04 | ~14min | 3 tasks | 7 files |
 | Phase 19 P05 | ~12min | 2 tasks | 5 files |
 | Phase 19 P06 | ~18min | 3 tasks | 8 files |
+| Phase 19 P07 | 20min | 3 tasks | 7 files |
 
 ## Roadmap v2.0 (9 phases)
 
@@ -593,7 +594,7 @@ ressources externes non provisionnables en session de développement.
 
 ## Session Continuity
 
-**Last session:** 2026-06-26T14:28:37.508Z
+**Last session:** 2026-06-26T14:48:28.058Z
 
 **Last session (archive):** 2026-06-19T03:41:29.665Z
 
