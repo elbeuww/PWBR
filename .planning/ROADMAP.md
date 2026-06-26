@@ -221,7 +221,13 @@ Détail complet archivé : `.planning/milestones/v2.0-ROADMAP.md`.
   2. Le superadmin voit la santé opérationnelle (jobs `job_runs`, fraîcheur `v_data_freshness`, file de paiements) et l'état de conformité (gate `LEGAL_REVIEW_DONE`).
   3. Le superadmin gère les utilisateurs (table virtualisée filtrable/paginée par curseur, état d'abonnement) et les paiements/affiliés (files, payouts manuels).
   4. Toutes les pages superadmin sont gated `is_superadmin()` (404 discret pour un non-superadmin), avec un client anon + RLS — jamais de service_role côté pages, aucune fuite cross-tenant via les matviews.
-**Plans** : TBD
+**Plans** : 6 plans (4 vagues)
+- [ ] 20-01-PLAN.md — Wave 0 gardes : helper filtres `lib/admin/searchParams.ts` (GREEN) + `admin-rls.test.ts` (RLS 2 rôles) + extension scans `rls-unchanged`/`no-perf-claims`/`no-perf-seed-claims` au groupe `(admin)` (ADASH-02/04/07)
+- [ ] 20-02-PLAN.md — [BLOQUANT] Migration `0021_admin_cockpit.sql` : 5 policies SELECT superadmin + `admin_audit_log` + `profiles.suspended` (helper RLS étendu) + 4 RPC SECURITY DEFINER gated+audit + 3 wrappers KPI gated ; apply LIVE MCP + gen-types + advisors + EXPLAIN (ADASH-01/02/03/04/05/07)
+- [ ] 20-03-PLAN.md — Couche données anon : `lib/admin/kpis.ts` (wrappers gated) + `lib/admin/queries.ts` (keyset + filtres + curseur anti-injection) + branche suspension `gate.ts` (ADASH-01/02/04/07)
+- [ ] 20-04-PLAN.md — Écritures gated : Server Actions membres/file/affiliation/payouts → RPC 0021 (zéro service_role) + `MemberRowActions` offrir/suspendre/réactiver (ADASH-04/05/07)
+- [ ] 20-05-PLAN.md — Cockpit home 4 sections (Revenus→Ops→Acquisition→Conformité) anon-client + 4 cartes AxisSummary (KPI mesuré + provenance) + sidebar 4 axes + panneau Conformité ; extinction scans no-perf (ADASH-01/02/03/06)
+- [ ] 20-06-PLAN.md — Pages détail anon+RLS : table users keyset+filtres serveur + file keyset + santé/signaux(read-only)/affiliation swap ; extinction `rls-unchanged` (ADASH-01/03/04/05/07)
 **UI hint** : yes
 **Notes** : Les 6 pages `/admin` existent en germe → enrichir + reskin, pas recréer. Adresse Pitfall #3 (fuite cross-tenant admin : route sans `is_superadmin()` en 1ʳᵉ ligne, ou matview sans wrapper). Tables virtualisées (react-virtual) pour 10k lignes. Anti-feature : pas d'édition manuelle des % ni de création/édition de signaux côté admin (casserait `persist.ts`, frontière producteur-unique).
 
@@ -260,7 +266,7 @@ Détail complet archivé : `.planning/milestones/v2.0-ROADMAP.md`.
 | 17. Fondation DB scalable | v3.0 | 3/3 | Complete   | 2026-06-25 |
 | 18. Seed de données réalistes à l'échelle | v3.0 | 3/3 | Complete   | 2026-06-25 |
 | 19. Dashboard utilisateur | v3.0 | 7/7 | Complete    | 2026-06-26 |
-| 20. Dashboard superadmin (cockpit 4 axes) | v3.0 | 0/? | Not started | - |
+| 20. Dashboard superadmin (cockpit 4 axes) | v3.0 | 0/6 | Not started | - |
 | 21. Tests E2E + audit de scalabilité | v3.0 | 0/? | Not started | - |
 
 **v2.0 : 9/9 phases complètes, 37/37 plans, 41/41 requirements couverts.**
