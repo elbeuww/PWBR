@@ -132,18 +132,27 @@
     "queueTitle": "File de validation",
     "members": {
       "colEmail": "Email",
+      "colSource": "Source",
       "colStatus": "Statut",
       "colPlan": "Plan",
       "colExpiry": "Expiration",
       "colLastPayment": "Dernier paiement",
       "filterStatus": "Statut",
+      "filterStatusAll": "Tous les statuts",
       "filterStatusActive": "Actif",
       "filterStatusInactive": "Inactif",
       "filterStatusExpired": "Expiré",
+      "filterStatusNone": "Sans abonnement",
+      "filterSource": "Source",
+      "filterSourceAll": "Toutes les sources",
+      "sourceDemo": "Démo",
+      "sourceBacktest": "Backtest",
+      "sourceLive": "Live",
       "searchEmail": "Rechercher par email",
       "statusActive": "Actif",
       "statusInactive": "Inactif",
       "statusExpired": "Expiré",
+      "statusNone": "Sans abonnement",
       "planDiscovery": "Découverte",
       "planStandard": "Standard",
       "actionActivate": "Activer / Prolonger",
@@ -153,7 +162,12 @@
       "actionSuspend": "Suspendre",
       "actionReactivate": "Réactiver",
       "emptyHeading": "Aucun membre pour ce filtre",
-      "emptyBody": "Ajuste le filtre de statut ou la recherche par email."
+      "emptyBody": "Ajuste le filtre de statut ou la recherche par email.",
+      "errorHeading": "Impossible de charger ces données",
+      "errorBody": "Réessaie ou vérifie les jobs dans Santé."
+    },
+    "pagination": {
+      "loadMore": "Charger la page suivante"
     },
     "grantDialog": {
       "title": "Offrir du temps gratuit",
