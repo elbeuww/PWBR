@@ -587,6 +587,16 @@
       "emptyTitle": "No closed signal",
       "emptyBody": "Your followed signals will appear here once closed, with their outcome."
     },
+    "list": {
+      "nextPage": "Next page",
+      "rUnit": "R",
+      "viewDetail": "View detail",
+      "issue": {
+        "hit_tp": "TP hit",
+        "hit_sl": "SL hit",
+        "flat": "Flat"
+      }
+    },
     "renewal": {
       "title": "Your subscription has expired",
       "body": "Renew to regain access to your signals and your watchlist.",

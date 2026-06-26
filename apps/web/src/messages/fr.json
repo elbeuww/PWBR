@@ -782,6 +782,16 @@
       "emptyTitle": "Aucun signal clôturé",
       "emptyBody": "Vos signaux suivis apparaîtront ici une fois clôturés, avec leur issue."
     },
+    "list": {
+      "nextPage": "Page suivante",
+      "rUnit": "R",
+      "viewDetail": "Voir le détail",
+      "issue": {
+        "hit_tp": "TP atteint",
+        "hit_sl": "SL touché",
+        "flat": "Neutre"
+      }
+    },
     "renewal": {
       "title": "Votre abonnement a expiré",
       "body": "Renouvelez pour réaccéder à vos signaux et à votre watchlist.",
