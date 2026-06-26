@@ -1,10 +1,11 @@
 ---
 phase: 19
 slug: dashboard-utilisateur
-status: draft
+status: approved
 shadcn_initialized: true
 preset: radix-nova (existing — DS v3 dark néon, locked)
 created: 2026-06-26
+reviewed_at: 2026-06-26
 ---
 
 # Phase 19 — UI Design Contract
