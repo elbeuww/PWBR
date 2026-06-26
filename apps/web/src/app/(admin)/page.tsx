@@ -1,22 +1,26 @@
 /**
- * (admin)/page — tableau de bord back-office (D-02, ADMIN landing).
+ * (admin)/page — cockpit superadmin 4 axes (D-05/D-07, ADASH-01..03/06).
  *
  * RSC, mono-FR, HORS [locale]. Le layout (admin) applique déjà le gate superadmin
- * (404 non-superadmin, T-08-10) : AUCUN guard inline dupliqué. Lecture service_role
- * LOCAL server-only (T-08-11).
+ * (404 non-superadmin, T-08-10) : AUCUN guard inline dupliqué.
  *
- * ≥3 KPI (D-02) via head counts (cheap, no rows) :
- *  - membres actifs : abonnements active + period non-échue (CRITÈRE MIROIR de membres/page.tsx).
- *  - file de validation en attente : payments status='ambiguous'.
- *  - santé globale : pire feu (red>amber>green) des sources candles/news/macro via les mappeurs
- *    Plan 01 (candleColor/ageColor) — pas de règle ad-hoc nouvelle.
+ * Lecture ANON-CLIENT uniquement (threat T-20-03) : `createClient()` @supabase/ssr,
+ * JAMAIS `createAdminServiceClient`. Les KPI sont lus via les wrappers gated
+ * `lib/admin/kpis.ts` (RPC `get_*`, 0 ligne pour non-superadmin) — jamais la matview
+ * directement. Les agrégats Ops réutilisent les mappeurs purs `freshness/jobs`.
  *
- * Chaque carte est un lien vers sa page complète. Présentation seule (D-08).
+ * Ordre des sections VERROUILLÉ (D-07) : Revenus → Ops → Acquisition → Conformité.
+ * Présentation seule : chaque axe est une carte avec KPI mesuré + provenance + lien
+ * « Voir le détail ». Aucun chiffre fabriqué (no-perf-claims étendu admin).
  */
-import Link from 'next/link'
-import { getTranslations } from 'next-intl/server'
-import { Card, CardHeader, CardContent } from '@/components/ui/card'
-import { createAdminServiceClient } from '@/lib/supabase/admin-service'
+import { createClient } from '@/lib/supabase/server'
+import {
+  getMrr,
+  formatMrr,
+  getChurn,
+  getPlanMix,
+  getAcquisitionFunnel,
+} from '@/lib/admin/kpis'
 import {
   candleColor,
   ageColor,
@@ -24,6 +28,11 @@ import {
   MACRO_THRESHOLDS,
   type FreshnessColor,
 } from '@/lib/admin/freshness'
+import { latestPerJob, type JobRunInput } from '@/lib/admin/jobs'
+import { AxisSummaryRevenus } from './_components/AxisSummaryRevenus'
+import { AxisSummaryOps } from './_components/AxisSummaryOps'
+import { AxisSummaryAcquisition } from './_components/AxisSummaryAcquisition'
+import { AxisSummaryConformite } from './_components/AxisSummaryConformite'
 
 const HOUR_MS = 3_600_000
 
@@ -50,47 +59,35 @@ function worstColor(a: FreshnessColor, b: FreshnessColor): FreshnessColor {
   return 'green'
 }
 
-// Feux de fraîcheur tokenisés (Tier 3 sober, swap law) : statut sémantique, jamais
-// palette brute. green→signal-bullish, amber→risk-moderate, red→destructive.
-const DOT_CLASS: Record<FreshnessColor, string> = {
-  green: 'bg-[var(--signal-bullish)]',
-  amber: 'bg-[var(--risk-moderate)]',
-  red: 'bg-destructive',
-}
-
-interface DashboardKpis {
-  activeMembers: number
-  pendingQueue: number
+interface OpsSummary {
   health: FreshnessColor
+  dataLastTs: string | null
+  jobsTotal: number
+  lastJobStatus: string | null
+  pendingQueue: number
 }
 
-async function loadKpis(): Promise<DashboardKpis> {
-  const client = createAdminServiceClient()
+/**
+ * Agrégats Ops sur anon-client (RLS superadmin, 0021). Dégradation gracieuse : sous
+ * RLS, un accès non autorisé renvoie 0 ligne (jamais une erreur) → feu rouge honnête,
+ * pas de zéro fabriqué masquant un défaut d'accès.
+ */
+async function loadOps(): Promise<OpsSummary> {
+  const supabase = await createClient()
   const now = Date.now()
-  const nowIso = new Date().toISOString()
 
-  // Membres actifs : MIROIR du critère membres/page.tsx (status='active' && period non-échue).
-  const { count: activeMembers, error: memErr } = await client
-    .from('subscriptions')
-    .select('user_id', { count: 'exact', head: true })
-    .eq('status', 'active')
-    .gt('current_period_end', nowIso)
-  if (memErr) throw new Error(`loadKpis members: ${memErr.message}`)
-
-  // File de validation en attente : payments status='ambiguous'.
-  const { count: pendingQueue, error: queueErr } = await client
+  // File de validation : paiements ambigus en attente.
+  const { count: pendingQueue } = await supabase
     .from('payments')
     .select('id', { count: 'exact', head: true })
     .eq('status', 'ambiguous')
-  if (queueErr) throw new Error(`loadKpis queue: ${queueErr.message}`)
 
-  // Santé globale : pire feu des sources, mêmes mappeurs que la page Santé.
+  // Fraîcheur candles : is_stale LU de la vue (jamais re-dérivé) + bande ambre.
   let health: FreshnessColor = 'green'
-
-  const { data: fresh, error: freshErr } = await client
+  let dataLastTs: string | null = null
+  const { data: fresh } = await supabase
     .from('v_data_freshness')
     .select('timeframe, last_ts, is_stale')
-  if (freshErr) throw new Error(`loadKpis candles: ${freshErr.message}`)
   if (!fresh || fresh.length === 0) {
     health = 'red'
   } else {
@@ -102,16 +99,17 @@ async function loadKpis(): Promise<DashboardKpis> {
         health,
         candleColor(Boolean(row.is_stale), ageHours, 2 * timeframeHours(row.timeframe)),
       )
+      if (row.last_ts && (dataLastTs === null || row.last_ts > dataLastTs)) dataLastTs = row.last_ts
     }
   }
 
-  const { data: lastNews, error: newsErr } = await client
+  // News : âge depuis max(published_at).
+  const { data: lastNews } = await supabase
     .from('news')
     .select('published_at')
     .order('published_at', { ascending: false })
     .limit(1)
     .maybeSingle()
-  if (newsErr) throw new Error(`loadKpis news: ${newsErr.message}`)
   health = worstColor(
     health,
     lastNews?.published_at
@@ -123,13 +121,13 @@ async function loadKpis(): Promise<DashboardKpis> {
       : 'red',
   )
 
-  const { data: lastMacro, error: macroErr } = await client
+  // Macro : âge depuis max(ts).
+  const { data: lastMacro } = await supabase
     .from('macro_series')
     .select('ts')
     .order('ts', { ascending: false })
     .limit(1)
     .maybeSingle()
-  if (macroErr) throw new Error(`loadKpis macro: ${macroErr.message}`)
   health = worstColor(
     health,
     lastMacro?.ts
@@ -141,68 +139,48 @@ async function loadKpis(): Promise<DashboardKpis> {
       : 'red',
   )
 
+  // Jobs : dernier run par job (triés started_at desc).
+  const { data: runs } = await supabase
+    .from('job_runs')
+    .select('job_name, status, started_at, finished_at')
+    .order('started_at', { ascending: false })
+  const jobs = latestPerJob((runs ?? []) as JobRunInput[])
+
   return {
-    activeMembers: activeMembers ?? 0,
-    pendingQueue: pendingQueue ?? 0,
     health,
+    dataLastTs,
+    jobsTotal: jobs.length,
+    lastJobStatus: jobs[0]?.status ?? null,
+    pendingQueue: pendingQueue ?? 0,
   }
 }
 
 export default async function AdminDashboardPage() {
-  const t = await getTranslations('admin')
-  const { activeMembers, pendingQueue, health } = await loadKpis()
-  const nf = new Intl.NumberFormat('fr-FR')
-
-  const healthWord: Record<FreshnessColor, string> = {
-    green: t('dashboard.healthOk'),
-    amber: t('dashboard.healthLimit'),
-    red: t('dashboard.healthStale'),
-  }
+  const [mrrRow, churn, planMix, funnel, ops] = await Promise.all([
+    getMrr(),
+    getChurn(),
+    getPlanMix(),
+    getAcquisitionFunnel(),
+    loadOps(),
+  ])
+  const mrr = formatMrr(mrrRow)
 
   return (
-    <main className="mx-auto max-w-6xl px-4 py-8">
-      <h1 className="font-display text-2xl font-semibold">{t('dashboard.title')}</h1>
+    <main className="mx-auto max-w-6xl px-8 py-8">
+      <h1 className="text-[28px] font-semibold leading-tight">Cockpit superadmin</h1>
 
-      <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        <Link href="/admin/membres" className="rounded-xl outline-none focus-visible:ring-2 focus-visible:ring-primary">
-          <Card>
-            <CardHeader>
-              <span className="text-sm text-muted-foreground">{t('dashboard.kpiActiveMembers')}</span>
-            </CardHeader>
-            <CardContent>
-              <span className="text-3xl font-semibold">
-                <bdi>{nf.format(activeMembers)}</bdi>
-              </span>
-            </CardContent>
-          </Card>
-        </Link>
-
-        <Link href="/admin/file" className="rounded-xl outline-none focus-visible:ring-2 focus-visible:ring-primary">
-          <Card>
-            <CardHeader>
-              <span className="text-sm text-muted-foreground">{t('dashboard.kpiPendingQueue')}</span>
-            </CardHeader>
-            <CardContent>
-              <span className="text-3xl font-semibold">
-                <bdi>{nf.format(pendingQueue)}</bdi>
-              </span>
-            </CardContent>
-          </Card>
-        </Link>
-
-        <Link href="/admin/sante" className="rounded-xl outline-none focus-visible:ring-2 focus-visible:ring-primary">
-          <Card>
-            <CardHeader>
-              <span className="text-sm text-muted-foreground">{t('dashboard.kpiHealth')}</span>
-            </CardHeader>
-            <CardContent>
-              <span className="flex items-center gap-2 text-3xl font-semibold">
-                <span className={`size-3 rounded-full ${DOT_CLASS[health]}`} aria-hidden />
-                <span className="text-xl">{healthWord[health]}</span>
-              </span>
-            </CardContent>
-          </Card>
-        </Link>
+      {/* Ordre verrouillé D-07 : Revenus → Ops → Acquisition → Conformité. */}
+      <div className="mt-12 flex flex-col gap-8">
+        <AxisSummaryRevenus mrr={mrr} churn={churn} planMix={planMix} />
+        <AxisSummaryOps
+          health={ops.health}
+          dataLastTs={ops.dataLastTs}
+          jobsTotal={ops.jobsTotal}
+          lastJobStatus={ops.lastJobStatus}
+          pendingQueue={ops.pendingQueue}
+        />
+        <AxisSummaryAcquisition funnel={funnel} />
+        <AxisSummaryConformite />
       </div>
     </main>
   )
