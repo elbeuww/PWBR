@@ -755,5 +755,60 @@
   },
   "baseline": {
     "text": "Nouvelle Ère · Alliance d'Échange"
+  },
+  "dash": {
+    "nav": {
+      "overview": "Vue d'ensemble",
+      "signaux": "Signaux",
+      "suivis": "Suivis",
+      "historique": "Historique",
+      "watchlist": "Watchlist",
+      "abonnement": "Abonnement",
+      "affiliation": "Affiliation",
+      "parametres": "Paramètres"
+    },
+    "overview": {
+      "title": "Cockpit personnel",
+      "subscriptionStatus": "Statut de l'abonnement",
+      "latestSignals": "Derniers signaux",
+      "shortcuts": "Raccourcis"
+    },
+    "suivis": {
+      "emptyTitle": "Aucun signal suivi",
+      "emptyBody": "Ajoutez un signal à votre watchlist en touchant l'étoile depuis la liste ou le détail d'un trade."
+    },
+    "historique": {
+      "emptyTitle": "Aucun signal clôturé",
+      "emptyBody": "Vos signaux suivis apparaîtront ici une fois clôturés, avec leur issue."
+    },
+    "renewal": {
+      "title": "Votre abonnement a expiré",
+      "body": "Renouvelez pour réaccéder à vos signaux et à votre watchlist.",
+      "cta": "Renouveler l'abonnement"
+    },
+    "watchlist": {
+      "add": "Ajouter à ma watchlist",
+      "remove": "Retirer de ma watchlist",
+      "error": "Impossible de mettre à jour votre watchlist. Réessayez."
+    },
+    "affiliate": {
+      "summary": "{subscribers} abonnés ramenés · {revenue} revenus mesurés",
+      "link": "Voir mon tableau d'affiliation"
+    },
+    "error": {
+      "title": "Impossible de charger vos données",
+      "body": "Vérifiez votre connexion et réessayez.",
+      "retry": "Réessayer"
+    },
+    "settings": {
+      "account": "Compte",
+      "email": "E-mail",
+      "changePassword": "Changer le mot de passe",
+      "language": "Langue",
+      "notifications": "Notifications",
+      "manageSubscription": "Gérer l'abonnement",
+      "signOut": "Se déconnecter",
+      "savePreferences": "Enregistrer les préférences"
+    }
   }
 }

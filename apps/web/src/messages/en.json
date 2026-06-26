@@ -560,5 +560,60 @@
   },
   "baseline": {
     "text": "New Era · Exchange Alliance"
+  },
+  "dash": {
+    "nav": {
+      "overview": "Overview",
+      "signaux": "Signals",
+      "suivis": "Followed",
+      "historique": "History",
+      "watchlist": "Watchlist",
+      "abonnement": "Subscription",
+      "affiliation": "Affiliation",
+      "parametres": "Settings"
+    },
+    "overview": {
+      "title": "Personal cockpit",
+      "subscriptionStatus": "Subscription status",
+      "latestSignals": "Latest signals",
+      "shortcuts": "Shortcuts"
+    },
+    "suivis": {
+      "emptyTitle": "No followed signal",
+      "emptyBody": "Add a signal to your watchlist by tapping the star from the list or from a trade's detail."
+    },
+    "historique": {
+      "emptyTitle": "No closed signal",
+      "emptyBody": "Your followed signals will appear here once closed, with their outcome."
+    },
+    "renewal": {
+      "title": "Your subscription has expired",
+      "body": "Renew to regain access to your signals and your watchlist.",
+      "cta": "Renew subscription"
+    },
+    "watchlist": {
+      "add": "Add to my watchlist",
+      "remove": "Remove from my watchlist",
+      "error": "Could not update your watchlist. Please try again."
+    },
+    "affiliate": {
+      "summary": "{subscribers} subscribers referred · {revenue} measured revenue",
+      "link": "View my affiliation dashboard"
+    },
+    "error": {
+      "title": "Could not load your data",
+      "body": "Check your connection and try again.",
+      "retry": "Retry"
+    },
+    "settings": {
+      "account": "Account",
+      "email": "Email",
+      "changePassword": "Change password",
+      "language": "Language",
+      "notifications": "Notifications",
+      "manageSubscription": "Manage subscription",
+      "signOut": "Sign out",
+      "savePreferences": "Save preferences"
+    }
   }
 }
