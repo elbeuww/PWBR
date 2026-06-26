@@ -2,12 +2,12 @@
 gsd_state_version: 1.0
 milestone: v3.0
 milestone_name: Plateforme complète sous identité dark néon NEXA
-status: executing
-last_updated: "2026-06-26T20:56:35.739Z"
+status: verifying
+last_updated: "2026-06-26T21:12:27.178Z"
 last_activity: 2026-06-26
 progress:
   total_phases: 12
-  completed_phases: 7
+  completed_phases: 8
   total_plans: 43
   completed_plans: 41
   percent: 95
@@ -32,7 +32,7 @@ See: .planning/PROJECT.md (mis à jour 2026-06-20 après clôture v2.0)
 Milestone: v3.0 — Plateforme complète sous identité dark néon NEXA (7 phases, 15-21)
 Phase: 20 (dashboard-superadmin-cockpit-4-axes) — EXECUTING
 Plan: 6 of 6
-Status: Ready to execute (dernier plan : 20-06)
+Status: Phase complete — ready for verification
 Last activity: 2026-06-26
 
 - **20-05 exécuté (2026-06-26)** : home `(admin)/page.tsx` transformée en **cockpit superadmin 4 sections** sur **anon-client** (ADASH-01/02/03/06), ordre verrouillé Revenus → Ops → Acquisition → Conformité (D-07). 4 cartes d'axe RSC `_components/AxisSummary{Revenus,Ops,Acquisition,Conformite}.tsx` : chacune KPI MESURÉ + ligne de provenance « Mesuré · N = … · période · source » (nombres rendus, jamais i18n) + lien « Voir le détail ». `Revenus` : MRR « Cash encaissé / mois » (formatAtomic via `getMrr`), churn via `applyThreshold` (Intl percent runtime → **0 caractère pour-cent en dur**), plan-mix. `Ops` : feux freshness/jobs tokenisés (`--signal-bullish`/`--risk-moderate`/`--destructive`) + file de validation → `/admin/sante`+`/admin/file`. `Acquisition` : agrégat funnel par étape → `/admin/affiliation/affilies`. `Conformité` : feu `isLegalReviewDone()` + version + date (D-18, read-only, rouge par défaut sûr). `page.tsx` : `createAdminServiceClient` → `createClient()` anon (T-20-03, plus aucune référence admin-service), KPI via wrappers gated 20-03 chargés en parallèle, agrégats Ops dégradant gracieusement sous RLS (0 ligne → feu rouge honnête). `AdminSidebar` regroupée sous 4 en-têtes d'axe, **URLs détail inchangées** (A5). `no-perf-seed-claims.ADMIN_UI_FILES` étendu aux 4 cartes → **scans no-perf VERTS 15/15** (extinction gardes 20-01). **D-20-05-A** : churn sans `%` littéral (applyThreshold + Intl percent). **D-20-05-B** : Conformité sans drill-down (aucune route détail), version/date via env `LEGAL_REVIEW_VERSION/DATE` (« — » si absentes). **D-20-05-C** : loadOps tolère RLS (pas de throw). typecheck exit 0. Commits `7ec9b44`/`81bb835`/`f37663e`. **Note scope** : `rls-unchanged.test.ts` reste RED par conception (extinction au 20-06, pages détail). **Reste : 20-06** (dernier plan, bascule pages détail + 0022).
@@ -163,6 +163,7 @@ ressources externes non provisionnables en session de développement.
 | Phase 20 P03 | ~15min | 3 tasks | 5 files |
 | Phase 20 P04 | ~40min | 2 tasks | 7 files |
 | Phase 20 P05 | ~20min | 3 tasks | 7 files |
+| Phase 20 P06 | 25min | 3 tasks | 10 files |
 
 ## Roadmap v2.0 (9 phases)
 
@@ -604,7 +605,7 @@ ressources externes non provisionnables en session de développement.
 
 ## Session Continuity
 
-**Last session:** 2026-06-26T20:56:35.728Z
+**Last session:** 2026-06-26T21:12:27.168Z
 
 **Last session (archive):** 2026-06-19T03:41:29.665Z
 

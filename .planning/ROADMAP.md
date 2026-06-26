@@ -43,7 +43,7 @@ Détail complet archivé : `.planning/milestones/v2.0-ROADMAP.md`.
  (completed 2026-06-25)
 - [x] **Phase 18: Seed de données réalistes à l'échelle** — `seed.ts` faker déterministe, idempotent, FK-cohérent (~10k users + signaux/paiements/affiliés/outcomes), labels `backtest`/`démo` (aucun chiffre de perf fabriqué), RLS re-testée depuis client anon. (SEED) (completed 2026-06-25)
 - [x] **Phase 19: Dashboard utilisateur** — Groupe `(dash)` : vue d'ensemble, signaux suivis/historique keyset, watchlist `user_followed_setups` (revue IDOR), abonnement + ExpiryBanner, affiliation intégrée, paramètres — démontrable sur données seedées. (UDASH) (completed 2026-06-26)
-- [ ] **Phase 20: Dashboard superadmin (cockpit 4 axes)** — Acquisition/Revenus(MRR mesuré)/Ops/Conformité, tables virtualisées filtrables/paginées, gating `is_superadmin()` (404 discret), matviews phase 17, jamais service_role côté pages. (ADASH)
+- [x] **Phase 20: Dashboard superadmin (cockpit 4 axes)** — Acquisition/Revenus(MRR mesuré)/Ops/Conformité, tables virtualisées filtrables/paginées, gating `is_superadmin()` (404 discret), matviews phase 17, jamais service_role côté pages. (ADASH) (completed 2026-06-26)
 - [ ] **Phase 21: Tests E2E + audit de scalabilité** — Playwright des flux principaux + isolation RLS/gating prouvée, audit DB `EXPLAIN ANALYZE` + `get_advisors` + `pg_stat_statements` sur les requêtes clés à ~10k (validation keyset/index/matviews). (E2E + SCALE-06)
 
 ## Phase Details
@@ -227,7 +227,7 @@ Détail complet archivé : `.planning/milestones/v2.0-ROADMAP.md`.
 - [x] 20-03-PLAN.md — Couche données anon : `lib/admin/kpis.ts` (wrappers gated) + `lib/admin/queries.ts` (keyset + filtres + curseur anti-injection) + branche suspension `gate.ts` (ADASH-01/02/04/07)
 - [x] 20-04-PLAN.md — Écritures gated : Server Actions membres/file/affiliation/payouts → RPC 0021 (zéro service_role) + `MemberRowActions` offrir/suspendre/réactiver (ADASH-04/05/07)
 - [x] 20-05-PLAN.md — Cockpit home 4 sections (Revenus→Ops→Acquisition→Conformité) anon-client + 4 cartes AxisSummary (KPI mesuré + provenance) + sidebar 4 axes + panneau Conformité ; extinction scans no-perf (ADASH-01/02/03/06)
-- [ ] 20-06-PLAN.md — Pages détail anon+RLS : table users keyset+filtres serveur + file keyset + santé/signaux(read-only)/affiliation swap ; extinction `rls-unchanged` (ADASH-01/03/04/05/07)
+- [x] 20-06-PLAN.md — Pages détail anon+RLS : table users keyset+filtres serveur + file keyset + santé/signaux(read-only)/affiliation swap ; extinction `rls-unchanged` (ADASH-01/03/04/05/07)
 **UI hint** : yes
 **Notes** : Les 6 pages `/admin` existent en germe → enrichir + reskin, pas recréer. Adresse Pitfall #3 (fuite cross-tenant admin : route sans `is_superadmin()` en 1ʳᵉ ligne, ou matview sans wrapper). Tables virtualisées (react-virtual) pour 10k lignes. Anti-feature : pas d'édition manuelle des % ni de création/édition de signaux côté admin (casserait `persist.ts`, frontière producteur-unique).
 
@@ -266,7 +266,7 @@ Détail complet archivé : `.planning/milestones/v2.0-ROADMAP.md`.
 | 17. Fondation DB scalable | v3.0 | 3/3 | Complete   | 2026-06-25 |
 | 18. Seed de données réalistes à l'échelle | v3.0 | 3/3 | Complete   | 2026-06-25 |
 | 19. Dashboard utilisateur | v3.0 | 7/7 | Complete    | 2026-06-26 |
-| 20. Dashboard superadmin (cockpit 4 axes) | v3.0 | 5/6 | In Progress|  |
+| 20. Dashboard superadmin (cockpit 4 axes) | v3.0 | 6/6 | Complete   | 2026-06-26 |
 | 21. Tests E2E + audit de scalabilité | v3.0 | 0/? | Not started | - |
 
 **v2.0 : 9/9 phases complètes, 37/37 plans, 41/41 requirements couverts.**
