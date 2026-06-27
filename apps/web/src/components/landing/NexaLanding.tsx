@@ -54,6 +54,9 @@ export async function NexaLanding() {
   const marqueeItems = tMarquee.raw('items') as string[]
   const ariaFor = (c: Card) => tScoreRing('ariaTemplate', { score: c.score, risk: c.riskLabel })
   const langs: Array<[string, string]> = [['fr', 'FR'], ['en', 'EN'], ['ar', 'AR']]
+  // Translation JSON guarantees ≥2 card entries; !-assert to satisfy noUncheckedIndexedAccess.
+  const card0 = cards[0]!
+  const card1 = cards[1]!
 
   return (
     <div className="nxl" data-theme="green">
@@ -106,17 +109,17 @@ export async function NexaLanding() {
             <div className="data-rain" id="dataRain" aria-hidden />
             <div className="globe-wrap layer" data-depth="0.35" aria-hidden><div className="atmo" /><div className="globe" /></div>
             <div className="layer float-card" data-depth="1.6" style={{ insetBlockStart: '4%', insetInlineStart: '-4%', zIndex: 3 }}>
-              <div className="fc-top"><span className="fc-sym"><bdi>{cards[0].instrument}</bdi></span><span className={`fc-dir ${cards[0].risk === 'eleve' ? 'sell' : 'buy'}`}>{cards[0].direction}</span></div>
+              <div className="fc-top"><span className="fc-sym"><bdi>{card0.instrument}</bdi></span><span className={`fc-dir ${card0.risk === 'eleve' ? 'sell' : 'buy'}`}>{card0.direction}</span></div>
               <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBlockStart: 6 }}>
-                <div className="fc-score" style={{ color: 'var(--primary)' }}><bdi>{cards[0].score}</bdi></div>
-                <Ring score={cards[0].score} risk={cards[0].risk} ariaLabel={ariaFor(cards[0])} />
+                <div className="fc-score" style={{ color: 'var(--primary)' }}><bdi>{card0.score}</bdi></div>
+                <Ring score={card0.score} risk={card0.risk} ariaLabel={ariaFor(card0)} />
               </div>
             </div>
             <div className="layer float-card" data-depth="2.1" style={{ insetBlockEnd: '6%', insetInlineEnd: '-6%', zIndex: 3 }}>
-              <div className="fc-top"><span className="fc-sym"><bdi>{cards[1].instrument}</bdi></span><span className={`fc-dir ${cards[1].risk === 'eleve' ? 'sell' : 'buy'}`}>{cards[1].direction}</span></div>
+              <div className="fc-top"><span className="fc-sym"><bdi>{card1.instrument}</bdi></span><span className={`fc-dir ${card1.risk === 'eleve' ? 'sell' : 'buy'}`}>{card1.direction}</span></div>
               <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBlockStart: 6 }}>
-                <div className="fc-score" style={{ color: 'var(--text)' }}><bdi>{cards[1].score}</bdi></div>
-                <Ring score={cards[1].score} risk={cards[1].risk} ariaLabel={ariaFor(cards[1])} />
+                <div className="fc-score" style={{ color: 'var(--text)' }}><bdi>{card1.score}</bdi></div>
+                <Ring score={card1.score} risk={card1.risk} ariaLabel={ariaFor(card1)} />
               </div>
             </div>
           </div>

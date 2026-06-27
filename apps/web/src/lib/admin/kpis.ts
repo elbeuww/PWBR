@@ -68,7 +68,10 @@ export async function getAcquisitionFunnel(
   pTo?: string,
 ): Promise<AcquisitionFunnelRow[]> {
   const supabase = await createClient()
-  const { data } = await supabase.rpc('get_acquisition_funnel', { p_from: pFrom, p_to: pTo })
+  const { data } = await supabase.rpc('get_acquisition_funnel', {
+    ...(pFrom !== undefined ? { p_from: pFrom } : {}),
+    ...(pTo !== undefined ? { p_to: pTo } : {}),
+  })
   return (data ?? []) as AcquisitionFunnelRow[]
 }
 
@@ -79,9 +82,11 @@ export async function getAcquisitionFunnel(
  */
 export async function getChurn(pMonth?: string): Promise<ChurnRow | null> {
   const supabase = await createClient()
-  const { data } = await supabase.rpc('get_churn', { p_month: pMonth })
+  const { data } = await supabase.rpc('get_churn', {
+    ...(pMonth !== undefined ? { p_month: pMonth } : {}),
+  })
   const rows = (data ?? []) as ChurnRow[]
-  return rows.length > 0 ? rows[0] : null
+  return rows[0] ?? null
 }
 
 /**

@@ -78,7 +78,7 @@ describe('admin-rls : barrière deux-rôles du cockpit superadmin (ADASH-07 / T-
   const superEmail = `admin-rls-super-${ts}@gmail.com`
   const password = 'TestPassword123!'
 
-  let memberClient: ReturnType<typeof createClient>
+  let memberClient: Awaited<ReturnType<typeof signUpAndGetClient>>['client']
   let memberId = ''
   let superId = ''
 

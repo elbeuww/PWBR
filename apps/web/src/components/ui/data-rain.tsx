@@ -54,7 +54,7 @@ export function DataRain({ columns, opacity = 0.18 }: DataRainProps) {
       }
       let html = ''
       for (let j = 0; j < 18; j++) {
-        const p = RAIN_POOL[(i * 7 + j * 3) % RAIN_POOL.length]
+        const p = RAIN_POOL[(i * 7 + j * 3) % RAIN_POOL.length] as string // modulo guarantees in-bounds
         const cls = p.charAt(0) === '+' ? 'u' : p.charAt(0) === '−' ? 'd' : ''
         html += '<span class="' + cls + '">' + p + '</span>'
       }

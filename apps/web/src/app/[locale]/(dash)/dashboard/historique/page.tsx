@@ -40,7 +40,7 @@ export default async function HistoriquePage({ params, searchParams }: Historiqu
       <KeysetTabs active="historique" />
       {/* loading (état 1) : la clé=curseur relance le fallback à chaque page suivante. */}
       <Suspense key={cursor ?? 'first'} fallback={<KeysetSkeleton />}>
-        <HistoriqueContent cursor={cursor} locale={locale} />
+        <HistoriqueContent {...(cursor !== undefined ? { cursor } : {})} locale={locale} />
       </Suspense>
     </main>
   )
@@ -53,7 +53,7 @@ async function HistoriqueContent({ cursor, locale }: { cursor?: string; locale: 
 
   const { data, nextCursor, error } = await fetchFollowedSetups(supabase, {
     status: 'historique',
-    cursor,
+    ...(cursor !== undefined ? { cursor } : {}),
   })
 
   // error (état 2).

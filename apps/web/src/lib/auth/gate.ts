@@ -80,7 +80,7 @@ async function authedClient(): Promise<{
   const { data: profile } = await supabase
     .from('profiles')
     .select('suspended')
-    .eq('id', user.id)
+    .eq('id', user!.id) // non-null: redirect() above throws NEXT_REDIRECT when user is null
     .single()
 
   if (profile?.suspended === true) {

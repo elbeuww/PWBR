@@ -48,7 +48,7 @@ export default async function SuivisPage({ params, searchParams }: SuivisPagePro
       <KeysetTabs active="suivis" />
       {/* loading (état 1) : la clé=curseur relance le fallback à chaque page suivante. */}
       <Suspense key={cursor ?? 'first'} fallback={<KeysetSkeleton />}>
-        <SuivisContent cursor={cursor} locale={locale} />
+        <SuivisContent {...(cursor !== undefined ? { cursor } : {})} locale={locale} />
       </Suspense>
     </main>
   )
@@ -61,7 +61,7 @@ async function SuivisContent({ cursor, locale }: { cursor?: string; locale: stri
 
   const { data, nextCursor, error } = await fetchFollowedSetups(supabase, {
     status: 'suivis',
-    cursor,
+    ...(cursor !== undefined ? { cursor } : {}),
   })
 
   // error (état 2).

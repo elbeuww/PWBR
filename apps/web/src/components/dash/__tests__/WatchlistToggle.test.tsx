@@ -55,7 +55,7 @@ describe('WatchlistToggle : optimiste + rollback + anti-IDOR (UDASH-03)', () => 
     expect(from).toHaveBeenCalledWith('user_followed_setups')
     expect(insert).toHaveBeenCalledWith({ setup_id: SID })
     // Anti-IDOR : aucune colonne propriétaire envoyée (default auth.uid() + with check).
-    expect(insert.mock.calls[0][0]).not.toHaveProperty('user_id')
+    expect(insert.mock.calls[0]![0]).not.toHaveProperty('user_id')
     expect(notifyError).not.toHaveBeenCalled()
   })
 

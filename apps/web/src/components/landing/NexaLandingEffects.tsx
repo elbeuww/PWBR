@@ -37,7 +37,7 @@ export function NexaLandingEffects() {
           col.style.animationDelay = (-(i * 1.3) % dur).toFixed(1) + 's'
           let html = ''
           for (let j = 0; j < 18; j++) {
-            const p = RAIN_POOL[(i * 7 + j * 3) % RAIN_POOL.length]
+            const p = RAIN_POOL[(i * 7 + j * 3) % RAIN_POOL.length]! // modulo guarantees in-bounds
             const cls = p.charAt(0) === '+' ? 'u' : p.charAt(0) === '−' ? 'd' : ''
             html += '<span class="' + cls + '">' + p + '</span>'
           }

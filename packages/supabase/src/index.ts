@@ -61,6 +61,14 @@ export type {
   TelegramPostRow,
   TelegramPostInsert,
   TelegramPostUpdate,
+  // Phase 20 — cockpit superadmin (audit log + KPI RPC/views)
+  AdminAuditAction,
+  AdminAuditLogRow,
+  AdminAuditLogInsert,
+  MvMrrRow,
+  AcquisitionFunnelRow,
+  ChurnRow,
+  PlanMixRow,
 } from './database.types'
 
 // Repositories
