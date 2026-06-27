@@ -1,0 +1,67 @@
+name: CI
+
+# Pipeline anti-regression durable (D-09). lint -> typecheck -> vitest -> e2e.
+# Le job e2e est BLOQUANT : un echec rouge bloque la PR (definition de done D-11).
+# Secrets Supabase fournis via GitHub Secrets uniquement (secrets.*), jamais en clair
+# ni logges (T-21-11/12). Aucun step ne dump l'environnement.
+on:
+  pull_request: {}
+  push:
+    branches: [master]
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # Lit packageManager pnpm@9.15.9 depuis package.json (pas de version en dur).
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      # Lockfile fige (T-21-13) : aucune resolution opportuniste de dependances.
+      - run: pnpm install --frozen-lockfile
+
+      - run: pnpm lint
+
+      - run: pnpm typecheck
+
+      # Vitest : contrats RLS / gardes deterministes contre le cloud Supabase partage.
+      - run: pnpm test
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+
+      # Navigateur Chromium + dependances systeme (RESEARCH Pitfall 6).
+      - run: pnpm exec playwright install --with-deps chromium
+
+      # Provisionne les 4 comptes fixtures (free/abonne/affilie/superadmin) AVANT E2E :
+      # auth.setup.ts (21-01) fait un login reel et exige ces comptes seedes. Idempotent
+      # (purge prefixe e2e-fixture- -> recreate). seed-fixtures.ts lit SUPABASE_URL
+      # (et non NEXT_PUBLIC_*) -> on mappe la meme valeur depuis le secret.
+      - run: pnpm --filter jobs seed:fixtures
+        env:
+          SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          E2E_FIXTURE_PW: ${{ secrets.E2E_FIXTURE_PW }}
+
+      # E2E BLOQUANT (D-09). Le webServer Playwright (pnpm --filter web build && start)
+      # est spawn ici et herite des NEXT_PUBLIC_* de cet env (requis au build).
+      - run: pnpm test:e2e
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          E2E_FIXTURE_PW: ${{ secrets.E2E_FIXTURE_PW }}
+
+      # Rapport Playwright archive meme en cas d'echec (debug des regressions).
+      - uses: actions/upload-artifact@v4
+        if: ${{ !cancelled() }}
+        with:
+          name: playwright-report
+          path: playwright-report/
