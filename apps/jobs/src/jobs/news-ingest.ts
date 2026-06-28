@@ -17,7 +17,6 @@ import { upsertNews } from '@app/supabase'
 import type { Json, Database } from '@app/supabase'
 import {
   fetchFinnhubNews,
-  parseFinnhubNews,
   fetchMarketauxNews,
 } from '@app/data-sources'
 import type { FinnhubCategory } from '@app/data-sources'

@@ -141,7 +141,7 @@ function contrastRatio(c1: RGB, c2: RGB): number {
 // ─────────────────────────────────────────────────────────────────────────────
 
 const BACKGROUND = '#070b08'
-const SURFACE_SOLID = '#0f1611'
+const _SURFACE_SOLID = '#0f1611'
 const FOREGROUND = '#eafff1'
 const PRIMARY = 'oklch(0.84 0.18 150)'
 const MUTED_FOREGROUND = 'rgba(212, 244, 224, 0.64)'
