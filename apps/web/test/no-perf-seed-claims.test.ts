@@ -180,11 +180,11 @@ describe('no-perf-overview-claims : aucun chiffre de perf fabriqué sur l’over
 // ──────────────────────────────────────────────────────────────────────────
 
 const ADMIN_UI_FILES = [
-  path.join(WEB_SRC, 'app/(admin)/page.tsx'),
-  path.join(WEB_SRC, 'app/(admin)/_components/AxisSummaryRevenus.tsx'),
-  path.join(WEB_SRC, 'app/(admin)/_components/AxisSummaryOps.tsx'),
-  path.join(WEB_SRC, 'app/(admin)/_components/AxisSummaryAcquisition.tsx'),
-  path.join(WEB_SRC, 'app/(admin)/_components/AxisSummaryConformite.tsx'),
+  path.join(WEB_SRC, 'app/admin/page.tsx'),
+  path.join(WEB_SRC, 'app/admin/_components/AxisSummaryRevenus.tsx'),
+  path.join(WEB_SRC, 'app/admin/_components/AxisSummaryOps.tsx'),
+  path.join(WEB_SRC, 'app/admin/_components/AxisSummaryAcquisition.tsx'),
+  path.join(WEB_SRC, 'app/admin/_components/AxisSummaryConformite.tsx'),
 ]
 
 // Même détecteur que le volet C (signatures de faux dashboards), appliqué au cockpit.

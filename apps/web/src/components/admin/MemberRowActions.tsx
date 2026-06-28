@@ -63,7 +63,7 @@ import {
   suspendAccount,
   unsuspendAccount,
   type AdminActionResult,
-} from '@/app/(admin)/membres/actions'
+} from '@/app/admin/membres/actions'
 
 interface MemberRowActionsProps {
   userId: string

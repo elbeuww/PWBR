@@ -26,22 +26,24 @@ import path from 'node:path'
 // __dirname = apps/web/src/styles/__tests__ → racine src = ../../
 const SRC_ROOT = path.resolve(__dirname, '../../')
 const APP_LOCALE = path.resolve(SRC_ROOT, 'app/[locale]')
-const APP_ROOT = path.resolve(SRC_ROOT, 'app') // le groupe (admin) vit hors de [locale]
+const APP_ROOT = path.resolve(SRC_ROOT, 'app') // le segment admin vit hors de [locale]
 
 // Groupes de routes scannés. (member)/(account)/(marketing)/(auth) vivent sous
-// app/[locale]/ ; (admin) est un groupe racine (app/(admin)/), SANS préfixe locale.
+// app/[locale]/ ; admin est un SEGMENT LITTÉRAL racine (app/admin/), SANS préfixe
+// locale (renommé depuis le route group (admin) — fix 404 route-group, 2026-06-27 :
+// un route group strippait le segment → /admin/* renvoyait 404).
 //
-// Phase 20 (ADASH-07, threat T-20-03) : on étend le scan au groupe (admin). Le cockpit
+// Phase 20 (ADASH-07, threat T-20-03) : on étend le scan au segment admin. Le cockpit
 // superadmin doit lire en anon-client + RLS `is_superadmin()` — JAMAIS service_role
 // bundlé côté page/action. RED PAR CONCEPTION en Wave 0 : les pages/actions admin
 // héritées (Phase 8) importent encore service_role.
 //   EXTINCTION → VERT : retrait de service_role des actions admin (plan 20-04) puis des
 //   pages admin (plan 20-06). Tant que l'une au moins l'utilise, ce scan reste ROUGE.
-const SCANNED_GROUPS = ['(member)', '(account)', '(marketing)', '(auth)', '(admin)'] as const
+const SCANNED_GROUPS = ['(member)', '(account)', '(marketing)', '(auth)', 'admin'] as const
 
-/** Base de résolution d'un groupe : (admin) à la racine app/, les autres sous [locale]. */
+/** Base de résolution d'un groupe : admin à la racine app/, les autres sous [locale]. */
 function groupBaseDir(group: string): string {
-  return group === '(admin)' ? APP_ROOT : APP_LOCALE
+  return group === 'admin' ? APP_ROOT : APP_LOCALE
 }
 
 // Allowlist : Server Actions pré-existants autorisés à utiliser service_role (D-13).
@@ -64,8 +66,8 @@ const ALLOWLIST = [
   // admin_activate_payment/admin_reject_payment/admin_adjust_plan +
   // admin_approve_application/admin_reject_application et que les 2 fichiers passent
   // en anon-client. Voir .planning/todos/pending/.
-  'app/(admin)/file/actions.ts',
-  'app/(admin)/affiliation/actions.ts',
+  'app/admin/file/actions.ts',
+  'app/admin/affiliation/actions.ts',
 ] as const
 
 // Infractions interdites sur une page non-admin.

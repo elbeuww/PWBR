@@ -37,20 +37,20 @@ const SRC_ROOT = path.resolve(__dirname, '../../')
 const FOUNDATION_FILES = [
   'components/LanguageSwitcher.tsx',
   'app/[locale]/affiliation/dashboard/page.tsx',
-  'app/(admin)/signaux/page.tsx',
-  'app/(admin)/page.tsx',
-  'app/(admin)/sante/page.tsx',
-  'app/(admin)/affiliation/page.tsx',
-  'app/(admin)/affiliation/payouts/page.tsx',
-  'app/(admin)/file/page.tsx',
+  'app/admin/signaux/page.tsx',
+  'app/admin/page.tsx',
+  'app/admin/sante/page.tsx',
+  'app/admin/affiliation/page.tsx',
+  'app/admin/affiliation/payouts/page.tsx',
+  'app/admin/file/page.tsx',
   'components/track-record/TrackRecordView.tsx',
   // Phase 16 — surfaces wave-2 (résiduel-offender + à tokeniser).
   // Phase 19 (D-19-04-A) : overview déplacé sous (dash)/dashboard/, ancien stub supprimé.
   'app/[locale]/(dash)/dashboard/page.tsx',
   'app/[locale]/(auth)/login/page.tsx',
-  'app/(admin)/membres/page.tsx',
-  'app/(admin)/signaux/[id]/page.tsx',
-  'app/(admin)/affiliation/affilies/page.tsx',
+  'app/admin/membres/page.tsx',
+  'app/admin/signaux/[id]/page.tsx',
+  'app/admin/affiliation/affilies/page.tsx',
 ] as const
 
 // Focus-ring bleu institutionnel hardcodé — interdit (D-07).
@@ -186,6 +186,6 @@ describe('THEME-02 / D-08 : scan anti-bespoke + anti-collision', () => {
   })
 
   it('SANITY — un fichier fondation manquant échoue explicitement (pas de skip)', () => {
-    expect(() => readFoundation('app/(admin)/__does_not_exist__.tsx')).toThrow(/introuvable/)
+    expect(() => readFoundation('app/admin/__does_not_exist__.tsx')).toThrow(/introuvable/)
   })
 })

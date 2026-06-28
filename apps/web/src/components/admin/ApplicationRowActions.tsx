@@ -35,7 +35,7 @@ import {
   approveApplication,
   rejectApplication,
   type QueueActionResult,
-} from '@/app/(admin)/affiliation/actions'
+} from '@/app/admin/affiliation/actions'
 
 interface ApplicationRowActionsProps {
   applicationId: string
