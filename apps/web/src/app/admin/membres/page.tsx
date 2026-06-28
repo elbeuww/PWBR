@@ -37,6 +37,7 @@ import {
   serializeAdminUsersParams,
 } from '@/lib/admin/searchParams'
 import { MemberRowActions } from '@/components/admin/MemberRowActions'
+import { AutoSubmitSelect } from '@/components/admin/AutoSubmitSelect'
 
 function fmtDate(iso: string | null): string {
   if (!iso) return '—'
@@ -88,7 +89,7 @@ export default async function AdminMembersPage({
           <label htmlFor="status" className="text-sm text-muted-foreground">
             {t('members.filterStatus')}
           </label>
-          <select
+          <AutoSubmitSelect
             id="status"
             name="status"
             defaultValue={params.status ?? ''}
@@ -98,13 +99,13 @@ export default async function AdminMembersPage({
             <option value="active">{t('members.filterStatusActive')}</option>
             <option value="expired">{t('members.filterStatusExpired')}</option>
             <option value="none">{t('members.filterStatusNone')}</option>
-          </select>
+          </AutoSubmitSelect>
         </div>
         <div className="grid gap-1.5">
           <label htmlFor="source" className="text-sm text-muted-foreground">
             {t('members.filterSource')}
           </label>
-          <select
+          <AutoSubmitSelect
             id="source"
             name="source"
             defaultValue={params.source ?? ''}
@@ -114,7 +115,7 @@ export default async function AdminMembersPage({
             <option value="demo">{t('members.sourceDemo')}</option>
             <option value="backtest">{t('members.sourceBacktest')}</option>
             <option value="live">{t('members.sourceLive')}</option>
-          </select>
+          </AutoSubmitSelect>
         </div>
         <div className="grid gap-1.5">
           <label htmlFor="q" className="text-sm text-muted-foreground">
