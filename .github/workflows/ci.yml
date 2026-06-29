@@ -60,10 +60,13 @@ jobs:
 
       # E2E BLOQUANT (D-09). Le webServer Playwright (pnpm --filter web build && start)
       # est spawn ici et herite des NEXT_PUBLIC_* de cet env (requis au build).
+      # SUPABASE_URL (sans prefixe) est requis par serviceClientLocal cote serveur
+      # (signup, server actions admin, RPC gated) : sans lui -> 500 sur ces routes.
       - run: pnpm test:e2e
         env:
           NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
           NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+          SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
           E2E_FIXTURE_PW: ${{ secrets.E2E_FIXTURE_PW }}
 
