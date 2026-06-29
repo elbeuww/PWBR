@@ -163,6 +163,28 @@ async function main(): Promise<void> {
       if (error) throw new Error(`subscription active ${spec.email}: ${error.message}`)
     }
 
+    // affilie → affilié + code stable 'TESTCODE' : précondition de l'attribution E2E
+    // (AFF-01, affiliation-attribution.spec.ts). attributeReferral résout le code →
+    // affiliate_id → crée la ligne referrals au signup. Les FK affiliates.user_id et
+    // affiliate_codes.affiliate_id sont ON DELETE CASCADE → le purge du fixture nettoie
+    // affilié + code + referrals. Delete défensif du code (idempotence inter-runs même
+    // si un TESTCODE orphelin subsistait).
+    if (spec.email === FIXTURES.affilie.email) {
+      await client.from('affiliate_codes').delete().eq('code', 'TESTCODE')
+      const { data: aff, error: affErr } = await client
+        .from('affiliates')
+        .insert({ user_id: userId, source: 'demo' })
+        .select('id')
+        .single()
+      if (affErr || !aff) {
+        throw new Error(`affiliate ${spec.email}: ${affErr?.message ?? 'no row'}`)
+      }
+      const { error: codeErr } = await client
+        .from('affiliate_codes')
+        .insert({ code: 'TESTCODE', affiliate_id: aff.id })
+      if (codeErr) throw new Error(`affiliate_code TESTCODE: ${codeErr.message}`)
+    }
+
     console.log(`   ✓ ${spec.email} (${spec.role})`)
   }
 

@@ -42,7 +42,8 @@ async function signUp(page: Page, email: string): Promise<void> {
   await page.locator('input[name="email"]').fill(email)
   await page.locator('input[name="password"]').fill(TEST_PASSWORD)
   await page.locator('button[type="submit"]').click()
-  await expect(page).toHaveURL('/fr/dashboard', { timeout: 10000 })
+  // D-09 : le signup s'arrête sur l'écran honnête « paiement bientôt » (pas /dashboard).
+  await expect(page).toHaveURL('/fr/paiement-bientot', { timeout: 10000 })
 }
 
 test.describe('T-03-RLS / MEMB-01 : non-abonné lit 0 trade_setup (barrière données)', () => {
