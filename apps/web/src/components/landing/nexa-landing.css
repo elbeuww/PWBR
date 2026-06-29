@@ -198,10 +198,9 @@
 .nxl .globe-wrap { position: absolute; inset-block-start: 50%; inset-inline-start: 50%; transform: translate(-50%, -50%); z-index: 1; }
 [dir="rtl"] .nxl .globe-wrap { transform: translate(50%, -50%); }
 .nxl .atmo { position: absolute; inset-block-start: 50%; inset-inline-start: 50%; inline-size: 388px; block-size: 388px; transform: translate(-50%, -50%); border-radius: 50%; background: radial-gradient(circle, color-mix(in oklch, var(--primary) 24%, transparent) 0%, transparent 62%); filter: blur(16px); }
-.nxl .globe { position: relative; inline-size: 300px; block-size: 300px; border-radius: 50%; overflow: hidden; background: radial-gradient(circle at 36% 30%, color-mix(in oklch, var(--primary) 26%, var(--surface-solid)), var(--bg2) 72%); box-shadow: inset -28px -26px 72px rgba(0, 0, 0, 0.78), inset 18px 16px 52px color-mix(in oklch, var(--primary) 20%, transparent), 0 0 92px -14px var(--glow); }
-.nxl .globe::before { content: ""; position: absolute; inset: 0; border-radius: 50%; opacity: 0.55; background-image: repeating-linear-gradient(0deg, transparent 0 26px, color-mix(in oklch, var(--primary) 45%, transparent) 26px 27px), repeating-linear-gradient(90deg, transparent 0 26px, color-mix(in oklch, var(--primary) 45%, transparent) 26px 27px); background-size: 100% 100%, 56px 100%; animation: nxl-globespin 16s linear infinite; -webkit-mask-image: radial-gradient(circle at 50% 50%, #000 56%, transparent 80%); mask-image: radial-gradient(circle at 50% 50%, #000 56%, transparent 80%); }
-.nxl .globe::after { content: ""; position: absolute; inset: 0; border-radius: 50%; background: radial-gradient(circle at 32% 26%, rgba(255, 255, 255, 0.16), transparent 44%); }
-@keyframes nxl-globespin { to { background-position: 0 0, -56px 0; } }
+/* Vrai globe terrestre = canvas WebGL (cobe), voir NexaGlobe.tsx. cobe dessine la
+   sphère + son propre glow ; `.atmo` ajoute un halo ambiant derrière. */
+.nxl .globe-canvas { position: relative; display: block; inline-size: 340px; block-size: 340px; max-inline-size: 86vw; aspect-ratio: 1; }
 
 /* Pluie de chiffres */
 .nxl .data-rain { position: absolute; inset: -16% -26%; z-index: 0; overflow: hidden; pointer-events: none; -webkit-mask-image: radial-gradient(58% 64% at 55% 45%, #000, transparent 82%); mask-image: radial-gradient(58% 64% at 55% 45%, #000, transparent 82%); }
@@ -216,13 +215,41 @@
 
 @media (max-width: 900px) {
   .nxl .hero-inner, .nxl .steps, .nxl .score-feature, .nxl .price-grid { grid-template-columns: 1fr; }
-  .nxl .scene { block-size: 360px; order: -1; }
+  .nxl .scene { block-size: 340px; order: -1; }
   .nxl .nav-links { display: none; }
+  .nxl .nav-inner { gap: 14px; }
   .nxl .steps-sticky { position: relative; inset-block-start: 0; }
+  /* Hero figé sur mobile : globe statique (géré par NexaGlobe.tsx) + pas de pluie. */
+  .nxl .data-rain { display: none; }
+}
+
+/* MOBILE — cadrage resserré + nav compacte */
+@media (max-width: 600px) {
+  .nxl .wrap { padding-inline: 18px; }
+  .nxl .nav-inner { gap: 10px; block-size: 60px; }
+  .nxl .lang-switch a { padding: 6px 9px; }
+  .nxl .btn-sm { padding: 9px 13px; font-size: 13px; }
+  .nxl .hero { padding-block: 96px 56px; }
+  .nxl section.block { padding-block: 72px; }
+  .nxl .scene { block-size: 300px; }
+  .nxl .globe-canvas { inline-size: 240px; block-size: 240px; }
+  .nxl .atmo { inline-size: 300px; block-size: 300px; }
+  .nxl .gauge-big { inline-size: 220px; block-size: 220px; }
+  .nxl .gauge-big .gnum { font-size: 60px; }
+  .nxl .sd-levels { grid-template-columns: repeat(2, 1fr); }
+  .nxl .price-card { padding: 26px 22px; }
+  .nxl .price-amt { font-size: 40px; }
+  .nxl .tg-stat { font-size: 42px; }
+  .nxl .foot-links { gap: 36px; }
+}
+
+/* TRÈS PETIT — on masque le login secondaire pour garantir 0 débordement nav */
+@media (max-width: 430px) {
+  .nxl .wrap { padding-inline: 14px; }
+  .nxl .nx-nav .btn-ghost { display: none; }
 }
 @media (prefers-reduced-motion: reduce) {
   .nxl .marquee-track { animation: none; }
-  .nxl .globe::before { animation: none; }
   .nxl .data-col { animation: none; }
   .nxl .reveal { opacity: 1; transform: none; }
 }

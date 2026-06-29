@@ -21,10 +21,13 @@ export function NexaLandingEffects() {
     const root = document.querySelector<HTMLElement>('.nxl')
     if (!root) return
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    // Le « hero qui bouge » (data-rain, parallaxe de scène, tilt) est réservé au
+    // desktop : sur mobile (≤900px) on garde la scène statique. Demande produit.
+    const sceneMotion = !reduce && window.matchMedia('(min-width: 901px)').matches
     const cleanups: Array<() => void> = []
 
     // ── data-rain ──
-    if (!reduce) {
+    if (sceneMotion) {
       const host = root.querySelector<HTMLElement>('#dataRain')
       if (host && !host.childElementCount) {
         const cols = window.innerWidth < 700 ? 5 : 9
@@ -65,9 +68,9 @@ export function NexaLandingEffects() {
       if (progress) progress.style.inlineSize = (h > 0 ? (st / h) * 100 : 0) + '%'
       if (nav) nav.classList.toggle('scrolled', st > 20)
       sy = st
-      if (!reduce) applyLayers()
+      if (sceneMotion) applyLayers()
     }
-    if (!reduce) {
+    if (sceneMotion) {
       const onMove = (e: MouseEvent) => {
         mx = e.clientX / window.innerWidth - 0.5
         my = e.clientY / window.innerHeight - 0.5
@@ -122,7 +125,7 @@ export function NexaLandingEffects() {
     cleanups.push(() => io.disconnect())
 
     // ── Tilt 3D ──
-    if (!reduce) {
+    if (sceneMotion) {
       root.querySelectorAll<HTMLElement>('.tilt').forEach((card) => {
         const max = parseFloat(card.dataset.tilt || '8')
         const onMove = (e: MouseEvent) => {

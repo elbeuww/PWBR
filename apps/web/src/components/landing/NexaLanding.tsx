@@ -1,6 +1,7 @@
 import { getTranslations, getLocale } from 'next-intl/server'
 
 import { Link } from '../../i18n/navigation'
+import { NexaGlobe } from './NexaGlobe'
 import { NexaLandingEffects } from './NexaLandingEffects'
 
 /**
@@ -107,7 +108,7 @@ export async function NexaLanding() {
           {/* SCÈNE : globe + data-rain + cartes flottantes */}
           <div className="scene">
             <div className="data-rain" id="dataRain" aria-hidden />
-            <div className="globe-wrap layer" data-depth="0.35" aria-hidden><div className="atmo" /><div className="globe" /></div>
+            <div className="globe-wrap layer" data-depth="0.35" aria-hidden><div className="atmo" /><NexaGlobe /></div>
             <div className="layer float-card" data-depth="1.6" style={{ insetBlockStart: '4%', insetInlineStart: '-4%', zIndex: 3 }}>
               <div className="fc-top"><span className="fc-sym"><bdi>{card0.instrument}</bdi></span><span className={`fc-dir ${card0.risk === 'eleve' ? 'sell' : 'buy'}`}>{card0.direction}</span></div>
               <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBlockStart: 6 }}>
