@@ -20,7 +20,11 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          # Node 22 LTS : WebSocket natif global requis par @supabase/supabase-js
+          # (realtime). Node 20 ne l'expose pas -> "Node.js 20 detected without
+          # native WebSocket support" sur tout createClient. Node 20 est aussi
+          # deprecie sur les runners. Aligne sur le runtime local (Node 22+).
+          node-version: 22
           cache: pnpm
 
       # Lockfile fige (T-21-13) : aucune resolution opportuniste de dependances.
