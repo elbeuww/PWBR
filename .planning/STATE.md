@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v3.0
 milestone_name: Plateforme complète sous identité dark néon NEXA
-status: executing
+status: milestone_complete
 last_updated: "2026-06-27T00:00:08.113Z"
 last_activity: 2026-06-26
 progress:
   total_phases: 12
-  completed_phases: 8
+  completed_phases: 9
   total_plans: 48
   completed_plans: 45
-  percent: 94
+  percent: 75
 ---
 
 # Project State
@@ -30,10 +30,10 @@ See: .planning/PROJECT.md (mis à jour 2026-06-20 après clôture v2.0)
 ## Current Position
 
 Milestone: v3.0 — Plateforme complète sous identité dark néon NEXA (7 phases, 15-21)
-Phase: 21 (tests-e2e-audit-de-scalabilit) — EXECUTING
-Plan: 5 of 5
-Status: Ready to execute
-Last activity: 2026-06-26
+Phase: 21
+Plan: Not started
+Status: Milestone complete
+Last activity: 2026-06-29
 
 - **20-05 exécuté (2026-06-26)** : home `(admin)/page.tsx` transformée en **cockpit superadmin 4 sections** sur **anon-client** (ADASH-01/02/03/06), ordre verrouillé Revenus → Ops → Acquisition → Conformité (D-07). 4 cartes d'axe RSC `_components/AxisSummary{Revenus,Ops,Acquisition,Conformite}.tsx` : chacune KPI MESURÉ + ligne de provenance « Mesuré · N = … · période · source » (nombres rendus, jamais i18n) + lien « Voir le détail ». `Revenus` : MRR « Cash encaissé / mois » (formatAtomic via `getMrr`), churn via `applyThreshold` (Intl percent runtime → **0 caractère pour-cent en dur**), plan-mix. `Ops` : feux freshness/jobs tokenisés (`--signal-bullish`/`--risk-moderate`/`--destructive`) + file de validation → `/admin/sante`+`/admin/file`. `Acquisition` : agrégat funnel par étape → `/admin/affiliation/affilies`. `Conformité` : feu `isLegalReviewDone()` + version + date (D-18, read-only, rouge par défaut sûr). `page.tsx` : `createAdminServiceClient` → `createClient()` anon (T-20-03, plus aucune référence admin-service), KPI via wrappers gated 20-03 chargés en parallèle, agrégats Ops dégradant gracieusement sous RLS (0 ligne → feu rouge honnête). `AdminSidebar` regroupée sous 4 en-têtes d'axe, **URLs détail inchangées** (A5). `no-perf-seed-claims.ADMIN_UI_FILES` étendu aux 4 cartes → **scans no-perf VERTS 15/15** (extinction gardes 20-01). **D-20-05-A** : churn sans `%` littéral (applyThreshold + Intl percent). **D-20-05-B** : Conformité sans drill-down (aucune route détail), version/date via env `LEGAL_REVIEW_VERSION/DATE` (« — » si absentes). **D-20-05-C** : loadOps tolère RLS (pas de throw). typecheck exit 0. Commits `7ec9b44`/`81bb835`/`f37663e`. **Note scope** : `rls-unchanged.test.ts` reste RED par conception (extinction au 20-06, pages détail). **Reste : 20-06** (dernier plan, bascule pages détail + 0022).
 - **20-04 exécuté (2026-06-26)** : bascule PARTIELLE des écritures admin sur les RPC `SECURITY DEFINER` gated de 0021 (anon-client, audit DB) + dialogs membres. **Convertis (zéro service_role)** : `membres/actions.ts` → `grantSubscriptionTime`/`suspendAccount`/`unsuspendAccount` via `grant_subscription_time`/`suspend_account`/`unsuspend_account` (whitelist `PERIODS` T-20-10, `fail()` opaque T-20-16) ; `payouts/actions.ts` → `payCommission` via `admin_mark_commission_paid` (TX_HASH/ATOMIC + garde `Number.isSafeInteger` CR-02). Chaque action : `requireRole('superadmin')` (re-gate POST) PUIS `.rpc()` gated sur `createClient()` anon — la garde `is_superadmin()` DANS le RPC reste la barrière réelle. `MemberRowActions` : Dialog « Offrir du temps gratuit » (presets 7j/1m/3m, CTA « Confirmer la prolongation »), AlertDialog destructif « Suspendre ce compte ? » (motif requis, CTA rouge `bg-destructive`), « Réactiver » selon `suspended` ; toasts sonner, bouton désactivé pendant `pending`, aucun chiffre fabriqué (libellé durée, pas de date calculée). `membres/page.tsx` charge `profiles.suspended` (prop) — lecture service_role inchangée (déférée 20-06). i18n FR `grantDialog`/`suspendDialog`/`reactivateDialog`. **D-20-04-A (Option B — defer)** : `file/actions.ts` + `affiliation/actions.ts` CONSERVENT `createAdminServiceClient` — 0021 ne fournit aucun RPC gated `authenticated` pour leurs écritures (tables `payments`/`affiliate_*` sans policy write anon) ; bascule = runtime cassé, suppression = pages live cassées. Allowlist `rls-unchanged.test.ts` (commentaire `DEFERRED-0022`) + todo `.planning/todos/pending/0022-rpc-gated-paiements-affiliation.md`. Scan re-run : ne flague plus que les **6 pages détail (admin)** (job 20-06), PAS les 2 actions déférées. typecheck exit 0 ; suite admin 67/67 vert. Commits `3b34323`/`99e488c`/`a2baaef`/`844d56c`. **ADASH-04/05/07 PARTIELS** — retrait COMPLET de service_role côté (admin) = **0022 + 20-06**. **Reste : 20-05/06**.

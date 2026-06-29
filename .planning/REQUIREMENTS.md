@@ -50,7 +50,7 @@ Requirements de ce milestone. Chacun est mappé à une phase de la roadmap (voir
 - [x] **SCALE-03**: Les KPIs superadmin s'appuient sur des **vues matérialisées** (unique index, `REFRESH CONCURRENTLY`) gated `is_superadmin()`.
 - [ ] **SCALE-04**: Les migrations à l'échelle sont **non bloquantes** (`CREATE INDEX CONCURRENTLY`, gestion de l'état INVALID).
 - [x] **SCALE-05**: Les flux temps réel à fort volume utilisent **Broadcast** plutôt que `postgres_changes`.
-- [ ] **SCALE-06**: Un **audit DB** (`EXPLAIN ANALYZE` + `get_advisors` + `pg_stat_statements`) valide les requêtes clés sur données seedées ~10k.
+- [x] **SCALE-06**: Un **audit DB** (`EXPLAIN ANALYZE` + `get_advisors` + `pg_stat_statements`) valide les requêtes clés sur données seedées ~10k.
 
 ### Données seedées réalistes (SEED)
 
@@ -123,7 +123,7 @@ Exclusions explicites de ce milestone, avec raison.
 | ADASH-07 | Phase 20 — Dashboard superadmin (cockpit 4 axes) | Complete |
 | E2E-01 | Phase 21 — Tests E2E + audit de scalabilité | Complete |
 | E2E-02 | Phase 21 — Tests E2E + audit de scalabilité | Complete |
-| SCALE-06 | Phase 21 — Tests E2E + audit de scalabilité | Pending |
+| SCALE-06 | Phase 21 — Tests E2E + audit de scalabilité | Complete |
 
 **Couverture :** 35/35 requirements v1 mappés, aucun orphelin, aucun doublon.
 - THEME (5) → Phase 15 · RESKIN (6) → Phase 16 · SCALE-01..05 (5) → Phase 17 · SEED (3) → Phase 18 · UDASH (6) → Phase 19 · ADASH (7) → Phase 20 · E2E (2) + SCALE-06 (1) → Phase 21.
