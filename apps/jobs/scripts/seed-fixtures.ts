@@ -91,6 +91,19 @@ async function purgeFixtures(): Promise<number> {
     if (users.length < perPage) break
   }
   for (const id of fixtureIds) {
+    // `admin_audit_log.actor_id → profiles` est en NO ACTION (la piste d'audit est
+    // préservée par design quand un user est supprimé). Si un fixture a généré des
+    // lignes d'audit (ex. superadmin testant les actions gated), la cascade
+    // `auth.users → profiles` est BLOQUÉE → "Database error deleting user".
+    // On purge donc d'abord l'audit généré par CE fixture (borné à son id, jamais
+    // les vrais users). service_role bypass RLS. cf. seed:fixtures idempotent.
+    const { error: auditErr } = await client
+      .from('admin_audit_log')
+      .delete()
+      .eq('actor_id', id)
+    if (auditErr) {
+      throw new Error(`purge fixtures (admin_audit_log ${id}): ${auditErr.message}`)
+    }
     const { error } = await client.auth.admin.deleteUser(id)
     if (error) throw new Error(`purge fixtures (deleteUser ${id}): ${error.message}`)
   }
