@@ -63,6 +63,14 @@ C'est exactement ce qui casse le client service_role de `runJob.ts` / `persist.t
 
 L'étape réseau Custom est **gatée par un run de fumée** (ROUTINE-01, plan 03) : un premier run cloud doit écrire dans `job_runs` sans `403 host_not_allowed` dans `job_runs.error` AVANT de planifier les fenêtres.
 
+**Résultat run de fumée (gate ROUTINE-01) — ✅ CONFIRMÉ le 2026-06-21 :**
+
+- **Mode réseau effectif : `Custom` + `*.supabase.co`** (package managers par défaut inclus). Le fallback `Full` n'a **PAS** été nécessaire.
+- Environment cloud : `nexa-jobs` (Anthropic Console, dashboard-only). Secrets `SUPABASE_URL` + `SUPABASE_SERVICE_ROLE_KEY` injectés en variables d'Environment (pas de secrets store dédié — accès édition restreint, P-SECRET).
+- Run one-off `heartbeat` : `corepack enable` → `pnpm install` (660 paquets) → `pnpm --filter jobs exec tsx src/dispatch.ts heartbeat`. Exit 0.
+- Egress prouvé : **aucune** chaîne `403` / `host_not_allowed` / `ENOTFOUND` / `EAI_AGAIN` / `fetch failed`. `job_runs` (`job_name='heartbeat'`) = `status='success'` (projet `csotpitrjxryjkadyiml`), vérifié via REST (HTTP 200). Aucun secret affiché, aucun fichier modifié.
+- ⚠️ **Connecteur MCP Supabase à retirer pour les vraies routines (ROUTINE-05)** : lors du smoke test, un connecteur MCP Supabase était attaché mais pointait vers un autre projet (`agencyhub`) sans table `job_runs` — l'agent l'a ignoré et a écrit via `supabase-js` (voie D-43 correcte). Confirme que le connecteur est inutile ET dangereux : le **supprimer** des routines `newyork`/`eod-swing`/`asia`/`london` (plans 05/06).
+
 **Architecture des jobs (invariante) :**
 ```
 Routine Claude Remote / Task Scheduler / croner
@@ -215,6 +223,35 @@ La clé `SUPABASE_SERVICE_ROLE_KEY` **bypass la RLS** (accès complet à la base
 - **Ne jamais committer** la clé (voir `.env` gitignoré).
 - **Ne jamais `echo`/logger** la clé dans les étapes du run (pas de dump d'`process.env`).
 - Rotation possible au passage au lancement payant (migration vers une infra à secrets store).
+
+---
+
+## 9. Premier run réel (gate ROUTINE-03) — ✅ chaîne prouvée le 2026-06-22
+
+Run one-off `RUN_ID=newyork-20260622T1730Z` (Environment `nexa-jobs`, 0 connecteur MCP) :
+
+- **Pipeline complet OK** : news-ingest, macro-ingest, technical/fundamental/news-engine, combine-engine → 10 snapshots `combined` (5 instruments crypto × 2 styles).
+- **ANALYZE agent-native** : 10 paires examinées, **8 rejetées avec discipline** (bos_choch null, volume contracting, R:R impossible, ATR percentile extrême), **2 retenues**.
+- **persist (frontière D-43)** : `{ written: 2, rejected: 0 }` → 2 `trade_setups` `status='active'` :
+  - `SOLUSDT swing short` — score 53 (recalculé code), R:R global 1.60, entry bord conservateur.
+  - `ETHUSDT swing short` — score 59 (recalculé code), R:R global 2.08, entry bord conservateur.
+- Frontière intacte : le score agent a bien été **écrasé par `scoreSetup`** ; R:R ≥ 1.2 ; entrées conservatrices.
+
+### 9.1 ⚠️ LIMITATION BLOQUANTE pour le LIVE — Binance géo-bloqué depuis le cloud
+
+`market-ingest` n'a inséré **aucune bougie fraîche** : **Binance (`api.binance.com`) bloque l'IP du datacenter cloud Anthropic** (451/403 « Unavailable For Legal Reasons »), malgré l'allowlist. OANDA a aussi échoué (token absent/invalide). Le run a donc tourné sur des **bougies pré-existantes du 2026-06-17** (4 j de stale) → les 2 setups sont une **preuve de chaîne valide**, mais **PAS des signaux frais tradables**.
+
+**À résoudre AVANT que de vrais signaux partent aux membres (2 options) :**
+1. **Basculer le client Binance sur `data-api.binance.vision`** (endpoint données publiques, non géo-bloqué) — modif `packages/data-sources/src/binance/client.ts` (baseUrl MainClient) + allowlist `data-api.binance.vision`. À faire en TDD.
+2. **Ingestion crypto en local** (Windows Task Scheduler, backup déjà prévu §Stack Patterns) qui garde Supabase frais ; le run cloud ne fait que ANALYZE + persist sur données fraîches.
+
+Décision d'archi à trancher (founder) avant l'élargissement (plan 06) et la mise en production des signaux.
+
+### 9.2 Reste à faire pour clore le plan 12-05
+
+- [ ] Résoudre la fraîcheur Binance (§9.1) — **bloquant live**.
+- [ ] Créer les 2 routines Remote **permanentes** : `newyork` (`30 12 * * 1-5`), `eod-swing` (`00 21 * * 1-5`), Environment `nexa-jobs`, 0 connecteur, prompt single-run validé.
+- [ ] Task 3 monitoring : re-run même `session_day` → pas de doublon (idempotence D-45) ; `/admin/sante` affiche le run + flag `stale` ; conso quota < ~15/j.
 
 ---
 

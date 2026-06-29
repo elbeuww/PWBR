@@ -200,7 +200,7 @@ export default async function AffiliateDashboardPage() {
             <CardTitle className="text-base">{t('dashboard.commissionsDueLabel')}</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-2xl font-semibold text-amber-700 dark:text-amber-400">
+            <p className="text-2xl font-semibold text-[--risk-moderate]">
               <bdi>{fmtAtomic(data?.commissions_due_atomic ?? null, unit)}</bdi>
             </p>
           </CardContent>

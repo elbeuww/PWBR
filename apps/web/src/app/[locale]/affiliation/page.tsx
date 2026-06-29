@@ -33,7 +33,9 @@ export default async function AffiliationPage({
   return (
     <main className="mx-auto max-w-xl px-4 py-12 text-start">
       <h1 className="text-2xl font-semibold">{t('application.title')}</h1>
-      <p className="mt-2 text-muted-foreground">{t('application.intro')}</p>
+      {/* Accent Tier 2 discret (filet token --primary). */}
+      <div className="mt-2 h-px w-16 bg-primary/60" aria-hidden="true" />
+      <p className="mt-3 text-muted-foreground">{t('application.intro')}</p>
 
       <div className="mt-8">
         <ApplicationForm sessionEmail={sessionEmail} />

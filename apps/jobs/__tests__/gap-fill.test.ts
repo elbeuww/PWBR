@@ -21,8 +21,9 @@ import { computeGapFillWindow } from '../src/jobs/market-ingest.js'
 
 // --- helpers ---
 
-const TIMEFRAMES = { H1: 60, H4: 240, D: 1440 } as const
-type Timeframe = keyof typeof TIMEFRAMES
+// Valeur conservée pour `typeof` uniquement (pas d'usage runtime) → préfixe `_`.
+const _TIMEFRAMES = { H1: 60, H4: 240, D: 1440 } as const
+type Timeframe = keyof typeof _TIMEFRAMES
 
 describe('computeGapFillWindow — gap-fill fenêtre since/until', () => {
   // Instant de référence fixe : 2026-06-09T10:30:00Z (30 min dans la bougie H1 10:00)

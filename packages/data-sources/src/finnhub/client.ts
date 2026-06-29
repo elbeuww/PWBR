@@ -1,3 +1,4 @@
+// eslint-disable-next-line @typescript-eslint/triple-slash-reference -- ambient module 'finnhub' (SDK sans types) : référence requise au sommet du fichier.
 /// <reference path="./finnhub.d.ts" />
 /**
  * Client Finnhub — news marché par catégorie (free tier).

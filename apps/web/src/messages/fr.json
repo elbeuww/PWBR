@@ -10,11 +10,6 @@
     "en": "English",
     "ar": "العربية"
   },
-  "theme": {
-    "toggleLabel": "Changer de thème",
-    "light": "Thème clair",
-    "dark": "Thème sombre"
-  },
   "auth": {
     "eyebrow": "Compte",
     "loginTitle": "Connexion",
@@ -137,25 +132,66 @@
     "queueTitle": "File de validation",
     "members": {
       "colEmail": "Email",
+      "colSource": "Source",
       "colStatus": "Statut",
       "colPlan": "Plan",
       "colExpiry": "Expiration",
       "colLastPayment": "Dernier paiement",
       "filterStatus": "Statut",
+      "filterStatusAll": "Tous les statuts",
       "filterStatusActive": "Actif",
       "filterStatusInactive": "Inactif",
       "filterStatusExpired": "Expiré",
+      "filterStatusNone": "Sans abonnement",
+      "filterSource": "Source",
+      "filterSourceAll": "Toutes les sources",
+      "sourceDemo": "Démo",
+      "sourceBacktest": "Backtest",
+      "sourceLive": "Live",
       "searchEmail": "Rechercher par email",
       "statusActive": "Actif",
       "statusInactive": "Inactif",
       "statusExpired": "Expiré",
+      "statusNone": "Sans abonnement",
       "planDiscovery": "Découverte",
       "planStandard": "Standard",
       "actionActivate": "Activer / Prolonger",
       "actionChangePlan": "Changer de plan",
       "actionRevoke": "Révoquer / Suspendre",
+      "actionGrant": "Offrir du temps gratuit",
+      "actionSuspend": "Suspendre",
+      "actionReactivate": "Réactiver",
       "emptyHeading": "Aucun membre pour ce filtre",
-      "emptyBody": "Ajuste le filtre de statut ou la recherche par email."
+      "emptyBody": "Ajuste le filtre de statut ou la recherche par email.",
+      "errorHeading": "Impossible de charger ces données",
+      "errorBody": "Réessaie ou vérifie les jobs dans Santé."
+    },
+    "pagination": {
+      "loadMore": "Charger la page suivante"
+    },
+    "grantDialog": {
+      "title": "Offrir du temps gratuit",
+      "durationLabel": "Durée à offrir",
+      "period7": "7 jours",
+      "period1m": "1 mois",
+      "period3m": "3 mois",
+      "effect": "Le compte sera prolongé de {duration} à partir de sa date d'expiration actuelle (ou d'aujourd'hui s'il est déjà expiré). Action tracée.",
+      "confirm": "Confirmer la prolongation",
+      "cancel": "Annuler"
+    },
+    "suspendDialog": {
+      "title": "Suspendre ce compte ?",
+      "body": "L'utilisateur sera réellement bloqué (lecture 0 ligne via RLS) jusqu'à réactivation. Action réversible et tracée.",
+      "reasonLabel": "Motif de la suspension",
+      "reasonPlaceholder": "Explique brièvement la raison de la suspension",
+      "confirm": "Suspendre",
+      "cancel": "Annuler"
+    },
+    "reactivateDialog": {
+      "title": "Réactiver ce compte ?",
+      "body": "L'accès de l'utilisateur sera rétabli immédiatement. Action tracée.",
+      "confirm": "Réactiver",
+      "cancel": "Annuler"
     },
     "queue": {
       "colExpected": "Montant attendu",
@@ -624,9 +660,99 @@
       "Analyse Day & Swing"
     ]
   },
+  "landing": {
+    "nav": {
+      "how": "Comment ça marche",
+      "score": "Le score",
+      "pricing": "Tarifs",
+      "telegram": "Telegram",
+      "login": "Se connecter",
+      "start": "Commencer"
+    },
+    "hero": {
+      "eyebrow": "Plateforme d'analyse & signaux · MENA",
+      "cta1": "Commencer",
+      "cta2": "Comment ça marche",
+      "trust1Value": "5",
+      "trust1Label": "Marchés couverts",
+      "trust2Value": "24/7",
+      "trust2Label": "Marchés analysés",
+      "trust3Value": "AR · EN · FR",
+      "trust3Label": "Trilingue"
+    },
+    "footer": {
+      "tag": "NEXA · Analyse & signaux, expliqués simplement.",
+      "col1": "Produit",
+      "col2": "Apprendre",
+      "col2_1": "Cours gratuits",
+      "col2_2": "C'est quoi un signal ?",
+      "col2_3": "Gérer son risque",
+      "col3": "Langue",
+      "disclaimer": "Contenu strictement éducatif. NEXA ne fournit pas de conseil en investissement personnalisé et ne promet aucun gain. Le trading comporte un risque de perte, parfois supérieur au capital engagé avec effet de levier. Les performances passées et les taux mesurés par backtest ne préjugent pas des résultats futurs. Le statut des crypto-actifs varie selon les juridictions — informe-toi sur la réglementation applicable dans ton pays avant tout paiement."
+    },
+    "how": {
+      "eyebrow": "Comment ça marche",
+      "title": "Trois étapes, zéro jargon",
+      "lede": "Pensé pour les débutants comme pour les confirmés. On vulgarise tout — et on montre le détail à qui veut comprendre.",
+      "mockLabel": "Exemples de setups analysés",
+      "step1Title": "L'IA analyse en continu",
+      "step1Body": "Crypto, forex, or, argent, pétrole — analysés par un moteur qui raisonne comme un trader vétéran. Les chiffres sont calculés en code, jamais inventés.",
+      "step2Title": "Chaque opportunité notée sur 100",
+      "step2Body": "Un score d'opportunité, un niveau de risque, et le plan complet : zone d'entrée, stop-loss, objectifs et ratio R:R.",
+      "step3Title": "Tu reçois, expliqué simplement",
+      "step3Body": "D'abord le pourquoi en clair. Puis l'analyse approfondie — technique, fondamentale, actualités — pour qui veut creuser. Tu gardes la décision."
+    },
+    "score": {
+      "eyebrow": "Le score d'opportunité",
+      "title": "Un chiffre que tu peux comprendre",
+      "lede": "Chaque signal porte une note de 0 à 100 et un niveau de risque, dérivés en code à partir des données — jamais d'un avis. Le taux de réussite n'est affiché que lorsqu'il est réellement mesuré.",
+      "exampleLabel": "Score d'exemple",
+      "stat1Value": "5",
+      "stat1Label": "marchés couverts",
+      "stat2Value": "H1 · H4 · D",
+      "stat2Label": "horizons analysés",
+      "stat3Value": "Day · Swing",
+      "stat3Label": "deux styles"
+    },
+    "demo": {
+      "eyebrow": "Un exemple concret",
+      "title": "Tout, sur une carte",
+      "instrument": "BTC/USDT",
+      "meta": "Binance · 4H · Day",
+      "direction": "Achat",
+      "note": "Exemple éducatif — pas un signal réel.",
+      "kEntry": "Entrée",
+      "kStop": "Stop",
+      "kTargets": "Objectifs",
+      "kRr": "Ratio R:R",
+      "vEntry": "64 820",
+      "vStop": "62 400",
+      "vTargets": "66,5k · 68k · 71k",
+      "vRr": "2,4",
+      "ariaScore": "Score d'exemple 92 sur 100, risque faible"
+    },
+    "telegram": {
+      "eyebrow": "Canal Telegram public",
+      "title": "Les résultats, au grand jour",
+      "lede": "Chaque jour, les trades partagés et leur suivi — visibles en permanence. La preuve avant la promesse.",
+      "cta": "Rejoindre le canal"
+    },
+    "pricing": {
+      "eyebrow": "Tarifs · payé en USDT",
+      "title": "Commence pour 3 $",
+      "lede": "Sans carte bancaire. Paiement en USDT, activation automatique, annulable à tout moment.",
+      "popularBadge": "Le plus choisi",
+      "discoveryCta": "Commencer l'essai",
+      "standardCta": "S'abonner",
+      "feat1": "Tous les signaux en temps réel",
+      "feat2": "Score sur 100 & plan de trade complet",
+      "feat3": "Explications vulgarisées",
+      "feat4": "Analyses approfondies — technique, fondamentale, news"
+    }
+  },
   "hero": {
-    "title": "Décidez avec discipline.",
-    "lede": "Chaque opportunité notée sur 100, son niveau de risque, et un plan clair : entrée, stop-loss, take-profits, ratio R:R.",
+    "title": "L'analyse d'un vétéran. La clarté d'un débutant.",
+    "lede": "Score sur 100, niveau de risque, plan de trade complet — le pourquoi en clair, le détail pour qui veut creuser. Toi, tu gardes la décision.",
     "ctaPrimary": "Découvrir la méthode",
     "ctaSecondary": "Voir les tarifs",
     "cardsLabel": "Exemples de setups analysés",
@@ -670,5 +796,83 @@
   },
   "baseline": {
     "text": "Nouvelle Ère · Alliance d'Échange"
+  },
+  "dash": {
+    "nav": {
+      "overview": "Vue d'ensemble",
+      "signaux": "Signaux",
+      "suivis": "Suivis",
+      "historique": "Historique",
+      "watchlist": "Watchlist",
+      "abonnement": "Abonnement",
+      "affiliation": "Affiliation",
+      "parametres": "Paramètres",
+      "sidebarLabel": "Navigation principale",
+      "bottomLabel": "Navigation rapide"
+    },
+    "overview": {
+      "title": "Cockpit personnel",
+      "subscriptionStatus": "Statut de l'abonnement",
+      "activeUntil": "Abonnement actif — accès jusqu'au {date}",
+      "latestSignals": "Derniers signaux",
+      "shortcuts": "Raccourcis"
+    },
+    "suivis": {
+      "emptyTitle": "Aucun signal suivi",
+      "emptyBody": "Ajoutez un signal à votre watchlist en touchant l'étoile depuis la liste ou le détail d'un trade."
+    },
+    "historique": {
+      "emptyTitle": "Aucun signal clôturé",
+      "emptyBody": "Vos signaux suivis apparaîtront ici une fois clôturés, avec leur issue."
+    },
+    "list": {
+      "nextPage": "Page suivante",
+      "rUnit": "R",
+      "viewDetail": "Voir le détail",
+      "issue": {
+        "hit_tp": "TP atteint",
+        "hit_sl": "SL touché",
+        "flat": "Neutre"
+      }
+    },
+    "renewal": {
+      "title": "Votre abonnement a expiré",
+      "body": "Renouvelez pour réaccéder à vos signaux et à votre watchlist.",
+      "cta": "Renouveler l'abonnement"
+    },
+    "watchlist": {
+      "add": "Ajouter à ma watchlist",
+      "remove": "Retirer de ma watchlist",
+      "error": "Impossible de mettre à jour votre watchlist. Réessayez."
+    },
+    "affiliate": {
+      "summary": "{subscribers} abonnés ramenés · {revenue} revenus mesurés",
+      "link": "Voir mon tableau d'affiliation"
+    },
+    "error": {
+      "title": "Impossible de charger vos données",
+      "body": "Vérifiez votre connexion et réessayez.",
+      "retry": "Réessayer"
+    },
+    "settings": {
+      "account": "Compte",
+      "email": "E-mail",
+      "changePassword": "Changer le mot de passe",
+      "newPassword": "Nouveau mot de passe",
+      "confirmPassword": "Confirmer le mot de passe",
+      "passwordMinHint": "8 caractères minimum.",
+      "passwordTooShort": "Le mot de passe doit contenir au moins 8 caractères.",
+      "passwordMismatch": "Les deux mots de passe ne correspondent pas.",
+      "passwordUpdated": "Mot de passe mis à jour.",
+      "passwordUpdateError": "Impossible de mettre à jour le mot de passe. Réessayez.",
+      "language": "Langue",
+      "notifications": "Notifications",
+      "notificationsHint": "Préférences d'affichage uniquement — aucun e-mail ni notification n'est encore envoyé.",
+      "notifyNewSignals": "Nouveaux signaux",
+      "notifyExpiry": "Rappel d'expiration de l'abonnement",
+      "manageSubscription": "Gérer l'abonnement",
+      "signOut": "Se déconnecter",
+      "savePreferences": "Enregistrer les préférences"
+    }
   }
 }

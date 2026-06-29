@@ -1,128 +1,130 @@
-# Requirements: NEXA — Milestone v2.1 « Mise en vie »
+# Requirements: NEXA — Milestone v3.0 « Plateforme complète sous identité dark néon NEXA »
 
-**Defined:** 2026-06-21
-**Core Value:** Produire, pour chaque opportunité, une analyse fiable et explicable (score /100 + risque + plan de trade), vulgarisée — avec un **% de réussite toujours mesuré, jamais inventé**. v2.1 : donner à la plateforme son **identité visuelle réelle**, **activer le moteur** en routines sans API, et rendre le **track record affichable dès J1**.
+**Defined:** 2026-06-22
+**Core Value:** Produire, pour chaque opportunité, une analyse fiable et explicable (score /100 + risque + plan de trade), vulgarisée — avec un **% de réussite toujours mesuré, jamais inventé**. v3.0 : unifier la plateforme sous l'**identité dark néon** de la landing, livrer des **dashboards utilisateur & superadmin** complets, et la rendre **scalable à 10k+ utilisateurs** — sur **données seedées** (branchement API/paiement/signaux réel reporté).
 
 ## v1 Requirements
 
 Requirements de ce milestone. Chacun est mappé à une phase de la roadmap (voir Traceability).
 
-### Identité de marque (BRAND)
+### Design system dark néon unique (THEME)
 
-- [x] **BRAND-01**: La marque affichée partout est « NEXA » (mark + wordmark) ; toute trace de « MERA » / « Make Everybody Rich Again » est retirée du code et du contenu.
-- [x] **BRAND-02**: Une baseline trilingue conforme (descripteur « Nouvelle Ère · Alliance d'Échange ») est affichée, **sans aucune promesse de gain**.
-- [x] **BRAND-03**: Un logo NEXA (mark + favicon + variantes clair/sombre + image OG) est intégré au header, au footer et aux métadonnées.
-- [x] **BRAND-04**: Aucune promesse de gain ni pourcentage non mesuré n'apparaît dans les surfaces reskinées (test automatisé `no-perf-claims` étendu aux composants NEXA).
+- [x] **THEME-01**: Le visiteur voit toute la plateforme dans un **thème dark néon unique** cohérent (tokens sémantiques promus depuis la landing `.nxl`), sans option de thème clair.
+- [x] **THEME-02**: Les composants UI partagés (boutons, cartes, badges, inputs, tables, dialogs, nav) héritent du DS dark via les tokens sémantiques — pas de CSS bespoke par page, **aucune collision d'utilitaires Tailwind** (ex. `ring`/glow).
+- [x] **THEME-03**: Le thème néon par défaut (**green ou volt** — à trancher en phase design) est figé pour toute la plateforme.
+- [x] **THEME-04**: Le RTL arabe et l'absence de flash (no-FOUC, `forcedTheme="dark"`, propriétés logiques) sont préservés sous le thème unique.
+- [x] **THEME-05**: Le contraste respecte **WCAG AA** sur les surfaces dark, y compris translucides.
 
-### Design system (DESIGN)
+### Reskin transversal des pages existantes (RESKIN)
 
-- [x] **DESIGN-01**: Des tokens OKLCH en couches (primitive→semantic→component) basés sur la palette NEXA (cyber green `#03d87f`, royal purple `#63279b`) vivent dans `globals.css` (`@theme`/`:root`/`.dark`).
-- [x] **DESIGN-02**: Les 5 familles de polices (Archivo, Chakra Petch, Space Grotesk, JetBrains Mono, Noto Sans Arabic) sont self-hostées via `next/font/local` et exposées en CSS vars.
-- [x] **DESIGN-03**: Le thème clair/sombre est sans flash (script pré-paint), aucun FOUC, RTL-safe.
-- [x] **DESIGN-04**: Le RTL arabe est préservé sur tout le reskin (propriétés logiques uniquement, vérifié sur chaque surface).
-- [x] **DESIGN-05**: Une bibliothèque de composants NEXA tokenisée existe (boutons, cards, nav, eyebrow, gauges/rings de score, marquee, stats de confiance) — pas de CSS bespoke par page.
+- [x] **RESKIN-01**: La vitrine publique (accueil, tarifs, méthodologie, légal) est au DS dark néon, trilingue AR/EN/FR.
+- [x] **RESKIN-02**: L'auth (login/signup) et l'espace compte/abonnement sont au DS dark néon.
+- [x] **RESKIN-03**: L'espace membre (liste signaux + détail trade + chart lightweight-charts) est au DS dark néon, gating RLS préservé.
+- [x] **RESKIN-04**: L'Académie (index + article + cours/leçon) est au DS dark néon, RTL et fallback FR préservés.
+- [x] **RESKIN-05**: Le back-office `/admin` est au DS dark néon.
+- [x] **RESKIN-06**: Les pages de paiement/funnel (paiement, paiement-bientot) sont au DS dark néon.
 
-### Reskin des surfaces (UI)
+### Dashboard utilisateur (UDASH)
 
-- [x] **UI-01**: La vitrine publique (accueil, tarifs, méthodologie, légal, paiement-bientot) est au design NEXA, trilingue AR/EN/FR.
-- [x] **UI-02**: Le hero animé complet (globe + cartes flottantes + data-rain + tilt/parallaxe) est livré, `prefers-reduced-motion` respecté, sans % nu ni promesse de gain.
-- [x] **UI-03**: L'espace membre (liste signaux + détail trade + chart lightweight-charts) est au design NEXA, gating RLS préservé.
-- [x] **UI-04**: L'Académie (index + article + cours/leçon) est au design NEXA, RTL et fallback FR préservés.
-- [x] **UI-05**: L'auth (login/signup) et l'espace compte/abonnement sont au design NEXA.
-- [x] **UI-06**: Le back-office `/admin` est au design NEXA (peut rester plus sobre que le public).
-- [x] **UI-07**: L'`ExpiryBanner` (alerte J-3/J-1, dette WIRING-01/PAY-05) est câblé dans l'espace membre/compte. (11-03 : tokenisation `warning` livrée ; câblage = 11-08.)
+- [x] **UDASH-01**: Le membre accède à un dashboard `(dash)` avec une **vue d'ensemble** (état d'abonnement, derniers signaux, raccourcis).
+- [x] **UDASH-02**: Le membre consulte ses **signaux suivis et son historique**, paginés (keyset).
+- [x] **UDASH-03**: Le membre **ajoute/retire un signal à sa watchlist** (`user_followed_setups`, écriture scopée à son propre compte, anti-IDOR).
+- [x] **UDASH-04**: Le membre **gère son abonnement** (statut, expiration, alerte J-3/J-1 via `ExpiryBanner`).
+- [x] **UDASH-05**: Le membre voit son **tableau d'affiliation** (abonnés ramenés, revenus mesurés) intégré au dashboard.
+- [x] **UDASH-06**: Le membre accède à ses **paramètres de compte**.
 
-### Routines d'analyse — moteur live sans API (ROUTINE)
+### Dashboard superadmin (ADASH)
 
-- [x] **ROUTINE-01**: Un Environment Claude Code est configuré avec les secrets (`SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`) et l'accès réseau `*.supabase.co` confirmé.
-- [x] **ROUTINE-02**: Des routines Remote planifiées couvrent les fenêtres **day** (ouverture de session + clôture H1/H4) et **swing** (pré-clôture daily), alignées sur `apps/jobs/config/sessions.ts`.
-- [x] **ROUTINE-03**: Un run réel de bout en bout `snapshot → analyze (vétéran) → persist` produit ≥1 setup persisté via `persist.ts` (frontière de confiance intacte, score recalculé en code).
-- [x] **ROUTINE-04**: Les runs sont idempotents et monitorés (`job_runs` + flag `stale` visible sur `/admin/sante`), sans dépasser le budget de quota (~15 runs/j partagé).
-- [x] **ROUTINE-05**: Les jobs accèdent à la DB via `supabase-js` uniquement (pas de MCP cloud), sans aucune clé API Anthropic.
+- [x] **ADASH-01**: Le superadmin voit un cockpit d'**acquisition** (funnel inscriptions, performance affiliés).
+- [x] **ADASH-02**: Le superadmin voit les **revenus** (MRR, churn, mix de plans) — chiffres **mesurés** sur données seedées, jamais inventés.
+- [x] **ADASH-03**: Le superadmin voit la **santé opérationnelle** (jobs `job_runs`, fraîcheur `v_data_freshness`, file de paiements).
+- [x] **ADASH-04**: Le superadmin **gère les utilisateurs** (table virtualisée, filtrable/paginée, état d'abonnement).
+- [x] **ADASH-05**: Le superadmin **gère les paiements et affiliés** (files, payouts manuels).
+- [x] **ADASH-06**: Le superadmin voit l'**état de conformité** (gate `LEGAL_REVIEW_DONE`).
+- [x] **ADASH-07**: Toutes les pages superadmin sont **gated `is_superadmin()`** (404 discret sinon), sans aucune fuite cross-tenant (jamais service_role côté pages).
 
-### Backtest du catalogue de patterns (BACKTEST)
+### Robustesse & scalabilité DB (SCALE)
 
-- [ ] **BACKTEST-01**: Une migration ajoute la discrimination de **source** (`backtest` vs `live`) — table `backtest_outcomes` + colonne/vue `pattern_stats` — **avant** tout seed de backtest (anti double-comptage).
-- [ ] **BACKTEST-02**: Un **catalogue de patterns** est figé (patterns nommés → détecteurs de `packages/indicators`) avant l'écriture du moteur.
-- [ ] **BACKTEST-03**: `packages/backtest` rejoue le catalogue sur l'historique de candles via `replayOutcome` (first-touch, anti look-ahead réutilisé tel quel) et agrège un win-rate mesuré par pattern.
-- [ ] **BACKTEST-04**: La significativité statistique (intervalle de Wilson) est golden-testée ; aucun pattern sous le seuil n'est présenté comme un % mesuré.
+- [x] **SCALE-01**: Les policies RLS sont optimisées (wrap `(select …)`) et **indexées sur les colonnes de policy** (gain >100× à l'échelle).
+- [x] **SCALE-02**: Les listes longues (signaux, utilisateurs, paiements) utilisent une **pagination par curseur (keyset)** avec index composites alignés `ORDER BY`.
+- [x] **SCALE-03**: Les KPIs superadmin s'appuient sur des **vues matérialisées** (unique index, `REFRESH CONCURRENTLY`) gated `is_superadmin()`.
+- [ ] **SCALE-04**: Les migrations à l'échelle sont **non bloquantes** (`CREATE INDEX CONCURRENTLY`, gestion de l'état INVALID).
+- [x] **SCALE-05**: Les flux temps réel à fort volume utilisent **Broadcast** plutôt que `postgres_changes`.
+- [x] **SCALE-06**: Un **audit DB** (`EXPLAIN ANALYZE` + `get_advisors` + `pg_stat_statements`) valide les requêtes clés sur données seedées ~10k.
 
-### Track record affiché (TRACK)
+### Données seedées réalistes (SEED)
 
-- [ ] **TRACK-04**: Chaque pourcentage affiché porte sa **provenance** (`backtest` ou `réel`) et son **N** visible — jamais un % nu.
-- [ ] **TRACK-05**: La bascule par bucket backtest→réel s'opère quand N_réel ≥ 30 ; en dessous, le % backtest est labellisé ou « échantillon insuffisant » est affiché.
-- [ ] **TRACK-06**: Le job `outcome-tracker` tourne en prod et résout les issues réelles (hit_tp/hit_sl/flat), alimentant le track record réel.
+- [x] **SEED-01**: Un script de **seed idempotent** peuple la DB avec des données **FK-cohérentes** (~10k utilisateurs + signaux/paiements/affiliés/outcomes), via faker déterministe.
+- [x] **SEED-02**: Les données seedées sont **labellisées** (`backtest`/`démo`) et respectent « % toujours mesuré, jamais inventé » (aucun chiffre de performance fabriqué).
+- [x] **SEED-03**: La RLS est **re-testée depuis un client anon** sur les données seedées (pas service_role) — isolation prouvée à l'échelle.
 
-## v2 Requirements
+### Tests fonctionnels (E2E)
 
-Reconnus mais différés au-delà de v2.1.
+- [x] **E2E-01**: Les flux principaux (auth, navigation membre, dashboard utilisateur, abonnement, gating admin) sont couverts par des tests **Playwright**.
+- [x] **E2E-02**: Les tests RLS/gating prouvent l'**isolation** (non-abonné → 0 ligne, non-superadmin → 404, cross-user).
 
-### Automatisation (AUTO)
+## Reporté de v2.1 (milestone en pause — repris à la reprise du moteur live)
 
-- **PAY-AUTO**: Processeur crypto (NOWPayments/Cryptomus) — adresse unique par facture + webhooks (remplace la soumission de hash manuelle).
-- **AFF-AUTO**: Automatisation des payouts d'affiliation.
-- **ENGINE-API**: Migration vers clé API Anthropic + infra 24/7 (fiabilité au lancement payant, au-delà du quota Max).
+> Ces requirements restent ouverts ; ils dépendent des **données réelles** (branchement API/signaux), explicitement reporté pour ce milestone. Voir `.planning/ROADMAP.md` (phases 12-14 v2.1) et `STATE.md`.
 
-### Calibration avancée (CALIB)
+- [ ] **ROUTINE-02/03/04** (partiel) : routines Claude permanentes (newyork/eod-swing) + run réel ≥1 setup + monitoring — phase 12 v2.1.
+- [ ] **BACKTEST-01..04** : migration source + catalogue figé + moteur `packages/backtest` + Wilson — phase 13 v2.1.
+- [ ] **TRACK-04..06** : provenance + N visible + bascule N≥30 + `outcome-tracker` en prod — phase 14 v2.1.
 
-- **CALIB-01**: Courbes de calibration par bucket de score (au-delà du % mesuré simple).
-- **CALIB-02**: Orchestration d'animations avancée via `motion` (si le CSS/vanilla atteint ses limites).
+## Out of Scope (v3.0)
 
-## Out of Scope
+Exclusions explicites de ce milestone, avec raison.
 
-| Feature | Reason |
-|---------|--------|
-| % « 73 % » hardcodé du mock | Anti-feature : pourcentage non mesuré = exposition légale. Tout % vient de `pattern_stats`. |
-| Slogan « Make Everybody Rich Again » | Anti-feature : promesse de gain explicite, contraire à la contrainte légale dure. |
-| 2e univers de marque « volt/green » du mock | Remplacé par l'identité NEXA réelle (green + purple). |
-| Clé API Anthropic en v2.1 | Hors scope ; le moteur tourne via routines Claude Code (forfait Max). → v2 (ENGINE-API). |
-| LEGAL-02 (sign-off juriste) | Gate non-code, dépendance externe ; bloque le 1er encaissement, pas ce milestone. |
-| PAY-AUTO / AFF-AUTO | Automatisation paiement/affiliation → v2. |
-| Lib lourde d'animation/3D (GSAP, three.js, WebGL) | CSS + vanilla TS suffisent (recherche STACK) ; `motion` autorisé en secours seulement. |
-| Actions/equities, scalping M1 temps réel | Inchangé : après le cœur prouvé. |
+- **Branchement des vraies API / signaux / paiement réel** — données seedées d'abord (« on ajustera les API demain »). Reporté.
+- **Moteur live (routines Claude, phase 12 v2.1)** — dépend des données réelles. En pause.
+- **LEGAL-02** (sign-off juriste) — gate non-code bloquant le 1er encaissement réel, pas le build.
+- **Test de charge réel (k6/artillery)** — la scalabilité de ce milestone = conception + audit DB, pas de load-test.
+- **Vérifications live différées v2.0** (P02-P08 UAT, paiement on-chain testnet) — hors scope.
+- **PAY-AUTO / AFF-AUTO** (automatisation paiement/payouts) — backlog.
+- **Communauté sociale, exécution automatique des trades, scalping M1/M5, actions/equities** — backlog produit (inchangé).
 
 ## Traceability
 
-Chaque requirement → exactement une phase. Phases 10-14 (numérotation continue après v2.0).
+> Mapping REQ-ID → phase (rempli par la roadmap 2026-06-22). Couverture 100 % : 35/35 requirements v1 mappés à exactement une phase. Numérotation des phases continue après v2.1 (phase 14) → v3.0 démarre à la phase 15.
 
-| Requirement | Phase | Status |
-|-------------|-------|--------|
-| DESIGN-01 | Phase 10 | Complete |
-| DESIGN-02 | Phase 10 | Complete |
-| DESIGN-03 | Phase 10 | Complete |
-| DESIGN-04 | Phase 10 | Complete |
-| DESIGN-05 | Phase 11 | Complete |
-| BRAND-01 | Phase 11 | Complete |
-| BRAND-02 | Phase 11 | Complete |
-| BRAND-03 | Phase 11 | Complete |
-| BRAND-04 | Phase 11 | Complete |
-| UI-01 | Phase 11 | Complete |
-| UI-02 | Phase 11 | Complete |
-| UI-03 | Phase 11 | Complete |
-| UI-04 | Phase 11 | Complete |
-| UI-05 | Phase 11 | Complete |
-| UI-06 | Phase 11 | Complete |
-| UI-07 | Phase 11 | Complete |
-| ROUTINE-01 | Phase 12 | Complete |
-| ROUTINE-02 | Phase 12 | Complete |
-| ROUTINE-03 | Phase 12 | Complete |
-| ROUTINE-04 | Phase 12 | Complete |
-| ROUTINE-05 | Phase 12 | Complete |
-| BACKTEST-01 | Phase 13 | Pending |
-| BACKTEST-02 | Phase 13 | Pending |
-| BACKTEST-03 | Phase 13 | Pending |
-| BACKTEST-04 | Phase 13 | Pending |
-| TRACK-04 | Phase 14 | Pending |
-| TRACK-05 | Phase 14 | Pending |
-| TRACK-06 | Phase 14 | Pending |
+| REQ-ID | Phase | Statut |
+|--------|-------|--------|
+| THEME-01 | Phase 15 — Design system v3 « dark néon unique » | Complete |
+| THEME-02 | Phase 15 — Design system v3 « dark néon unique » | Complete |
+| THEME-03 | Phase 15 — Design system v3 « dark néon unique » | Complete |
+| THEME-04 | Phase 15 — Design system v3 « dark néon unique » | Complete |
+| THEME-05 | Phase 15 — Design system v3 « dark néon unique » | Complete |
+| RESKIN-01 | Phase 16 — Reskin transversal de toutes les pages | Complete |
+| RESKIN-02 | Phase 16 — Reskin transversal de toutes les pages | Complete |
+| RESKIN-03 | Phase 16 — Reskin transversal de toutes les pages | Complete |
+| RESKIN-04 | Phase 16 — Reskin transversal de toutes les pages | Complete |
+| RESKIN-05 | Phase 16 — Reskin transversal de toutes les pages | Complete |
+| RESKIN-06 | Phase 16 — Reskin transversal de toutes les pages | Complete |
+| SCALE-01 | Phase 17 — Fondation DB scalable | Complete |
+| SCALE-02 | Phase 17 — Fondation DB scalable | Complete |
+| SCALE-03 | Phase 17 — Fondation DB scalable | Complete |
+| SCALE-04 | Phase 17 — Fondation DB scalable | Pending |
+| SCALE-05 | Phase 17 — Fondation DB scalable | Complete |
+| SEED-01 | Phase 18 — Seed de données réalistes à l'échelle | Complete |
+| SEED-02 | Phase 18 — Seed de données réalistes à l'échelle | Complete |
+| SEED-03 | Phase 18 — Seed de données réalistes à l'échelle | Complete |
+| UDASH-01 | Phase 19 — Dashboard utilisateur | Complete |
+| UDASH-02 | Phase 19 — Dashboard utilisateur | Complete |
+| UDASH-03 | Phase 19 — Dashboard utilisateur | Complete |
+| UDASH-04 | Phase 19 — Dashboard utilisateur | Complete |
+| UDASH-05 | Phase 19 — Dashboard utilisateur | Complete |
+| UDASH-06 | Phase 19 — Dashboard utilisateur | Complete |
+| ADASH-01 | Phase 20 — Dashboard superadmin (cockpit 4 axes) | Complete |
+| ADASH-02 | Phase 20 — Dashboard superadmin (cockpit 4 axes) | Complete |
+| ADASH-03 | Phase 20 — Dashboard superadmin (cockpit 4 axes) | Complete |
+| ADASH-04 | Phase 20 — Dashboard superadmin (cockpit 4 axes) | Complete |
+| ADASH-05 | Phase 20 — Dashboard superadmin (cockpit 4 axes) | Complete |
+| ADASH-06 | Phase 20 — Dashboard superadmin (cockpit 4 axes) | Complete |
+| ADASH-07 | Phase 20 — Dashboard superadmin (cockpit 4 axes) | Complete |
+| E2E-01 | Phase 21 — Tests E2E + audit de scalabilité | Complete |
+| E2E-02 | Phase 21 — Tests E2E + audit de scalabilité | Complete |
+| SCALE-06 | Phase 21 — Tests E2E + audit de scalabilité | Complete |
 
-**Coverage:**
-- v1 requirements: 28 total
-- Mapped to phases: 28 ✓
-- Unmapped: 0 ✓
-
-Répartition : Phase 10 = 4 (DESIGN-01..04) · Phase 11 = 12 (DESIGN-05 + BRAND-01..04 + UI-01..07) · Phase 12 = 5 (ROUTINE-01..05) · Phase 13 = 4 (BACKTEST-01..04) · Phase 14 = 3 (TRACK-04..06).
-
----
-*Requirements defined: 2026-06-21*
-*Last updated: 2026-06-21 — roadmap créée, 28/28 requirements mappés aux Phases 10-14.*
+**Couverture :** 35/35 requirements v1 mappés, aucun orphelin, aucun doublon.
+- THEME (5) → Phase 15 · RESKIN (6) → Phase 16 · SCALE-01..05 (5) → Phase 17 · SEED (3) → Phase 18 · UDASH (6) → Phase 19 · ADASH (7) → Phase 20 · E2E (2) + SCALE-06 (1) → Phase 21.
+- **Note SCALE :** SCALE-01..05 (conception perf) en Phase 17 ; SCALE-06 (audit chiffré sur seed ~10k) en Phase 21 — l'audit exige les données seedées et les dashboards en place.

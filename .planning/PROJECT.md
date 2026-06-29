@@ -22,7 +22,27 @@ L'IA se comporte comme un trader vétéran (50 ans d'expérience). L'analyse cha
 
 Produire, pour chaque opportunité, une analyse fiable et explicable — score /100 + niveau de risque + plan de trade (entrée/SL/TP/R:R/levier) — vulgarisée pour un public non technique. Si tout le reste échoue, **la qualité et la traçabilité de l'analyse d'un trade** doit fonctionner : le % de réussite affiché est toujours mesuré, jamais inventé — c'est le socle de confiance qui fait payer l'abonnement.
 
-## Current Milestone: v2.1 — Mise en vie : identité NEXA, moteur live & track record
+## Current Milestone: v3.0 — Plateforme complète sous identité dark néon NEXA
+
+**Goal :** Faire de NEXA une plateforme pleinement fonctionnelle et scalable (dizaines de milliers d'utilisateurs), unifiée sous l'identité **dark néon** de la landing, avec **dashboards utilisateur et superadmin** complets, construite sur **données seedées** (branchement des vraies API/signaux/paiement reporté).
+
+**Target features :**
+- **Design system v3 « dark néon unique »** : promotion de l'identité de la landing (composants `.nxl`, thème volt/green OKLCH) en design system **global**, thème **dark unique**, en remplacement du DS NEXA light/dark institutionnel des phases 10-11. Polices conservées (Archivo / Chakra Petch / Space Grotesk / JetBrains Mono / Noto Sans Arabic).
+- **Reskin de TOUTES les pages existantes** sur ce nouveau DS (vitrine, légal, auth, espace membre signaux/détail, paiement, compte/abonnement, académie/CMS, admin).
+- **Dashboard utilisateur** complet (vue d'ensemble, signaux suivis, abonnement, affiliation).
+- **Dashboard superadmin** complet/refondu (pilotage signaux, santé système, affiliés, paiements, utilisateurs).
+- **Tests fonctionnels E2E** des flux principaux.
+- **Robustesse & scalabilité DB pour 10k+ users** : audit approfondi (indexes ciblés + EXPLAIN sur requêtes clés, RLS perf via helpers security-definer, pagination/curseurs, Supabase advisors, pooler/pgBouncer, limites Realtime). PAS de test de charge réel dans ce milestone.
+
+**Key context :**
+- **v2.1 mis en pause** : phases 12 (routines d'analyse Claude), 13 (backtest catalogue), 14 (track record prod) **reportées** — elles dépendent des données réelles (« on ajustera les API demain »).
+- L'identité dark néon **remplace assumément** le DS NEXA light/dark des phases 10-11 (refonte produit voulue par le fondateur, 2026-06-22).
+- **Données seedées** réalistes ; aucun branchement API/paiement/signaux réels dans ce milestone.
+- **Scalabilité = conception + audit DB** (pas de test de charge réel).
+- Contraintes conservées : RLS stricte · % TOUJOURS mesuré jamais inventé (VITR-03) · aucune promesse de gain · i18n fr/en/ar + RTL · garde no-mera-brand.
+- **Hors scope** : moteur live (phase 12), LEGAL-02 (sign-off juriste), vérifs live différées v2.0.
+
+## Paused Milestone: v2.1 — Mise en vie : identité NEXA, moteur live & track record (phases 10-11 livrées, 12-14 reportées)
 
 **Goal :** Donner à la plateforme son identité visuelle réelle (design **NEXA** sur toute l'app), activer le moteur d'analyse en **routines Claude planifiées sans clé API** (day + swing, timing choisi par le moteur), et rendre le **track record affichable dès le lancement** (backtest du catalogue de patterns + boucle d'outcomes en prod).
 
@@ -81,6 +101,10 @@ Produire, pour chaque opportunité, une analyse fiable et explicable — score /
 - [x] **Superadmin consolidé (v2.0 Phase 8, 2026-06-19)** : `/admin` KPI + `/admin/signaux` (× telegram_posts, filtres URL) + `/admin/sante` (feux fraîcheur + job_runs) + `/admin/affiliation` (perfs + payouts), 404 discret non-superadmin (T-04-ADMIN-ELEV, **live-vérifié** gating E2E). Requirements ADMIN-03/04.
 
 - [x] **Composants NEXA, reskin transversal & rebranding (v2.1 Phase 11, 2026-06-21)** : tokens component-layer 3 couches (`--accent-brand` purple + `--risk-moderate` amber), bibliothèque NEXA tokenisée (Eyebrow, ScoreRing `role=meter` couleur=risque, Marquee RTL-aware, ConfidenceStat via `applyThreshold`, Logo SVG marque), recoloration résiduelle vers tokens flip-safe (CandleChart `MutationObserver`+`applyOptions`, SignalCard/SignalDetail `--signal-*`, ExpiryBanner/alert tokenisés), rebranding MERA→NEXA complet (header/footer/metadata, grep=0) + baseline trilingue + assets `next/og` (favicon/apple-icon/OG), hero animé greenfield CSS+vanilla TS (globe/cartes/data-rain/tilt, double-gardé `prefers-reduced-motion`, zéro three/gsap), reskin transversal toutes surfaces (vitrine/académie/auth/compte/admin) + **WIRING-01 clos** (ExpiryBanner câblé sur `/abonnement`, fetch RLS serveur). Garde-fous text-scan (no-perf-claims, no-mera-brand, rtl-logical-props). Suite unit 582/4-skip/0-fail, tsc 0-erreur, code review 0 blocker (WR-01/WR-02 invariants flip-safe+RTL corrigés). Requirements DESIGN-05, BRAND-01..04, UI-01..07. **Restant UAT humain (11-HUMAN-UAT.md) :** rendu multi-locale/RTL + E2E Playwright + reduced-motion + theme-flip CandleChart.
+
+- [x] **Design system v3 « dark néon unique » (v3.0 Phase 15, 2026-06-22)** : thème dark unique figé — `forcedTheme="dark"` (D-04), valeurs sémantiques GREEN `.nxl` promues verbatim dans `:root` + `.dark` réconcilié byte-identique (`--background:#070b08`, `--primary:oklch(0.84 0.18 150)`, D-01/D-02/D-03), `ThemeToggle` supprimé + namespace i18n `theme` purgé en parité trilingue stricte (D-05), palette bespoke résiduelle + focus ring institutionnel `ring-[#2563EB]` éliminés sur 9 surfaces fondation vers la couche token (D-07, scan THEME-02 GREEN 5/5, D-08), no-FOUC + RTL préservés (D-12). Gates Wave-0 authorés RED-puis-GREEN : `theme-scan` (THEME-02) + `contrast-aa` WCAG AA math auto-contenue, surfaces translucides compositées sur `#070b08` (THEME-05, D-09/D-10). Vérification 11/11, suite 608/4-skip/0-fail, tsc 0-erreur. Requirements THEME-01..05. Base figée pour le reskin transversal (Phase 16).
+
+- [x] **Dashboard utilisateur (v3.0 Phase 19, 2026-06-26)** : watchlist membre `user_followed_setups` (migration 0020 LIVE, RLS anti-IDOR `auth.uid()`-scopée + index keyset `(user_id, created_at desc, id desc)`), shell `(dash)` gardé `requireUser` (abonné expiré entre pour renouveler, gate `(member)` intact) avec `ExpiryBanner` monté — **dette WIRING-01 définitivement close** — et `DashShell` 6 onglets RTL-safe, namespace i18n `dash` figé parité stricte fr/en/ar. Surfaces : overview cockpit no-perf (UDASH-01), carte affiliation conditionnelle no-PII (UDASH-05), paramètres + changement mot de passe (UDASH-06), Suivis/Historique source-unique `user_followed_setups ⋈ trade_setups` paginées par curseur keyset opaque sanitizé (UDASH-02, 4 états dont renewal), `WatchlistToggle` étoile optimiste anti-IDOR (anon-client RLS, 0 service_role, rollback) câblé sur SignalCard/SignalDetail (UDASH-03). Code review 0 critique / 5 warnings tous corrigés. UAT live 4/4 navigateur (2 bugs trouvés+corrigés : crash `QueryProvider` overview, placement étoile). Suite 639/13-skip/0-fail, tsc 0-erreur. Requirements UDASH-01..06. **Restant (différé non-bloquant, 19-HUMAN-UAT.md) :** EXPLAIN keyset Index Scan à confirmer au seed-à-l'échelle · test RLS `user-followed-rls` à exécuter avec `.env.test`.
 
 ### Active — milestone en cours (v2.1 : identité NEXA, moteur live & track record)
 
@@ -164,6 +188,10 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-06-20 — démarrage du milestone **v2.1 « Mise en vie : identité NEXA, moteur live & track record »** (3 axes : design NEXA toute l'app · routines d'analyse Claude sans API · backtest + track record en prod). Requirements + roadmap en cours de définition.*
+*Last updated: 2026-06-26 — **Phase 19 « Dashboard utilisateur » livrée et vérifiée** (UDASH-01..06, watchlist anti-IDOR + shell `(dash)` + WIRING-01 close ; UAT live 4/4, 639 tests). Prochaine : Phase 20 « Dashboard superadmin (cockpit 4 axes) ». NB tracking : Phases 16/17/18 à réconcilier dans Validated (drift antérieur).*
+
+*Précédent : 2026-06-22 — démarrage du milestone **v3.0 « Plateforme complète sous identité dark néon NEXA »** (design system dark unique · reskin toutes pages · dashboards utilisateur & superadmin · tests E2E · scalabilité DB 10k+ users, sur données seedées). v2.1 mis en pause (phases 10-11 livrées, 12-14 reportées car dépendantes des données réelles). Requirements + roadmap en cours de définition.*
+
+*Précédent : 2026-06-20 — démarrage du milestone **v2.1 « Mise en vie : identité NEXA, moteur live & track record »** (3 axes : design NEXA toute l'app · routines d'analyse Claude sans API · backtest + track record en prod). Phases 10-11 livrées ; 12-14 reportées à la reprise du moteur live.*
 
 *Précédent : 2026-06-20 après clôture du milestone v2.0 « Plateforme publique ». Les 9 phases sont livrées et réconciliées dans « Validated » (P1-P9 v2.0 + cœur v1.0 P1-4). Vérification automatisée 100 % verte (Vitest 566 ✓, typecheck 0) ; P01 + P09 live-vérifiés (E2E 32 ✓, bug i18n localeDetection corrigé au passage). Items live différés (P02-P08 + UAT P02/P03) et dette explicite (WIRING-01, LEGAL-02) consignés dans `STATE.md → Deferred Items`. Roadmap collapsée ; détail v2.0 archivé `.planning/milestones/v2.0-ROADMAP.md`. Prochain milestone candidat : W5 automatisation.*

@@ -98,73 +98,91 @@
 }
 
 /*
- * COUCHE 2 — SÉMANTIQUE (:root / .dark). SEULE couche qui FLIPPE entre thèmes.
- * Chaque token repointe sur une PRIMITIVE NEXA (var(--nexa-*)) — aucune valeur
- * littérale HEX/OKLCH ici (sortie du bleu institutionnel v2.0, D-04).
+ * COUCHE 2 — SÉMANTIQUE (:root / .dark). FIGÉE GREEN (Phase 15, D-01/D-02/D-03).
  *
- * D-05 : --primary = BRAND green (--nexa-green-500), jamais un signal de trade.
- * Les signaux trading sont exposés à part (--signal-bullish / --signal-bearish),
- * distincts de --primary, consommés par les widgets de trading en Phase 11.
+ * Promotion SÉMANTIQUE des valeurs `.nxl[data-theme="green"]` (nexa-landing.css)
+ * verbatim dans `:root` — PAS une de-scope mécanique de `.nxl` (Pitfall #1).
+ * Valeurs GREEN gelées (D-02), exception documentée à la règle « var() only en
+ * Layer 2 » (PATTERNS.md §Token-via-var, Phase 15 only) : les littéraux HEX/OKLCH
+ * de la marque vivent ici car la couche ne flippe plus (thème dark unique, D-04).
  *
- * Valeurs LIGHT (rôles 60/30/10 — 02-UI-SPEC §Color).
+ * D-05 : --primary = BRAND green, jamais un signal de trade. Les signaux trading
+ * (--signal-bullish / --signal-bearish) restent DISTINCTS via var(--nexa-signal-*).
+ * Sous forcedTheme="dark", `.dark` gagne toujours → il DOIT résoudre aux MÊMES
+ * valeurs GREEN que :root, sinon la plateforme peindrait le navy hérité (D-03).
  */
 :root {
   --radius: 0.625rem;
-  --background: var(--nexa-white);          /* dominant 60% */
-  --foreground: var(--nexa-ink);            /* texte primaire */
-  --card: var(--nexa-neutral-50);           /* surface secondaire 30% */
-  --card-foreground: var(--nexa-ink);
-  --popover: var(--nexa-white);
-  --popover-foreground: var(--nexa-ink);
-  --primary: var(--nexa-green-500);         /* BRAND green (D-05) — CTA, focus, états actifs */
-  --primary-foreground: var(--nexa-ink);    /* green clair → texte sombre (contraste) */
-  --secondary: var(--nexa-neutral-50);      /* header/footer/cartes */
-  --secondary-foreground: var(--nexa-ink);
-  --muted: var(--nexa-neutral-50);
-  --muted-foreground: var(--nexa-neutral-500); /* texte atténué */
-  --accent: var(--nexa-neutral-50);
-  --accent-foreground: var(--nexa-ink);
-  --destructive: var(--nexa-signal-bear);   /* rouge réel (signaux désormais dédiés, D-05) */
-  --border: var(--nexa-neutral-200);
-  --input: var(--nexa-neutral-200);
-  --ring: var(--nexa-green-500);            /* focus ring = brand green */
+  --background: #070b08;                     /* fond GREEN dominant (D-02 gelé) */
+  --foreground: #eafff1;                     /* texte primaire */
+  --card: #0f1611;                           /* surface solide */
+  --card-foreground: #eafff1;
+  --popover: #0f1611;
+  --popover-foreground: #eafff1;
+  --primary: oklch(0.84 0.18 150);           /* BRAND green (D-05) — CTA, focus, états actifs */
+  --primary-foreground: #051009;             /* texte sur primary (on-primary) */
+  --secondary: #0f1611;
+  --secondary-foreground: #eafff1;
+  --muted: #0f1611;
+  --muted-foreground: rgba(212, 244, 224, 0.64); /* texte atténué (--sub) */
+  --accent: #0f1611;
+  --accent-foreground: #eafff1;
+  --destructive: oklch(0.68 0.2 24);         /* rouge réel (--sell) */
+  --border: rgba(255, 255, 255, 0.1);
+  --input: rgba(255, 255, 255, 0.1);
+  --ring: oklch(0.84 0.18 150);              /* focus ring = brand green */
 
-  /* Signaux trading — DISTINCTS de --primary (D-05), consommés en Phase 11. */
+  /* Extended custom props (pas de nom shadcn) — promus de .nxl[data-theme=green]. */
+  --background-alt: #0b110d;                 /* --bg2 */
+  --surface-translucent: rgba(255, 255, 255, 0.035); /* --surface */
+  --line-soft: rgba(255, 255, 255, 0.06);    /* --line-soft */
+  --muted-tertiary: rgba(212, 244, 224, 0.4); /* --mute */
+  --glow: oklch(0.84 0.18 150 / 0.55);       /* --glow */
+
+  /* Signaux trading — DISTINCTS de --primary (D-05), via primitives dédiées. */
   --signal-bullish: var(--nexa-signal-bull);
   --signal-bearish: var(--nexa-signal-bear);
 
-  /* Phase 11 : token component ajouté (DESIGN-05), sans re-décision de palette (Pitfall 4). */
-  --accent-brand: var(--nexa-purple-500);   /* purple accent light (Eyebrow/gradients) */
-  --risk-moderate: var(--nexa-amber-500);   /* amber risque modéré (ScoreRing) — teinte unique aux 2 thèmes */
+  /* Phase 11 : tokens component (DESIGN-05), conservés via primitives (D-05). */
+  --accent-brand: var(--nexa-purple-400);    /* purple accent (Eyebrow/gradients) */
+  --risk-moderate: var(--nexa-amber-500);    /* amber risque modéré (ScoreRing) */
 }
 
 /*
- * Valeurs DARK — n'overrider QUE ce qui flippe. Les signaux GARDENT leur teinte
- * (une perte est rouge dans les deux thèmes) → définis une seule fois en :root.
+ * `.dark` — RÉCONCILIÉ aux MÊMES valeurs GREEN gelées que :root (D-03).
+ * Sélecteur conservé (D-06 — CandleChart MutationObserver + sonner useTheme
+ * observent `.dark`). Sous forcedTheme="dark", `.dark` est toujours appliqué :
+ * en le faisant résoudre identiquement à :root, le navy hérité ne peut plus
+ * réapparaître (plus de --nexa-ink / --nexa-neutral-800).
  */
 .dark {
-  --background: var(--nexa-ink);            /* near-black navy NEXA */
-  --foreground: oklch(0.95 0.01 260);       /* off-white teinté navy */
-  --card: var(--nexa-neutral-800);          /* slate navy sombre */
-  --card-foreground: oklch(0.95 0.01 260);
-  --popover: var(--nexa-neutral-800);
-  --popover-foreground: oklch(0.95 0.01 260);
-  --primary: var(--nexa-green-500);         /* BRAND green conservé (D-05) */
-  --primary-foreground: var(--nexa-ink);
-  --secondary: var(--nexa-neutral-800);
-  --secondary-foreground: oklch(0.95 0.01 260);
-  --muted: var(--nexa-neutral-800);
-  --muted-foreground: oklch(0.72 0.015 265);
-  --accent: var(--nexa-neutral-800);
-  --accent-foreground: oklch(0.95 0.01 260);
-  --destructive: var(--nexa-signal-bear);   /* rouge réel, même teinte qu'en light */
-  --border: var(--nexa-neutral-900);
-  --input: var(--nexa-neutral-900);
-  --ring: var(--nexa-green-500);
+  --background: #070b08;
+  --foreground: #eafff1;
+  --card: #0f1611;
+  --card-foreground: #eafff1;
+  --popover: #0f1611;
+  --popover-foreground: #eafff1;
+  --primary: oklch(0.84 0.18 150);
+  --primary-foreground: #051009;
+  --secondary: #0f1611;
+  --secondary-foreground: #eafff1;
+  --muted: #0f1611;
+  --muted-foreground: rgba(212, 244, 224, 0.64);
+  --accent: #0f1611;
+  --accent-foreground: #eafff1;
+  --destructive: oklch(0.68 0.2 24);
+  --border: rgba(255, 255, 255, 0.1);
+  --input: rgba(255, 255, 255, 0.1);
+  --ring: oklch(0.84 0.18 150);
 
-  /* Phase 11 : token component ajouté (DESIGN-05), sans re-décision de palette (Pitfall 4). */
-  --accent-brand: var(--nexa-purple-400);   /* variante sombre éclaircie (primitive dédiée) */
-  /* --risk-moderate GARDE sa teinte amber dans les 2 thèmes → non redéclaré ici (cf. --signal-*). */
+  --background-alt: #0b110d;
+  --surface-translucent: rgba(255, 255, 255, 0.035);
+  --line-soft: rgba(255, 255, 255, 0.06);
+  --muted-tertiary: rgba(212, 244, 224, 0.4);
+  --glow: oklch(0.84 0.18 150 / 0.55);
+
+  --accent-brand: var(--nexa-purple-400);
+  /* --risk-moderate / --signal-* hérités de :root (teinte unique aux 2 thèmes). */
 }
 
 /*
@@ -285,5 +303,128 @@
 
   .nexa-datarain {
     animation: nexa-rain 6s linear infinite;
+  }
+}
+
+/*
+ * ─── Landing (vitrine NEXA) — ambiance riche, tokens UNIQUEMENT, reduced-motion gardé.
+ * Toutes les couleurs dérivent des tokens via var()/color-mix (aucun littéral HEX/OKLCH,
+ * aucune couleur de signal codée en dur). Effets composés GPU (opacity/transform/filter).
+ */
+
+/* Aura radiale derrière le hero — lueur brand green + purple, theme-safe. */
+.nexa-hero-aura {
+  position: absolute;
+  inset-block-start: -25%;
+  inset-inline: -10%;
+  block-size: 75%;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(40% 60% at 72% 28%, color-mix(in oklch, var(--primary) 38%, transparent), transparent 70%),
+    radial-gradient(45% 55% at 22% 8%, color-mix(in oklch, var(--accent-brand) 34%, transparent), transparent 70%);
+  filter: blur(22px);
+  opacity: 0.6;
+}
+
+/* Grille filaire de fond — discrète, masquée en fondu radial. */
+.nexa-hero-grid {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.5;
+  background-image:
+    linear-gradient(to right, color-mix(in oklch, var(--primary) 12%, transparent) 1px, transparent 1px),
+    linear-gradient(to bottom, color-mix(in oklch, var(--primary) 12%, transparent) 1px, transparent 1px);
+  background-size: 46px 46px;
+  -webkit-mask-image: radial-gradient(72% 72% at 50% 28%, black, transparent 82%);
+  mask-image: radial-gradient(72% 72% at 50% 28%, black, transparent 82%);
+}
+
+/* Bande Telegram — dégradé de marque. */
+.nexa-band {
+  background:
+    radial-gradient(60% 120% at 15% 0%, color-mix(in oklch, var(--accent-brand) 30%, transparent), transparent 60%),
+    radial-gradient(60% 120% at 90% 100%, color-mix(in oklch, var(--primary) 26%, transparent), transparent 60%),
+    var(--card);
+}
+
+/*
+ * Reveal au scroll — entrée subtile (translation only). Le contenu reste TOUJOURS
+ * visible (jamais opacity:0) : une anim qui masque le contenu = pire qu'aucune anim.
+ * Scroll-driven CSS pur, no-op si non supporté ou reduced-motion.
+ */
+@keyframes nexa-rise {
+  from { transform: translateY(16px); }
+  to { transform: none; }
+}
+.nexa-reveal { opacity: 1; }
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .nexa-reveal {
+      animation: nexa-rise linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 30%;
+    }
+  }
+}
+
+/*
+ * Data-rain Tier-2 (primitive components/ui/data-rain.tsx, Phase 16 D-06/D-14).
+ *
+ * Voile ambiant LÉGER pour surfaces calmes (auth, empty states, en-tête membre) —
+ * JAMAIS au-dessus de données denses. Couleurs liées à la SEULE couche token via
+ * color-mix : haussier = --signal-bullish, baissier = --signal-bearish, neutre =
+ * --muted-tertiary. AUCUN littéral, AUCUNE var landing (--buy/--sell).
+ *
+ * Double-garde reduced-motion (D-14) : keyframes UNIQUEMENT sous
+ * `@media (prefers-reduced-motion: no-preference)`. Sous reduced-motion les colonnes
+ * sont rendues (composition préservée) mais figées. transform only → composé GPU.
+ * Masque radial pour fondre les bords. Propriétés logiques → RTL-safe.
+ */
+.nxl-data-rain {
+  position: absolute;
+  inset: -16% -26%;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+  -webkit-mask-image: radial-gradient(58% 64% at 55% 45%, black, transparent 82%);
+  mask-image: radial-gradient(58% 64% at 55% 45%, black, transparent 82%);
+}
+
+.nxl-data-rain .nxl-data-col {
+  position: absolute;
+  inset-block-start: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 12px;
+  line-height: 1.5;
+  white-space: nowrap;
+  color: color-mix(in oklch, var(--primary) 55%, var(--muted-tertiary));
+  /* Figée par défaut (reduced-motion / fallback) — ambiance préservée. */
+  animation-name: none;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+
+.nxl-data-rain .nxl-data-col .u {
+  color: color-mix(in oklch, var(--signal-bullish) 72%, transparent);
+}
+
+.nxl-data-rain .nxl-data-col .d {
+  color: color-mix(in oklch, var(--signal-bearish) 72%, transparent);
+}
+
+@keyframes nxl-datafall {
+  from { transform: translateY(-55%); }
+  to { transform: translateY(55%); }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .nxl-data-rain .nxl-data-col {
+    animation-name: nxl-datafall;
   }
 }

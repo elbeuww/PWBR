@@ -23,7 +23,7 @@ import {
 } from '@/components/ui/alert-dialog'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { payCommission, type PayoutActionResult } from '@/app/(admin)/affiliation/payouts/actions'
+import { payCommission, type PayoutActionResult } from '@/app/admin/affiliation/payouts/actions'
 
 interface PayoutRowActionProps {
   commissionId: string

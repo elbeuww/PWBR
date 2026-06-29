@@ -36,6 +36,9 @@ export async function Hero() {
       // D-04 : fond ink FIXE, theme-indépendant.
       style={{ backgroundColor: 'var(--nexa-ink)' }}
     >
+      {/* Ambiance NEXA — aura radiale + grille filaire (décoratif, z-0). */}
+      <div aria-hidden className="nexa-hero-aura" />
+      <div aria-hidden className="nexa-hero-grid" />
       {/* Couche décorative lointaine — data-rain (z-0). */}
       <DataRain />
 

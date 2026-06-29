@@ -24,6 +24,8 @@ export default async function PaiementBientotPage({
   return (
     <main className="mx-auto max-w-prose px-4 py-20 text-start">
       <h1 className="text-2xl font-semibold">{t('title')}</h1>
+      {/* Accent Tier 2 discret (filet token --primary) sur surface funnel calme. */}
+      <div className="mt-3 h-px w-16 bg-primary/60" aria-hidden="true" />
       <p className="mt-4 text-muted-foreground">{t('body')}</p>
     </main>
   )

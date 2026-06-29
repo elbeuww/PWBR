@@ -40,9 +40,10 @@ test.describe('AUTH-01 : signup → login → session persiste', () => {
     const email = uniqueEmail('signup')
     await signUp(page, email)
 
-    // Session active : /dashboard (auth-only) affiche l'email de l'utilisateur.
+    // Session active : /dashboard (auth-only) rend le « Cockpit personnel ». H1 stable
+    // indépendant de l'abonnement (un fraîchement-inscrit n'a pas d'abo actif en P1).
     await page.goto('/fr/dashboard')
-    await expect(page.getByText(email)).toBeVisible()
+    await expect(page.getByRole('heading', { level: 1, name: 'Cockpit personnel' })).toBeVisible()
   })
 
   test('session persiste après rechargement de la page', async ({ page }) => {
@@ -53,15 +54,16 @@ test.describe('AUTH-01 : signup → login → session persiste', () => {
     await page.goto('/fr/dashboard')
     await page.reload()
     await expect(page).toHaveURL('/fr/dashboard')
-    await expect(page.getByText(email)).toBeVisible()
+    await expect(page.getByRole('heading', { level: 1, name: 'Cockpit personnel' })).toBeVisible()
   })
 
   test('visiteur non authentifié sur /fr/dashboard est redirigé vers /fr/login', async ({
     page,
   }) => {
-    // Accès direct sans session
+    // Accès direct sans session. Le gate (requireUser) ajoute ?returnTo=… (D-08) →
+    // match souple sur le chemin /fr/login (pas d'égalité stricte avec la query).
     await page.goto('/fr/dashboard')
-    await expect(page).toHaveURL('/fr/login', { timeout: 5000 })
+    await expect(page).toHaveURL(/\/fr\/login/, { timeout: 5000 })
   })
 
   test('login avec des credentials valides connecte et redirige', async ({ page, context }) => {
@@ -77,15 +79,18 @@ test.describe('AUTH-01 : signup → login → session persiste', () => {
     await expect(page).toHaveURL('/fr/dashboard', { timeout: 10000 })
   })
 
-  test('/dashboard affiche au moins un instrument (seed)', async ({ page }) => {
-    const email = uniqueEmail('seed')
+  test('après signup, le dashboard rend ses sections structurelles', async ({ page }) => {
+    const email = uniqueEmail('sections')
     await signUp(page, email)
 
-    // Session active → /dashboard (auth-only). La table instruments doit afficher
-    // au moins une ligne de seed (12 instruments seedés au MVP, cf. CLAUDE.md).
+    // Session active → /dashboard (auth-only). Le cockpit personnel rend toujours ses
+    // en-têtes de sections (D-08), indépendamment de l'abonnement et du volume seed.
+    // Le CONTENU signaux (gated RLS/abo) est couvert par la suite abonné (phase 21),
+    // pas ici : un fraîchement-inscrit n'a pas d'abo actif.
     await page.goto('/fr/dashboard')
-    const rows = page.locator('table tbody tr')
-    await expect(rows.first()).toBeVisible({ timeout: 5000 })
-    expect(await rows.count()).toBeGreaterThanOrEqual(1)
+    await expect(page.getByRole('heading', { level: 1, name: 'Cockpit personnel' })).toBeVisible()
+    await expect(
+      page.getByRole('heading', { level: 2, name: "Statut de l'abonnement" }),
+    ).toBeVisible()
   })
 })

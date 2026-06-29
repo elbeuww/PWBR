@@ -10,11 +10,6 @@
     "en": "English",
     "ar": "العربية"
   },
-  "theme": {
-    "toggleLabel": "Toggle theme",
-    "light": "Light theme",
-    "dark": "Dark theme"
-  },
   "auth": {
     "eyebrow": "Account",
     "loginTitle": "Sign in",
@@ -429,9 +424,99 @@
       "Day & Swing analysis"
     ]
   },
+  "landing": {
+    "nav": {
+      "how": "How it works",
+      "score": "The score",
+      "pricing": "Pricing",
+      "telegram": "Telegram",
+      "login": "Log in",
+      "start": "Get started"
+    },
+    "hero": {
+      "eyebrow": "Analysis & signals platform · MENA",
+      "cta1": "Get started",
+      "cta2": "How it works",
+      "trust1Value": "5",
+      "trust1Label": "Markets covered",
+      "trust2Value": "24/7",
+      "trust2Label": "Markets analysed",
+      "trust3Value": "AR · EN · FR",
+      "trust3Label": "Trilingual"
+    },
+    "footer": {
+      "tag": "NEXA · Analysis & signals, explained simply.",
+      "col1": "Product",
+      "col2": "Learn",
+      "col2_1": "Free courses",
+      "col2_2": "What is a signal?",
+      "col2_3": "Manage your risk",
+      "col3": "Language",
+      "disclaimer": "Strictly educational content. NEXA does not provide personalised investment advice and promises no gains. Trading carries a risk of loss, sometimes exceeding the capital committed when using leverage. Past performance and backtest-measured rates do not guarantee future results. The status of crypto-assets varies by jurisdiction — check the rules that apply in your country before any payment."
+    },
+    "how": {
+      "eyebrow": "How it works",
+      "title": "Three steps, zero jargon",
+      "lede": "Built for beginners and seasoned traders alike. We explain everything in plain words — and show the detail to anyone who wants to dig in.",
+      "mockLabel": "Examples of analyzed setups",
+      "step1Title": "The AI analyzes continuously",
+      "step1Body": "Crypto, forex, gold, silver, oil — analyzed by an engine that reasons like a veteran trader. The numbers are computed in code, never invented.",
+      "step2Title": "Every opportunity scored out of 100",
+      "step2Body": "An opportunity score, a risk level, and the full plan: entry zone, stop-loss, targets and R:R ratio.",
+      "step3Title": "You get it, explained simply",
+      "step3Body": "First the why in plain words. Then the deep analysis — technical, fundamental, news — for those who want to dig in. You keep the decision."
+    },
+    "score": {
+      "eyebrow": "The opportunity score",
+      "title": "A number you can understand",
+      "lede": "Every signal carries a 0–100 score and a risk level, derived in code from the data — never from an opinion. The success rate is shown only when it is actually measured.",
+      "exampleLabel": "Example score",
+      "stat1Value": "5",
+      "stat1Label": "markets covered",
+      "stat2Value": "H1 · H4 · D",
+      "stat2Label": "horizons analyzed",
+      "stat3Value": "Day · Swing",
+      "stat3Label": "two styles"
+    },
+    "demo": {
+      "eyebrow": "A concrete example",
+      "title": "Everything, on one card",
+      "instrument": "BTC/USDT",
+      "meta": "Binance · 4H · Day",
+      "direction": "Buy",
+      "note": "Educational example — not a real signal.",
+      "kEntry": "Entry",
+      "kStop": "Stop",
+      "kTargets": "Targets",
+      "kRr": "R:R ratio",
+      "vEntry": "64,820",
+      "vStop": "62,400",
+      "vTargets": "66.5k · 68k · 71k",
+      "vRr": "2.4",
+      "ariaScore": "Example score 92 out of 100, low risk"
+    },
+    "telegram": {
+      "eyebrow": "Public Telegram channel",
+      "title": "Results, out in the open",
+      "lede": "Every day, the shared trades and how they play out — always visible. Proof before the promise.",
+      "cta": "Join the channel"
+    },
+    "pricing": {
+      "eyebrow": "Pricing · paid in USDT",
+      "title": "Start for $3",
+      "lede": "No bank card. Pay in USDT, automatic activation, cancel anytime.",
+      "popularBadge": "Most chosen",
+      "discoveryCta": "Start the trial",
+      "standardCta": "Subscribe",
+      "feat1": "All signals in real time",
+      "feat2": "Score out of 100 & full trade plan",
+      "feat3": "Plain-language explanations",
+      "feat4": "Deep analysis — technical, fundamental, news"
+    }
+  },
   "hero": {
-    "title": "Decide with discipline.",
-    "lede": "Every opportunity scored out of 100, its risk level, and a clear plan: entry, stop-loss, take-profits, R:R ratio.",
+    "title": "A veteran's analysis. A beginner's clarity.",
+    "lede": "Scored out of 100, risk level, a complete trade plan — the why in plain words, the detail for those who want to dig in. You keep the decision.",
     "ctaPrimary": "Discover the method",
     "ctaSecondary": "See pricing",
     "cardsLabel": "Examples of analyzed setups",
@@ -475,5 +560,83 @@
   },
   "baseline": {
     "text": "New Era · Exchange Alliance"
+  },
+  "dash": {
+    "nav": {
+      "overview": "Overview",
+      "signaux": "Signals",
+      "suivis": "Followed",
+      "historique": "History",
+      "watchlist": "Watchlist",
+      "abonnement": "Subscription",
+      "affiliation": "Affiliation",
+      "parametres": "Settings",
+      "sidebarLabel": "Primary navigation",
+      "bottomLabel": "Quick navigation"
+    },
+    "overview": {
+      "title": "Personal cockpit",
+      "subscriptionStatus": "Subscription status",
+      "activeUntil": "Subscription active — access until {date}",
+      "latestSignals": "Latest signals",
+      "shortcuts": "Shortcuts"
+    },
+    "suivis": {
+      "emptyTitle": "No followed signal",
+      "emptyBody": "Add a signal to your watchlist by tapping the star from the list or from a trade's detail."
+    },
+    "historique": {
+      "emptyTitle": "No closed signal",
+      "emptyBody": "Your followed signals will appear here once closed, with their outcome."
+    },
+    "list": {
+      "nextPage": "Next page",
+      "rUnit": "R",
+      "viewDetail": "View detail",
+      "issue": {
+        "hit_tp": "TP hit",
+        "hit_sl": "SL hit",
+        "flat": "Flat"
+      }
+    },
+    "renewal": {
+      "title": "Your subscription has expired",
+      "body": "Renew to regain access to your signals and your watchlist.",
+      "cta": "Renew subscription"
+    },
+    "watchlist": {
+      "add": "Add to my watchlist",
+      "remove": "Remove from my watchlist",
+      "error": "Could not update your watchlist. Please try again."
+    },
+    "affiliate": {
+      "summary": "{subscribers} subscribers referred · {revenue} measured revenue",
+      "link": "View my affiliation dashboard"
+    },
+    "error": {
+      "title": "Could not load your data",
+      "body": "Check your connection and try again.",
+      "retry": "Retry"
+    },
+    "settings": {
+      "account": "Account",
+      "email": "Email",
+      "changePassword": "Change password",
+      "newPassword": "New password",
+      "confirmPassword": "Confirm password",
+      "passwordMinHint": "At least 8 characters.",
+      "passwordTooShort": "Password must be at least 8 characters.",
+      "passwordMismatch": "The two passwords do not match.",
+      "passwordUpdated": "Password updated.",
+      "passwordUpdateError": "Could not update the password. Please try again.",
+      "language": "Language",
+      "notifications": "Notifications",
+      "notificationsHint": "Display preferences only — no email or notification is sent yet.",
+      "notifyNewSignals": "New signals",
+      "notifyExpiry": "Subscription expiry reminder",
+      "manageSubscription": "Manage subscription",
+      "signOut": "Sign out",
+      "savePreferences": "Save preferences"
+    }
   }
 }

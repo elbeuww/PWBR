@@ -22,6 +22,7 @@ import { Collapsible as CollapsiblePrimitive } from 'radix-ui'
 import { Link } from '../../i18n/navigation'
 import { formatPrice } from '../../lib/signals/format'
 import { ContributingFactors } from './ContributingFactors'
+import { WatchlistToggle } from '../dash/WatchlistToggle'
 
 /** Sous-ensemble §3 (Output) affiché VERBATIM dans le détail. */
 export interface SignalPayload {
@@ -53,6 +54,8 @@ export interface TradeSetupDetail {
 interface SignalDetailProps {
   setup: TradeSetupDetail
   locale: string
+  /** État initial de suivi (déterminé côté page via fetchFollowedSetupIds, 19-06). */
+  followed?: boolean
 }
 
 /** Capitalise pour reconstruire la clé i18n (riskLow/riskMedium…). */
@@ -60,7 +63,7 @@ function capitalize(s: string): string {
   return s.length > 0 ? s.charAt(0).toUpperCase() + s.slice(1) : s
 }
 
-export function SignalDetail({ setup, locale }: SignalDetailProps) {
+export function SignalDetail({ setup, locale, followed = false }: SignalDetailProps) {
   const t = useTranslations('signalDetail')
   const tSignals = useTranslations('signals')
   const tAcademy = useTranslations('academy')
@@ -88,6 +91,8 @@ export function SignalDetail({ setup, locale }: SignalDetailProps) {
             {isLong ? tSignals('direction.long') : tSignals('direction.short')}
           </span>
         </div>
+        {/* Étoile watchlist (D-06) : îlot client autonome dans l'en-tête du détail. */}
+        <WatchlistToggle setupId={setup.id} initialFollowed={followed} />
       </header>
 
       {/* NIVEAU 1 — Explication simple : veteran_note VERBATIM + plan résumé. */}

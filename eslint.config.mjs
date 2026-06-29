@@ -11,6 +11,10 @@ export default tseslint.config(
       '**/dist/**',
       '**/playwright-report/**',
       '**/test-results/**',
+      // Généré par Next à chaque build (triple-slash + types auto) — non lintable.
+      '**/next-env.d.ts',
+      // Fixtures qui violent VOLONTAIREMENT une règle pour la tester (ex. D-07).
+      '**/__lint_fixtures__/**',
     ],
   },
 
@@ -40,6 +44,55 @@ export default tseslint.config(
           ],
         },
       ],
+    },
+  },
+
+  // Convention projet : un identifiant préfixé par `_` est intentionnellement inutilisé
+  // (params ignorés, destructuring partiel, const conservée pour `typeof`). Aligné sur
+  // l'usage déjà répandu dans le code (_opts, _cols, _col…).
+  {
+    files: ['**/*.{ts,tsx,mts,cts}'],
+    rules: {
+      '@typescript-eslint/no-unused-vars': [
+        'error',
+        {
+          argsIgnorePattern: '^_',
+          varsIgnorePattern: '^_',
+          caughtErrorsIgnorePattern: '^_',
+          destructuredArrayIgnorePattern: '^_',
+        },
+      ],
+    },
+  },
+
+  // Fichiers de déclaration ambiante : ils décrivent des modules tiers et n'ont pas à
+  // consommer localement chaque type déclaré (ex. NewsArticle documenté mais non exporté).
+  {
+    files: ['**/*.d.ts'],
+    rules: {
+      '@typescript-eslint/no-unused-vars': 'off',
+    },
+  },
+
+  // Scripts Node (ESM) hors build : fournir les globals d'exécution, sinon no-undef
+  // sur process/console/URL… (ces fichiers ne tournent jamais dans un navigateur).
+  {
+    files: ['scripts/**/*.{js,mjs,cjs}'],
+    languageOptions: {
+      globals: {
+        process: 'readonly',
+        console: 'readonly',
+        URL: 'readonly',
+        URLSearchParams: 'readonly',
+        Buffer: 'readonly',
+        fetch: 'readonly',
+        setTimeout: 'readonly',
+        clearTimeout: 'readonly',
+        setInterval: 'readonly',
+        clearInterval: 'readonly',
+        TextEncoder: 'readonly',
+        TextDecoder: 'readonly',
+      },
     },
   },
 )

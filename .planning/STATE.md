@@ -1,16 +1,16 @@
 ---
 gsd_state_version: 1.0
-milestone: v2.1
-milestone_name: "Mise en vie : identité NEXA, moteur live & track record"
-status: executing
-last_updated: "2026-06-21T21:48:28.291Z"
-last_activity: 2026-06-21
+milestone: v3.0
+milestone_name: Plateforme complète sous identité dark néon NEXA
+status: milestone_complete
+last_updated: "2026-06-27T00:00:08.113Z"
+last_activity: 2026-06-26
 progress:
-  total_phases: 5
-  completed_phases: 2
-  total_plans: 17
-  completed_plans: 13
-  percent: 76
+  total_phases: 12
+  completed_phases: 9
+  total_plans: 48
+  completed_plans: 45
+  percent: 75
 ---
 
 # Project State
@@ -23,19 +23,51 @@ progress:
 See: .planning/PROJECT.md (mis à jour 2026-06-20 après clôture v2.0)
 
 **Core value:** Produire, pour chaque opportunité, une analyse fiable et explicable — vulgarisée pour un public non technique — avec un % de réussite TOUJOURS mesuré, jamais inventé : c'est le socle de confiance qui fait payer l'abonnement.
-**Current focus:** Phase 12 — routines-d-analyse-claude-planifi-es-sans-api
+**Current focus:** Phase 21 — tests-e2e-audit-de-scalabilit
 **Mode:** interactive (MVP vertical)
 **Granularity:** fine
 
 ## Current Position
 
-Phase: 12 (routines-d-analyse-claude-planifi-es-sans-api) — EXECUTING
-Plan: 3 of 6
-Status: Ready to execute
-**Plan 11-08 livré :** UI-01/04/05/06 reskinés NEXA (vitrine/académie/auth/admin sobre), UI-07 levé (ExpiryBanner câblé sur abonnement via RLS serveur, dette WIRING-01/PAY-05 close). Gate phase 11 : unit 582✓/0 fail, tsc 0, lint:i18n 0 ; 5 specs E2E human-verify (sélecteurs préservés).
-**Items live non-bloquants restants :** (1) no-flash runtime (10-VERIFICATION.md) ; (2) 5 specs E2E GREEN autoritaire en dev server / Vercel preview (precedent D-01-04-C).
-**Prochaine action à la reprise :** `/clear` puis `/gsd-verify-phase 11` (ou `/gsd-plan-phase 12` — routines d'analyse Claude planifiées).
-Last activity: 2026-06-21
+Milestone: v3.0 — Plateforme complète sous identité dark néon NEXA (7 phases, 15-21)
+Phase: 21
+Plan: Not started
+Status: Milestone complete
+Last activity: 2026-06-29
+
+- **20-05 exécuté (2026-06-26)** : home `(admin)/page.tsx` transformée en **cockpit superadmin 4 sections** sur **anon-client** (ADASH-01/02/03/06), ordre verrouillé Revenus → Ops → Acquisition → Conformité (D-07). 4 cartes d'axe RSC `_components/AxisSummary{Revenus,Ops,Acquisition,Conformite}.tsx` : chacune KPI MESURÉ + ligne de provenance « Mesuré · N = … · période · source » (nombres rendus, jamais i18n) + lien « Voir le détail ». `Revenus` : MRR « Cash encaissé / mois » (formatAtomic via `getMrr`), churn via `applyThreshold` (Intl percent runtime → **0 caractère pour-cent en dur**), plan-mix. `Ops` : feux freshness/jobs tokenisés (`--signal-bullish`/`--risk-moderate`/`--destructive`) + file de validation → `/admin/sante`+`/admin/file`. `Acquisition` : agrégat funnel par étape → `/admin/affiliation/affilies`. `Conformité` : feu `isLegalReviewDone()` + version + date (D-18, read-only, rouge par défaut sûr). `page.tsx` : `createAdminServiceClient` → `createClient()` anon (T-20-03, plus aucune référence admin-service), KPI via wrappers gated 20-03 chargés en parallèle, agrégats Ops dégradant gracieusement sous RLS (0 ligne → feu rouge honnête). `AdminSidebar` regroupée sous 4 en-têtes d'axe, **URLs détail inchangées** (A5). `no-perf-seed-claims.ADMIN_UI_FILES` étendu aux 4 cartes → **scans no-perf VERTS 15/15** (extinction gardes 20-01). **D-20-05-A** : churn sans `%` littéral (applyThreshold + Intl percent). **D-20-05-B** : Conformité sans drill-down (aucune route détail), version/date via env `LEGAL_REVIEW_VERSION/DATE` (« — » si absentes). **D-20-05-C** : loadOps tolère RLS (pas de throw). typecheck exit 0. Commits `7ec9b44`/`81bb835`/`f37663e`. **Note scope** : `rls-unchanged.test.ts` reste RED par conception (extinction au 20-06, pages détail). **Reste : 20-06** (dernier plan, bascule pages détail + 0022).
+- **20-04 exécuté (2026-06-26)** : bascule PARTIELLE des écritures admin sur les RPC `SECURITY DEFINER` gated de 0021 (anon-client, audit DB) + dialogs membres. **Convertis (zéro service_role)** : `membres/actions.ts` → `grantSubscriptionTime`/`suspendAccount`/`unsuspendAccount` via `grant_subscription_time`/`suspend_account`/`unsuspend_account` (whitelist `PERIODS` T-20-10, `fail()` opaque T-20-16) ; `payouts/actions.ts` → `payCommission` via `admin_mark_commission_paid` (TX_HASH/ATOMIC + garde `Number.isSafeInteger` CR-02). Chaque action : `requireRole('superadmin')` (re-gate POST) PUIS `.rpc()` gated sur `createClient()` anon — la garde `is_superadmin()` DANS le RPC reste la barrière réelle. `MemberRowActions` : Dialog « Offrir du temps gratuit » (presets 7j/1m/3m, CTA « Confirmer la prolongation »), AlertDialog destructif « Suspendre ce compte ? » (motif requis, CTA rouge `bg-destructive`), « Réactiver » selon `suspended` ; toasts sonner, bouton désactivé pendant `pending`, aucun chiffre fabriqué (libellé durée, pas de date calculée). `membres/page.tsx` charge `profiles.suspended` (prop) — lecture service_role inchangée (déférée 20-06). i18n FR `grantDialog`/`suspendDialog`/`reactivateDialog`. **D-20-04-A (Option B — defer)** : `file/actions.ts` + `affiliation/actions.ts` CONSERVENT `createAdminServiceClient` — 0021 ne fournit aucun RPC gated `authenticated` pour leurs écritures (tables `payments`/`affiliate_*` sans policy write anon) ; bascule = runtime cassé, suppression = pages live cassées. Allowlist `rls-unchanged.test.ts` (commentaire `DEFERRED-0022`) + todo `.planning/todos/pending/0022-rpc-gated-paiements-affiliation.md`. Scan re-run : ne flague plus que les **6 pages détail (admin)** (job 20-06), PAS les 2 actions déférées. typecheck exit 0 ; suite admin 67/67 vert. Commits `3b34323`/`99e488c`/`a2baaef`/`844d56c`. **ADASH-04/05/07 PARTIELS** — retrait COMPLET de service_role côté (admin) = **0022 + 20-06**. **Reste : 20-05/06**.
+- **20-03 exécuté (2026-06-26)** : couche d'accès données du cockpit sur **anon-client** (ADASH-01/02/04/07), interface-first avant les pages 20-05/06. 3 modules : (1) `lib/admin/queries.ts` — `fetchAdminUsers(params)` keyset `(created_at desc, id desc)` + sentinelle `PAGE_SIZE(50)+1` → `{ rows, nextCursor }`, filtres serveur `source`/`q`(.ilike)/`status` (jointure subscriptions, `!inner` active/expired, `.is(null)` none), `sanitizeCursor` (ISO+UUID) copié verbatim de watchlist AVANT `.or()` (T-20-13) ; `createClient` anon, zéro `admin-service`. (2) `lib/admin/kpis.ts` — wrappers typés `getMrr`/`getAcquisitionFunnel`/`getChurn`/`getPlanMix` via `.rpc(get_*)` gated (0 ligne non-superadmin, jamais throw), `formatMrr` honnête « cash encaissé / mois » via `formatAtomic` (D-13), aucun `.from('mv_mrr')` (T-20-14, assertion source testée). (3) `lib/auth/gate.ts` — branche suspension dans `authedClient` : lecture `profiles.suspended` après `getUser()`, `suspended` → `signOut()` + `redirect('/login?suspended=1')` (couche UX sur barrière RLS 0021, T-20-11), signatures publiques inchangées. **D-20-03-A** : `status=none` via filtre top-level `.is('subscriptions', null)` sur embed nullable (cast de forme borné, relation absente de l'union colonne générée — aucun `any`). **D-20-03-B** : `getMrr` retourne le mois le plus récent (reduce max sur `month` ISO, get_mrr sans ordre garanti). Tests : sanitize 9/9, kpis 11/11, suite admin 62/62, typecheck exit 0. Commits `02286a7`/`ca12a22`/`8eb1682`. **Déviation Rule 3** : `pnpm --filter web test/typecheck` inexistants → vérif via `pnpm vitest run <path>` + `pnpm typecheck` racine. **Reste vague 4+ : 20-04..06**.
+- **20-02 exécuté (2026-06-26)** : migration **0021_admin_cockpit LIVE** (`apply_migration`, jamais `db push`) — fondation données/sécurité du cockpit (ADASH-01..05/07). 5 couches : (A) policies SELECT « superadmin voit tout » wrap InitPlan sur profiles/telegram_posts/candles/trade_setups/analyses ; (B) `admin_audit_log` (SELECT gated, aucune policy écriture — miroir 0016) ; (C) `profiles.suspended/suspended_at/suspended_reason` + `has_active_subscription()` étendu `and not suspended` (suspension = barrière RLS unique, D-17) ; (D) 4 RPC écriture SECURITY DEFINER gated+audit atomique (`grant_subscription_time`/`suspend_account`/`unsuspend_account`/`admin_mark_commission_paid`) ; (E) 3 wrappers KPI gated (`get_acquisition_funnel`/`get_churn`/`get_plan_mix`). Commit migration `aca2ff8` ; types+test `0000813`. **D-20-02-A** : 3 KPI gardés **à-la-volée** (EXPLAIN sain seed 1028 profils ; funnel 6.6ms ; keyset profiles = Index Scan) — pas de matview (D-10). Advisors : **0 `auth_rls_initplan`** (wrap tenu) ; aucune nouvelle fuite réelle (l'ERROR security_definer_view = `pattern_stats` préexistant 0014 ; WARN executable = même pattern accepté que `get_mrr` 0017). **D-20-02-B** : test `admin-rls.test.ts` aligné `target_*` → `p_user_id`/`p_commission_id` (préfixe `p_` autoritatif) → 5/5 GREEN contre DB live, typecheck exit 0. 3 déviations Task 1 honnêtes : `create or replace` has_active_subscription (drop casse policies dépendantes), args DEFAULT wrappers KPI (PGRST202 sans), garde get_churn en sous-requête externe. **Reste vague 2+ : 20-03..06**.
+- **20-01 exécuté (2026-06-26)** : garde-fous Wave 0 du cockpit superadmin (ADASH-02/04/07). Helper `lib/admin/searchParams.ts` (`AdminUsersParamsSchema` status/source/q/cursor, safeParse champ-par-champ anti-injection T-20-02, test 9/9 GREEN, commit `e8e8349`). Contrat RLS deux-rôles `apps/web/test/admin-rls.test.ts` (161 l., 8 RPC figés `get_mrr`/`get_acquisition_funnel`/`get_churn`/`get_plan_mix`/`grant_subscription_time`/`suspend_account`/`unsuspend_account`/`admin_mark_commission_paid` + `admin_audit_log` + 6 tables, RED until 0021, commit `08bad19`). 3 scans étendus au groupe `(admin)` (commit `97498b6`) : `rls-unchanged` RED (13 fichiers service_role hérités, éteint 20-04+20-06), `no-perf-claims`/`no-perf-seed-claims` GREEN gardes armées. **D-20-01-A** : `(admin)` est un groupe RACINE `app/(admin)/` (hors `[locale]`) → `groupBaseDir()` + `listPages` couvre aussi `actions.ts`. **D-20-01-B** : les 2 scans perf sont GREEN (surface Phase 8 déjà honnête), pas RED comme prédit — gardes armées pour le reskin 20-05. Typecheck workspace exit 0. **Reste vague 1+ : 20-02** (migration 0021 → éteint admin-rls).
+- **19-06 exécuté (2026-06-26)** : `WatchlistToggle` (étoile optimiste anti-IDOR, UDASH-03) — écriture `user_followed_setups` via anon-client navigateur (RLS `auth.uid()`), insert minimal `{ setup_id }` SANS colonne propriétaire (`default auth.uid()` + `with check`), toggle optimiste react-query (flip immédiat, rollback+toast). Câblée en SIBLING hors du `<Link>` sur `SignalCard` + en-tête `SignalDetail` ; `fetchFollowedSetupIds` 1× par page membre → prop `followed`. Commits e502e90/189b1f5/afb63fd/1d94e71. **D-19-06-A** : logique optimiste extraite en helper pur `buildWatchlistToggle` testé en Node (env vitest sans jsdom). **D-19-06-B/C (Rule 1)** : mock du toggle dans `SignalDetail.test` + `QueryProvider` ajouté à la page détail (useMutation exige un QueryClient). Vitest 223/223, typecheck vert. **Reste : 19-07** (dernier plan, vague 3).
+- **19-05 exécuté (2026-06-26)** : écran Paramètres `/dashboard/parametres` (UDASH-06) — Compte (email + PasswordChangeForm via `supabase.auth.updateUser`), Langue (LanguageSwitcher, pas de toggle thème D-11), Notifications (UI seules localStorage, aucune delivery D-12), lien abonnement, déconnexion. Commits 156e66e/5e1a1cb. **D-19-05-A** : page placée sous `(dash)/dashboard/parametres/` (URL `/dashboard/parametres`) pour matcher la nav DashShell 19-02. **D-19-05-B** : Task 3 (stub `/dashboard`) ABANDONNÉE — déjà supprimée par 19-04 (D-19-04-A), recréation casserait le build. Reste vague 3 : **19-06/07**.
+
+### ▶ REPRISE Phase 19 (point de reprise)
+
+- Crash PC pendant l'exécution. 19-01 Task 1 était commitée (`89818d2`), Task 2 [BLOCKING] non faite.
+- **Repris** : migration 0020 `user_followed_setups` LIVE (apply_migration), index keyset CONCURRENTLY valide, EXPLAIN keyset prouvé (forcé, table vide), types régénérés + alias, advisors verts, typecheck vert, suite 621✓/13 skip. SUMMARY écrit.
+- Déviation D-19-01-A : `default (select auth.uid())` → `default auth.uid()` (subquery interdite en DEFAULT).
+- **Action attendue** : enchaîner vague 1 → **19-02**, puis vague 2 (19-03/04/05), vague 3 (19-06/07). `/gsd:execute-phase 19` reprend automatiquement (19-01 a son SUMMARY).
+- **19-04 exécuté (2026-06-26)** : overview cockpit `/dashboard` (ordre D-08, zéro perf fabriquée), AffiliateSummaryCard conditionnelle no-PII, abonnement réhébergé `/dashboard/abonnement`, no-perf étendu (détecteur UI non trivial). Commits a19a063/ea3c295/ec22dd3. **D-19-04-A** : overview placé sous `(dash)/dashboard/page.tsx` (la nav DashShell 19-02 est figée sur `/dashboard/*` ; `(dash)/page.tsx` aurait collisionné avec `(marketing)`/racine) → ancien placeholder `[locale]/dashboard/page.tsx` SUPPRIMÉ (conflit de routes). Conséquence : la tâche « remplacement stub `/dashboard` » prévue en 19-05 est déjà faite ; 19-05 ne livre plus que les Paramètres. Reste vague 2 : **19-05** (paramètres), puis vague 3 (19-06/07).
+
+### ▶ REPRISE Phase 17 (point de reprise)
+
+- 0017 appliquée LIVE via MCP (apply_migration Partie A + 5 index CONCURRENTLY, 0 INVALID).
+- Gates D-05 auto **PASS** : advisors perf 0 `auth_rls_initplan` ; advisors security 0 nouvelle alerte (2 fuites fermées : mv_mrr exposée + trigger fn en RPC) ; EXPLAIN keyset Index Scan ; REFRESH CONCURRENTLY mv_mrr OK ; typecheck vert ; 617 tests verts (mrr-gating assertif).
+- **Action attendue** : exécuter le gate Broadcast Manual-Only de `17-HUMAN-UAT.md` (badge live abonné / shape payload A4 / non-abonné silencieux), puis :
+  - « approuvé » → `gsd-sdk query phase.complete 17` + commit tracking, puis offer_next (Phase 18).
+  - problème → `/gsd:plan-phase 17 --gaps` (gap-closure ciblée sur le gate en échec).
+- Note : ordonnanceur `refresh_mv_mrr()` (pg_cron/Edge/job) hors scope P17 (Open Question 1) ; SCALE-06 (audit chiffré) déféré Phase 21.
+
+### ▶ REPRISE Phase 16 (point de reprise)
+
+- Tous les gates verts ; CR-01 (Tailwind v4 `bg-[var(--token)]`) corrigé.
+- 5 items de test visuel/runtime persistés dans `16-HUMAN-UAT.md` (landing green-only, pastilles admin, police h1, data-rain auth, glow tarifs/SignalCards).
+- **Action attendue** : tester les 5 items dans le navigateur, puis :
+  - « approuvé » → marquer phase complete : `gsd-sdk query phase.complete 16` + commit ROADMAP/STATE/REQUIREMENTS/VERIFICATION, puis offer_next.
+  - problèmes → `/gsd:plan-phase 16 --gaps` (gap-closure).
+- Dette préexistante hors scope notée dans 16-REVIEW.md : même syntaxe `bg-[--token]` cassée dans signaux/page.tsx, affiliation/page.tsx, affiliation/payouts, file/page.tsx, affiliation/dashboard, TrackRecordView.tsx (non touchés par phase 16) ; WR-04 `font-heading` non déclaré (dette phase 04).
 
 ## Deferred Items
 
@@ -107,6 +139,34 @@ ressources externes non provisionnables en session de développement.
 | Phase 11 P08 | ~25min | 3 tasks | 10 files |
 | Phase 12 P01 | ~12min | 3 tasks | 3 files |
 | Phase 12 P02 | ~10min | 3 tasks | 1 files |
+| Phase 15 P01 | ~5min | 2 tasks | 2 files |
+| Phase 15 P02 | ~8min | 3 tasks | 7 files |
+| Phase 15 P03 | ~6min | 3 tasks | 9 files |
+| Phase 15 P03 | 6min | 3 tasks | 9 files |
+| Phase 16 P01 | ~20min | 2 tasks | 7 files |
+| Phase 16 P02 | ~12min | 2 tasks | 6 files |
+| Phase 16 P03 | ~10min | 2 tasks | 8 files |
+| Phase 16 P04 | ~6min | 2 tasks | 5 files |
+| Phase 17 P01 | ~20min | 4 tasks | 1 files |
+| Phase 17 P02 | ~10min | 2 tasks | 2 files |
+| Phase 18 P01 | ~35min | 3 tasks | 7 files |
+| Phase 18 P02 | 15min | 3 tasks | 6 files |
+| Phase 18 P03 | ~5min | 3 tasks | 4 files |
+| Phase 19 P02 | ~5min | 3 tasks | 6 files |
+| Phase 19 P03 | ~12min | 3 tasks | 4 files |
+| Phase 19 P04 | ~14min | 3 tasks | 7 files |
+| Phase 19 P05 | ~12min | 2 tasks | 5 files |
+| Phase 19 P06 | ~18min | 3 tasks | 8 files |
+| Phase 19 P07 | 20min | 3 tasks | 7 files |
+| Phase 20 P01 | 12min | 3 tasks | 6 files |
+| Phase 20 P02 | ~25min | 2 tasks | 3 files |
+| Phase 20 P03 | ~15min | 3 tasks | 5 files |
+| Phase 20 P04 | ~40min | 2 tasks | 7 files |
+| Phase 20 P05 | ~20min | 3 tasks | 7 files |
+| Phase 20 P06 | 25min | 3 tasks | 10 files |
+| Phase 21 P01 | ~15min | 2 tasks | 6 files |
+| Phase 21 P05 | 20min | 2 tasks | 2 files |
+| Phase 21 P03 | ~25min | 3 tasks | 4 files |
 
 ## Roadmap v2.0 (9 phases)
 
@@ -137,6 +197,29 @@ ressources externes non provisionnables en session de développement.
 - Migration source (BACKTEST-01) + catalogue figé (BACKTEST-02) AVANT moteur (BACKTEST-03) et affichage (P14) — inverser corrompt pattern_stats.
 - P14 dépend de P12 (signaux réels) ET P13 (seed backtest).
 - Research flags : P12 (valider réseau Remote A1) · P13 (figer le catalogue de patterns, décision fondateur).
+
+**Statut v2.1 : EN PAUSE.** Phases 10-11 livrées ; phases 12-14 (routines Claude, backtest, track record prod) reportées car dépendantes des **données réelles** (branchement API/signaux). Reprises à la reprise du moteur live.
+
+## Roadmap v3.0 (7 phases, 15-21) — sur données seedées
+
+15. Design system v3 « dark néon unique » — promotion couche sémantique `.nxl` en DS global dark unique, `forcedTheme="dark"`, retrait toggle clair, décision green vs volt, WCAG AA, no-FOUC + RTL (THEME-01..05)
+16. Reskin transversal de toutes les pages — vitrine/légal/auth/compte/membre/paiement/académie/admin sur DS v3, RLS/i18n/disclaimers/no-perf-claims/no-mera-brand préservés (RESKIN-01..06)
+17. Fondation DB scalable (perf avant charge) — migration 0017 : wrap RLS `(select …)` + index colonnes de policy, index composites keyset, infra matviews KPIs (unique index + wrapper `is_superadmin()`), Broadcast vs postgres_changes, migrations `CONCURRENTLY` (SCALE-01..05)
+18. Seed de données réalistes à l'échelle — `seed.ts` faker déterministe/idempotent FK-cohérent ~10k, labels `backtest`/`démo` (zéro chiffre fabriqué), RLS re-testée client anon (SEED-01..03)
+19. Dashboard utilisateur — groupe `(dash)` : vue d'ensemble, signaux suivis/historique keyset, watchlist `user_followed_setups` (revue IDOR), abonnement+ExpiryBanner, affiliation intégrée, paramètres (UDASH-01..06)
+20. Dashboard superadmin (cockpit 4 axes) — Acquisition/Revenus(MRR mesuré)/Ops/Conformité, tables virtualisées paginées keyset, gating `is_superadmin()` 404 discret, matviews P17, jamais service_role côté pages (ADASH-01..07)
+21. Tests E2E + audit de scalabilité — Playwright flux principaux + isolation RLS/gating, audit DB `EXPLAIN ANALYZE`+`get_advisors`+`pg_stat_statements` à ~10k (E2E-01/02, SCALE-06)
+
+**Arêtes critiques v3.0 (build order strict, source `research/SUMMARY.md`) :**
+
+- DS v3 figé (P15) AVANT reskin (P16) — migrer la couche sémantique, jamais copier-coller `.nxl` (Pitfall #1).
+- Fondation DB scalable (P17) AVANT exposition à l'échelle — fix RLS `(select …)` + index = gain >100×, le plus rentable (Pitfalls #2/#4).
+- Seed massif (P18) AVANT dashboards (P19-20) ET audit (P21) — sans ~10k FK-cohérent, ni démo ni mesure fiable (Pitfall #5) ; seed après la fondation DB (re-tester la RLS optimisée à l'échelle).
+- Dashboards (P19-20) AVANT E2E + audit (P21) — l'audit valide l'assemblage complet sur seed.
+- Parallélisme : axe design (P15-16) // axe DB (P17-18), surfaces disjointes ; convergence aux dashboards (P19-20).
+- Garde-fous transverses : RLS stricte (jamais service_role côté pages) · % TOUJOURS mesuré jamais inventé (VITR-03/no-perf-claims) · aucune promesse de gain · i18n fr/en/ar + RTL · no-mera-brand · données SEEDÉES uniquement.
+- Research flags : P15 (décision green vs volt + matrice contraste AA translucide) · P17/P21 (seuils OFFSET→keyset et postgres_changes→Broadcast à confirmer par EXPLAIN ANALYZE post-seed).
+- Couverture : 35/35 requirements v1 mappés (THEME 5→P15 · RESKIN 6→P16 · SCALE-01..05→P17 · SEED 3→P18 · UDASH 6→P19 · ADASH 7→P20 · E2E 2 + SCALE-06→P21), aucun orphelin, aucun doublon.
 
 ## Accumulated Context
 
@@ -406,6 +489,99 @@ ressources externes non provisionnables en session de développement.
 - **D-12-02-D (A3 closed)** : `.gitignore` confirmé — `run-artifacts/` déjà présent ligne 38, `git ls-files run-artifacts/` vide, aucune édition (surgical, verification-only). Pas de commit pour Task 3.
 - **Commits 12-02** : eb14a9b (Task 1 — 3 sections stale), 50c57b9 (Task 2 — §8 single-run/RUN_ID/P-SECRET/P-MCP/calme), ccc078d (SUMMARY). ROUTINE-01/02/05 marqués complets.
 
+### Decisions exécution (Plan 15-01 — gardes Wave-0 contraste WCAG AA + scan THEME-02)
+
+- **D-15-01-A** : `contrast-aa.test.ts` utilise une math WCAG canonique auto-contenue (sRGB gamma-expand + 0.2126/0.7152/0.0722 ; conversion OKLCH→linéaire→sRGB CSS Color 4). `text/bg` reproduit l'ancre D-09 **18.93:1 à l'identique** ; `primary/bg` (~12.9) et `muted/bg` (~7.1) divergent des ancres gelées 11.39 / 6.76 (rendu OKLCH navigateur gamut-dépendant). Les ancres D-09 restent la **spec gelée** encodée en littéraux ; les assertions de PASSAGE portent sur le plancher AA réel + proximité au ratio canonique avec une tolérance couvrant les deux modèles — **aucune fausse couleur, aucun faux-vert**.
+- **D-15-01-B** : les deux gardes Wave-0 sont auto-contenues, **zéro nouvelle dépendance** (contrainte T-15-SC). `contrast-aa` = math-only → GREEN quel que soit l'état du fichier (la spec). `theme-scan` se lie à l'arbre → **RED-par-design** sur les hardcodes résiduels (`ring-[#2563EB]` LanguageSwitcher 168/200 + utilitaires palette brute) = la cible GREEN objective des Plans 02 (suppression ThemeToggle) + 03 (tokenisation).
+- **D-15-01-C (Rule 1)** : fixture SANITY de `theme-scan` corrigée (ajout des variantes `dark:text-*-400` manquantes) pour que les 13 regex `FORBIDDEN_PALETTE` matchent toutes — le bloc sanity doit passer indépendamment de l'état de l'arbre.
+- **THEME-02 / THEME-05 NON marqués complets** : leurs gates sont authorés ici mais la satisfaction réelle dépend des Plans 02+03 (`theme-scan` est intentionnellement RED jusque-là). Marquage différé à la fin du reskin/tokenisation.
+- **Commits 15-01** : c82f494 (Task 1 — contrast-aa GREEN 8/8), 29d3e46 (Task 2 — theme-scan RED-by-design 2+3).
+
+### Decisions exécution (Plan 15-02 — DS figé GREEN dark unique, THEME-01/03/04)
+
+- **D-15-02-A** : promotion SÉMANTIQUE (D-03) — les valeurs `.nxl[data-theme="green"]` (nexa-landing.css) copiées VERBATIM en littéraux HEX/OKLCH dans `:root` (PAS une de-scope mécanique de `.nxl`, Pitfall #1). Exception Phase-15 à la règle « var() only en Layer 2 » : la couche ne flippe plus (thème dark unique, D-04) donc les littéraux y vivent. `.dark` RÉCONCILIÉ aux MÊMES valeurs gelées → sous `forcedTheme="dark"` (où `.dark` gagne toujours) la plateforme ne peut plus peindre le navy hérité (`--nexa-ink`/`--nexa-neutral-800`). Sélecteur `.dark` conservé (D-06 : CandleChart MutationObserver + sonner). Layer 1 `@theme`, Layer 3 `@theme inline`, `:lang(ar)` byte-unchanged (D-11/D-12). Signaux (`--signal-*`) + accents (`--accent-brand`/`--risk-moderate`) restent DISTINCTS via primitives (D-05).
+- **D-15-02-B** : `forcedTheme="dark"` (suppr. `defaultTheme`/`enableSystem`) ; `ThemeToggle.tsx` supprimé (seul consommateur de `useTranslations('theme')`) ; namespace i18n top-level `theme {toggleLabel,light,dark}` purgé fr/en/ar en parité STRICTE (T-15-02) — la clé `theme` imbriquée (admin) préservée (1 occurrence/locale). `theme-parity.test.ts` INVERSÉ (asserte l'ABSENCE). `<html lang dir suppressHydrationWarning>` intact (D-12 / no-FOUC).
+- **D-15-02-C (out of scope, deferred)** : `theme-scan.test.ts` (gate RED de 15-01) reste RED — ses fichiers fautifs (`LanguageSwitcher.tsx` `ring-[#2563EB]` + utilitaires palette brute des pages admin/affiliation) sont la **surface de reskin Phase 16** (RESKIN-01..06), hors `files_modified` de 15-02. Loggé `deferred-items.md`. La suite de vérif propre au plan (contrast-aa, design-tokens, rtl-logical-props, theme-parity) est 100 % verte.
+- **Commits 15-02** : b9ff5b5 (Task 1 — :root/.dark frozen GREEN), 09e4112 (Task 2 — forcedTheme=dark + delete ThemeToggle), 5bd8f14 (Task 3 — purge i18n theme + parity inversée).
+
+### Decisions exécution (Plan 16-01 — Wave-0 garde-fous reskin + primitives néon)
+
+- **D-16-01-A** : `volt-orphan-free.test.ts` est RED contre l'arbre courant — la landing (`NexaLanding.tsx`/`nexa-landing.css`/`NexaLandingEffects.tsx`, rendue live via `(marketing)/page.tsx`) porte ENCORE `data-theme="volt"`/`nxl-theme-toggle`/`nexa-landing-theme`. C'est l'état TDD attendu (comme theme-scan Test 2) : la garde mesure la migration de la landing en wave 2. SANITY GREEN. L'acceptance « 3 scans GREEN » supposait à tort la landing déjà nettoyée.
+- **D-16-01-B** : `theme-scan` Test 2 RED liste les offenders RÉELS : `sante` + `admin/page` (`bg-emerald-500`/`bg-amber-500` standalone) + `dashboard` (`text-red-600`). PAS `login` (déjà tokenisé, zéro offender — reste en FOUNDATION_FILES). `rls-unchanged` + `lwc-recolor-intact` GREEN (arbre conforme).
+- **D-16-01-C** : `rls-unchanged.test.ts` strippe les commentaires avant scan (les pages member/account documentent « aucun service_role » en prose, ce n'est pas une infraction) ; allowlist littérale des 2 Server Actions pré-existants ; scans 100 % node:fs (zéro import `@/`).
+- **D-16-01-D** : primitives Tier-2 token-only. `ui/glow.tsx` = box-shadow `var(--glow)` (recettes `.btn-primary`/`.mark-tile`), jamais `ring-*` (D-08/C-3). `ui/data-rain.tsx` = voile ambiant léger, colonnes `--signal-bullish`/`--signal-bearish` via `color-mix`, CSS `.nxl-data-rain` dans globals.css double-gardé `prefers-reduced-motion` (D-14). NON câblées (waves 2 les appliquent). tsc 0 erreur.
+- **D-16-01-E** : RESKIN-01..06 laissés **Pending** dans REQUIREMENTS.md — plan 01 = Wave-0 (garde-fous), il ne DÉLIVRE pas le reskin. Les requirements sont satisfaits par les plans 02 (RESKIN-01), 03 (RESKIN-02/03/06), 04 (RESKIN-04/05). Marquage prématuré annulé.
+- **Commits 16-01** : 3792693 (Task 1 — theme-scan étendu + 3 scans structurels), 2808648 (Task 2 — primitives glow + data-rain tokenisées).
+
+### Decisions exécution (Plan 16-02 — reskin Tier 1 vitrine + réconciliation landing green-only, RESKIN-01)
+
+- **D-16-02-A** : landing réconciliée green-only — `NexaLanding.tsx` `data-theme="green"` figé + bloc toggle supprimé ; `NexaLandingEffects.tsx` logique de thème entièrement retirée (data-rain/parallaxe/tilt/reveal/progress PRÉSERVÉS, theme-agnostic) ; `nexa-landing.css` bloc volt + overrides volt `.mark-tile` + CSS toggle supprimés, branche `green` seule vivante (D-01/D-02/D-03). `volt-orphan-free` GREEN.
+- **D-16-02-B** : Tier 1 vitrine appliqué — `tarifs` carte Standard 9$/mois (vedette) `border-primary/40` + `glowClass('soft')` (box-shadow `var(--glow)`, jamais ring — C-3/D-08) + CTA primaire glow ; `<Disclaimer />` ajouté ; `méthodologie`/`légal` filet d'accent `bg-primary/60`. 3 surfaces token-pure (grep raw-palette = 0).
+- **D-16-02-C** : `Eyebrow` (composant partagé) NON modifié — son défaut `tone=purple` utilise `text-[var(--accent-brand)]` (var tokenisée, passe theme-scan). Les pages consomment le composant, pas le littéral → grep d'acceptance = 0. Toucher le défaut déborderait sur des surfaces hors plan 02.
+- **D-16-02-D** : `theme-scan` Test 2 reste RED MAIS uniquement sur `(admin)/page.tsx`, `(admin)/sante/page.tsx` (`bg-emerald/amber-500`), `dashboard/page.tsx` (`text-red-600`) — buckets admin/dashboard des plans 16-03/16-04, jamais touchés ici. no-perf-claims/no-mera-brand/rtl-logical-props GREEN, typecheck 0 erreur, lint:i18n exit 0.
+- **Commits 16-02** : b731968 (Task 1 — landing green-only, orphelins volt supprimés), 5bd2f36 (Task 2 — accent néon Tier 1 tarifs/méthodologie/légal).
+
+### Decisions exécution (Plan 16-03 — reskin Tier 2 app auth/compte/membre/funnel, RESKIN-02/03/06)
+
+- **D-16-03-A** : auth (login/signup) Tier 2 calme — swap `text-[var(--accent-brand)]` → `text-primary` ; glow discret `glowClass('soft')` sur le CTA submit (box-shadow `var(--glow)`, jamais ring) ; data-rain ambiant (`<DataRain />`, reduced-motion double-gardé) sur auth UNIQUEMENT. dashboard residual offender corrigé `text-red-600` → `text-destructive`.
+- **D-16-03-B** : surfaces denses/funnel non-auth (dashboard, abonnement, paiement-bientot, affiliation) → accent Tier 2 = filet token `--primary` (`h-px w-16 bg-primary/60`), PAS de data-rain (réservé aux surfaces calmes, D-05/D-14). Accent présent partout (anti « tokenisé mais fade », C-6).
+- **D-16-03-C** : membre dense readability-first (D-05) — glow discret sur CARTES seulement : `SignalCard` (la carte) + en-tête de la route `signaux/[id]`. `SignalList`/`FilterBar`/`SignalDetail`/`signaux/page.tsx` étaient DÉJÀ token-purs (zéro littéral) → laissés intacts (un glow sur listes/tables violerait D-05). Déviation au files_modified, conforme C-6/D-05.
+- **D-16-03-D** : invariants gated préservés — `rls-unchanged` GREEN, fetch `createClient`/`fetchActiveSignals`/anti-IDOR byte-identiques ; `lwc-recolor-intact` GREEN + CandleChart diff VIDE (D-11 verbatim) ; aucun service_role ; `SignalList` importe légitimement `lib/supabase/client` pour Realtime (pattern D-13 pré-existant, hors scope rls-unchanged). theme-scan Test 2 reste RED uniquement sur les offenders admin (plan 16-04). typecheck 0 erreur, lint:i18n exit 0.
+- **Commits 16-03** : e94fa2d (Task 1 — auth+compte+funnel Tier 2), fda34b6 (Task 2 — membre dense readability-first glow cartes).
+
+### Decisions exécution (Plan 16-04 — reskin Académie Tier 2 + admin résiduel Tier 3 sober, RESKIN-04/05)
+
+- **D-16-04-A** : les 3 pages Académie (index/[slug]/[slug]/[lesson]) + FallbackBanner + Callout étaient DÉJÀ token-pures (zéro littéral, propriétés logiques, FR fallback intact). Unique travail Tier 2 net-new = accent discret = `glowClass('soft')` sur la CARTE de contenu (`ContentCard`), miroir de SignalCard. Aucun glow sur listes/TOC/prose (readability-first, D-05/D-07). 5/6 fichiers Académie laissés intacts (frontière de scope).
+- **D-16-04-B** : `(admin)/page.tsx` tokenisé EN PLUS des files_modified du plan — il portait le MÊME offender DOT_CLASS (`bg-emerald-500`/`bg-amber-500`) que sante et figure dans FOUNDATION_FILES. Le critical_constraint exige theme-scan Test 2 GREEN → fix appliqué (Rule 2/3). Sans lui, Test 2 serait resté RED.
+- **D-16-04-C** : status dots admin (sante + admin/page) → `bg-[--signal-bullish]` (sain), `bg-[--risk-moderate]` (limite), `bg-destructive` (périmé) — statut sémantique tokenisé. Tier 3 sober respecté : couleur de fond de pastille, PAS un glow/aura/animation. Zéro `var(--glow)` sur l'admin (grep vérifié).
+- **D-16-04-D** : 3 offenders de propriété physique corrigés en logique (membres `ml-2`→`ms-2`, affilies `text-right`→`text-end` ×2) par cohérence RTL (action du plan). signaux/[id] déjà logique → non touché.
+- **D-16-04-E** : service_role admin-only intégralement préservé — `createAdminServiceClient()` + tous les fetch byte-identiques sur les 5 fichiers admin (diff = className/markup seul). Import admin-service présent dans 5 pages admin, nulle part ailleurs (C-2). **theme-scan Test 2 désormais GREEN** (clôture du reskin transversal). typecheck 0 erreur, lint:i18n exit 0.
+- **Commits 16-04** : ab8821b (Task 1 — glow Académie ContentCard Tier 2), c0c0ce7 (Task 2 — admin résiduel Tier 3 sober).
+
+### Decisions exécution (Plan 17-01 — fondation DB scalable, migration 0017 AUTHORING, SCALE-01/02/03/05)
+
+- **D-17-01-A1 (checkpoint résolu)** : `mv_mrr` = **cash encaissé** (Option B, décision fondateur) — `sum(payments.amount_atomic) WHERE status='verified' GROUP BY date_trunc('month', verified_at)`. Source de vérité = `amount_atomic` (constaté on-chain, PAS `expected_amount_atomic`) ; période = mois de `verified_at` (PAS `current_period_end`) ; les 2 plans (discovery+standard) ; **PAS de déduplication** (plusieurs paiements verified/mois d'un même user s'additionnent — vue cash encaissé, pas un MRR récurrent dédupé, comportement voulu).
+- **D-17-01-WRAP** : 21 expressions de policy RLS réécrites en wrap `(select ...)` InitPlan par drop/recreate par NOM EXACT (profiles ×2, trade_setups, analyses, candles, payments ×3, subscriptions ×2, 6 tables affiliation). `prediction_outcomes` (`using (true)`) laissée telle quelle (rien à wrapper — advisor vérifié au gate 17-03).
+- **D-17-01-PROFILES (Rule 2)** : `"profiles: modifier le sien"` (0001 L.24, hors inventaire du plan) aussi wrappée `id = (select auth.uid())` pour atteindre le critère d'arrêt D-01 (`get_advisors(performance)` vert COMPLET sur TOUTES les policies).
+- **D-17-01-MV** : `get_mrr()` SECURITY DEFINER `stable` gated `where (select is_superadmin())` + revoke public/anon + grant authenticated (aucun GRANT SELECT direct — les matviews n'ont pas de RLS). `refresh_mv_mrr()` SECURITY DEFINER `REFRESH ... CONCURRENTLY`, revoke public/anon/**authenticated** (service_role bypass uniquement). Ordonnanceur du refresh = hors scope P17 (Open Question 1).
+- **D-17-01-BCAST** : trigger `trg_trade_setups_broadcast` (after insert/update) → `broadcast_trade_setup_changes()` → `realtime.broadcast_changes('topic:new-signals', ...)` (topic FIXE + canal privé) ; policy `realtime.messages` répliquant `(select has_active_subscription())` (parité abonné vs filtre postgres_changes retiré).
+- **D-17-01-PUBLI (A3)** : retrait `alter publication supabase_realtime drop table trade_setups` + `replica identity default` **différé au plan 17-03** (commenté), à exécuter SEULEMENT après vérif LIVE `pg_publication_tables` qu'aucun autre consommateur postgres_changes n'en dépend.
+- **D-17-01-PARTB** : 6 `CREATE INDEX CONCURRENTLY` documentés en commentaire (mv_mrr_month_idx UNIQUE + 3 keyset `(created_at desc, id desc)` + 2 colonnes de policy) + script de gate (détection indisvalid, drop concurrently, EXPLAIN gabarit, REFRESH, get_advisors). **NE PAS dans apply_migration** (Pitfall 1 / 25001) → `execute_sql` per-statement au plan 17-03. **AUCUNE application LIVE dans ce plan** (authoring uniquement).
+- **Commits 17-01** : 4d49832 (T1 — wrap RLS), 188d69d (T2 — matview MRR + get_mrr + refresh), 443dd41 (T3 — Broadcast trigger + policy realtime.messages), 166aadd (T4 — Partie B index CONCURRENTLY + script de gate).
+
+### Decisions exécution (Plan 17-02 — SignalList Broadcast client + filet gating MRR, SCALE-05/03)
+
+- **D-17-02-A4** : `SignalList.tsx` bascule de `postgres_changes` vers le canal privé Broadcast `topic:new-signals` (`await supabase.realtime.setAuth()` + `config.private`). Mapping `payload.payload.record` (forme `realtime.broadcast_changes`), **JAMAIS** `payload.new`. États `newCount`/`removedIds`/`realtimeLost`, `revealNew`, bloc `subscribe` (CHANNEL_ERROR/TIMED_OUT/CLOSED → realtimeLost), cleanup `removeChannel` et `RealtimeBadge` conservés à l'identique. Vérification runtime du shape réel différée au plan 17-04 (HUMAN-UAT, T-17-A4).
+- **D-17-02-ASYNC** : `setAuth()` async + abonnement canal privé → useEffect encapsule le setup dans une fonction async ; cleanup via variable `channel` mutable + flag `cancelled` (race promesse/unmount gérée, `removeChannel` fiable).
+- **D-17-02-SKIP (Rule 3)** : `mrr-gating.test.ts` (Wave-0, miroir Vitest de `signals-rls.spec.ts`, client anon nu JAMAIS service_role) skip statiquement si env absent ET skip **dynamiquement sur PGRST202** (get_mrr absent du cache de schéma = 0017 pas LIVE). `.env.test` étant présent, sans cette garde le test échouait (fonction introuvable) et cassait la suite → fix nécessaire au critère « suite non régressée ». Assertions (error null + 0 ligne) intactes ; deviendra assertif une fois 0017 LIVE (17-04). Aucun GREEN fabriqué.
+- **Commits 17-02** : a1c4dda (T1 — SignalList canal privé Broadcast), 889eb5d (T2 — Wave-0 mrr-gating.test.ts). `pnpm test` 616 passed | 5 skipped | 0 failed ; `pnpm typecheck` 0 erreur.
+
+### Decisions exécution (Plan 18-01 — fondation + Wave 0, colonne source + tests RLS/no-perf, SEED-02/03)
+
+- **D-18-01-A (D-01)** : migration `0018_seed_source_column.sql` ajoute `source text not null default 'live' check (source in ('live','demo','backtest'))` sur les **8 tables seedées** (profiles, subscriptions, payments, analyses, trade_setups, prediction_outcomes, affiliates, commissions). `default 'live'` rend les lignes existantes `live` (future-proof). Périmètre minimal : tables volume (candles/snapshots/job_runs) et filles cascadées (affiliate_codes/referrals/payouts) NON colonnées en P18.
+- **D-18-01-B (T-18-01)** : `source` est un **LABEL de provenance, JAMAIS un gate de lecture** — 0018 ne crée/modifie AUCUNE policy RLS, aucun `using (source=…)`. Appliquée LIVE via MCP `apply_migration` (Partie A) ; 3 index partiels `create index concurrently … WHERE source='demo'` (analyses/trade_setups/payments) via `execute_sql` per-statement, `indisvalid=true` confirmé. `get_advisors(security)` post-0018 = **0 nouvelle alerte RLS** (2 WARN security-definer pré-existants tolérés EXPECTED BY DESIGN).
+- **D-18-01-C (Pitfall 6 types)** : `database.types.ts` régénéré via MCP `generate_typescript_types` puis **ré-édité À LA MAIN** (convention repo, PAS `gen types --linked`) : `source` dans Row/Insert/Update des 8 tables, override `*_atomic` string et alias maison préservés. `pnpm typecheck` vert.
+- **D-18-01-D (SEED-02)** : `no-perf-seed-claims.test.ts` (apps/web/test) scanne `apps/jobs/scripts/seed/**` via `node:fs` (zéro DB, toujours CI-exécutable). `FORBIDDEN_SEED_FIELDS = /win_?rate|success_?rate|winRatePct|expectancy|hardcoded.*%/i`, whitelist `realized_r/outcome/amount_atomic/rate_bps`. Test de contrôle non-trivial : un `win_rate: 0.9` planté EST détecté (anti vacuous-green). seed/ ne contenant que `config.ts` → 0 offender (vert toléré, garde armée pour Waves ≥ 1).
+- **D-18-01-E (SEED-03, T-18-02)** : `seed-rls.test.ts` (packages/supabase/.../__tests__) calque EXACTEMENT `affiliate-rls.test.ts` : `HAS_ENV`, `adminClient()`, `signUpAndGetClient()`, `describe.skipIf(!HAS_ENV)`, `afterAll` deleteUser. 2 assertions lues TOUJOURS via client **anon** (jamais service_role) : (a) non-abonné lit 0 `trade_setups` ; (b) user A ne lit aucun `payments` de B (payment de B seedé via service_role : source='demo', amount_atomic string, status='verified'). SKIP propre sans `.env.test`.
+- **Commits 18-01** : 493acee (T1 — migration 0018 + faker devDep + config seed), 949111a (T2 — apply LIVE MCP + régen types, owned orchestrateur), 71533cf (T3 — tests Wave 0 no-perf-seed-claims + seed-rls). `no-perf-seed-claims` 4 passed ; `seed-rls` 2 skipped propre ; `pnpm typecheck` 0 erreur.
+
+### Decisions exécution (Plan 18-02 — seed core : orchestrateur + purge + users + subscriptions + payments, SEED-01)
+
+- **D-18-02-A (Pitfall 4 / T-18-09)** : `users.ts` borne `auth.admin.createUser` via un **pLimit maison** (file de promesses, concurrence 5) — `p-limit` absent du workspace, bornage sans nouvelle dépendance, conforme à la discipline `p-limit` du projet. Emails `seed-{i}@demo.nexa.invalid` (RFC 2606, T-18-06) + `user_metadata.seed:true` ; faker multi-locale `ar/fr/en` + `base` fallback, chaque instance `seed(FAKER_SEED)` ; UPDATE profiles `role`/`source='demo'`/`created_at` étalé luxon (anti Pitfall 1 keyset).
+- **D-18-02-B (chaîne déterministe)** : `seedUsers` retourne `SeededUser[]` (id, role, locale, index, createdAt) ; `subscriptions`/`payments` consomment cette sortie ; l'ordre par `index` garantit la reproductibilité au re-seed.
+- **D-18-02-C (purge D-06 / T-18-05)** : `purge.ts` = `delete().eq('source','demo')` sur 8 tables en **ordre FK inverse** (commissions → affiliates → prediction_outcomes → trade_setups → analyses → payments → subscriptions → profiles), AUCUN truncate, puis `auth.admin.listUsers` paginé + `deleteUser` filtré domaine `demo.nexa.invalid` (auth.users sans colonne source). Sûre à vide.
+- **D-18-02-D (D-03/D-04)** : `subscriptions.ts` status déterministe par index (active 37 % / expired 18 % / canceled 5 % / leads 40 % sans subscription), plan standard ~75 % / discovery ~25 %, `current_period_end` étalé luxon (actifs futur dont J-3/J-1 pour ExpiryBanner P19, expirés 1-6 mois passés = churn). `payments.ts` `verified`, `amount_atomic = PRICE_ATOMIC[plan].toString()` (bigint ×10^6, jamais float — T-18-08), `expected = amount`, `tx_hash = demo-{userIndex}-{n}` (UNIQUE global 0012, idempotent car purge en tête), `verified_at` étalé ~12 mois UTC, renouvellements 1-N (MRR/LTV). Aucun MRR/% stocké → émerge de `mv_mrr`.
+- **D-18-02-E (verify)** : `pnpm typecheck` vert ; `pnpm test -- no-perf-seed-claims` 4 passed (5 fichiers seed sans champ de perf) ; suite complète 621 passed / 6 skipped (0 régression). Type-correction des scripts seed confirmée via tsconfig temporaire `include scripts/seed/**` = 0 erreur (le `tsc -b` exclut `scripts/`). **AUCUN seed live lancé** (UAT Manual-Only). Erreur tsc pré-existante hors scope : `freeze-nile-fixture.ts:103` (TS2769).
+- **Commits 18-02** : b7a9c1a (T1 — seed.ts orchestrateur fail-fast + purge.ts D-06), 4bbd018 (T2 — users.ts createUser borné faker déterministe), 3cfe072 (T3 — subscriptions.ts + payments.ts MRR/churn étalés).
+
+### Decisions exécution (Plan 19-04 — overview cockpit + affiliation conditionnelle + abonnement réhébergé, UDASH-01/05)
+
+- **D-19-04-A (déviation chemin, Rule 3 — blocage build)** : un route group `(dash)` n'ajoute rien à l'URL → les chemins `(dash)/page.tsx` / `(dash)/abonnement/page.tsx` du plan collisionneraient avec `(marketing)`/racine et ne matcheraient PAS la nav DashShell FIGÉE en 19-02 (`/dashboard/*`). Overview placé à `(dash)/dashboard/page.tsx` (URL `/dashboard`, landing post-login), abonnement à `(dash)/dashboard/abonnement/page.tsx`. Ancien placeholder `[locale]/dashboard/page.tsx` (listing instruments, hors shell) SUPPRIMÉ (conflit de routes parallèles Next) — la gate `requireUser` du layout `(dash)` le remplace. **Conséquence** : la tâche « remplacement stub `/dashboard` » prévue en 19-05 est déjà faite ; 19-05 ne livre plus que les Paramètres.
+- **D-19-04-B** : overview monte `SignalCard` SANS QueryProvider/SignalList (ni Realtime ni react-query sur la vue d'ensemble) — 3-4 cartes statiques RSC ; le live reste sur la surface signaux pleine. Satisfait « montage, pas clone » (D-02) tout en gardant l'overview léger.
+- **D-19-04-C** : carte affiliation rendue conditionnellement via lecture `profiles.role` + `return null` (jamais le gate de rôle redirigeant, T-19-15) ; lit la vue `affiliate_dashboard` (agrégats no-PII, T-19-13) ; montants `formatAtomic(BigInt(...))` jamais Number (T-19-16). État renouvellement (D-03) si abo expiré, CTA `/tarifs`.
+- **D-19-04-D** : clé i18n `overview.activeUntil` ({date}) ajoutée à parité stricte fr/en/ar (sans terme interdit, parité dash 4/4 verte) ; empty/error des 3-4 signaux réutilisent le namespace `signals`. Garde `no-perf-seed-claims` étendue à l'overview (volet C, détecteur UI non trivial — injection `+12%` → scan échoue, prouvé).
+- **Commits 19-04** : a19a063 (T1 — AffiliateSummaryCard), ea3c295 (T2 — overview + abonnement + suppression placeholder + i18n), ec22dd3 (T3 — no-perf étendu). typecheck vert, 11/11 tests (no-perf + parité dash), lint:i18n exit 0.
+
 ### Open todos / research flags (v2.0)
 
 - **Phase 4 (research flag) :** TronGrid endpoint `walletsolidity`, parsing logs TRC-20, normalisation hex↔base58 — doc TS peu dense, recherche de phase recommandée.
@@ -432,7 +608,7 @@ ressources externes non provisionnables en session de développement.
 
 ## Session Continuity
 
-**Last session:** 2026-06-21T21:47:52.665Z
+**Last session:** 2026-06-26T23:59:57.577Z
 
 **Last session (archive):** 2026-06-19T03:41:29.665Z
 
@@ -454,7 +630,9 @@ ressources externes non provisionnables en session de développement.
 
 **Last session (archive):** 2026-06-14 — Completed 02-03-PLAN.md (4 commits : 38c1894 tarifs 9$/3$ + paiement-bientot + funnel signup→paiement-bientot, 86e7001 home bénéfice-first + proof slot masqué, 49ac57e RED no-perf-claims, fa8a5d0 GREEN glob vitest). Cœur conversion de la vitrine livré : home VITR-01, tarifs VITR-02 (USDT TRC-20, D-10/D-11/D-12), funnel honnête D-09, garde no-perf-claims VITR-03/D-08. 15 tests verts, tsc/lint:i18n OK, invariant auth P1 intact. **Phase 02 COMPLETE (3/3 plans).** Stopped at : Plan 02-03 terminé.
 
-**Next action:** Phase 10 — Plan 10-03 (tokens OKLCH). Migrer `globals.css` des HEX de marque obsolètes (#1E5FBF/#03d87f/#63279b) vers la palette OKLCH NEXA (`--nexa-green-500` etc.), `@theme inline` = var() only, repointer `--font-latin`/`--font-arabic` vers les 5 nouvelles variables `--font-*` exposées en 10-02. Cible GREEN : `design-tokens.test.ts` (4 assertions, 3 actuellement RED). 10-02 COMPLETE (b5efb9b/863dd7c) : 5 polices NEXA self-hostées, `fonts.test.ts` GREEN 5/5, `no-cdn-fonts.spec.ts` GREEN runtime. `rtl-logical-props.test.ts` + `no-flash.spec.ts` = gardes de non-régression à préserver.
+**Next action:** Phase 19 — Plan 19-05 (Paramètres : compte/langue/notifications UI + changement mdp `updateUser` + déconnexion, UDASH-06). NB : le « remplacement du stub `/dashboard` » de 19-05 est DÉJÀ fait en 19-04 (D-19-04-A — placeholder supprimé, overview en place). Reste vague 3 : 19-06 (watchlist write anti-IDOR) + 19-07 (suivis/historique keyset). 19-04 COMPLETE (a19a063/ea3c295/ec22dd3) : overview cockpit D-08 no-perf + AffiliateSummaryCard conditionnelle no-PII + abonnement réhébergé.
+
+**Next action (archive):** Phase 10 — Plan 10-03 (tokens OKLCH). Migrer `globals.css` des HEX de marque obsolètes (#1E5FBF/#03d87f/#63279b) vers la palette OKLCH NEXA (`--nexa-green-500` etc.), `@theme inline` = var() only, repointer `--font-latin`/`--font-arabic` vers les 5 nouvelles variables `--font-*` exposées en 10-02. Cible GREEN : `design-tokens.test.ts` (4 assertions, 3 actuellement RED). 10-02 COMPLETE (b5efb9b/863dd7c) : 5 polices NEXA self-hostées, `fonts.test.ts` GREEN 5/5, `no-cdn-fonts.spec.ts` GREEN runtime. `rtl-logical-props.test.ts` + `no-flash.spec.ts` = gardes de non-régression à préserver.
 
 **Next action (archive):** Milestone v2.1 — roadmap créée (5 phases, 10-14). Lancer la planification de **Phase 10 (Fondation design system NEXA, DESIGN-01..04)** via `/gsd-execute-phase 10`. Axe design (P10-11) parallélisable contre routine+backtest (P12-13). Research flags à lever au planning : P12 (réseau Remote *.supabase.co, Open Q A1) et P13 (figer le catalogue de patterns — décision fondateur Borhane). Dette héritée v2.0 traitée : WIRING-01/ExpiryBanner → Phase 11 (UI-07). Hors scope v2.1 : LEGAL-02, PAY-AUTO, AFF-AUTO, ENGINE-API.
 

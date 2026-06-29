@@ -8,6 +8,8 @@ import { Link } from '../../../../i18n/navigation'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Eyebrow } from '@/components/nexa/Eyebrow'
+import { glowClass } from '@/components/ui/glow'
+import { DataRain } from '@/components/ui/data-rain'
 import { signUp } from '../actions'
 
 export default async function SignupPage({
@@ -20,7 +22,9 @@ export default async function SignupPage({
   const t = await getTranslations('auth')
 
   return (
-    <main className="mx-auto max-w-sm px-4 py-20 text-start">
+    <main className="relative mx-auto max-w-sm px-4 py-20 text-start">
+      {/* Surface calme (auth) → data-rain ambiant très subtil, reduced-motion gardé. */}
+      <DataRain />
       <Eyebrow>{t('eyebrow')}</Eyebrow>
       <h1 className="mt-2 font-display text-2xl font-semibold">{t('signupTitle')}</h1>
       <form action={signUp} className="mt-6 flex flex-col gap-4">
@@ -38,12 +42,13 @@ export default async function SignupPage({
             autoComplete="new-password"
           />
         </label>
-        <Button type="submit" className="mt-2 w-full">
+        {/* Accent Tier 2 discret : glow tokenisé (box-shadow var(--glow)), jamais un ring. */}
+        <Button type="submit" className={`mt-2 w-full ${glowClass('soft')}`}>
           {t('signupButton')}
         </Button>
       </form>
       <p className="mt-4 text-sm">
-        <Link href="/login" className="text-[var(--accent-brand)] hover:underline">
+        <Link href="/login" className="text-primary hover:underline">
           {t('loginButton')}
         </Link>
       </p>

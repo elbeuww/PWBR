@@ -32,6 +32,13 @@ vi.mock('../../../i18n/navigation', () => ({
     createElement('a', { href, ...rest }, children as never),
 }))
 
+// WatchlistToggle : îlot client (react-query useMutation) câblé dans l'en-tête (19-06).
+// Hors sujet de ce test (contenu IA VERBATIM) et il exige un QueryClientProvider absent
+// du rendu statique → on le neutralise. Sa logique a son propre test dédié (dash/).
+vi.mock('../../dash/WatchlistToggle', () => ({
+  WatchlistToggle: () => null,
+}))
+
 const VETERAN_NOTE =
   'Setup propre sur cassure de structure H4 ; je laisse courir vers le TP2 si le momentum tient.'
 const TECH_REASON = 'BOS haussier confirmé sur H4 avec retest de la zone de demande.'

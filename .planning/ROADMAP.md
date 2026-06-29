@@ -4,7 +4,8 @@
 
 - ✅ **v1.0 — Moteur analytique déterministe** — Phases 1-4 (livré 2026-06-14, archivé `.planning/archive/v1.0-moteur-analytique/`)
 - ✅ **v2.0 — MVP plateforme publique (MENA, trilingue)** — Phases 1-9 (livré 2026-06-20)
-- 🚧 **v2.1 — Mise en vie : identité NEXA, moteur live & track record** — Phases 10-14 (en cours, démarré 2026-06-21)
+- ⏸️ **v2.1 — Mise en vie : identité NEXA, moteur live & track record** — Phases 10-14 (EN PAUSE — phases 10-11 livrées ; 12-14 reportées, dépendent des données réelles)
+- 🚧 **v3.0 — Plateforme complète sous identité dark néon NEXA** — Phases 15-21 (en cours, démarré 2026-06-22 — sur données seedées)
 
 ## Phases
 
@@ -25,13 +26,25 @@ Détail complet archivé : `.planning/milestones/v2.0-ROADMAP.md`.
 
 </details>
 
-### v2.1 — Mise en vie (Phases 10-14)
+### v2.1 — Mise en vie (Phases 10-14) ⏸️ EN PAUSE (12-14 reportées)
 
 - [x] **Phase 10: Fondation design system NEXA** — Tokens OKLCH en couches + 5 polices self-hostées + thème no-flash RTL-safe (axe design, fondation). (completed 2026-06-21)
 - [x] **Phase 11: Composants NEXA, reskin transversal & rebranding** — Bibliothèque tokenisée + reskin de toutes les surfaces + MERA→NEXA + hero animé, sans promesse de gain. (completed 2026-06-21)
-- [ ] **Phase 12: Routines d'analyse Claude planifiées (sans API)** — Environment + fenêtres Remote day/swing + 1 run réel snapshot→analyze→persist, monitoré.
-- [ ] **Phase 13: Backtest du catalogue de patterns (source-discrimination + moteur)** — Migration `source` AVANT seed + catalogue figé + `packages/backtest` réutilisant `replayOutcome` + Wilson golden-testé.
-- [ ] **Phase 14: Track record affiché & boucle outcomes en prod** — Provenance backtest/réel + N visible + bascule N≥30 + outcome-tracker en prod.
+- [ ] **Phase 12: Routines d'analyse Claude planifiées (sans API)** ⏸️ — Environment + fenêtres Remote day/swing + 1 run réel snapshot→analyze→persist, monitoré. (REPORTÉE — dépend des données réelles)
+- [ ] **Phase 13: Backtest du catalogue de patterns (source-discrimination + moteur)** ⏸️ — Migration `source` AVANT seed + catalogue figé + `packages/backtest` réutilisant `replayOutcome` + Wilson golden-testé. (REPORTÉE)
+- [ ] **Phase 14: Track record affiché & boucle outcomes en prod** ⏸️ — Provenance backtest/réel + N visible + bascule N≥30 + outcome-tracker en prod. (REPORTÉE)
+
+### v3.0 — Plateforme complète sous identité dark néon NEXA (Phases 15-21)
+
+- [x] **Phase 15: Design system v3 « dark néon unique »** — Promotion de la couche sémantique `.nxl` (landing) en DS global dark unique, `forcedTheme="dark"`, retrait du toggle clair, décision green vs volt, contraste WCAG AA, no-FOUC + RTL préservés. (THEME) (completed 2026-06-22)
+- [x] **Phase 16: Reskin transversal de toutes les pages** — Vitrine, légal, auth, compte/abonnement, espace membre signaux/détail+chart, paiement/funnel, Académie, admin repeints sur le DS v3, RLS/i18n/disclaimers/no-perf-claims/no-mera-brand préservés. (RESKIN)
+ (completed 2026-06-23)
+- [x] **Phase 17: Fondation DB scalable (perf avant charge)** — Migration `0017` : wrap RLS `(select …)` + index sur colonnes de policy, index composites keyset alignés `ORDER BY`, infra matviews KPIs (unique index + wrapper `is_superadmin()`), Broadcast vs `postgres_changes`, migrations non bloquantes `CONCURRENTLY`. (SCALE perf)
+ (completed 2026-06-25)
+- [x] **Phase 18: Seed de données réalistes à l'échelle** — `seed.ts` faker déterministe, idempotent, FK-cohérent (~10k users + signaux/paiements/affiliés/outcomes), labels `backtest`/`démo` (aucun chiffre de perf fabriqué), RLS re-testée depuis client anon. (SEED) (completed 2026-06-25)
+- [x] **Phase 19: Dashboard utilisateur** — Groupe `(dash)` : vue d'ensemble, signaux suivis/historique keyset, watchlist `user_followed_setups` (revue IDOR), abonnement + ExpiryBanner, affiliation intégrée, paramètres — démontrable sur données seedées. (UDASH) (completed 2026-06-26)
+- [x] **Phase 20: Dashboard superadmin (cockpit 4 axes)** — Acquisition/Revenus(MRR mesuré)/Ops/Conformité, tables virtualisées filtrables/paginées, gating `is_superadmin()` (404 discret), matviews phase 17, jamais service_role côté pages. (ADASH) (completed 2026-06-26)
+- [x] **Phase 21: Tests E2E + audit de scalabilité** — Playwright des flux principaux + isolation RLS/gating prouvée, audit DB `EXPLAIN ANALYZE` + `get_advisors` + `pg_stat_statements` sur les requêtes clés à ~10k (validation keyset/index/matviews). (E2E + SCALE-06) (completed 2026-06-29)
 
 ## Phase Details
 
@@ -73,7 +86,7 @@ Détail complet archivé : `.planning/milestones/v2.0-ROADMAP.md`.
 **UI hint** : yes
 **Notes** : Axe design (parallélisable contre Phases 12-13). Adresse Pitfall P7 (promesse de gain visuelle). Reskin = swap de tokens + nouveaux primitifs NEXA, jamais migration du fetch RLS vers le client (Anti-Pattern 3). CandleChart recoloré via l'API JS lwc (Anti-Pattern 5). Conserver `data-testid`/rôles ARIA des spec files E2E. **Divergence ROADMAP « 6 spec files » tranchée : 5 specs existent (i18n, affiliation-attribution, gating, auth, academie) — la note « 6 » est une coquille ; les 5 sont préservés, aucune 6e créée (plan 11-08).**
 
-### Phase 12: Routines d'analyse Claude planifiées (sans API)
+### Phase 12: Routines d'analyse Claude planifiées (sans API) ⏸️ REPORTÉE
 **Goal** : Activer le moteur en production via des routines Claude Code Remote planifiées (day + swing) qui produisent de vrais setups par `snapshot → analyze → persist`, sans clé API, idempotentes et monitorées — levant la dette v1.0 P4.
 **Depends on** : Cœur v1.0 (combine-engine, persist.ts, sessions.ts) — indépendant des Phases 10-11.
 **Requirements** : ROUTINE-01, ROUTINE-02, ROUTINE-03, ROUTINE-04, ROUTINE-05
@@ -86,13 +99,13 @@ Détail complet archivé : `.planning/milestones/v2.0-ROADMAP.md`.
 **Plans** : 6 plans (4 vagues)
 - [x] 12-01-PLAN.md — Wave-0 : tests validation (persist true-empty/all-rejected, idempotence run-level, static-check no-MCP) (ROUTINE-03/04/05)
 - [x] 12-02-PLAN.md — Runbook : corriger docs/routines-claude.md (réseau Custom *.supabase.co obligatoire, single-run, P-SECRET/P-MCP, RUN_ID) + vérif .gitignore (ROUTINE-01/02/05)
-- [ ] 12-03-PLAN.md — Environment Custom + secrets + allowlist *.supabase.co + run de fumée egress (gate ROUTINE-01) (ROUTINE-01/05)
+- [x] 12-03-PLAN.md — Environment Custom + secrets + allowlist *.supabase.co + run de fumée egress (gate ROUTINE-01) (ROUTINE-01/05)
 - [x] 12-04-PLAN.md — Revue fondateur du prompt vétéran avant go-live (D-12-08) (ROUTINE-03)
 - [ ] 12-05-PLAN.md — Routines newyork + eod-swing + 1 run réel ≥1 setup persisté (D-43) + monitoring/idempotence (ROUTINE-02/03/04)
 - [ ] 12-06-PLAN.md — Élargissement asia + london après validation du minimal (D-12-01) (ROUTINE-02/04)
-**Notes** : Axe routine (parallélisable contre l'axe design). Config-first : Environments + schedules vivent HORS git (dashboard). Pas de job `analyze.ts` (Anti-Pattern 1) — ANALYZE reste agent-native ; `persist.ts` demeure la seule frontière d'écriture IA. Research flag : valider Open Question A1 (réseau `*.supabase.co` Remote) AVANT de planifier. Adresse Pitfalls P10 (hallucination), P11 (quota), P12 (MCP absent en Remote).
+**Notes** : Axe routine. **REPORTÉE en v3.0** (dépend des données réelles). Config-first : Environments + schedules vivent HORS git (dashboard). Pas de job `analyze.ts` (Anti-Pattern 1) — ANALYZE reste agent-native ; `persist.ts` demeure la seule frontière d'écriture IA. Research flag : valider Open Question A1 (réseau `*.supabase.co` Remote) AVANT de planifier. Adresse Pitfalls P10 (hallucination), P11 (quota), P12 (MCP absent en Remote).
 
-### Phase 13: Backtest du catalogue de patterns (source-discrimination + moteur)
+### Phase 13: Backtest du catalogue de patterns (source-discrimination + moteur) ⏸️ REPORTÉE
 **Goal** : Mesurer un win-rate par pattern via un backtest honnête, en posant d'abord la discrimination de source (anti double-comptage) et en figeant le catalogue, puis en réutilisant `replayOutcome` pour produire un % statistiquement significatif.
 **Depends on** : Cœur v1.0 (`replayOutcome`, `packages/indicators`, `pattern_stats` 0014). Migration source = prérequis dur du moteur.
 **Requirements** : BACKTEST-01, BACKTEST-02, BACKTEST-03, BACKTEST-04
@@ -102,9 +115,9 @@ Détail complet archivé : `.planning/milestones/v2.0-ROADMAP.md`.
   3. `packages/backtest` rejoue le catalogue sur l'historique de candles via `replayOutcome` (first-touch, anti look-ahead réutilisé tel quel) et agrège un win-rate mesuré par pattern.
   4. L'intervalle de Wilson est golden-testé ; aucun pattern sous le seuil de significativité n'est présenté comme un % mesuré.
 **Plans** : TBD
-**Notes** : Axe backtest. **Ordre dur** : migration source (BACKTEST-01) → catalogue figé (BACKTEST-02) → moteur (BACKTEST-03) → significativité (BACKTEST-04). Inverser corrompt `pattern_stats` (double-comptage silencieux). `packages/backtest` séparé de `packages/indicators` (préserver sa pureté). Aucune écriture dans `trade_setups`/`prediction_outcomes` (Anti-Pattern 2). Research flag : le catalogue = décision fondateur (Borhane) à figer avant le code. Adresse Pitfalls P2, P3, P5, P6.
+**Notes** : Axe backtest. **REPORTÉE en v3.0** (dépend des données réelles). **Ordre dur** : migration source (BACKTEST-01) → catalogue figé (BACKTEST-02) → moteur (BACKTEST-03) → significativité (BACKTEST-04). Inverser corrompt `pattern_stats` (double-comptage silencieux). `packages/backtest` séparé de `packages/indicators` (préserver sa pureté). Aucune écriture dans `trade_setups`/`prediction_outcomes` (Anti-Pattern 2). Research flag : le catalogue = décision fondateur (Borhane) à figer avant le code. Adresse Pitfalls P2, P3, P5, P6.
 
-### Phase 14: Track record affiché & boucle outcomes en prod
+### Phase 14: Track record affiché & boucle outcomes en prod ⏸️ REPORTÉE
 **Goal** : Afficher dès J1 un % de réussite toujours mesuré, étiqueté par provenance avec son N, et faire tourner la boucle outcome-tracker en prod pour basculer progressivement du backtest vers le track record réel.
 **Depends on** : Phase 12 (routine produisant des signaux réels) ET Phase 13 (backtest seedant `pattern_stats`). Surfaces d'affichage reskinées en Phase 11.
 **Requirements** : TRACK-04, TRACK-05, TRACK-06
@@ -114,7 +127,126 @@ Détail complet archivé : `.planning/milestones/v2.0-ROADMAP.md`.
   3. Le job `outcome-tracker` tourne en prod et résout les issues réelles (hit_tp/hit_sl/flat), alimentant le track record réel.
 **Plans** : TBD
 **UI hint** : yes
-**Notes** : Tout chemin de rendu d'un % passe par `applyThreshold` (`@app/core`, source unique). Adresse Pitfalls P1 (% sans label), P4 (N<30 affiché), P9 (bascule silencieuse). La bascule est un changement de filtre de provenance, jamais une réécriture de chiffres.
+**Notes** : **REPORTÉE en v3.0** (dépend des données réelles). Tout chemin de rendu d'un % passe par `applyThreshold` (`@app/core`, source unique). Adresse Pitfalls P1 (% sans label), P4 (N<30 affiché), P9 (bascule silencieuse). La bascule est un changement de filtre de provenance, jamais une réécriture de chiffres.
+
+### Phase 15: Design system v3 « dark néon unique »
+**Goal** : Promouvoir l'identité dark néon de la landing (`.nxl`) en design system **global et unique** — un seul thème dark, sans option claire — en migrant la couche sémantique des tokens, pour que toute la suite (reskin, dashboards) s'appuie sur une base figée jamais à retrofitter.
+**Depends on** : v2.1 Phases 10-11 (tokens NEXA en couches, polices self-hostées, `.nxl` landing). Première phase v3.0.
+**Requirements** : THEME-01, THEME-02, THEME-03, THEME-04, THEME-05
+**Success Criteria** (what must be TRUE) :
+  1. Au chargement de n'importe quelle page (fr/en/ar), la plateforme s'affiche dans un thème dark néon unique, sans flash (no-FOUC, `forcedTheme="dark"`), et aucun chemin n'expose plus de bascule vers un thème clair.
+  2. Les composants UI partagés (boutons, cartes, badges, inputs, tables, dialogs, nav) rendent leurs couleurs via les tokens sémantiques promus depuis `.nxl` — un scan prouve l'absence de CSS bespoke par page et d'aucune collision d'utilitaires Tailwind (ex. `ring`/glow).
+  3. Le thème néon par défaut (green ou volt — décision produit tranchée et documentée dans cette phase) est figé en `:root` pour toute la plateforme.
+  4. En arabe, la mise en page reste correctement miroir (propriétés logiques uniquement) sous le thème unique, sur les surfaces touchées par la fondation.
+  5. Un test de contraste prouve WCAG AA sur les surfaces dark, y compris les surfaces translucides (overlays, cartes glow).
+**Plans** : 3 plans (2 vagues)
+- [x] 15-01-PLAN.md — Wave-0 gardes : test contraste WCAG AA (opaque + surfaces translucides compositées) + scan bespoke/collision Tailwind, verrouillés AVANT migration (THEME-02/THEME-05)
+- [x] 15-02-PLAN.md — Promotion + gel : GREEN figé en `:root`, `.dark` réconcilié aux mêmes valeurs (forced `.dark` ne flippe plus vers navy), `forcedTheme="dark"`, suppression ThemeToggle, purge namespace i18n `theme` (THEME-01/THEME-03/THEME-04)
+- [x] 15-03-PLAN.md — Tokenisation résiduelle : `ring-[#2563EB]` → `ring-ring` (LanguageSwitcher) + utilitaires palette bruts → tokens sémantiques sur 8 surfaces admin/affiliation/track-record (THEME-02)
+**UI hint** : yes
+**Notes** : Arête dure : DS figé AVANT tout reskin (sinon double passage). Migration = **promotion sémantique** : copier les valeurs GREEN `.nxl[data-theme="green"]` dans `:root` (D-02/D-03, jamais de copie mécanique du sélecteur `.nxl` — Pitfall #1) ; le sélecteur `.dark` **reste présent** (D-06, observé par CandleChart + sonner) mais réconcilié aux mêmes valeurs GREEN que `:root` ; suppression du **toggle** + `forcedTheme="dark"`. Primitives (couche 1) et noms shadcn (couche 3) intacts ; RTL/i18n orthogonaux non touchés (purge du seul namespace `theme`). Research flag résolu : GREEN tranché (D-01) + matrice de contraste AA translucide compositée (D-09/D-10). Parallélisme : 15-02 (globals/layout/messages) // 15-03 (LanguageSwitcher + admin/affiliation/track-record), fichiers disjoints.
+
+### Phase 16: Reskin transversal de toutes les pages
+**Goal** : Repeindre toutes les surfaces existantes de la plateforme sur le DS v3 dark néon figé, d'un seul passage, en préservant intégralement le gating RLS, l'i18n/RTL, les disclaimers et les garde-fous textuels.
+**Depends on** : Phase 15 (DS v3 figé). Arête dure.
+**Requirements** : RESKIN-01, RESKIN-02, RESKIN-03, RESKIN-04, RESKIN-05, RESKIN-06
+**Success Criteria** (what must be TRUE) :
+  1. La vitrine publique (accueil, tarifs, méthodologie, légal) est au DS dark néon, trilingue AR-RTL/EN/FR, `<Disclaimer />` et no-perf-claims préservés.
+  2. L'auth (login/signup), le compte/abonnement, l'espace membre (liste signaux + détail trade + chart lightweight-charts) et les pages de paiement/funnel sont au DS dark néon, le gating RLS et l'isolation anti-IDOR inchangés (fetch RLS jamais migré vers le client).
+  3. L'Académie (index + article + cours/leçon) et le back-office `/admin` sont au DS dark néon, RTL et fallback FR préservés sur l'Académie.
+  4. Un scan prouve qu'aucune page ne réintroduit de % non mesuré ni de marque « MERA » (no-perf-claims + no-mera-brand verts), et que le CandleChart est recoloré via l'API JS lwc (pas de CSS bespoke).
+**Plans** : 4 plans (2 vagues)
+- [x] 16-01-PLAN.md — Wave-0 gardes : extension theme-scan (FOUNDATION_FILES + FORBIDDEN_PALETTE) + 3 scans structurels (rls-unchanged / lwc-recolor-intact / volt-orphan-free) + extraction primitives glow + data-rain tokenisées (RESKIN-01..06)
+- [x] 16-02-PLAN.md — Vitrine Tier 1 + réconciliation landing volt→green : nettoyage orphelins + tarifs/méthodologie/légal token-pure plein néon (RESKIN-01)
+- [x] 16-03-PLAN.md — App Tier 2 : auth/compte/membre/funnel token-pure glow discret, fetch RLS + CandleChart intacts, data-rain calme uniquement (RESKIN-02/03/06)
+- [x] 16-04-PLAN.md — Académie Tier 2 (RTL + fallback FR) + Admin Tier 3 sobre (offenders résiduels tokenisés, service_role admin-only) (RESKIN-04/05)
+**UI hint** : yes
+**Notes** : Reskin = swap de tokens + primitifs du DS v3, jamais migration du fetch RLS vers le client (Anti-Pattern). CandleChart recoloré via l'API JS lwc. Conserver `data-testid`/rôles ARIA pour les specs E2E (phase 21). Patterns établis (recherche légère). Découpage par tier/route group (fichiers disjoints → vague 2 parallélisable) ; vague 1 = gardes + primitives gate toutes les surfaces.
+
+### Phase 17: Fondation DB scalable (perf avant charge)
+**Goal** : Durcir la couche données pour 10k+ utilisateurs AVANT d'exposer des vues lourdes à l'échelle — corriger la dette de perf RLS, poser les index keyset, l'infra matviews KPIs et les migrations non bloquantes — par conception (pas de load-test).
+**Depends on** : v2.0 (RLS `has_active_subscription()`/`is_superadmin()`, tables existantes). Indépendant du reskin (phases 15-16) ; doit précéder seed + dashboards.
+**Requirements** : SCALE-01, SCALE-02, SCALE-03, SCALE-04, SCALE-05
+**Success Criteria** (what must be TRUE) :
+  1. Les policies RLS clés sont réécrites en wrap `(select auth.uid())` / `(select has_active_subscription())` et les colonnes de policy sont indexées ; `get_advisors` ne signale plus de policy en clair réévaluée par ligne.
+  2. Des index composites alignés `ORDER BY` existent pour les listes longues (signaux, utilisateurs, paiements), prêts pour une pagination par curseur (keyset) — vérifiable par un `EXPLAIN` montrant un index scan (pas de seq scan + tri).
+  3. L'infra de matviews KPIs superadmin est posée avec **unique index** (`REFRESH CONCURRENTLY` possible) et un **wrapper `is_superadmin()`** (les matviews n'ayant pas de RLS), sans aucune exposition cross-tenant.
+  4. Les migrations à l'échelle sont non bloquantes (`CREATE INDEX CONCURRENTLY` hors transaction, gestion de l'état INVALID) et les flux temps réel à fort volume utilisent **Broadcast** plutôt que `postgres_changes`.
+**Plans** : 3 plans (2 vagues)
+- [x] 17-01-PLAN.md — 0017 authoring : wrap RLS `(select …)` toutes policies + matview MRR (wrapper `is_superadmin()` + refresh) + trigger Broadcast + policy `realtime.messages` + Partie B index CONCURRENTLY/script de gate documentés (SCALE-01/02/03/05) — checkpoint A1 (définition MRR)
+- [x] 17-02-PLAN.md — Client + Wave-0 : réécriture `SignalList` postgres_changes→canal privé Broadcast + test anon `mrr-gating` (SCALE-05/03)
+- [x] 17-03-PLAN.md — [BLOQUANT] Apply LIVE via MCP : apply_migration (Partie A) + execute_sql per-statement (Partie B CONCURRENTLY) + gen-types/reconcile + get_advisors/EXPLAIN/REFRESH/INVALID + tests RLS (SCALE-04 + validation 01/02/03/05)
+**Notes** : Arête dure : perf DB AVANT exposition à l'échelle (fix RLS/index = gain >100×, le plus rentable). Migration `0017`. Adresse Pitfalls #2 (perf RLS) et #4 (Realtime saturation / migration bloquante). SCALE-06 (audit chiffré) est en phase 21, une fois le seed en place. Research flag : seuils OFFSET→keyset et `postgres_changes`→Broadcast à confirmer par `EXPLAIN ANALYZE` post-seed.
+
+### Phase 18: Seed de données réalistes à l'échelle
+**Goal** : Peupler la DB de données ~10k FK-cohérentes, déterministes et idempotentes, labellisées `backtest`/`démo`, pour rendre dashboards et audit démontrables/mesurables — sans fabriquer aucun chiffre de performance.
+**Depends on** : Phase 17 (RLS/index/matviews en place — re-tester la RLS à l'échelle a du sens une fois optimisée). Arête dure : seed AVANT dashboards ET audit.
+**Requirements** : SEED-01, SEED-02, SEED-03
+**Success Criteria** (what must be TRUE) :
+  1. Un script `seed.ts` (faker `faker.seed()` déterministe, locales fr/en/ar) peuple la DB avec ~10k utilisateurs + signaux/paiements/affiliés/outcomes **FK-cohérents** ; un re-run est idempotent (N stable, pas d'accumulation).
+  2. Toutes les données seedées sont labellisées (`backtest`/`démo`) et respectent « % toujours mesuré, jamais inventé » (VITR-03) : aucun chiffre de performance fabriqué — un scan/test le prouve.
+  3. La RLS est re-testée **depuis un client anon** (pas service_role) sur les données seedées : non-abonné lit 0 ligne de signaux, isolation cross-user prouvée à l'échelle.
+**Plans** : 3 plans (3 vagues)
+- [x] 18-01-PLAN.md — Fondation + Wave 0 : migration 0018 (colonne `source` 8 tables) + apply LIVE via MCP + types regen + tests no-perf-seed-claims/seed-rls + config seed (SEED-02/SEED-03)
+- [x] 18-02-PLAN.md — Seed core : orchestrateur + purge idempotente (WHERE source='demo' ordre FK inverse) + users (createUser borné) + subscriptions/payments étalés (SEED-01)
+- [x] 18-03-PLAN.md — Signaux (outcomes bruts) + affiliation (commissions via RPC) + refresh mv_mrr + tests idempotence/RLS cross-user (SEED-01/02/03)
+**Notes** : Adresse Pitfall #5 (seed non FK-cohérent / sous-dimensionné → audit faussement vert). `@faker-js/faker` en devDep, via `tsx`. Prix MRR seedé = 9 $ standard / 3 $ découverte (PROJECT.md) à confirmer pour la cohérence du MRR superadmin. Pas d'API/paiement réel.
+
+### Phase 19: Dashboard utilisateur
+**Goal** : Livrer le groupe de routes `(dash)` membre complet — vue d'ensemble, signaux suivis/historique, watchlist, abonnement, affiliation intégrée, paramètres — sur le DS v3 et données seedées, en agrégeant les surfaces déjà livrées sans les réimplémenter.
+**Depends on** : Phase 16 (DS reskiné), Phase 17 (keyset/index), Phase 18 (données seedées à afficher).
+**Requirements** : UDASH-01, UDASH-02, UDASH-03, UDASH-04, UDASH-05, UDASH-06
+**Success Criteria** (what must be TRUE) :
+  1. Le membre accède à un dashboard `(dash)` (gate `requireUser`) avec une vue d'ensemble démontrable sur données seedées : état d'abonnement, derniers signaux, raccourcis.
+  2. Le membre consulte ses signaux suivis et son historique paginés par curseur (keyset), et ajoute/retire un signal de sa watchlist (`user_followed_setups`, écriture scopée à `auth.uid()`, anti-IDOR — non-propriétaire ne peut écrire 0 ligne d'autrui).
+  3. Le membre gère son abonnement (statut, expiration, alerte J-3/J-1 via `ExpiryBanner`) et voit son tableau d'affiliation intégré (abonnés ramenés, revenus **mesurés** sur seed, aucun chiffre inventé).
+  4. Le membre accède à ses paramètres de compte ; toutes les listes restent gated par la RLS, jamais par le gate UX seul.
+**Plans** : 7 plans (3 vagues)
+- [x] 19-01-PLAN.md — Fondation données : migration 0020 `user_followed_setups` + RLS anti-IDOR + index keyset CONCURRENTLY + push LIVE + types + test anon (UDASH-03, UDASH-02)
+- [x] 19-02-PLAN.md — Shell `(dash)` : layout `requireUser` + ExpiryBanner câblé (WIRING-01) + DashShell sidebar/bottom-nav sans glow + namespace i18n `dash` complet fr/en/ar (UDASH-04)
+- [x] 19-03-PLAN.md — Helper keyset `cursor.ts` + `lib/watchlist/queries` (source unique keyset + followed-ids) + `searchParams` cursor/tab (UDASH-02)
+- [x] 19-04-PLAN.md — Overview cockpit (ordre D-08, no-perf) + abonnement réhébergé + AffiliateSummaryCard conditionnelle no-PII + garde no-perf étendue (UDASH-01, UDASH-05)
+- [x] 19-05-PLAN.md — Paramètres (compte/langue/notifications UI/abonnement/déconnexion) + changement mdp `updateUser` + remplacement stub `/dashboard` (UDASH-06)
+- [x] 19-06-PLAN.md — Watchlist write : WatchlistToggle optimiste anti-IDOR + câblage SignalCard/SignalDetail + followed-ids dans pages membre (UDASH-03)
+- [x] 19-07-PLAN.md — Suivis + Historique keyset (4 états dont renewal) + KeysetList + route watchlist→Suivis (UDASH-02)
+**UI hint** : yes
+**Notes** : `/dashboard` actuel = stub (liste `instruments`) → remplacer. Onglets membre = agrégation de surfaces existantes (signaux, abonnement, affiliation) — ne pas réimplémenter. Watchlist = **seule écriture front membre** du milestone (1re policy insert/delete scopée `auth.uid()` → revue IDOR). Décision libs tranchée : **aucune nouvelle dépendance** (pas de react-table/react-virtual/nuqs — réutiliser react-query/zod/sonner/lucide + pattern URL-state maison), keyset via helper `cursor.ts`. Anti-feature : pas d'equity curve/P&L/ROI (chiffre non mesuré + promesse implicite, VITR-03).
+
+### Phase 20: Dashboard superadmin (cockpit 4 axes)
+**Goal** : Refondre les pages `/admin` en cockpit superadmin complet (Acquisition, Revenus, Ops, Conformité) avec tables virtualisées et KPIs mesurés sur données seedées, sous gating `is_superadmin()` strict et sans aucune fuite cross-tenant.
+**Depends on** : Phase 16 (DS reskiné), Phase 17 (matviews KPIs + wrapper `is_superadmin()`), Phase 18 (données seedées). Consomme directement les matviews de la phase 17.
+**Requirements** : ADASH-01, ADASH-02, ADASH-03, ADASH-04, ADASH-05, ADASH-06, ADASH-07
+**Success Criteria** (what must be TRUE) :
+  1. Le superadmin voit un cockpit d'acquisition (funnel inscriptions, performance affiliés) et de revenus (MRR, churn, mix de plans) — chiffres **mesurés** sur données seedées, jamais inventés (test no-perf-claims côté admin préservé).
+  2. Le superadmin voit la santé opérationnelle (jobs `job_runs`, fraîcheur `v_data_freshness`, file de paiements) et l'état de conformité (gate `LEGAL_REVIEW_DONE`).
+  3. Le superadmin gère les utilisateurs (table virtualisée filtrable/paginée par curseur, état d'abonnement) et les paiements/affiliés (files, payouts manuels).
+  4. Toutes les pages superadmin sont gated `is_superadmin()` (404 discret pour un non-superadmin), avec un client anon + RLS — jamais de service_role côté pages, aucune fuite cross-tenant via les matviews.
+**Plans** : 6 plans (4 vagues)
+- [x] 20-01-PLAN.md — Wave 0 gardes : helper filtres `lib/admin/searchParams.ts` (GREEN) + `admin-rls.test.ts` (RLS 2 rôles) + extension scans `rls-unchanged`/`no-perf-claims`/`no-perf-seed-claims` au groupe `(admin)` (ADASH-02/04/07)
+- [x] 20-02-PLAN.md — [BLOQUANT] Migration `0021_admin_cockpit.sql` : 5 policies SELECT superadmin + `admin_audit_log` + `profiles.suspended` (helper RLS étendu) + 4 RPC SECURITY DEFINER gated+audit + 3 wrappers KPI gated ; apply LIVE MCP + gen-types + advisors + EXPLAIN (ADASH-01/02/03/04/05/07)
+- [x] 20-03-PLAN.md — Couche données anon : `lib/admin/kpis.ts` (wrappers gated) + `lib/admin/queries.ts` (keyset + filtres + curseur anti-injection) + branche suspension `gate.ts` (ADASH-01/02/04/07)
+- [x] 20-04-PLAN.md — Écritures gated : Server Actions membres/file/affiliation/payouts → RPC 0021 (zéro service_role) + `MemberRowActions` offrir/suspendre/réactiver (ADASH-04/05/07)
+- [x] 20-05-PLAN.md — Cockpit home 4 sections (Revenus→Ops→Acquisition→Conformité) anon-client + 4 cartes AxisSummary (KPI mesuré + provenance) + sidebar 4 axes + panneau Conformité ; extinction scans no-perf (ADASH-01/02/03/06)
+- [x] 20-06-PLAN.md — Pages détail anon+RLS : table users keyset+filtres serveur + file keyset + santé/signaux(read-only)/affiliation swap ; extinction `rls-unchanged` (ADASH-01/03/04/05/07)
+**UI hint** : yes
+**Notes** : Les 6 pages `/admin` existent en germe → enrichir + reskin, pas recréer. Adresse Pitfall #3 (fuite cross-tenant admin : route sans `is_superadmin()` en 1ʳᵉ ligne, ou matview sans wrapper). Tables virtualisées (react-virtual) pour 10k lignes. Anti-feature : pas d'édition manuelle des % ni de création/édition de signaux côté admin (casserait `persist.ts`, frontière producteur-unique).
+
+### Phase 21: Tests E2E + audit de scalabilité
+**Goal** : Valider les flux principaux par des tests E2E et prouver la tenue à l'échelle de la DB par un audit chiffré sur données seedées ~10k — une fois tout l'assemblage en place (clôture du milestone).
+**Depends on** : Phases 19 et 20 (dashboards en place), Phase 18 (seed ~10k), Phase 17 (index/matviews à auditer).
+**Requirements** : E2E-01, E2E-02, SCALE-06
+**Success Criteria** (what must be TRUE) :
+  1. Des specs Playwright couvrent les flux principaux : auth, navigation membre, dashboard utilisateur, gestion d'abonnement, gating admin.
+  2. Les tests RLS/gating prouvent l'isolation : non-abonné → 0 ligne de signaux, non-superadmin → 404 discret, isolation cross-user.
+  3. Un audit DB (`EXPLAIN ANALYZE` + `get_advisors` + `pg_stat_statements`) sur les requêtes clés à ~10k valide les index/keyset/matviews : index scans (pas de seq scan + tri), advisors verts, pas de policy RLS réévaluée par ligne.
+**Plans** : 5 plans (3 vagues)
+- [x] 21-01-PLAN.md — Infra E2E multi-roles : fixtures deterministes + seed-fixtures idempotent + setup-project storageState + config par role + webServer CI (Wave 0)
+- [x] 21-02-PLAN.md — Specs E2E dashboard utilisateur Phase 19 (groupe (dash), role abonne) — E2E-01
+- [x] 21-03-PLAN.md — Specs E2E cockpit superadmin Phase 20 (11 items 20-UAT) + isolation 404/tarifs — E2E-01/E2E-02
+- [x] 21-04-PLAN.md — Pipeline CI GitHub Actions bloquant (lint+typecheck+vitest+e2e) + secrets — D-09
+- [x] 21-05-PLAN.md — Audit DB chiffre SCALE-06 (EXPLAIN ANALYZE + advisors delta + InitPlan + medianes) vers 21-AUDIT.md
+**UI hint** : yes
+**Notes** : Clôture v3.0. Pas de test de charge réel (k6/artillery hors scope) — la scalabilité = conception (phase 17) + audit chiffré (ici). Research flag : seuils chiffrés de bascule à mesurer une fois le seed en place (compute Supabase non profilé).
 
 ## Progress
 
@@ -129,28 +261,41 @@ Détail complet archivé : `.planning/milestones/v2.0-ROADMAP.md`.
 | 7. Affiliation à paliers | v2.0 | 6/6 | Complete | 2026-06-18 |
 | 8. Superadmin consolidé | v2.0 | 4/4 | Complete | 2026-06-19 |
 | 9. CMS cours & articles | v2.0 | 5/5 | Complete | 2026-06-20 |
-| 10. Fondation design system NEXA | v2.1 | 3/3 | Complete   | 2026-06-21 |
-| 11. Composants NEXA & reskin transversal | v2.1 | 8/8 | Complete    | 2026-06-21 |
-| 12. Routines d'analyse Claude (sans API) | v2.1 | 3/6 | In Progress|  |
-| 13. Backtest catalogue de patterns | v2.1 | 0/? | Not started | - |
-| 14. Track record affiché & boucle prod | v2.1 | 0/? | Not started | - |
+| 10. Fondation design system NEXA | v2.1 | 3/3 | Complete | 2026-06-21 |
+| 11. Composants NEXA & reskin transversal | v2.1 | 8/8 | Complete | 2026-06-21 |
+| 12. Routines d'analyse Claude (sans API) | v2.1 | 4/6 | ⏸️ Paused | - |
+| 13. Backtest catalogue de patterns | v2.1 | 0/? | ⏸️ Paused | - |
+| 14. Track record affiché & boucle prod | v2.1 | 0/? | ⏸️ Paused | - |
+| 15. Design system v3 « dark néon unique » | v3.0 | 3/3 | Complete    | 2026-06-22 |
+| 16. Reskin transversal de toutes les pages | v3.0 | 4/4 | Complete    | 2026-06-24 |
+| 17. Fondation DB scalable | v3.0 | 3/3 | Complete   | 2026-06-25 |
+| 18. Seed de données réalistes à l'échelle | v3.0 | 3/3 | Complete   | 2026-06-25 |
+| 19. Dashboard utilisateur | v3.0 | 7/7 | Complete    | 2026-06-26 |
+| 20. Dashboard superadmin (cockpit 4 axes) | v3.0 | 6/6 | Complete   | 2026-06-26 |
+| 21. Tests E2E + audit de scalabilité | v3.0 | 5/5 | Complete    | 2026-06-29 |
 
 **v2.0 : 9/9 phases complètes, 37/37 plans, 41/41 requirements couverts.**
-**v2.1 : 0/5 phases, 28/28 requirements mappés.**
+**v2.1 : 2/5 phases livrées (10-11), 12-14 en pause ; 28/28 requirements mappés.**
+**v3.0 : 0/7 phases (15-21), 35/35 requirements v1 mappés (THEME 5 · RESKIN 6 · SCALE 6 · SEED 3 · UDASH 6 · ADASH 7 · E2E 2 ; SCALE-06 audité en phase 21).**
 
-## Arêtes critiques (v2.1)
+## Arêtes critiques (v3.0)
 
-- **Axe design** : tokens/thèmes/polices (Phase 10) AVANT composants/reskin (Phase 11). No-flash + RTL = fondation, jamais retrofit.
-- **Axe routine** : config Environment + accès réseau `*.supabase.co` AVANT scheduling/run (Phase 12). ANALYZE reste agent-native ; `persist.ts` = seule frontière d'écriture IA.
-- **Axe backtest** : migration source (BACKTEST-01) + catalogue figé (BACKTEST-02) AVANT moteur (BACKTEST-03) et affichage (Phase 14). Inverser corrompt `pattern_stats`.
-- **Track record** (Phase 14) dépend de la routine (signaux réels, Phase 12) ET du backtest (seed `pattern_stats`, Phase 13).
-- **Parallélisme** : l'axe design (Phases 10-11) est parallélisable contre les axes routine+backtest (Phases 12-13) — surfaces disjointes (CSS/composants vs jobs/DB).
+Build order strict (arêtes dures), conforme à `research/SUMMARY.md` :
+
+1. **DS v3 figé (Phase 15) AVANT reskin (Phase 16)** — repeindre sur un DS non figé = double travail ; migrer la couche sémantique, pas un copier-coller de `.nxl`.
+2. **Fondation DB scalable (Phase 17) AVANT exposition à l'échelle** — le fix RLS `(select …)` + index est le gain le plus rentable (>100×) et doit exister avant que les dashboards tapent la DB.
+3. **Seed massif (Phase 18) AVANT dashboards (19-20) ET audit (21)** — sans données ~10k FK-cohérentes, ni démonstration ni mesure fiable ; seed après la fondation DB (re-tester la RLS optimisée à l'échelle).
+4. **Dashboards (19-20) AVANT E2E + audit (21)** — l'audit valide l'ensemble assemblé sur données seedées.
+5. **Parallélisme** : l'axe design (15-16) et l'axe DB (17-18) sont partiellement parallélisables (surfaces disjointes : CSS/composants vs RLS/migrations/seed) ; ils convergent aux dashboards (19-20).
+
+**Garde-fous transverses préservés** : RLS stricte (jamais service_role côté pages) · % TOUJOURS mesuré jamais inventé (VITR-03, no-perf-claims) · aucune promesse de gain · i18n fr/en/ar + RTL (propriétés logiques) · no-mera-brand · données SEEDÉES uniquement (aucun branchement API/paiement/signaux réel).
 
 ## Notes de clôture v2.0
 
 - Vérification automatisée 100 % verte (Vitest 566 ✓, typecheck 0 erreur) ; P01 + P09 live-vérifiés (E2E 32 ✓).
 - Items différés à la clôture (vérifs live P02-P08, UAT P02/P03) : voir `STATE.md → Deferred Items`.
-- Dette explicite hors jalon : **WIRING-01** (ExpiryBanner) traité en Phase 11 (UI-07) ; **LEGAL-02** (sign-off juriste) reste hors scope v2.1.
+- Dette explicite hors jalon : **WIRING-01** (ExpiryBanner) traité en Phase 11 (UI-07) ; **LEGAL-02** (sign-off juriste) reste hors scope v2.1/v3.0.
 
 ---
-*Roadmap v2.1 créée 2026-06-21 (5 phases, 10-14). Numérotation continue après v2.0. Détail v2.0 archivé `.planning/milestones/v2.0-ROADMAP.md`.*
+*Roadmap v3.0 créée 2026-06-22 (7 phases, 15-21). Numérotation continue après v2.1 (phase 14). Dérivée des requirements v1 v3.0 (THEME/RESKIN/SCALE/SEED/UDASH/ADASH/E2E) sur données seedées. v2.1 phases 12-14 mises en pause (dépendent des données réelles).*
+*Précédent : Roadmap v2.1 créée 2026-06-21 (5 phases, 10-14). Détail v2.0 archivé `.planning/milestones/v2.0-ROADMAP.md`.*

@@ -17,6 +17,7 @@ import { setRequestLocale, getTranslations } from 'next-intl/server'
 import { createClient } from '../../../../lib/supabase/server'
 import { parseSignalsParams } from '../../../../lib/signals/searchParams'
 import { fetchActiveSignals } from '../../../../lib/signals/queries'
+import { fetchFollowedSetupIds } from '../../../../lib/watchlist/queries'
 import { FilterBar } from '../../../../components/signals/FilterBar'
 import { SignalList } from '../../../../components/signals/SignalList'
 import { SignalsDisclaimerBanner } from '../../../../components/signals/SignalsDisclaimerBanner'
@@ -39,6 +40,10 @@ export default async function SignalsPage({ params, searchParams }: SignalsPageP
   const filters = parseSignalsParams(sp)
 
   const { data, error } = await fetchActiveSignals(supabase, filters)
+
+  // État initial des étoiles : UNE seule requête RLS-scopée (jamais N+1). Échec →
+  // Set vide (dégradation gracieuse : étoiles non remplies, le toggle reste fonctionnel).
+  const followedIds = Array.from(await fetchFollowedSetupIds(supabase))
 
   return (
     <main className="mx-auto max-w-screen-xl px-4 py-10 text-start md:px-6 lg:px-8">
@@ -70,7 +75,12 @@ export default async function SignalsPage({ params, searchParams }: SignalsPageP
         </section>
       ) : (
         <QueryProvider>
-          <SignalList initialData={data} filters={filters} locale={locale} />
+          <SignalList
+            initialData={data}
+            filters={filters}
+            locale={locale}
+            followedIds={followedIds}
+          />
         </QueryProvider>
       )}
 

@@ -5,7 +5,9 @@
   "type": "module",
   "scripts": {
     "dispatch": "tsx src/dispatch.ts",
-    "freeze-nile-fixture": "tsx scripts/freeze-nile-fixture.ts"
+    "freeze-nile-fixture": "tsx scripts/freeze-nile-fixture.ts",
+    "seed": "tsx scripts/seed.ts",
+    "seed:fixtures": "tsx scripts/seed-fixtures.ts"
   },
   "dependencies": {
     "@app/core": "workspace:*",

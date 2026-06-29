@@ -15,13 +15,17 @@
 import { useTranslations } from 'next-intl'
 import { Link } from '../../i18n/navigation'
 import { Card, CardContent, CardHeader } from '../ui/card'
+import { glowClass } from '../ui/glow'
 import { ScoreRing, type ScoreRisk } from '../nexa/ScoreRing'
+import { WatchlistToggle } from '../dash/WatchlistToggle'
 import { formatRelativeAge } from '../../lib/signals/format'
 import type { SignalRow } from '../../lib/signals/queries'
 
 interface SignalCardProps {
   signal: SignalRow
   locale: string
+  /** État initial de suivi (Set de setup_id fetché côté page, 19-06). Défaut false. */
+  followed?: boolean
 }
 
 /** Bande qualitative neutre du score (D-03). Bornes : ≥80 / 60-79 / <60. */
@@ -49,7 +53,7 @@ function mapRiskToScoreRisk(risk: string): ScoreRisk {
   }
 }
 
-export function SignalCard({ signal, locale }: SignalCardProps) {
+export function SignalCard({ signal, locale, followed = false }: SignalCardProps) {
   const t = useTranslations('signals')
   const tScore = useTranslations('scoreRing')
   const isLong = signal.direction === 'long'
@@ -68,12 +72,20 @@ export function SignalCard({ signal, locale }: SignalCardProps) {
   })
 
   return (
-    <Link
-      href={`/signaux/${signal.id}`}
-      className="group block rounded-xl outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-      aria-label={t('cardAction')}
-    >
-      <Card className="h-full transition-shadow group-hover:ring-foreground/20 group-focus-visible:ring-foreground/20">
+    // Conteneur relatif : le <Link> couvre la carte ; l'étoile est un SIBLING
+    // positionné par-dessus (jamais imbriquée dans le Link, sinon le clic est
+    // capturé par la navigation / hydratation imbriquée — Pattern d'insertion 19-06).
+    <div className="relative">
+      <Link
+        href={`/signaux/${signal.id}`}
+        className="group block rounded-xl outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+        aria-label={t('cardAction')}
+      >
+      {/* Accent Tier 2 readability-first : glow discret sur la CARTE uniquement
+          (box-shadow var(--glow), jamais un ring). Aucun voile ambiant sur surface dense. */}
+      <Card
+        className={`h-full transition-shadow ${glowClass('soft')} group-hover:ring-foreground/20 group-focus-visible:ring-foreground/20`}
+      >
         <CardHeader>
           <div className="flex items-center justify-between gap-2">
             <span className="font-mono text-sm font-semibold">{signal.instruments.symbol}</span>
@@ -126,7 +138,15 @@ export function SignalCard({ signal, locale }: SignalCardProps) {
           <span className="text-sm font-semibold text-primary">{t('cardAction')}</span>
         </CardContent>
       </Card>
-    </Link>
+      </Link>
+
+      {/* Étoile watchlist : îlot client autonome, FRÈRE du <Link> (hors de son JSX).
+          Positionnée au coin end/bottom (bas-droite, RTL-safe via end-),
+          hit-area ≥44px assurée par WatchlistToggle. */}
+      <span className="absolute bottom-2 end-2 z-10">
+        <WatchlistToggle setupId={signal.id} initialFollowed={followed} />
+      </span>
+    </div>
   )
 }
 

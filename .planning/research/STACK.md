@@ -1,148 +1,90 @@
-# Stack Research — v2.1 Additions (NEXA identity · routines live · backtest)
+# Stack Research
 
-**Domain:** Trading-signals SaaS (Next.js 15 + Supabase), milestone v2.1 add-ons on an already-shipped v2.0 app
-**Researched:** 2026-06-20
-**Confidence:** HIGH (DESIGN, ROUTINES, BACKTEST)
-**Scope rule:** Only NEW capabilities for the 3 axes. The v2.0 stack is locked and reused — do not re-add it. (Prior v2.0 stack research preserved at `.planning/milestones/` if archived.)
+**Domain:** Plateforme SaaS trading (Next.js 15 + Supabase) — milestone v3.0 « dark néon NEXA » : dashboards riches + scalabilité DB 10k+ users + E2E + seed à l'échelle, sur données seedées.
+**Researched:** 2026-06-22
+**Confidence:** HIGH (versions npm vérifiées 2026-06-22 ; patterns Supabase confirmés docs officielles)
 
----
-
-## TL;DR — the minimal set
-
-**Net-new runtime dependencies for the whole milestone: ZERO required, ONE optional.**
-
-| Axis | Verdict | New dep |
-|------|---------|---------|
-| DESIGN | CSS + `@theme` (Tailwind v4) + ~120 lines of vanilla TS (IntersectionObserver + rAF). Fonts via `next/font/local`. | **None required.** `motion` (12.x) only if scroll-reveal/tilt orchestration becomes painful across the whole app — defer until proven. |
-| ROUTINES | A Claude Code **scheduled Remote routine** that invokes the existing `tsx` job. No package, no API key. | **None.** Pure config + one new job file. |
-| BACKTEST | Pure TS replaying candles through existing `packages/indicators` + `replayOutcome` (already shipped v2.0 P5). Stats are trivial. | **None.** |
-
-The reference mock (`Nexa - Landing.html`) ships its behaviour in a plain `landing.css` + `landing.js` — **no framework, no animation lib in the markup.** Everything it does (marquee, score rings, scroll-reveal, mouse-tilt, count-up, parallax hero, CSS globe) is reproducible with CSS + a tiny vanilla helper. **Reconstruct, do not import a heavy lib.**
+> **Cadrage** — Ce milestone est un AJOUT à une app déjà construite. La stack existante (Next 15 App Router/RSC, Supabase Postgres 15+/Auth/Realtime/RLS, TS strict, pnpm workspaces, Tailwind v4 CSS-first, next-intl 4.13 fr/en/ar RTL, next-themes, lightweight-charts 5, recharts 3, @tanstack/react-query 5, Zod 4, Vitest 4, Playwright 1.60) **ne se re-recherche pas et ne change pas**. Ci-dessous : UNIQUEMENT le NEUF nécessaire aux 5 axes, et ce qu'il NE faut PAS ajouter.
 
 ---
 
 ## Recommended Stack
 
-### Core Technologies (NEW for v2.1)
+### Le NEUF — 5 additions seulement
 
-| Technology | Version | Purpose | Why Recommended |
-|------------|---------|---------|-----------------|
-| **`next/font/local`** | built into Next 15 — no install | Self-host the 5 brand fonts: Archivo, Chakra Petch, Space Grotesk, JetBrains Mono, Noto Sans Arabic | The mock loads them from Google Fonts CDN. Self-host instead: zero layout shift (auto fallback metrics), no third-party render-blocking `<link>` (privacy + MENA latency). Same mechanism already used for Inter/IBM Plex Sans Arabic in v2.0 P2 — extend it. Exposes CSS vars (`--font-archivo`, etc.) consumed by Tailwind `@theme`. |
-| **Tailwind v4 `@theme` + OKLCH custom props** | `tailwindcss 4.3.1` (ALREADY installed) | Brand tokens, two themes `volt`/`green`, RTL | No new dep. The mock already speaks OKLCH (`oklch(0.74 0.16 147)`) — Tailwind v4 is OKLCH-native. Themes via `[data-theme="volt"]`/`[data-theme="green"]` attribute selectors overriding `@theme` custom properties (mirrors the mock's `data-theme` on `<html>`). RTL stays as v2.0: logical properties only, no `tailwindcss-rtl`. |
-| **Vanilla TS animation helpers** | n/a (~120 LOC, client components in `apps/web`) | scroll-reveal, count-up, mouse-tilt, parallax depth | The mock's `.reveal`, `data-count`, `.tilt[data-tilt]`, `.layer[data-depth]` are driven by `landing.js`. Reconstruct with `IntersectionObserver` (reveal), `requestAnimationFrame` (count-up easing), `mousemove`+`transform` (tilt/parallax). Tree-shakeable, SSR-safe (guard in `useEffect`), `prefers-reduced-motion`-aware. Cheaper than any lib for this exact set. |
-| **Claude Code scheduled Remote routine** | platform feature (Max plan) — no npm | Trigger `snapshot → analyze(veteran) → persist` at day/swing windows | Confirmed by `docs/routines-claude.md` + PROJECT.md: intelligence is the agent; backend only reads/writes Supabase via `supabase-js`. No Anthropic API key, no new dependency. The routine is dashboard config that runs the existing `tsx` dispatcher. |
+| Library | Version | Axe | Purpose | Why Recommended |
+|---------|---------|-----|---------|-----------------|
+| **@tanstack/react-table** | `8.21.3` | Dashboards | Datagrid **headless** (tri, filtre, colonnes, pagination) sans CSS imposé | Standard de fait pour tableaux riches React. Headless = se style à 100 % avec le DS dark néon (Tailwind v4) ; zéro conflit visuel, zéro thème à overrider. Même éditeur que react-query (déjà là) → cohérence ergonomique. v8 stable, maintenu (modifié 2026-06-20). Indispensable pour `/admin` (membres, paiements, affiliés, signaux) et tableaux denses utilisateur. |
+| **@tanstack/react-virtual** | `3.14.3` | Dashboards + scalabilité front | Virtualisation de lignes (windowing) pour listes/tables longues | Sans virtualisation, afficher 10k lignes seedées tue le DOM. Rend des milliers de lignes à coût constant. S'intègre nativement avec react-table (recette officielle TanStack). À utiliser **seulement** sur les tables superadmin volumineuses, pas partout. Même famille TanStack. |
+| **@faker-js/faker** | `10.5.0` | Seed à l'échelle | Génération de données réalistes (users, paiements, signaux, outcomes, affiliés) | Standard JS pour fixtures réalistes. `faker.seed(n)` = **déterminisme reproductible** (rejouer le même dataset). Locales `fr`/`ar`/`en` alignées sur l'audience MENA pour des noms/textes crédibles. devDependency seulement. v10 ESM natif (cohérent avec `"type":"module"`). |
+| **nuqs** | `2.8.9` | Dashboards | État d'URL typé (filtres/tri/pagination ↔ searchParams) pour RSC | Les pages existantes utilisent déjà des **filtres via searchParams URL** (FilterBar v2.0 P3). nuqs typifie et centralise ce pattern (parsers Zod-like, defaults, shallow), compatible App Router + RSC + Server Components. Évite de réécrire à la main le parsing/sérialisation des filtres des nouveaux dashboards. **Optionnel** mais fortement recommandé vu le nombre de tableaux filtrables à livrer. |
+| **@tanstack/react-query-devtools** | `5.101.0` | Dev/dashboards | Inspecteur de cache react-query en dev | devDependency. Accélère le debug des dashboards temps réel (cache, invalidation, états loading). Version **strictement alignée** sur react-query 5.101.0 déjà installé. |
 
-### Supporting Libraries
+> Tout le reste des 5 axes se fait avec la stack DÉJÀ présente. Voir « What NOT to Use ».
 
-| Library | Version | Purpose | When to Use |
-|---------|---------|---------|-------------|
-| **`motion`** (successor to `framer-motion`) | `12.x` (latest 12.40.0, 2026) | Declarative scroll/enter animations IF vanilla orchestration proves unmaintainable across many app surfaces | **OPTIONAL — defer.** ESM, `motion/react` (React 19 compatible) + vanilla `animate()`. Hybrid engine (WAAPI + JS), GPU-accelerated. Only adopt if applying reveal/stagger to member + academy + admin becomes repetitive enough that hand-rolled IO is worse. For the landing page alone, NOT needed. Budget ~30–40 kB gzip with `LazyMotion`. |
-| **`tw-animate-css`** | `1.4.0` (ALREADY installed) | Keyframe utilities (fade/slide) used by shadcn v4 | Already a dep. Covers simple entrance/exit (dialogs, toasts). Use it before reaching for `motion`. Marquee + rings are NOT here — those are bespoke CSS. |
-| **`lightweight-charts`** | `5.2.0` (ALREADY installed) | Reused as-is if a "replay over history" preview UI is built for backtest | No change. Backtest engine is headless TS; reuse the existing v5 chart from member detail if a visual replay is wanted. |
+### Outillage scalabilité/audit DB — AUCUN paquet npm à ajouter
 
-### Development Tools (reused for v2.1)
+| Capacité | Outil | Comment (pas de dépendance) |
+|----------|-------|------------------------------|
+| `EXPLAIN (ANALYZE, BUFFERS)` sur requêtes clés | **MCP Supabase `execute_sql`** (déjà connecté) | Lancer EXPLAIN sur les requêtes des dashboards (listes signaux/membres/paiements) pour valider l'usage d'index avant/après. |
+| `pg_stat_statements` | **Extension Supabase** (pré-activée sur la plateforme) | Identifier les requêtes lentes/fréquentes. Lire via `execute_sql`. Aucun client à installer. |
+| Advisors (RLS perf, index manquants, sécurité) | **MCP Supabase `get_advisors`** (déjà utilisé en v2.0 P5) | `lint` + `performance`. Garde-fou systématique après chaque migration d'index/RLS. |
+| Indexation ciblée | **Migrations SQL Supabase CLI** (source de vérité existante) | `CREATE INDEX ... ON (...)` pour les colonnes de tri/filtre/curseur. Pas d'outil tiers. |
+| Pooling 10k+ connexions | **Supavisor transaction mode (port 6543)** — config, pas de paquet | Voir section dédiée ci-dessous. Impact app à comprendre, mais **rien à `npm install`**. |
+| Pagination par curseur | **`@supabase/supabase-js` `.gt()/.lt()/.order().limit()`** (déjà là) | Keyset pagination native du client. Pas de lib de pagination. Voir section dédiée. |
+| Seed massif performant | **`tsx` `4.22.4`** (déjà là) + faker + client Supabase service_role | `pnpm tsx apps/jobs/seed.ts` — réutilise le runner de jobs existant. Inserts par batch (upsert idempotent). |
+
+### Development Tools
 
 | Tool | Purpose | Notes |
 |------|---------|-------|
-| **Vitest** (ALREADY `4.1.8`) | Golden tests for the backtest engine + Wilson-interval helper + count-up easing math | Same harness as `packages/indicators`. Fixed candle fixtures → fixed `pattern_stats`. Mirror existing golden-value discipline. |
-| **Playwright** (ALREADY `1.60.0`) | Visual/RTL E2E for the rebrand across surfaces; theme-toggle no-flash; reduced-motion | Add specs: `data-theme` swap, AR-RTL intact, fonts loaded (no FOUT), reveal fires. Extends v2.0 E2E. |
+| **Playwright `1.60.0`** (déjà installé) | E2E des flux v3.0 | **Rien à ajouter.** Axe « tests fonctionnels E2E » = écrire des specs, pas changer d'outil. Réutilise la config + les specs authorées (32 ✓ en v2.0). Couvrir : auth, dashboard user, dashboard superadmin (gating 404 non-superadmin), filtres/pagination des tables, RTL ar. |
+| **Vitest `4.1.8`** (déjà installé) | Unit (parsers seed, formatters dashboard, helpers curseur) | Inchangé. Cible 80 %. |
+| **faker (mode seed déterministe)** | `faker.seed(42)` en tête de `seed.ts` | Garantit un dataset reproductible entre machines/CI. |
+| **@tanstack/react-query-devtools** | Debug cache dashboards | Monté uniquement en `process.env.NODE_ENV !== 'production'`. |
 
 ---
 
 ## Installation
 
 ```bash
-# DESIGN — NO new npm package required for the baseline reconstruction.
-# Fonts: place the 5 .woff2 subsets in apps/web/app/fonts/ and wire next/font/local.
-#   Archivo (600–900), Chakra Petch (600/700), Space Grotesk (300–700),
-#   JetBrains Mono (500–700), Noto Sans Arabic (400–700).
-# (No @fontsource needed for these — local files + next/font/local, like the Inter setup.)
+# Dashboards (apps/web) — runtime
+pnpm --filter web add @tanstack/react-table@8.21.3 @tanstack/react-virtual@3.14.3 nuqs@2.8.9
 
-# OPTIONAL, only if scroll/stagger orchestration across the whole app gets unwieldy:
-pnpm --filter web add motion        # 12.x — import from "motion/react"
+# Dashboards — dev
+pnpm --filter web add -D @tanstack/react-query-devtools@5.101.0
 
-# ROUTINES — NO package. Configure a Claude Code Remote routine in the dashboard +
-# add apps/jobs/src/jobs/analyze.ts that runs through the existing dispatch.ts/runJob.ts.
+# Seed à l'échelle (apps/jobs, devDependency)
+pnpm --filter jobs add -D @faker-js/faker@10.5.0
+# (ou racine workspace si le seed vit hors apps/jobs)
 
-# BACKTEST — NO package. New code under packages/core (engine) reusing packages/indicators
-# + the shipped replayOutcome. Optional Wilson-interval helper = ~15 lines, no dep.
+# RIEN d'autre. Pooling = config Supavisor. Audit DB = MCP Supabase + migrations SQL. E2E = Playwright déjà là.
 ```
 
 ---
 
-## DESIGN — animation decision matrix (the core question)
+## Pagination par curseur (Supabase / RSC) — pattern recommandé
 
-Verdict per mock feature. **CSS/zero-dep wins for every one.**
+**Décision : keyset (cursor) pagination, PAS de lib dédiée.** Le client `@supabase/supabase-js` la fait nativement.
 
-| Mock feature (selector) | How the mock does it | Recommended reconstruction | Lib? |
-|---|---|---|---|
-| Ticker **marquee** (`.marquee-track`, duplicated ticks) | CSS `@keyframes` translateX loop on a duplicated track | Pure CSS keyframes + `will-change: transform`; pause on `prefers-reduced-motion`. RTL: reverse direction under `[dir=rtl]`. | **No** |
-| **Score rings / gauges** (`.ring svg`, `.gauge-big`, `stroke-dasharray`) | SVG `stroke-dasharray`/offset + CSS transition; `data-score` sets final dash | SVG + CSS `transition: stroke-dashoffset`; set target via inline style or 1-line `useEffect`. Color is OKLCH per score band. | **No** |
-| **Count-up numbers** (`data-count`, `data-suffix`) | `landing.js` rAF easing 0 → value when in view | `requestAnimationFrame` easing helper (~25 LOC), triggered by IntersectionObserver. | **No** (vanilla) |
-| **Scroll-reveal** (`.reveal`, `.reveal.d1/d2`) | IntersectionObserver toggles a class; CSS transitions; `.d1/.d2` = stagger delays | `IntersectionObserver` adding `.is-visible`; CSS handles transition + delay classes. ~30 LOC, one observer reused app-wide. | **No** (vanilla) |
-| **Mouse-tilt cards** (`.tilt[data-tilt]`, `.mock`, `.signal-demo`, `.price-card`) | `mousemove` → `rotateX/rotateY`, `data-tilt`=max deg | `mousemove`/`mouseleave` handler computing rotation from pointer offset; `transform-style: preserve-3d`. Disable on touch + reduced-motion. ~30 LOC. | **No** (vanilla) |
-| **Parallax hero layers** (`.layer[data-depth]`, float-cards, `data-rain`) | `mousemove`/scroll translates layers by `data-depth` factor | Same pointer handler outputs per-layer `translate3d` scaled by depth. Data-rain = CSS animation on generated spans (or a tiny canvas if perf demands). | **No** (vanilla) |
-| **3D globe** (`.globe`, `.atmo`, `.hero-aura`, `.hero-grid`) | Pure CSS: radial/conic gradients + `border-radius:50%` + blur; grid is a CSS background | Pure CSS gradients + `border-radius` + `filter: blur`. **No three.js / WebGL.** It is a stylised disc, not a textured sphere. | **No** |
-| **Progress bar** (`#progress`) | scroll-linked width | CSS `animation-timeline: scroll()` (modern) or 3-line scroll listener fallback. | **No** |
-| **Theme toggle** `volt`/`green` (`#theme-toggle`, `data-theme`) | sets `data-theme` on root | Reuse v2.0 `next-themes` but with `attribute="data-theme"` + `themes={['volt','green']}`; no-flash already solved in v2.0 P2. | **No** (reuse) |
-
-**Why not a lib by default:** the entire set is CSS-transform + IntersectionObserver + rAF. A library buys declarative ergonomics, not capability. Bundle cost (motion ≈ 30–40 kB, GSAP ≈ 50 kB+) is unjustified for a MENA mobile audience when ~120 LOC of guarded vanilla does it. Keep helpers in `apps/web/lib/anim/` as small client modules, each `prefers-reduced-motion`-aware.
-
-**When `motion` becomes justified:** if the rebrand mandates consistent staggered reveals + shared-layout transitions across *member + academy + admin* and the hand-rolled observer turns into copy-paste sprawl. Then adopt `motion` (not GSAP — see What NOT to Use) with `LazyMotion`. This is a Phase-level decision — flag it, don't pre-commit.
-
-### Fonts — concrete wiring
-
-- 5 families self-hosted via `next/font/local`, each exposing a CSS variable. Subset to mock weights (Archivo 600–900, Chakra Petch 600/700, Space Grotesk 300–700, JetBrains Mono 500–700, Noto Sans Arabic 400–700).
-- **Noto Sans Arabic** = the AR (RTL) face. Decide in requirements whether it *replaces* v2.0's IBM Plex Sans Arabic or co-exists — prefer replace, to keep the weight budget lean. Don't ship both unless a fallback is required.
-- Map vars in Tailwind v4 `@theme`: `--font-display: var(--font-archivo)`, `--font-mono: var(--font-jetbrains)`, etc. Latin display (Archivo/Chakra/Space Grotesk) for LTR; Noto Sans Arabic auto-applied under `[lang=ar]`/`[dir=rtl]`.
-- `display: 'swap'` + `adjustFontFallback` to kill CLS.
-
-### OKLCH multi-theme + RTL with Tailwind v4
-
-- Tokens declared once in `@theme` as OKLCH (matches mock literals). `volt`/`green` are attribute-scoped overrides: `[data-theme=green] { --primary: oklch(...); --buy: ...; }`.
-- The mock keys colour off semantic vars (`--primary`, `--buy`, `--sell`, `--surface`, `--surface-solid`, `--line`, `--line-soft`, `--sub`, `--mute`, `--bg2`, `--accent`, `--text`) — replicate that exact token list so both themes are pure var swaps.
-- RTL unchanged from v2.0: logical properties + `dir` on `<html>` (next-intl ar→rtl). Marquee/tilt/parallax handlers must read `dir` to mirror direction.
+- **Pourquoi pas `.range()` (OFFSET) partout** : OFFSET scanne toutes les lignes sautées → O(n) sur les pages profondes ; **et avec RLS, `LIMIT/OFFSET` doit évaluer la policy sur toutes les lignes pour ordonner** (coût massif à 10k+). Inacceptable pour des tables superadmin qui grossissent.
+- **Pattern keyset** : trier sur une clé stable et **indexée** (ex. `(created_at, id)` pour départager les ex æquo), puis `.lt('created_at', lastSeen)` (ou tuple) + `.order(...)` + `.limit(n)`. O(1) quelle que soit la profondeur.
+- **Prérequis non négociable** : un **index B-tree composite** sur les colonnes d'`ORDER BY` du curseur (sinon keyset ne sert à rien). À créer par migration + valider via `EXPLAIN ANALYZE` (index scan, pas seq scan).
+- **RSC** : le curseur transite par `searchParams` (`?after=<created_at>_<id>`), parsé/typé par **nuqs**, lu côté serveur, passé au client Supabase anon (RLS appliquée). Curseur opaque côté UI.
+- **Quand `.range()` reste OK** : petites tables bornées (ex. liste de payouts d'un affilié) ou « page 1 » d'aperçu avec `count: 'estimated'`. Ne pas sur-ingénierer : keyset là où le volume seedé l'exige (signaux, paiements, users, outcomes).
 
 ---
 
-## ROUTINES — what's actually required (no API key, no new dep)
+## Pooling de connexions (Supavisor transaction mode) — impact app
 
-**Confirmed from `docs/routines-claude.md` + PROJECT.md:** the analysis intelligence is the Claude Code *agent itself* running a scheduled **Remote routine**. There is **NO npm package** and **NO Anthropic API key**. The routine simply executes the existing `tsx` dispatcher; Claude provides the veteran reasoning during the run.
+**Décision : Supavisor en transaction mode (port 6543) pour les jobs/serveurs Node ; config, pas de paquet.**
 
-| Requirement | Mechanism | New dep? |
-|---|---|---|
-| Run reasoning without API key | Claude Code scheduled **Remote routine** (cloud), Max plan, ~15 runs/day **shared** with interactive sessions | None |
-| Secrets in the cloud run | **Environments** (encrypted `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`); `dispatch.ts` already loads `dotenv/config` (no-op in cloud) | None |
-| DB access | `supabase-js` over HTTPS (the `.mcp.json` stdio MCP is NOT available in Remote runs — documented) | None (reuse) |
-| The job itself | NEW `apps/jobs/src/jobs/analyze.ts` = `snapshot → analyze → persist.ts`, idempotent, writes `job_runs` | None (new code) |
-| Idempotency / monitoring | Existing `runJob.ts` (startRun/finishRun) + `job_runs` + stale flag | None (reuse) |
-
-### Choosing day vs swing windows — "the engine picks the timing"
-
-Two layers, neither needs a package:
-
-1. **Schedule layer (when the routine fires):** define routine cron windows in the Claude dashboard aligned to `docs/routines-claude.md §6` UTC session times — e.g. `22:30` post-NY (swing / D & H4), `09:15` post-London open (day), `00:15` post-Binance close (crypto daily). This bounds the ~15 runs/day quota.
-2. **Selection layer (which instruments/styles are opportune *within* a run):** a deterministic TS selector in `packages/core` scores candidate (instrument, style, timeframe) tuples by session activity + data freshness (`v_data_freshness`) + last-analysis recency; the agent reasons over the shortlist. Pure TS — `luxon` (ALREADY installed) handles session/DST math. **No scheduler lib.** `croner` (installed) stays as the local backup-daemon option; Windows Task Scheduler as deterministic-ingestion backup.
-
-**Quota guardrail (design constraint, not a lib):** ingestion jobs keep running via Task Scheduler so they never burn the 15 agent runs. Only the `analyze` job consumes agent quota. This split is already documented — v2.1 just activates the analyze routine and lifts the v1.0 P4 debt ("configure routines + 1 real run").
-
----
-
-## BACKTEST — pure TS, reuse what exists
-
-**Verdict: no new package.** v2.0 P5 already shipped the outcome primitive (`replayOutcome`, first-touch, golden-tested: `hit_tp`/`hit_sl`/`flat` + R), plus `prediction_outcomes`, the `pattern_stats` view, and the public N≥30 gating. The backtest is the same machinery pointed at *historical* candles instead of live ones.
-
-| Need | Solution | New dep? |
-|---|---|---|
-| Replay a pattern catalogue over history | NEW headless engine in `packages/core` (e.g. `backtest/`) iterating stored `candles`, detecting patterns via existing `packages/indicators` (incl. home-made market-structure: BOS/CHoCH/swings), generating setups, resolving with **the existing `replayOutcome`** | None |
-| Compute win-rate per pattern | Count `hit_tp` vs resolved → proportion. Seed `pattern_stats` (same shape the live loop already feeds) | None |
-| Confidence / honesty (N visible, N≥30) | **Wilson score interval** for the proportion — ~15 LOC pure math, golden-testable. Honest band, not a bare point estimate. No stats package. | None |
-| Candle source | Already in Supabase `candles` (v2.0 P2 ingestion). Replay is read-only over history. | None |
-| Determinism / no look-ahead | Anti look-ahead constants (v1.0 P1, 16 golden values) already enforce no future leak — reuse in the replay loop. | None |
-
-**Statistical helpers:** resist `simple-statistics`/`jstat`. The only non-trivial stat is a binomial CI (Wilson) — write it, golden-test against known values (e.g. p̂=0.7, n=30 → known bounds). Everything else is counting. A stats lib would be dead weight for one formula and dilutes the "every number measured and traceable" guarantee.
-
-**Integration point:** backtest writes into the *same* `pattern_stats`/`prediction_outcomes` surfaces the live `outcome-tracker` uses, so the public "% mesuré dès J1" block (already built) shows backtest numbers first, then live outcomes take over as N grows — exactly the PROJECT.md decision. Run it as a one-shot `tsx` job (Task Scheduler / manual) — deterministic, no reasoning → **no agent quota consumed**.
+- **Pourquoi** : à 10k+ users, les connexions Postgres directes (port 5432) s'épuisent. Transaction mode emprunte une connexion **pour la durée d'une transaction** puis la rend → supporte un grand nombre de clients concurrents. C'est le port pour le serverless/edge et les pics de trafic.
+- **Impact app à connaître** :
+  - **Pas de prepared statements persistants** en transaction mode (la connexion est réassignée). **`@supabase/supabase-js` (PostgREST/HTTP) n'est PAS concerné** — il passe par l'API REST, pas par une connexion SQL directe. Donc le front/RSC qui lit via supabase-js : **aucun changement**.
+  - Le sujet ne concerne que **les connexions SQL directes** : jobs `tsx` qui ouvriraient un client `postgres`/`pg`, migrations, scripts de seed massif. Si un tel client est utilisé, viser le **driver `postgres` (porthos)** qui **ne crée pas de prepared statements par défaut** → compatible transaction mode sans flag. (Si jamais Prisma/Drizzle entraient en jeu : `pgbouncer=true`/`prepare:false` — mais on n'en ajoute pas, voir What NOT to Use.)
+  - **Ne pas faire tourner PgBouncer ET Supavisor** simultanément (risque de saturer `max_connections` sur petit tier).
+- **Seed à l'échelle** : insérer par **batch** (ex. 500–1000 lignes/insert) via supabase-js service_role ou un client `postgres` en transaction mode ; rester idempotent (upsert sur clés naturelles) pour rejouer le seed sans dupliquer.
 
 ---
 
@@ -150,12 +92,12 @@ Two layers, neither needs a package:
 
 | Recommended | Alternative | When to Use Alternative |
 |-------------|-------------|-------------------------|
-| Vanilla CSS + IO/rAF helpers | `motion` 12.x | If staggered reveals + shared-layout transitions are needed consistently across member+academy+admin and hand-rolled IO becomes maintenance sprawl. Adopt with `LazyMotion`. |
-| Vanilla CSS + IO/rAF helpers | `GSAP` 3.x | Essentially never here. GSAP shines for complex timelines/scrubbing; overkill + heavier than motion for reveal/tilt/marquee. Only for a future cinematic scrollytelling section. |
-| Pure CSS globe (gradients) | `three.js` / R3F (WebGL) | Only if the brand later demands a real textured/interactive 3D globe. The mock globe is a stylised CSS disc — WebGL = large bundle + mobile battery cost for zero current benefit. |
-| `next/font/local` (self-host) | `@fontsource/*` packages | If you prefer npm-managed font files. v2.0 uses `@fontsource/ibm-plex-sans-arabic` — acceptable, but `next/font/local` gives better CLS control + the CSS-var ergonomics Tailwind `@theme` wants. |
-| Hand-written Wilson interval | `simple-statistics` / `jstat` | If the backtest later needs many stats (Sharpe, drawdown distributions, t-tests). For one CI formula, don't. |
-| Claude scheduled routine (no key) | Anthropic API key + cloud cron | At paid public launch when 24/7 reliability for paying subscribers outweighs cost (already flagged in PROJECT.md as the post-launch migration). Out of scope for v2.1. |
+| **@tanstack/react-table** (headless) | AG Grid, MUI DataGrid, shadcn DataTable « tout fait » | Jamais ici. AG Grid/MUI imposent leur CSS/thème → conflit frontal avec le DS dark néon OKLCH et le RTL. shadcn DataTable EST déjà react-table sous le capot. Headless = seul choix cohérent avec Tailwind v4 CSS-first. |
+| **@tanstack/react-virtual** | `react-window`, `react-virtuoso` | react-virtuoso si on voulait un composant clé-en-main (mais opinionated, moins headless). react-window en maintenance douce. react-virtual s'imbrique mieux avec react-table. |
+| **@faker-js/faker** | `@snaplet/seed`, drizzle-seed, fixtures SQL manuelles | **@snaplet/seed = ABANDONNÉ** (dernière publication 2024-08, Snaplet fermé) → ne pas adopter. drizzle-seed exigerait Drizzle (interdit). Fixtures SQL manuelles = ingérables à 10k. faker + tsx couvre tout. |
+| **Keyset via supabase-js** | RPC SQL custom paginée, `pg_cursor` serveur | RPC seulement si une requête de dashboard devient trop complexe pour le query builder (jointures lourdes). Démarrer sans ; ajouter une RPC ciblée si `EXPLAIN` le justifie. |
+| **nuqs** | Parsing manuel `searchParams` (pattern v2.0 existant) | Le pattern manuel reste valable pour 1-2 filtres simples. nuqs paie dès qu'on multiplie tables filtrables + tri + curseur. Adoption optionnelle mais recommandée. |
+| **recharts 3** (déjà là) | visx, nivo, Tremor, ECharts | **Aucun ajout.** recharts 3.x couvre equity curve, barres de calibration, KPIs dashboards. Tremor imposerait son propre style (conflit DS). N'ajouter visx QUE si un graphe très custom (heatmap dense) s'avère impossible en recharts — à trancher au cas par cas, pas par défaut. |
 
 ---
 
@@ -163,36 +105,36 @@ Two layers, neither needs a package:
 
 | Avoid | Why | Use Instead |
 |-------|-----|-------------|
-| `framer-motion` (the old package name) | Renamed/superseded by `motion`; importing the old name invites version confusion | `motion` (`import { motion } from "motion/react"`) — and only if actually needed |
-| `GSAP` for this milestone | 50 kB+, plugin licensing nuance, timeline power unused by reveal/tilt/marquee | CSS + vanilla, or `motion` |
-| `three.js` / `@react-three/fiber` for the hero globe | Heavy WebGL bundle + mobile cost; the mock globe is pure CSS | CSS radial/conic gradients + blur |
-| `react-fast-marquee` / `embla` for the ticker | A duplicated CSS-keyframe track is smaller and is the mock's own approach | CSS `@keyframes` translateX |
-| Google Fonts CDN `<link>` (as in the raw mock) | Render-blocking, third-party request, CLS, privacy/latency for MENA | `next/font/local` self-host, `display:swap` |
-| Any stats package for the backtest | Only one non-trivial formula (Wilson) needed; dilutes "every number measured" provenance | ~15 LOC hand-written + golden test |
-| Anthropic API key / SDK in v2.1 | Out of scope; intelligence = scheduled agent on Max plan | Claude Code Remote routine running existing `tsx` job |
-| `node-cron` / new scheduler dep for routine windows | TZ/DST handling weaker; routine timing lives in the Claude dashboard + luxon selector | Claude routine schedule + `luxon` (installed) + `croner` (installed) backup |
-| `tailwindcss-rtl` plugin | Tailwind v4 logical properties already give RTL; v2.0 deliberately avoided it | Logical properties + `dir` (next-intl ar→rtl) |
-| Burning agent quota on ingestion/backtest | 15 runs/day shared; deterministic jobs don't need reasoning | Windows Task Scheduler / plain `tsx` runs |
+| **Drizzle / Prisma / tout ORM** | Dédouble la source de vérité du schéma (migrations SQL Supabase = source unique) ; complexifie RLS ; prepared statements incompatibles transaction mode. Déjà banni au CLAUDE.md. | Client Supabase typé (`supabase gen types`) + repositories `/packages/supabase` + migrations SQL CLI. |
+| **Nouvelle lib de charting** (Tremor, nivo, ECharts, visx par défaut) | recharts 3 + lightweight-charts 5 couvrent déjà prix + analytique. Ajout = bundle + incohérence visuelle avec le DS dark néon. | recharts 3.x (déjà installé) pour l'analytique, lightweight-charts 5 pour les prix. |
+| **AG Grid / MUI X DataGrid / table « stylée »** | CSS/thème imposés → cassent le DS dark néon OKLCH et le RTL ; lourd. | @tanstack/react-table (headless) stylé en Tailwind v4. |
+| **@snaplet/seed / snaplet** | **Projet abandonné** (2024), non maintenu, risque supply-chain. | @faker-js/faker 10 + script tsx idempotent. |
+| **Lib de pagination tierce** (react-paginate, etc.) | La pagination est une affaire de requête SQL (keyset) + état d'URL, pas un composant. | `.gt()/.lt()/.order().limit()` supabase-js + index composite + nuqs pour l'URL. |
+| **PgBouncer auto-hébergé en plus de Supavisor** | Deux poolers = risque de saturer `max_connections`. | Supavisor seul (fourni par Supabase), transaction mode port 6543. |
+| **Prepared statements forcés sur connexion SQL directe** en transaction mode | Cassent en transaction mode (connexion réassignée). | supabase-js (HTTP, non concerné) ; si SQL direct nécessaire, driver `postgres` (porthos, no-prepare par défaut). |
+| **Outil d'audit DB tiers** (pganalyze, etc.) payant | Inutile : `get_advisors`, `pg_stat_statements`, `EXPLAIN ANALYZE` via MCP Supabase suffisent pour un audit de conception. | MCP Supabase (`execute_sql`, `get_advisors`) + migrations SQL. |
+| **Outil de charge réel** (k6, Artillery) | **Hors scope explicite du milestone** (« PAS de test de charge réel », « scalabilité = conception + audit »). | EXPLAIN/advisors sur dataset seedé à l'échelle. |
+| **Cypress** (autre runner E2E) | Playwright déjà la base E2E (config + 32 specs ✓). Doublon. | Playwright 1.60 (déjà installé). |
 
 ---
 
 ## Stack Patterns by Variant
 
-**If the rebrand stays landing-page-centric (likely first):**
-- Zero new deps. Vanilla helpers in `apps/web/lib/anim/`, Tailwind `@theme` tokens, `next/font/local`.
-- Because the cost/benefit of an animation lib is negative for a single-surface reconstruction.
+**Si une table superadmin doit afficher > ~500 lignes simultanées :**
+- Combiner @tanstack/react-table + @tanstack/react-virtual (windowing) + keyset pagination serveur.
+- Parce que rendre 10k lignes seedées en DOM brut gèle le navigateur ; la virtualisation borne le coût de rendu et le keyset borne le coût DB.
 
-**If staggered motion must be uniform across member + academy + admin:**
-- Add `motion` 12.x with `LazyMotion` + `domAnimation`; keep marquee/rings/globe in CSS regardless.
-- Because declarative orchestration beats duplicated IO handlers at app scale — but only the reveal/stagger layer, not the bespoke SVG/CSS art.
+**Si un dashboard a ≤ 1-2 filtres simples et peu de lignes :**
+- Garder le pattern searchParams manuel existant + `.range()` (`count: 'estimated'`).
+- Parce que nuqs + keyset seraient de la sur-ingénierie ; ne pas alourdir.
 
-**If a "replay over history" preview UI is requested for backtest:**
-- Reuse `lightweight-charts` v5 (installed) to scrub historical candles + plotted setups; engine stays headless.
-- Because no new charting dep is justified.
+**Si une requête de dashboard devient trop complexe pour le query builder (jointures/agrégats lourds) :**
+- Encapsuler dans une **RPC SQL** (`SECURITY INVOKER`, RLS respectée) testée + indexée, appelée via `supabase.rpc()`.
+- Parce qu'une RPC indexée bat un empilement de filtres côté client et garde la logique paginable.
 
-**If 24/7 reliability becomes mandatory at paid launch:**
-- Migrate the analyze routine to an Anthropic API key + cloud cron (Vercel Cron / GitHub Actions), keeping `dispatch.ts`/`persist.ts` unchanged.
-- Because Max-plan shared quota (15/day) is a launch-time risk already logged in PROJECT.md.
+**Si le seed doit produire des séries temporelles cohérentes (candles/outcomes) :**
+- `faker.seed(n)` + génération dérivée déterministe (marche aléatoire bornée, pas de random pur sur les prix) + upsert idempotent sur `(instrument_id, timeframe, ts)`.
+- Parce que les % de réussite/outcomes seedés doivent rester reproductibles et plausibles.
 
 ---
 
@@ -200,24 +142,26 @@ Two layers, neither needs a package:
 
 | Package A | Compatible With | Notes |
 |-----------|-----------------|-------|
-| `motion` 12.x (IF adopted) | React 19 / Next 15 | ESM, `motion/react` entry. Use `LazyMotion` to cap bundle. No conflict with existing deps. Verify peer `react@^19` at install. |
-| `next/font/local` | Next 15 / React 19 | Built-in; no version pin. Generates fallback metrics for CLS. |
-| Tailwind v4 `@theme` OKLCH | `tailwindcss 4.3.1` (installed) | OKLCH-native; `data-theme` attribute overrides for volt/green. shadcn v4 tokens must use the same OKLCH var set. |
-| `next-themes 0.4.6` (installed) | `attribute="data-theme"`, `themes={['volt','green']}` | Reuse v2.0 no-flash pattern; switch class→data-attribute to match the mock. |
-| Backtest engine (new TS) | `packages/indicators` + `replayOutcome` (v2.0 P5) | Same ESM/tsx runtime; golden-test with Vitest 4.1.8. |
-| Claude Remote routine | `supabase-js 2.108.0` only (no MCP in cloud) | Documented constraint; `dispatch.ts` already `dotenv/config`-loads. |
+| @tanstack/react-table 8.21.3 | React 19 / Next 15 | v8 React-19-ready. Headless → aucun conflit Tailwind v4 / RTL. |
+| @tanstack/react-virtual 3.14.3 | @tanstack/react-table 8.x | Recette d'intégration officielle TanStack (row virtualization). |
+| @tanstack/react-query-devtools 5.101.0 | @tanstack/react-query 5.101.0 | **Versions doivent matcher** (déjà 5.101.0 installé). |
+| nuqs 2.8.9 | Next 15 App Router / RSC | Adapter `nuqs/adapters/next/app`. Compatible Server Components + RTL (n'affecte pas le DOM dir). |
+| @faker-js/faker 10.5.0 | Node ESM (`"type":"module"`) | v10 ESM natif. devDependency uniquement. Locales fr/ar/en disponibles. |
+| supabase-js 2.108.x | Supavisor transaction mode | **Non concerné par prepared statements** (HTTP/PostgREST). Aucun changement front/RSC. |
+| Driver `postgres` (porthos) 3.4.x | Supavisor transaction mode (6543) | **Seulement si** un job SQL direct est nécessaire ; no-prepare par défaut → OK transaction mode. Ne PAS ajouter sans besoin réel. |
+| recharts 3.x | React 19 | Déjà installé. Aucun upgrade requis pour les graphes dashboards. |
 
 ---
 
 ## Sources
 
-- `Nexa - Landing.html` (repo root) — full markup of every animation/feature; confirms vanilla `landing.css`+`landing.js`, no framework/anim-lib in the mock; OKLCH literals; `data-theme` volt/green; the 5 font families — **HIGH** (primary source)
-- `docs/routines-claude.md` — Remote routine model, no API key, Environments secrets, supabase-js-only, 15 runs/day shared quota, UTC session windows — **HIGH** (project doc)
-- `.planning/PROJECT.md` — v2.1 scope, locked stack, backtest→pattern_stats decision, fonts list, themes, rebrand MERA→NEXA — **HIGH** (project source)
-- `apps/web/package.json` + root `package.json` — current installed deps (Tailwind 4.3.1, next-themes 0.4.6, tw-animate-css 1.4.0, lightweight-charts 5.2.0, luxon, croner, Vitest 4.1.8, Playwright 1.60.0) — **HIGH** (repo)
-- WebSearch `motion` npm (2026) — latest 12.40.0, successor to framer-motion, `motion/react` + vanilla `animate`, React/Next compatible — **MEDIUM** (single search; verify peer at install) — https://www.npmjs.com/package/motion · https://motion.dev/docs/react-installation
-- Wilson score interval — standard binomial CI for the N-visible honesty band — **HIGH** (established method)
+- npm registry (vérifié 2026-06-22) — @tanstack/react-table 8.21.3 (modifié 2026-06-20), @tanstack/react-virtual 3.14.3, @faker-js/faker 10.5.0 (2026-06-17), nuqs 2.8.9, @tanstack/react-query-devtools 5.101.0, recharts 3.8.1, @supabase/supabase-js 2.108.2, @snaplet/seed 0.98.0 **stale 2024-08 → abandonné**, drizzle-orm 0.45.2 (non retenu), postgres 3.4.9 — **HIGH**
+- Supabase Docs — Connecting to Postgres / Supavisor FAQ / transaction mode port 6543, prepared statements, ne pas cumuler PgBouncer+Supavisor — https://supabase.com/docs/guides/database/connecting-to-postgres — **HIGH**
+- Supabase Docs — RLS Performance and Best Practices (impact LIMIT/OFFSET sous RLS) — https://supabase.com/docs/guides/troubleshooting/rls-performance-and-best-practices-Z5Jjwv — **HIGH**
+- Supabase agent-skills — data-pagination (keyset > OFFSET, index requis sur ORDER BY) — https://github.com/supabase/agent-skills/blob/main/skills/supabase-postgres-best-practices/references/data-pagination.md — **HIGH**
+- CLAUDE.md (stack verrouillée + What NOT to Use : pas d'ORM, pas de node-cron, supabase-js typé) + PROJECT.md (milestone v3.0, scope « conception + audit, pas de charge réelle », EXISTING_CONTEXT) — **HIGH** (source projet)
+- apps/web/package.json + package.json racine (deps installées : react-query 5.101.0, Playwright 1.60, Vitest 4.1.8, tsx 4.22.4) — **HIGH** (lecture directe)
 
 ---
-*Stack research for: v2.1 — NEXA identity (design system reconstruction) · routines d'analyse Claude sans clé API · backtest + track record en prod*
-*Researched: 2026-06-20*
+*Stack research for: NEXA v3.0 — dashboards dark néon + scalabilité DB 10k+ + E2E + seed à l'échelle (données seedées)*
+*Researched: 2026-06-22*

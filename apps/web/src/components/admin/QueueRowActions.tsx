@@ -42,7 +42,7 @@ import {
   rejectPayment,
   adjustPayment,
   type QueueActionResult,
-} from '@/app/(admin)/file/actions'
+} from '@/app/admin/file/actions'
 
 interface QueueRowActionsProps {
   paymentId: string

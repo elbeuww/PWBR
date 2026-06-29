@@ -11,6 +11,9 @@
  *           déterministe (jamais le score agent).
  */
 import { describe, it, expect, vi, beforeEach } from 'vitest'
+import * as fs from 'node:fs'
+import * as os from 'node:os'
+import * as path from 'node:path'
 import type { Output } from '@app/core'
 import {
   validLongOutput,
@@ -358,9 +361,6 @@ describe('computePromptVersion (D-51)', () => {
 
   it('lève si le front-matter version: est absent', () => {
     // un fichier sans front-matter version → throw (pas de version silencieuse)
-    const fs = require('node:fs') as typeof import('node:fs')
-    const os = require('node:os') as typeof import('node:os')
-    const path = require('node:path') as typeof import('node:path')
     const tmp = path.join(os.tmpdir(), `noversion-${Date.now()}.md`)
     fs.writeFileSync(tmp, '# pas de front-matter\ncontenu')
     expect(() => computePromptVersion(tmp)).toThrow(/version:/)

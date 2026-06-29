@@ -14,6 +14,47 @@ export type Database = {
   }
   public: {
     Tables: {
+      admin_audit_log: {
+        // Phase 20 (0021) — journal d'audit des écritures admin (cockpit superadmin).
+        // Écrit UNIQUEMENT via RPC SECURITY DEFINER (aucune policy insert/update/delete) ;
+        // SELECT gated is_superadmin(). actor_id -> profiles(id).
+        Row: {
+          action: string
+          actor_id: string
+          created_at: string
+          id: string
+          payload: Json
+          target_id: string
+          target_type: string
+        }
+        Insert: {
+          action: string
+          actor_id: string
+          created_at?: string
+          id?: string
+          payload?: Json
+          target_id: string
+          target_type: string
+        }
+        Update: {
+          action?: string
+          actor_id?: string
+          created_at?: string
+          id?: string
+          payload?: Json
+          target_id?: string
+          target_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "admin_audit_log_actor_id_fkey"
+            columns: ["actor_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       analyses: {
         Row: {
           created_at: string
@@ -25,6 +66,7 @@ export type Database = {
           schema_version: string
           session: string
           snapshot: Json
+          source: string
           style: string
         }
         Insert: {
@@ -37,6 +79,7 @@ export type Database = {
           schema_version: string
           session: string
           snapshot: Json
+          source?: string
           style: string
         }
         Update: {
@@ -49,6 +92,7 @@ export type Database = {
           schema_version?: string
           session?: string
           snapshot?: Json
+          source?: string
           style?: string
         }
         Relationships: [
@@ -322,6 +366,7 @@ export type Database = {
           reject_reason: string | null
           reservation_expires_at: string | null
           screenshot_url: string | null
+          source: string
           status: string
           tx_hash: string
           user_id: string
@@ -337,6 +382,7 @@ export type Database = {
           reject_reason?: string | null
           reservation_expires_at?: string | null
           screenshot_url?: string | null
+          source?: string
           status?: string
           tx_hash: string
           user_id: string
@@ -352,6 +398,7 @@ export type Database = {
           reject_reason?: string | null
           reservation_expires_at?: string | null
           screenshot_url?: string | null
+          source?: string
           status?: string
           tx_hash?: string
           user_id?: string
@@ -374,6 +421,7 @@ export type Database = {
           realized_r: number
           resolved_at: string
           setup_id: string
+          source: string
         }
         Insert: {
           candle_count?: number | null
@@ -381,6 +429,7 @@ export type Database = {
           realized_r: number
           resolved_at?: string
           setup_id: string
+          source?: string
         }
         Update: {
           candle_count?: number | null
@@ -388,6 +437,7 @@ export type Database = {
           realized_r?: number
           resolved_at?: string
           setup_id?: string
+          source?: string
         }
         Relationships: [
           {
@@ -400,23 +450,37 @@ export type Database = {
         ]
       }
       profiles: {
+        // Phase 20 (0021) — suspended/suspended_at/suspended_reason : suspension =
+        // barrière RLS réelle via has_active_subscription() étendu (D-17, source unique).
         Row: {
           created_at: string
           email: string
           id: string
           role: string
+          source: string
+          suspended: boolean
+          suspended_at: string | null
+          suspended_reason: string | null
         }
         Insert: {
           created_at?: string
           email: string
           id: string
           role?: string
+          source?: string
+          suspended?: boolean
+          suspended_at?: string | null
+          suspended_reason?: string | null
         }
         Update: {
           created_at?: string
           email?: string
           id?: string
           role?: string
+          source?: string
+          suspended?: boolean
+          suspended_at?: string | null
+          suspended_reason?: string | null
         }
         Relationships: []
       }
@@ -473,6 +537,7 @@ export type Database = {
           current_period_end: string | null
           id: string
           plan: string
+          source: string
           status: string
           user_id: string
         }
@@ -481,6 +546,7 @@ export type Database = {
           current_period_end?: string | null
           id?: string
           plan?: string
+          source?: string
           status?: string
           user_id: string
         }
@@ -489,6 +555,7 @@ export type Database = {
           current_period_end?: string | null
           id?: string
           plan?: string
+          source?: string
           status?: string
           user_id?: string
         }
@@ -552,6 +619,7 @@ export type Database = {
           risk_reward: number
           session: string
           session_day: string
+          source: string
           status: string
           stop_loss: number
           style: string
@@ -572,6 +640,7 @@ export type Database = {
           risk_reward: number
           session: string
           session_day: string
+          source?: string
           status?: string
           stop_loss: number
           style: string
@@ -592,6 +661,7 @@ export type Database = {
           risk_reward?: number
           session?: string
           session_day?: string
+          source?: string
           status?: string
           stop_loss?: number
           style?: string
@@ -619,16 +689,19 @@ export type Database = {
         Row: {
           created_at: string
           id: string
+          source: string
           user_id: string
         }
         Insert: {
           created_at?: string
           id?: string
+          source?: string
           user_id: string
         }
         Update: {
           created_at?: string
           id?: string
+          source?: string
           user_id?: string
         }
         Relationships: [
@@ -753,6 +826,7 @@ export type Database = {
           period: string
           rate_bps: number
           referral_id: string | null
+          source: string
           status: string
         }
         Insert: {
@@ -765,6 +839,7 @@ export type Database = {
           period: string
           rate_bps: number
           referral_id?: string | null
+          source?: string
           status?: string
         }
         Update: {
@@ -777,6 +852,7 @@ export type Database = {
           period?: string
           rate_bps?: number
           referral_id?: string | null
+          source?: string
           status?: string
         }
         Relationships: [
@@ -831,6 +907,35 @@ export type Database = {
           },
         ]
       }
+      user_followed_setups: {
+        Row: {
+          created_at: string
+          id: string
+          setup_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          setup_id: string
+          user_id?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          setup_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_followed_setups_setup_id_fkey"
+            columns: ["setup_id"]
+            isOneToOne: false
+            referencedRelation: "trade_setups"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       affiliate_dashboard: {
@@ -876,6 +981,17 @@ export type Database = {
           },
         ]
       }
+      mv_mrr: {
+        // Phase 17 (0017) — matview de référence MRR « cash encaissé par mois »
+        // (checkpoint A1, option B). revenue_atomic = bigint Postgres -> string
+        // (PostgREST, comme les autres *_atomic). NE PAS regénérer sans ré-appliquer.
+        Row: {
+          month: string | null
+          payments_count: number | null
+          revenue_atomic: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       affiliate_rate_bps: {
@@ -905,6 +1021,61 @@ export type Database = {
       }
       has_active_subscription: { Args: never; Returns: boolean }
       is_superadmin: { Args: never; Returns: boolean }
+      get_mrr: {
+        // Phase 17 (0017) — lecture gated de mv_mrr (SECURITY DEFINER, is_superadmin()).
+        // setof public.mv_mrr -> tableau du Row mv_mrr (revenue_atomic string).
+        Args: never
+        Returns: {
+          month: string | null
+          payments_count: number | null
+          revenue_atomic: string | null
+        }[]
+      }
+      // Phase 20 (0021) — cockpit superadmin : 4 RPC d'écriture gated+audit + 3 wrappers KPI gated.
+      admin_mark_commission_paid: {
+        // p_amount_atomic typé number (calque mark_commission_paid 0016 ; cast bigint côté SQL).
+        Args: {
+          p_amount_atomic: number
+          p_commission_id: string
+          p_tx_hash: string
+        }
+        Returns: undefined
+      }
+      grant_subscription_time: {
+        Args: { p_interval: string; p_user_id: string }
+        Returns: undefined
+      }
+      suspend_account: {
+        Args: { p_reason: string; p_user_id: string }
+        Returns: undefined
+      }
+      unsuspend_account: {
+        Args: { p_user_id: string }
+        Returns: undefined
+      }
+      get_acquisition_funnel: {
+        // wrapper gated (where is_superadmin()) — 0 ligne pour non-superadmin, jamais throw.
+        Args: { p_from?: string; p_to?: string }
+        Returns: {
+          n: number
+          source: string
+          stage: string
+        }[]
+      }
+      get_churn: {
+        Args: { p_month?: string }
+        Returns: {
+          active_start: number
+          churn_count: number
+        }[]
+      }
+      get_plan_mix: {
+        Args: never
+        Returns: {
+          n: number
+          plan: string
+        }[]
+      }
     }
     Enums: {
       [_ in never]: never
@@ -1127,3 +1298,29 @@ export type CommissionUpdate = Database['public']['Tables']['commissions']['Upda
 export type PayoutRow = Database['public']['Tables']['payouts']['Row']
 export type PayoutInsert = Database['public']['Tables']['payouts']['Insert']
 export type AffiliateDashboardRow = Database['public']['Views']['affiliate_dashboard']['Row']
+
+// Phase 17 — fondation DB scalable (0017) — matview de référence MRR « cash encaissé »
+// gated via get_mrr() (D-02/SCALE-03). revenue_atomic string (bigint -> PostgREST).
+export type MvMrrRow = Database['public']['Views']['mv_mrr']['Row']
+
+// Phase 19 — watchlist membre (UDASH-03, migration 0020) — alias maison.
+// `user_id` jamais reçu du client (default auth.uid()) ; RLS with-check = barrière anti-IDOR.
+export type UserFollowedSetupRow = Database['public']['Tables']['user_followed_setups']['Row']
+export type UserFollowedSetupInsert = Database['public']['Tables']['user_followed_setups']['Insert']
+export type UserFollowedSetupUpdate = Database['public']['Tables']['user_followed_setups']['Update']
+
+// Phase 20 — cockpit superadmin (ADASH-01..07, migration 0021) — alias maison.
+// admin_audit_log écrit uniquement via RPC SECURITY DEFINER (audit atomique) ; SELECT gated.
+export type AdminAuditAction =
+  | 'grant_subscription_time'
+  | 'suspend_account'
+  | 'unsuspend_account'
+  | 'mark_commission_paid'
+export type AdminAuditTargetType = 'user' | 'commission'
+export type AdminAuditLogRow = Database['public']['Tables']['admin_audit_log']['Row']
+export type AdminAuditLogInsert = Database['public']['Tables']['admin_audit_log']['Insert']
+// KPI cockpit — lignes renvoyées par les wrappers gated (0 ligne pour non-superadmin).
+export type AcquisitionFunnelRow =
+  Database['public']['Functions']['get_acquisition_funnel']['Returns'][number]
+export type ChurnRow = Database['public']['Functions']['get_churn']['Returns'][number]
+export type PlanMixRow = Database['public']['Functions']['get_plan_mix']['Returns'][number]
