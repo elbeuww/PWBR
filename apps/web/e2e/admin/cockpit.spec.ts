@@ -95,7 +95,9 @@ test.describe('E2E-01 cockpit superadmin', () => {
     // numéros de page. Or() tolère le cas mono-page sans casser (rendu, pas volume — D-05).
     const loadMore = page.getByRole('link', { name: 'Charger la page suivante' })
     const table = page.getByRole('table')
-    await expect(loadMore.or(table)).toBeVisible()
+    // Avec du seed multi-page, loadMore ET table existent → `.or()` matche 2 éléments
+    // (strict mode). `.first()` tolère mono-page (table seule) comme multi-page (les deux).
+    await expect(loadMore.or(table).first()).toBeVisible()
   })
 
   // UAT item 6 — /admin/file : file de validation paginée keyset, email membre par ligne.

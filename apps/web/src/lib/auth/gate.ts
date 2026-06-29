@@ -114,6 +114,34 @@ export async function requireActiveSub(): Promise<User> {
 }
 
 export async function requireRole(role: 'superadmin' | 'affiliate'): Promise<User> {
+  // superadmin = back-office CACHÉ (D-09 / threat T-04-ADMIN-ELEV). TOUT accès non
+  // superadmin — y compris un visiteur ANONYME — reçoit notFound() (404 discrétion),
+  // JAMAIS une redirection /login (qui révélerait l'existence du back-office) ni un 403.
+  // On ne passe donc PAS par authedClient() (qui, lui, redirige l'anon vers /login).
+  // Contrat prouvé par e2e/isolation/anon-admin.spec.ts + e2e/gating.spec.ts.
+  if (role === 'superadmin') {
+    const supabase = await createClient()
+    const {
+      data: { user },
+    } = await supabase.auth.getUser() // token revalidé serveur (Pitfall 4)
+    if (!user) notFound() // anon → 404, jamais redirect login (discrétion)
+
+    const { data } = await supabase
+      .from('profiles')
+      .select('role, suspended')
+      .eq('id', user.id)
+      .single()
+
+    // Profil introuvable, rôle insuffisant OU compte suspendu = 404 discret (WR-01).
+    if (!data || data.role !== 'superadmin' || data.suspended === true) {
+      notFound()
+    }
+
+    return user
+  }
+
+  // affiliate : accès réservé mais NON dissimulé → comportement existant (authedClient
+  // redirige l'anon vers /login), et un rôle insuffisant donne une redirection NEUTRE.
   const { user, supabase } = await authedClient()
 
   const { data } = await supabase
@@ -122,11 +150,7 @@ export async function requireRole(role: 'superadmin' | 'affiliate'): Promise<Use
     .eq('id', user.id)
     .single()
 
-  // Profil introuvable OU rôle insuffisant = accès refusé (WR-01 : pas de 200 silencieux).
   if (!data || data.role !== role) {
-    if (role === 'superadmin') {
-      notFound() // 404 discrétion (D-09), jamais 403
-    }
     const locale = await getLocale()
     redirect({ href: '/', locale }) // affiliate : redirection neutre
   }
