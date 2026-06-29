@@ -35,10 +35,14 @@ jobs:
       - run: pnpm typecheck
 
       # Vitest : contrats RLS / gardes deterministes contre le cloud Supabase partage.
+      # Les tests d'integration jobs (runJob, idempotency, snapshots-rls) lisent
+      # SUPABASE_URL (sans prefixe NEXT_PUBLIC) -> mappe la meme valeur que le step
+      # seed:fixtures, sinon "SUPABASE_URL ... manquantes dans apps/jobs/.env".
       - run: pnpm test
         env:
           NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
           NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+          SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
 
       # Navigateur Chromium + dependances systeme (RESEARCH Pitfall 6).
