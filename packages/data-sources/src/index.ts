@@ -14,6 +14,15 @@ export { fetchOandaCandles } from './oanda/client.js'
 export { parseOandaCandles } from './oanda/schema.js'
 export { OANDA_SYMBOLS } from './oanda/instruments.js'
 
+// Twelve Data (remplace OANDA pour forex + or — token OANDA mort, 401)
+export { fetchTwelveDataTimeSeries } from './twelvedata/client.js'
+export { parseTwelveDataTimeSeries } from './twelvedata/schema.js'
+export {
+  toTwelveDataSymbol,
+  toTwelveDataInterval,
+  TWELVEDATA_SYMBOLS,
+} from './twelvedata/instruments.js'
+
 // Finnhub news (D-28 : marketNews par catégorie uniquement)
 export { fetchFinnhubNews, type FinnhubCategory } from './finnhub/client.js'
 export { parseFinnhubNews } from './finnhub/schema.js'
