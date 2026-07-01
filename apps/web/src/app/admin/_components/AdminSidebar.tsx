@@ -16,13 +16,16 @@
  * hrefs littéraux /admin/…, JAMAIS le Link i18n de next-intl. L'accent --primary est
  * réservé à l'item actif.
  */
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useTranslations } from 'next-intl'
+import { Dialog as DialogPrimitive } from 'radix-ui'
 import {
   Activity,
   Inbox,
   LayoutDashboard,
+  Menu,
   Radio,
   Share2,
   Users,
@@ -84,6 +87,11 @@ function isActive(pathname: string, item: NavItem): boolean {
 export function AdminSidebar() {
   const t = useTranslations('admin')
   const pathname = usePathname()
+  // Drawer mobile : ouvert via le bouton ☰, fermé au changement de route.
+  const [open, setOpen] = useState(false)
+  useEffect(() => {
+    setOpen(false)
+  }, [pathname])
 
   const renderItem = (item: NavItem) => {
     const active = isActive(pathname, item)
@@ -105,28 +113,67 @@ export function AdminSidebar() {
     )
   }
 
-  return (
-    <aside className="w-60 shrink-0 border-e border-border bg-card text-card-foreground">
-      <nav className="flex flex-col gap-4 p-3">
-        {renderItem(DASHBOARD)}
+  // Corps de navigation partagé (sidebar desktop + drawer mobile) — source unique.
+  const navBody = (
+    <nav className="flex flex-col gap-4 p-3">
+      {renderItem(DASHBOARD)}
 
-        {AXES.map((axis) => (
-          <div key={axis.title} className="flex flex-col gap-1">
-            <p className="px-3 pt-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-              {axis.title}
-            </p>
-            {axis.items.map(renderItem)}
-          </div>
-        ))}
-
-        {/* Conformité : pas de page détail, synthèse sur le tableau de bord (D-18). */}
-        <div className="flex flex-col gap-1">
+      {AXES.map((axis) => (
+        <div key={axis.title} className="flex flex-col gap-1">
           <p className="px-3 pt-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-            Conformité
+            {axis.title}
           </p>
-          <p className="px-3 text-xs text-muted-foreground">Synthèse sur le tableau de bord.</p>
+          {axis.items.map(renderItem)}
         </div>
-      </nav>
-    </aside>
+      ))}
+
+      {/* Conformité : pas de page détail, synthèse sur le tableau de bord (D-18). */}
+      <div className="flex flex-col gap-1">
+        <p className="px-3 pt-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+          Conformité
+        </p>
+        <p className="px-3 text-xs text-muted-foreground">Synthèse sur le tableau de bord.</p>
+      </div>
+    </nav>
+  )
+
+  return (
+    <>
+      {/* Sidebar persistante (desktop uniquement). */}
+      <aside className="hidden w-60 shrink-0 border-e border-border bg-card text-card-foreground md:block">
+        {navBody}
+      </aside>
+
+      {/* Barre supérieure mobile : bouton ☰ ouvrant le drawer. Fixe (hors flux). */}
+      <div className="fixed inset-x-0 top-0 z-40 flex h-14 items-center gap-2 border-b border-border bg-card px-3 md:hidden">
+        <button
+          type="button"
+          onClick={() => setOpen(true)}
+          aria-haspopup="dialog"
+          aria-expanded={open}
+          aria-label={t('nav.dashboard')}
+          className="flex size-10 items-center justify-center rounded-md text-muted-foreground hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        >
+          <Menu size={20} aria-hidden="true" />
+        </button>
+        <span className="text-sm font-semibold">Admin</span>
+      </div>
+
+      {/* Drawer de navigation (mobile). */}
+      <DialogPrimitive.Root open={open} onOpenChange={setOpen}>
+        <DialogPrimitive.Portal>
+          <DialogPrimitive.Overlay className="fixed inset-0 z-40 bg-black/40 duration-150 data-open:animate-in data-open:fade-in-0 data-closed:animate-out data-closed:fade-out-0 md:hidden" />
+          <DialogPrimitive.Content
+            aria-label="Navigation admin"
+            className="fixed inset-y-0 start-0 z-50 flex w-72 max-w-[85%] flex-col overflow-y-auto border-e border-border bg-card text-card-foreground shadow-lg duration-150 outline-none data-open:animate-in data-open:fade-in-0 data-closed:animate-out data-closed:fade-out-0 md:hidden"
+          >
+            <DialogPrimitive.Title className="px-3 pt-3 text-sm font-semibold">
+              Admin
+            </DialogPrimitive.Title>
+            {navBody}
+          </DialogPrimitive.Content>
+        </DialogPrimitive.Portal>
+      </DialogPrimitive.Root>
+    </>
   )
 }
