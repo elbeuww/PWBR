@@ -75,10 +75,18 @@ export async function fetchTwelveDataTimeSeries(
             `Twelve Data ${tdSymbol} ${tdInterval}: HTTP ${res.status} ${res.statusText}`,
           )
           if (res.status === 429) {
+            // rate limit → retryable : respecter Retry-After.
             const retryAfterSec = Number(res.headers.get('retry-after') ?? 0)
             if (Number.isFinite(retryAfterSec) && retryAfterSec > 0) {
               ;(err as Error & { retryAfterMs?: number }).retryAfterMs = retryAfterSec * 1000
             }
+            throw err
+          }
+          // 4xx (ex 404 instrument non couvert) = erreur client définitive → non-retryable
+          // (AbortError) : inutile de gaspiller le quota 8/min à ré-essayer (T-1ib-03).
+          // 5xx = transitoire → retryable.
+          if (res.status >= 400 && res.status < 500) {
+            throw new AbortError(err)
           }
           throw err
         }
