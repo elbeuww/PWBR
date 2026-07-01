@@ -41,7 +41,7 @@ export function MobileNav() {
       {/* Bottom-bar fixe (mobile uniquement). */}
       <nav
         aria-label={t('bottomLabel')}
-        className="fixed inset-inline-0 bottom-0 z-30 flex items-stretch border-t border-[var(--border)] bg-[var(--card)] md:hidden"
+        className="fixed inset-x-0 bottom-0 z-30 flex items-stretch border-t border-[var(--border)] bg-[var(--card)] md:hidden"
       >
         {PRIMARY_ITEMS.map(({ key, href, Icon }) => {
           const active = isActive(pathname, href)
@@ -81,7 +81,7 @@ export function MobileNav() {
           <DialogPrimitive.Overlay className="fixed inset-0 z-40 bg-black/40 duration-150 data-open:animate-in data-open:fade-in-0 data-closed:animate-out data-closed:fade-out-0 md:hidden" />
           <DialogPrimitive.Content
             aria-label={t('sidebarLabel')}
-            className="fixed inset-block-0 start-0 z-50 flex h-full w-72 max-w-[85%] flex-col border-e border-[var(--border)] bg-[var(--card)] p-4 shadow-lg duration-150 outline-none data-open:animate-in data-open:fade-in-0 data-closed:animate-out data-closed:fade-out-0 md:hidden"
+            className="fixed inset-y-0 start-0 z-50 flex h-full w-72 max-w-[85%] flex-col border-e border-[var(--border)] bg-[var(--card)] p-4 shadow-lg duration-150 outline-none data-open:animate-in data-open:fade-in-0 data-closed:animate-out data-closed:fade-out-0 md:hidden"
           >
             <DialogPrimitive.Title className="px-3 pb-2 font-heading text-sm font-semibold text-[var(--muted-foreground)]">
               {t('sidebarLabel')}
