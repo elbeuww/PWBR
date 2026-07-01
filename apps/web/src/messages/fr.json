@@ -809,13 +809,16 @@
       "affiliation": "Affiliation",
       "parametres": "Paramètres",
       "sidebarLabel": "Navigation principale",
-      "bottomLabel": "Navigation rapide"
+      "bottomLabel": "Navigation rapide",
+      "menu": "Menu",
+      "logout": "Déconnexion"
     },
     "overview": {
       "title": "Cockpit personnel",
       "subscriptionStatus": "Statut de l'abonnement",
       "activeUntil": "Abonnement actif — accès jusqu'au {date}",
       "latestSignals": "Derniers signaux",
+      "viewAllSignals": "Voir tous les signaux",
       "shortcuts": "Raccourcis"
     },
     "suivis": {

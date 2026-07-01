@@ -14,6 +14,7 @@
 import { requireActiveSub } from '../../../lib/auth/gate'
 import { createClient } from '../../../lib/supabase/server'
 import { ExpiryBanner } from '@/components/member/ExpiryBanner'
+import { MobileNav } from '@/components/dash/MobileNav'
 
 export default async function MemberLayout({ children }: { children: React.ReactNode }) {
   const user = await requireActiveSub()
@@ -32,7 +33,10 @@ export default async function MemberLayout({ children }: { children: React.React
   return (
     <>
       <ExpiryBanner currentPeriodEnd={sub?.current_period_end ?? null} />
-      {children}
+      {/* pb pour ne pas masquer le bas de page sous la bottom-bar mobile (fixed). */}
+      <div className="pb-20 md:pb-0">{children}</div>
+      {/* Nav mobile (bottom-bar + drawer) — sinon l'utilisateur est bloqué sur mobile. */}
+      <MobileNav />
     </>
   )
 }
