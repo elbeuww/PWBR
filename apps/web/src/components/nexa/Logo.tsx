@@ -4,55 +4,63 @@ import { cn } from "@/lib/utils"
  * Logo — identité de marque NEXA (BRAND-03, D-06/D-07/D-08).
  *
  * SVG inline STATIQUE authored (jamais d'injection HTML brute — XSS, T-11-XSS) :
- * mark emblème hexagonal portant un glyphe « N », rempli par un dégradé
- * `#03d87f` (green) → `#63279b` (purple).
+ * mark = « N » violet formé de deux traits angulaires, traversé par une flèche
+ * verte montante (up-trend) pointant en haut à droite. Reproduction vectorielle
+ * du logo officiel NEXA fourni (fichiers Logo/Nexa*.jpeg).
  *
- * Exception sanctionnée au var()-only (RESEARCH Pattern 9 / A2) : ces deux hex
- * sont l'identité chromatique FIXE de la marque, indépendante du thème — c'est le
- * SEUL endroit de l'app où un littéral HEX est autorisé hors de la couche 1 des
- * tokens. Tout le reste consomme `var()`.
+ * Exception sanctionnée au var()-only (RESEARCH Pattern 9 / A2) : les deux hex de
+ * marque (#63279b violet, #03d87f green) sont l'identité chromatique FIXE, INDÉPEN-
+ * dante du thème — c'est le SEUL endroit de l'app où un littéral HEX est autorisé
+ * hors de la couche 1 des tokens. Tout le reste consomme `var()`.
  *
  * Le wordmark « NEXA » est rendu en `font-display` (Archivo, Phase 10) bold,
- * majuscules, interlettrage large (D-07). `variant="mark"` = hexagone seul (favicon
- * /footer) ; `variant="full"` = mark + wordmark (header).
- *
- * Chaque instance du dégradé porte un id unique (suffixe `variant`) pour éviter une
- * collision d'`id` si plusieurs `<Logo>` coexistent dans le DOM.
+ * majuscules, interlettrage large (D-07). `variant="mark"` = symbole seul (favicon
+ * /footer) ; `variant="full"` = symbole + wordmark (header).
  */
 interface LogoProps {
   variant?: "full" | "mark"
   className?: string
 }
 
+// Couleurs de marque FIXES (voir note d'exception ci-dessus).
+const BRAND_PURPLE = "#63279b"
+const BRAND_GREEN = "#03d87f"
+
 export function Logo({ variant = "full", className }: LogoProps) {
-  const gradientId = `nexa-grad-${variant}`
   const brandName = "NEXA" // i18n-ignore: nom de marque (autonyme)
 
   const mark = (
     <svg
-      viewBox="0 0 48 48"
+      viewBox="0 0 64 64"
       role="img"
       aria-label={brandName}
       className="block h-7 w-7 shrink-0"
     >
-      <defs>
-        <linearGradient id={gradientId} x1="0" y1="0" x2="48" y2="48" gradientUnits="userSpaceOnUse">
-          <stop offset="0" stopColor="#03d87f" />
-          <stop offset="1" stopColor="#63279b" />
-        </linearGradient>
-      </defs>
-      {/* Emblème hexagonal (D-06). */}
+      {/* « N » violet — deux montants + diagonale (up-trend). */}
       <path
-        d="M24 2 L42 13 L42 35 L24 46 L6 35 L6 13 Z"
+        d="M11 47 L11 17 L37 47 L37 17"
         fill="none"
-        stroke={`url(#${gradientId})`}
-        strokeWidth="3"
+        stroke={BRAND_PURPLE}
+        strokeWidth="6.5"
+        strokeLinecap="round"
         strokeLinejoin="round"
       />
-      {/* Glyphe « N » plein dans l'emblème. */}
+      {/* Flèche verte montante : hampe traversant le N vers le haut-droit. */}
       <path
-        d="M16 34 L16 14 L20 14 L28 27 L28 14 L32 14 L32 34 L28 34 L20 21 L20 34 Z"
-        fill={`url(#${gradientId})`}
+        d="M16 43 L46 16"
+        fill="none"
+        stroke={BRAND_GREEN}
+        strokeWidth="6.5"
+        strokeLinecap="round"
+      />
+      {/* Pointe de flèche (deux barbes ouvertes vers le sud-ouest). */}
+      <path
+        d="M35 18 L46 16 L44 28"
+        fill="none"
+        stroke={BRAND_GREEN}
+        strokeWidth="6.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
       />
     </svg>
   )

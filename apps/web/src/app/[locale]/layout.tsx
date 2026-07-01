@@ -65,8 +65,11 @@ export default async function LocaleLayout({
             {!isHome && (
               <header className="flex h-14 items-center justify-between bg-secondary px-4 md:px-6">
                 {/* D-16 : wordmark NEXA (Logo full) + baseline trilingue (ton sobre vétéran, D-17). */}
+                {/* Logo cliquable → retour accueil (nav globale, Link localisé). */}
                 <div className="flex flex-col">
-                  <Logo variant="full" />
+                  <Link href="/" aria-label={tBaseline('home')} className="w-fit">
+                    <Logo variant="full" />
+                  </Link>
                   <span className="text-xs text-muted-foreground tracking-wide">
                     {tBaseline('text')}
                   </span>
