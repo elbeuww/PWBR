@@ -35,7 +35,8 @@ export default async function AdminLayout({ children }: { children: React.ReactN
           <NextIntlClientProvider locale="fr" messages={frMessages}>
             <div className="flex min-h-screen bg-background text-foreground">
               <AdminSidebar />
-              <div className="min-w-0 flex-1 overflow-x-auto">{children}</div>
+              {/* pt mobile : la barre ☰ est fixe (h-14) → décale le contenu dessous. */}
+              <div className="min-w-0 flex-1 overflow-x-auto pt-14 md:pt-0">{children}</div>
             </div>
             <Toaster />
           </NextIntlClientProvider>
