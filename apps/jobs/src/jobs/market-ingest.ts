@@ -28,7 +28,12 @@ import {
 } from '@app/supabase'
 import type { Json, Database, CandleInsert } from '@app/supabase'
 import { fetchBinanceKlines, parseBinanceKlines } from '@app/data-sources'
-import { fetchOandaCandles, parseOandaCandles } from '@app/data-sources'
+import {
+  fetchTwelveDataTimeSeries,
+  parseTwelveDataTimeSeries,
+  toTwelveDataSymbol,
+  toTwelveDataInterval,
+} from '@app/data-sources'
 
 type Timeframe = keyof typeof TIMEFRAMES
 
@@ -96,7 +101,6 @@ const BINANCE_INTERVAL_MAP: Record<Timeframe, string> = {
 }
 
 const BINANCE_LIMIT = 1000
-const OANDA_MAX_CANDLES = 5000
 
 async function ingestBinance(
   sourceSymbol: string,
@@ -141,56 +145,48 @@ async function ingestBinance(
   return allCandles
 }
 
-// ─── Pagination OANDA ─────────────────────────────────────────────────────────
-
-const OANDA_GRANULARITY_MAP: Record<Timeframe, string> = {
-  H1: 'H1',
-  H4: 'H4',
-  D: 'D',
-}
-
-async function ingestOanda(
+// ─── Twelve Data (forex + or) ─────────────────────────────────────────────────
+//
+// APPROCHE : OANDA remplacé par Twelve Data (token OANDA mort → 401). On CONSERVE
+// broker='oanda' en DB (pas de churn de schéma) ; le dataSource 'oanda' est routé
+// ici vers Twelve Data. Réversible = revert de ce code.
+//
+// TD FREE couvre EUR/USD, GBP/USD, AUD/USD, USD/JPY, XAU/USD. XAG/USD + WTI ne sont
+// PAS couverts (404 Grow/Venture) → désactivés en DB via migration 0022.
+//
+// PAS de pagination : un seul appel (outputsize=5000) couvre le backfill max
+// (2 ans daily ≈730 bougies, 6 mois H1 ≈4320 < 5000) → 1 crédit/(instrument×tf),
+// compatible avec le rate limit FREE 8/min (throttle strict dans le client).
+//
+// NOTE anti look-ahead : TD n'expose PAS de flag `complete` (contrairement à OANDA) ;
+// la bougie EN COURS peut apparaître → on filtre ici `ts < until` (borne haute exclusive).
+// NOTE daily : les bougies daily TD sont datées 00:00 UTC (≠ ancre OANDA 17:00 NY de
+// computeGapFillWindow, inchangée) → nouveaux ts, dédup upsert sûre (clé
+// instrument_id+timeframe+ts), aucun conflit ; forward-only.
+async function ingestTwelveData(
   sourceSymbol: string,
   instrumentId: string,
   tf: Timeframe,
   since: DateTime,
   until: DateTime,
 ): Promise<CandleInsert[]> {
-  const granularity = OANDA_GRANULARITY_MAP[tf]
-  const tfMs = TIMEFRAMES[tf] * 60 * 1000
-  const allCandles: CandleInsert[] = []
+  // Bornes UTC au format SQL attendu par TD (start_date / end_date).
+  const startDate = since.toUTC().toFormat('yyyy-MM-dd HH:mm:ss')
+  const endDate = until.toUTC().toFormat('yyyy-MM-dd HH:mm:ss')
 
-  let currentStart = since
-  while (currentStart.toMillis() < until.toMillis()) {
-    // Fenêtre de page : max OANDA_MAX_CANDLES bougies
-    const pageEnd = DateTime.fromMillis(
-      Math.min(
-        currentStart.toMillis() + OANDA_MAX_CANDLES * tfMs,
-        until.toMillis(),
-      ),
-      { zone: 'utc' },
-    )
+  const raw = await fetchTwelveDataTimeSeries(
+    toTwelveDataSymbol(sourceSymbol),
+    toTwelveDataInterval(tf),
+    startDate,
+    endDate,
+  )
+  const candles = parseTwelveDataTimeSeries(raw, instrumentId, tf)
 
-    const response = await fetchOandaCandles(
-      sourceSymbol,
-      granularity,
-      currentStart.toISO()!,
-      pageEnd.toISO()!,
-    )
-
-    const candles = parseOandaCandles(response, instrumentId, tf)
-    if (candles.length === 0) break
-
-    allCandles.push(...candles)
-
-    // Avancer : includeFirst=false implicite (on part du dernier ts + 1 tf)
-    const lastCandle = candles[candles.length - 1]
-    if (!lastCandle) break
-    const lastTs = DateTime.fromISO(lastCandle.ts, { zone: 'utc' })
-    currentStart = lastTs.plus({ milliseconds: tfMs })
-  }
-
-  return allCandles
+  // Anti look-ahead : ne garder que les bougies strictement AVANT la borne exclusive.
+  const untilMs = until.toMillis()
+  return candles.filter(
+    (c) => DateTime.fromISO(c.ts, { zone: 'utc' }).toMillis() < untilMs,
+  )
 }
 
 // ─── Job principal ────────────────────────────────────────────────────────────
@@ -261,7 +257,7 @@ export async function marketIngest(): Promise<Json> {
         if (dataSource === 'binance') {
           candles = await ingestBinance(sourceSymbol, inst.id, tf, since, until)
         } else {
-          candles = await ingestOanda(sourceSymbol, inst.id, tf, since, until)
+          candles = await ingestTwelveData(sourceSymbol, inst.id, tf, since, until)
         }
 
         // Upsert idempotent (DATA-06)
