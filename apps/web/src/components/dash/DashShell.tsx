@@ -3,10 +3,11 @@
 /**
  * DashShell — chrome de navigation du groupe (dash) (UDASH-04, D-01/D-02).
  *
- * Sidebar latérale persistante en desktop (md:+) + bottom-nav fixe en mobile, 6
- * onglets (vue d'ensemble · signaux suivis · watchlist · abonnement · affiliation ·
- * paramètres) via le namespace i18n `dash.nav.*`. Liens localisés (`Link` de
- * @/i18n/navigation) ; item actif détecté par `usePathname()` (segment-aware).
+ * Sidebar latérale persistante en desktop (md:+) ; en mobile la nav est déléguée à
+ * <MobileNav/> (bottom-bar + drawer, couche partagée avec (member)/(account)). 7
+ * onglets (vue d'ensemble · signaux · suivis · watchlist · abonnement · affiliation ·
+ * paramètres) via le namespace i18n `dash.nav.*` et le modèle partagé `./navItems`.
+ * Liens localisés (`Link` de @/i18n/navigation) ; item actif via `usePathname()`.
  *
  * D-01 (P16) : AUCUN halo lumineux (néon) sur le chrome de navigation — l'item actif
  * = accent `--primary` en fill/underline SUBTIL (lisibilité d'abord, Tier App).
@@ -18,50 +19,10 @@
  *
  * lucide-react est résolu dans apps/web (UI-SPEC iconLibrary lucide) → icônes lucide.
  */
-import type { ComponentType } from 'react'
 import { useTranslations } from 'next-intl'
 import { Link, usePathname } from '@/i18n/navigation'
-import {
-  LayoutDashboard,
-  Activity,
-  Star,
-  CreditCard,
-  Share2,
-  Settings,
-} from 'lucide-react'
-
-interface NavItem {
-  /** Clé de label sous `dash.nav.*`. */
-  key: string
-  /** Chemin localisé (sans préfixe de locale — géré par Link). */
-  href: string
-  Icon: ComponentType<{ className?: string; 'aria-hidden'?: boolean }>
-}
-
-// 6 onglets (UI-SPEC Surfaces & Interaction Contracts). L'onglet « signaux » pointe
-// sur la vue Suivis ; Historique est une sous-vue interne (plan aval).
-const NAV_ITEMS: readonly NavItem[] = [
-  { key: 'overview', href: '/dashboard', Icon: LayoutDashboard },
-  { key: 'suivis', href: '/dashboard/suivis', Icon: Activity },
-  { key: 'watchlist', href: '/dashboard/watchlist', Icon: Star },
-  { key: 'abonnement', href: '/dashboard/abonnement', Icon: CreditCard },
-  { key: 'affiliation', href: '/dashboard/affiliation', Icon: Share2 },
-  { key: 'parametres', href: '/dashboard/parametres', Icon: Settings },
-]
-
-/**
- * Actif si la route courante correspond à l'onglet. La vue d'ensemble (`/dashboard`)
- * exige une correspondance EXACTE (sinon elle resterait active sur toutes les
- * sous-routes) ; les autres acceptent leurs sous-chemins.
- */
-function isActive(pathname: string, href: string): boolean {
-  if (href === '/dashboard') return pathname === href
-  // Historique is a sub-view of Suivis (D-19-02-A) — treat as active when on either.
-  if (href === '/dashboard/suivis') {
-    return pathname === href || pathname.startsWith(`${href}/`) || pathname === '/dashboard/historique'
-  }
-  return pathname === href || pathname.startsWith(`${href}/`)
-}
+import { NAV_ITEMS, isActive } from './navItems'
+import { MobileNav } from './MobileNav'
 
 export function DashShell({ children }: { children: React.ReactNode }) {
   const t = useTranslations('dash.nav')
@@ -100,32 +61,8 @@ export function DashShell({ children }: { children: React.ReactNode }) {
         <main className="flex-1">{children}</main>
       </div>
 
-      {/* Bottom-nav fixe (mobile). */}
-      <nav
-        aria-label={t('bottomLabel')}
-        className="fixed inset-inline-0 bottom-0 z-20 flex items-stretch border-t border-[var(--border)] bg-[var(--card)] md:hidden"
-      >
-        {NAV_ITEMS.map(({ key, href, Icon }) => {
-          const active = isActive(pathname, href)
-          return (
-            <Link
-              key={key}
-              href={href}
-              aria-current={active ? 'page' : undefined}
-              className={[
-                'flex min-h-11 min-w-11 flex-1 flex-col items-center justify-center gap-1 px-1 py-2 text-xs',
-                'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[var(--ring)]',
-                active
-                  ? 'font-medium text-[var(--primary)]'
-                  : 'text-[var(--muted-foreground)]',
-              ].join(' ')}
-            >
-              <Icon className="size-5 shrink-0" aria-hidden={true} />
-              <span className="truncate">{t(key)}</span>
-            </Link>
-          )
-        })}
-      </nav>
+      {/* Bottom-bar + drawer (mobile) — couche partagée avec (member)/(account). */}
+      <MobileNav />
     </div>
   )
 }

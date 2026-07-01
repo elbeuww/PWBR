@@ -15,6 +15,7 @@
  */
 import { requireUser } from '../../../lib/auth/gate'
 import { Toaster } from '@/components/ui/sonner'
+import { MobileNav } from '@/components/dash/MobileNav'
 
 export default async function AccountLayout({ children }: { children: React.ReactNode }) {
   await requireUser()
@@ -22,7 +23,10 @@ export default async function AccountLayout({ children }: { children: React.Reac
   // émettent des toasts sonner (succès/erreur) sur le parcours d'achat.
   return (
     <>
-      {children}
+      {/* pb pour ne pas masquer le bas de page sous la bottom-bar mobile (fixed). */}
+      <div className="pb-20 md:pb-0">{children}</div>
+      {/* Nav mobile (bottom-bar + drawer) — sinon l'utilisateur est bloqué sur mobile. */}
+      <MobileNav />
       <Toaster />
     </>
   )

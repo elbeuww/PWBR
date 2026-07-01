@@ -573,13 +573,16 @@
       "affiliation": "Affiliation",
       "parametres": "Settings",
       "sidebarLabel": "Primary navigation",
-      "bottomLabel": "Quick navigation"
+      "bottomLabel": "Quick navigation",
+      "menu": "Menu",
+      "logout": "Log out"
     },
     "overview": {
       "title": "Personal cockpit",
       "subscriptionStatus": "Subscription status",
       "activeUntil": "Subscription active — access until {date}",
       "latestSignals": "Latest signals",
+      "viewAllSignals": "View all signals",
       "shortcuts": "Shortcuts"
     },
     "suivis": {

@@ -573,13 +573,16 @@
       "affiliation": "الإحالة",
       "parametres": "الإعدادات",
       "sidebarLabel": "التنقل الرئيسي",
-      "bottomLabel": "التنقل السريع"
+      "bottomLabel": "التنقل السريع",
+      "menu": "القائمة",
+      "logout": "تسجيل الخروج"
     },
     "overview": {
       "title": "لوحة القيادة الشخصية",
       "subscriptionStatus": "حالة الاشتراك",
       "activeUntil": "الاشتراك نشط — الوصول حتى {date}",
       "latestSignals": "أحدث الإشارات",
+      "viewAllSignals": "عرض كل الإشارات",
       "shortcuts": "اختصارات"
     },
     "suivis": {

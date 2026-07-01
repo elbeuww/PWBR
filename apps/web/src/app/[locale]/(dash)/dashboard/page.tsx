@@ -127,6 +127,17 @@ export default async function DashOverviewPage({ params }: OverviewPageProps) {
             </div>
           </QueryProvider>
         )}
+        {/* Accès à la liste COMPLÈTE des signaux actifs (l'overview n'en montre que 4). */}
+        {!signalsError && latestSignals.length > 0 ? (
+          <div className="mt-4">
+            <Link
+              href="/dashboard/signaux"
+              className="inline-flex min-h-11 items-center rounded-md text-sm font-semibold text-primary outline-none hover:underline focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+            >
+              {t('overview.viewAllSignals')}
+            </Link>
+          </div>
+        ) : null}
       </section>
 
       {/* 3. Raccourcis (D-08) — watchlist · paramètres · affiliation conditionnelle */}
